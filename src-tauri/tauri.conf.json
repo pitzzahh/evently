@@ -47,10 +47,9 @@
       "icons/icon.ico"
     ],
     "externalBin": [
-      "binaries/pocketbase_darwin_amd64",
-      "binaries/pocketbase_darwin_arm64",
-      "binaries/pocketbase_linux_amd64",
-      "binaries/pocketbase_windows_amd64.exe"
+      "/binaries/pocketbase-aarch64-apple-darwin",
+      "/binaries/pocketbase-x86_64-unknown-linux-gnu",
+      "/binaries/pocketbase-x86_64-pc-windows-msvc.exe"
     ]
   },
   "plugins": {

@@ -21,6 +21,7 @@ fn get_exe_path() -> PathBuf {
 #[tauri::command]
 async fn create_pocketbase_superuser(app: tauri::AppHandle, email: String, password: String) {
     let os = env::consts::OS;
+    println!("OS: {}", os);
     let binary_name = match os {
         "windows" => "pocketbase_windows_amd64.exe",
         "macos" => {
