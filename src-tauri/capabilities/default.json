@@ -6,6 +6,43 @@
     "main"
   ],
   "permissions": [
-    "core:default"
-  ]
+    "core:default",
+    {
+      "identifier": "shell:allow-execute",
+      "allow": [
+        {
+          "name": "pocketbase_darwin_amd64",
+          "sidecar": true
+        }
+      ]
+    },
+    {
+      "identifier": "shell:allow-execute",
+      "allow": [
+        {
+          "name": "pocketbase_darwin_arm64",
+          "sidecar": true
+        }
+      ]
+    },
+    {
+      "identifier": "shell:allow-execute",
+      "allow": [
+        {
+          "name": "pocketbase_linux_amd64",
+          "sidecar": true
+        }
+      ]
+    },
+    {
+      "identifier": "shell:allow-execute",
+      "allow": [
+        {
+          "name": "pocketbase_windows_amd64.exe",
+          "sidecar": true
+        }
+      ]
+    }
+  ],
+  "shell:allow-open"
 }
