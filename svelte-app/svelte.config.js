@@ -6,12 +6,14 @@ import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 const config = {
 	preprocess: [vitePreprocess(), mdsvex()],
 	kit: {
-		adapter: adapter(),
+		adapter: adapter({
+			fallback: 'index.html',
+		}),
+		paths: {
+			base: ''
+		},
 		router: {
 			type: 'hash'
-		},
-		output: {
-			bundleStrategy: 'inline'
 		},
 		csp: {
 			directives: {
