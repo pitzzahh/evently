@@ -10,6 +10,9 @@ const config = {
 		router: {
 			type: 'hash'
 		},
+		output: {
+			bundleStrategy: 'inline'
+		},
 		csp: {
 			directives: {
 				"default-src": ["*", "unsafe-inline"],
