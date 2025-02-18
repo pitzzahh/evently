@@ -3,6 +3,7 @@
 
 use std::env;
 use tauri_plugin_shell::ShellExt;
+use std::path::{PathBuf};
 
 #[tauri::command]
 fn get_env_var(key: String) -> String {
