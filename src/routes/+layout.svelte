@@ -1,11 +1,30 @@
 <script lang="ts">
-	import "../app.css";
-	import { ModeWatcher } from "mode-watcher";
-	import AppSidebar from "@/components/app-sidebar.svelte";
-	import * as Breadcrumb from "@/components/ui/breadcrumb/index.js";
-	import { Separator } from "@/components/ui/separator/index.js";
-	import * as Sidebar from "@/components/ui/sidebar/index.js";
+	import '../app.css';
+	import { ModeWatcher } from 'mode-watcher';
+	import AppSidebar from '@/components/app-sidebar.svelte';
+	import * as Breadcrumb from '@/components/ui/breadcrumb/index.js';
+	import { Separator } from '@/components/ui/separator/index.js';
+	import * as Sidebar from '@/components/ui/sidebar/index.js';
+	import { warn, debug, trace, info, error } from '@tauri-apps/plugin-log';
+
 	let { children } = $props();
+
+	function forwardConsole(
+		fnName: 'log' | 'debug' | 'info' | 'warn' | 'error',
+		logger: (message: string) => Promise<void>
+	) {
+		const original = console[fnName];
+		console[fnName] = (message) => {
+			original(message);
+			logger(message);
+		};
+	}
+
+	forwardConsole('log', trace);
+	forwardConsole('debug', debug);
+	forwardConsole('info', info);
+	forwardConsole('warn', warn);
+	forwardConsole('error', error);
 </script>
 
 <ModeWatcher />
@@ -21,9 +40,7 @@
 				<Breadcrumb.Root>
 					<Breadcrumb.List>
 						<Breadcrumb.Item class="hidden md:block">
-							<Breadcrumb.Link href="#"
-								>Building Your Application</Breadcrumb.Link
-							>
+							<Breadcrumb.Link href="#">Building Your Application</Breadcrumb.Link>
 						</Breadcrumb.Item>
 						<Breadcrumb.Separator class="hidden md:block" />
 						<Breadcrumb.Item>
