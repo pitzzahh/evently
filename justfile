@@ -9,7 +9,7 @@ default:
 install:
 	concurrently "cd svelte-app && bun install --force" "cd electron-app && bun install --force"
 
-dev: 
+dev: gen-types
   concurrently "cd svelte-app && bun run dev" "cd electron-app && bun run dev"
 
 dev-frontend:
@@ -36,3 +36,6 @@ move-svelte:
 	if (Test-Path "electron-app\out\renderer") { Remove-Item -Recurse -Force "electron-app\out\renderer" }; 
 	New-Item -ItemType Directory -Force -Path "electron-app\out\renderer" | Out-Null; 
 	Copy-Item -Path "svelte-app\build\*" -Destination "electron-app\out\renderer" -Recurse
+
+gen-types:
+	concurrently "cd electron-app && npx pocketbase-typegen --db ./db/pb_data/data.db --out ../svelte-app/src/lib/types/pb-types.ts"

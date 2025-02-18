@@ -1,6 +1,6 @@
 import PocketBase from 'pocketbase'
-
-const pb = new PocketBase(import.meta.env.VITE_POCKETBASE_INSTANCE)
+import type { TypedPocketBase } from "@/types/pb-types"
+const pb = new PocketBase(import.meta.env.VITE_POCKETBASE_INSTANCE) as TypedPocketBase
 
 export async function getAuth() {
   await pb.collection('_superusers').authWithPassword(import.meta.env.VITE_ADMIN_EMAIL, import.meta.env.VITE_ADMIN_PASSWORD)
