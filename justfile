@@ -9,8 +9,8 @@ default:
 install:
 	concurrently "cd svelte-app && bun install --force" "cd electron-app && bun install --force"
 
-dev: gen-types
-  concurrently "cd svelte-app && bun run dev" "cd electron-app && bun run dev"
+dev:
+  concurrently "cd svelte-app && bun run dev" "cd electron-app && bun run dev" 
 
 dev-frontend:
 	concurrently "cd svelte-app && bun run dev"

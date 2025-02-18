@@ -3,6 +3,10 @@ import type { TypedPocketBase } from "@/types/pb-types"
 const pb = new PocketBase(import.meta.env.VITE_POCKETBASE_INSTANCE) as TypedPocketBase
 
 export async function getAuth() {
+  console.log({
+    email: import.meta.env.VITE_ADMIN_EMAIL,
+    password: import.meta.env.VITE_ADMIN_PASSWORD
+  })
   await pb.collection('_superusers').authWithPassword(import.meta.env.VITE_ADMIN_EMAIL, import.meta.env.VITE_ADMIN_PASSWORD)
   console.log("Logged in to Pocket client: ", pb.authStore.isValid)
 }
