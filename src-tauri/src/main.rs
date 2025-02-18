@@ -2,7 +2,6 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use std::env;
-use tauri_plugin_shell::ShellExt;
 use std::path::{PathBuf};
 
 #[tauri::command]
@@ -46,7 +45,6 @@ fn main() {
         )
         .plugin(tauri_plugin_updater::Builder::new().build())
         .invoke_handler(tauri::generate_handler![
-            create_pocketbase_superuser,
             get_env_var,
             get_exe_path
         ])
