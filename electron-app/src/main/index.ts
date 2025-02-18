@@ -70,11 +70,10 @@ function createAdminAccount() {
     }
     const command = is.dev ? `${pocketbaseDevPath} superuser create ${ADMIN_EMAIL} ${ADMIN_PASS}` : `${pocketbaseProdPath} superuser create ${ADMIN_EMAIL} ${ADMIN_PASS}`
 
-    console.log(`Executing: ${command}`);
     if (is.dev) {
+      console.log(`Executing: ${command}`);
       createAdmin = spawn(command)
     } else {
-      console.log(`Executing: ${pocketbaseProdPath} superuser create ${ADMIN_EMAIL} ${ADMIN_PASS}`);
       createAdmin = spawn(command)
     }
     if (createAdmin.stdout) {
