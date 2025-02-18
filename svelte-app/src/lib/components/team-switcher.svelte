@@ -28,7 +28,7 @@
 						>
 							<activeTeam.logo class="size-4" />
 						</div>
-						<div class="grid flex-1 text-left text-sm leading-tight">
+						<div class="flex-1 text-left text-sm leading-tight grid">
 							<span class="truncate font-semibold">
 								{activeTeam.name}
 							</span>
