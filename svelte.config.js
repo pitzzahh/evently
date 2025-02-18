@@ -7,9 +7,6 @@ const config = {
 	preprocess: [vitePreprocess(), mdsvex()],
 	kit: {
 		adapter: adapter(),
-		router: {
-			type: 'hash'
-		},
 		output: {
 			bundleStrategy: 'inline'
 		},
