@@ -77,8 +77,8 @@ function createAdminAccount() {
       createAdmin = spawn(command)
     }
     if (createAdmin.stdout) {
-      createAdmin.stdout.on('data', () => {
-        console.log('Create admin PocketBase account if not already exist.')
+      createAdmin.stdout.on('data', (d) => {
+        console.log('Create admin PocketBase account if not already exist.', d)
       })
     }
 
