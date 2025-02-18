@@ -15,12 +15,10 @@ const config = {
 		},
 		csp: {
 			directives: {
-				'default-src': ['self', 'unsafe-inline'],
-				'script-src': ['self', 'unsafe-inline'],
-				'style-src': ['self', 'unsafe-inline'],
-				'img-src': ['self', 'data:', 'blob:'],
-				'font-src': ['self']
-			}
+				"default-src": ["*", "unsafe-inline"],
+				"style-src": ["self", "unsafe-inline"],
+				'img-src': ['self', 'githubusercontent.com', '*.githubusercontent.com', 'data:',]
+			},
 		},
 		alias: {
 			"@/*": "./src/lib/*",
