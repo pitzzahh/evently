@@ -56,24 +56,25 @@ function createWindow(): void {
   }
 }
 
-
-
 function createAdminAccount() {
   return new Promise((resolve, reject) => {
     let createAdmin: ChildProcess | null
     //@ts-ignore
     const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL;
     //@ts-ignore
-    const ADMIN_PASS = import.meta.env.VITE_ADMIN_PASS;
-    if (is.dev) {
-      createAdmin = spawn(pocketbaseDevPath, ['superuser', 'upsert', ADMIN_EMAIL, ADMIN_PASS])
-    } else {
-      createAdmin = spawn(pocketbaseProdPath, ['superuser', 'upsert', ADMIN_EMAIL, ADMIN_PASS])
+    const ADMIN_PASS = import.meta.env.VITE_ADMIN_PASSWORD;
+    if (!ADMIN_EMAIL || !ADMIN_PASS) {
+      return reject(new Error('Admin email or password not set'))
     }
+    const pocketbasePath = is.dev ? pocketbaseDevPath : pocketbaseProdPath;
+    const args = ['superuser', 'create', ADMIN_EMAIL, ADMIN_PASS];
+
+    console.log(`Executing: ${pocketbasePath} ${args.join(' ')}`);
+    createAdmin = spawn(pocketbasePath, args);
 
     if (createAdmin.stdout) {
-      createAdmin.stdout.on('data', () => {
-        console.log('Create admin PocketBase account if not already exist.')
+      createAdmin.stdout.on('data', (d) => {
+        console.log('Create admin PocketBase account if not already exist.', d.toString())
       })
     }
 
