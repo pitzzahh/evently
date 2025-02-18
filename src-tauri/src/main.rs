@@ -18,34 +18,6 @@ fn get_exe_path() -> PathBuf {
         .to_path_buf()
 }
 
-#[tauri::command]
-async fn create_pocketbase_superuser(app: tauri::AppHandle, email: String, password: String) {
-    let os = env::consts::OS;
-    println!("OS: {}", os);
-    let binary_name = match os {
-        "windows" => "pocketbase_windows_amd64.exe",
-        "macos" => {
-            if cfg!(target_arch = "aarch64") {
-                "pocketbase_darwin_arm64"
-            } else {
-                "pocketbase_darwin_amd64"
-            }
-        }
-        "linux" => "pocketbase_linux_amd64",
-        _ => panic!("Unsupported OS"),
-    };
-
-    let sidecar_command = app.shell().sidecar(binary_name).unwrap().args([
-        "superuser",
-        "create",
-        "--email",
-        &email,
-        "--password",
-        &password,
-    ]);
-    let (mut _rx, mut _child) = sidecar_command.spawn().unwrap();
-}
-
 fn main() {
     dotenv::from_read(include_str!("../../.env").as_bytes())
         .unwrap()
@@ -71,29 +43,12 @@ fn main() {
                 .timezone_strategy(tauri_plugin_log::TimezoneStrategy::UseLocal)
                 .build(),
         )
-        .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .invoke_handler(tauri::generate_handler![
             create_pocketbase_superuser,
             get_env_var,
             get_exe_path
         ])
-        .setup(|app| {
-            // Check if it's the first run and call the create_pocketbase_superuser command
-            let first_run = true; // Replace with actual first run check logic
-            if first_run {
-                let app_handle = app.handle();
-                tauri::async_runtime::spawn(async move {
-                    create_pocketbase_superuser(
-                        app_handle,
-                        "admin@pocketbase.com".into(),
-                        "12345678".into(),
-                    )
-                    .await;
-                });
-            }
-            Ok(())
-        })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

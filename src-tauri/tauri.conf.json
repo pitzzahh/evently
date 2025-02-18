@@ -47,9 +47,7 @@
       "icons/icon.ico"
     ],
     "externalBin": [
-      "/binaries/pocketbase-aarch64-apple-darwin",
-      "/binaries/pocketbase-x86_64-unknown-linux-gnu",
-      "/binaries/pocketbase-x86_64-pc-windows-msvc.exe"
+      "binaries/pocketbase"
     ]
   },
   "plugins": {

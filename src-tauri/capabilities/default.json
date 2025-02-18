@@ -16,26 +16,9 @@
       "identifier": "shell:allow-execute",
       "allow": [
         {
-          "name": "pocketbase-aarch64-apple-darwin",
-          "sidecar": true
-        }
-      ]
-    },
-    {
-      "identifier": "shell:allow-execute",
-      "allow": [
-        {
-          "name": "pocketbase-x86_64-unknown-linux-gnu",
-          "sidecar": true
-        }
-      ]
-    },
-    {
-      "identifier": "shell:allow-execute",
-      "allow": [
-        {
-          "name": "pocketbase-x86_64-pc-windows-msvc.exe",
-          "sidecar": true
+          "name": "pocketbase",
+          "sidecar": true,
+          "args": true
         }
       ]
     },
