@@ -3,6 +3,7 @@ import { getEnv } from "@/utils/invokes";
 import { error } from "@sveltejs/kit";
 
 export async function load() {
+  console.log('page.ts load')
   const email = await getEnv('ADMIN_EMAIL');
   const pass = await getEnv('ADMIN_PASS');
   console.log(`ADMIN_EMAIL: ${email}\nADMIN_PASS: ${pass}`);
