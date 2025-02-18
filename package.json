@@ -1,0 +1,15 @@
+{
+  "name": "sveltekit-electron-pocketbase",
+  "version": "0.0.1",
+  "description": "scaffolding project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "concurrently \"cd svelte-app && bun run dev\" \"cd electron-app && bun run dev\""
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
