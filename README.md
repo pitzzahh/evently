@@ -1,17 +1,38 @@
-# Sveltekit Pocketbase Electron
+# sv
 
-This is a scaffolding project for sveltekit+pocketbase+electron. Most of the instructions came from following this [article](https://www.darricheng.com/posts/developing-an-electron-app-with-sveltekit/). 
+Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
 
-## How to use
+## Creating a project
 
-- Download [Pocketbase](https://pocketbase.io/docs/) and place under `electron-app/db`
-- Install [sd](https://github.com/chmln/sd).
-- Install [Just](https://github.com/casey/just). Then run `just install` and `just dev` in root directory to start.
- 
-The current justfile is made with windows powershell in mind. 
+If you're seeing this, you've probably already done this step. Congrats!
 
+```bash
+# create a new project in the current directory
+npx sv create
 
-## Caveats
+# create a new project in my-app
+npx sv create my-app
+```
 
-- Had to use hash based routing in order to work with electron: https://github.com/sveltejs/kit/issues/11997
-- Had to add 'unsafe-inline' to make CSP work: https://github.com/sveltejs/kit/issues/11747
+## Developing
+
+Once you've created a project and installed dependencies with `npm install` (or `bun install` or `yarn`), start a development server:
+
+```bash
+npm run dev
+
+# or start the server and open the app in a new browser tab
+npm run dev -- --open
+```
+
+## Building
+
+To create a production version of your app:
+
+```bash
+npm run build
+```
+
+You can preview the production build with `npm run preview`.
+
+> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
