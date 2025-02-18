@@ -58,33 +58,33 @@ function createWindow(): void {
 
 
 
-// function createAdminAccount() {
-//   return new Promise((resolve, reject) => {
-//     let createAdmin
-//     if (is.dev) {
-//       createAdmin = spawn(pocketbaseDevPath, ['superuser', 'upsert', adminEmail, adminPass])
-//     } else {
-//       createAdmin = spawn(pocketbaseProdPath, ['superuser', 'upsert', adminEmail, adminPass])
-//     }
+function createAdminAccount() {
+  return new Promise((resolve, reject) => {
+    let createAdmin
+    if (is.dev) {
+      createAdmin = spawn(pocketbaseDevPath, ['superuser', 'upsert', import.meta.env.VITE_ADMIN_EMAIL, import.meta.env.VITE_ADMIN_PASS])
+    } else {
+      createAdmin = spawn(pocketbaseProdPath, ['superuser', 'upsert', import.meta.env.VITE_ADMIN_EMAIL, import.meta.env.VITE_ADMIN_PASS])
+    }
 
-//     createAdmin.stdout.on('data', () => {
-//       console.log('Create admin PocketBase account if not already exist.')
-//     })
+    createAdmin.stdout.on('data', () => {
+      console.log('Create admin PocketBase account if not already exist.')
+    })
 
-//     createAdmin.on('close', (code) => {
-//       if (code === 0) {
-//         console.log('Admin account either exists or created successfully.')
-//         resolve(undefined)
-//       } else {
-//         reject(new Error('Failed to create admin account'))
-//       }
-//     })
+    createAdmin.on('close', (code) => {
+      if (code === 0) {
+        console.log('Admin account either exists or created successfully.')
+        resolve(undefined)
+      } else {
+        reject(new Error('Failed to create admin account'))
+      }
+    })
 
-//     createAdmin.on('error', (err) => {
-//       reject(err)
-//     })
-//   })
-// }
+    createAdmin.on('error', (err) => {
+      reject(err)
+    })
+  })
+}
 
 function runPocketbase() {
 
