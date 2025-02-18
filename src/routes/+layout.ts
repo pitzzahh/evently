@@ -8,6 +8,7 @@ export const ssr = false;
 export async function load() {
   const email = await getEnv('ADMIN_EMAIL');
   const pass = await getEnv('ADMIN_PASS');
+  console.log(`ADMIN_EMAIL: ${email}\nADMIN_PASS: ${pass}`);
   if (!email || !pass) {
     error(404, 'ADMIN_EMAIL or ADMIN_PASS not set in environment variables');
   }
