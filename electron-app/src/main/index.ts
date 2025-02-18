@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
@@ -62,9 +63,12 @@ function createAdminAccount() {
   return new Promise((resolve, reject) => {
     let createAdmin: ChildProcess | null
     //@ts-ignore
-    const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL;
+    const ADMIN_EMAIL = process.env.VITE_ADMIN_EMAIL;
     //@ts-ignore
-    const ADMIN_PASS = import.meta.env.VITE_ADMIN_PASS;
+    const ADMIN_PASS = process.env.VITE_ADMIN_PASS;
+    if (!ADMIN_EMAIL || !ADMIN_PASS) {
+      return reject(new Error('Admin email or password not set'))
+    }
     if (is.dev) {
       createAdmin = spawn(pocketbaseDevPath, ['superuser', 'upsert', ADMIN_EMAIL, ADMIN_PASS])
     } else {
