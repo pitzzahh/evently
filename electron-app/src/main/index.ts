@@ -5,7 +5,7 @@ import icon from '../../resources/icon.png?asset'
 import { ChildProcess, spawn } from 'child_process'
 import { resourcesPath } from 'process'
 
-let pocketBaseProcess
+let pocketBaseProcess: ChildProcess | undefined
 
 const pocketbaseDevPath = join(__dirname, '..', '..', 'db', 'pocketbase')
 const pocketbaseProdPath = join(resourcesPath, 'db', 'pocketbase')
@@ -60,18 +60,24 @@ function createWindow(): void {
 
 function createAdminAccount() {
   return new Promise((resolve, reject) => {
-    let createAdmin
+    let createAdmin: ChildProcess | null
+    //@ts-ignore
+    const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL;
+    //@ts-ignore
+    const ADMIN_PASS = import.meta.env.VITE_ADMIN_PASS;
     if (is.dev) {
-      createAdmin = spawn(pocketbaseDevPath, ['superuser', 'upsert', import.meta.env.VITE_ADMIN_EMAIL, import.meta.env.VITE_ADMIN_PASS])
+      createAdmin = spawn(pocketbaseDevPath, ['superuser', 'upsert', ADMIN_EMAIL, ADMIN_PASS])
     } else {
-      createAdmin = spawn(pocketbaseProdPath, ['superuser', 'upsert', import.meta.env.VITE_ADMIN_EMAIL, import.meta.env.VITE_ADMIN_PASS])
+      createAdmin = spawn(pocketbaseProdPath, ['superuser', 'upsert', ADMIN_EMAIL, ADMIN_PASS])
     }
 
-    createAdmin.stdout.on('data', () => {
-      console.log('Create admin PocketBase account if not already exist.')
-    })
+    if (createAdmin.stdout) {
+      createAdmin.stdout.on('data', () => {
+        console.log('Create admin PocketBase account if not already exist.')
+      })
+    }
 
-    createAdmin.on('close', (code) => {
+    createAdmin.on('close', (code: number | null) => {
       if (code === 0) {
         console.log('Admin account either exists or created successfully.')
         resolve(undefined)
@@ -80,7 +86,7 @@ function createAdminAccount() {
       }
     })
 
-    createAdmin.on('error', (err) => {
+    createAdmin.on('error', (err: Error) => {
       reject(err)
     })
   })
@@ -116,13 +122,11 @@ function runPocketbase() {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
-
-
-  // try {
-  //   await createAdminAccount()
-  // } catch (err) {
-  //   console.log('Error creating admin account: ', err)
-  // }
+  try {
+    await createAdminAccount()
+  } catch (err) {
+    console.log('Error creating admin account: ', err)
+  }
 
   // run pocketbase
   runPocketbase()

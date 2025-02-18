@@ -23,7 +23,7 @@
 		--border: 211 30% 50%;
 		--input: 211 30% 26%;
 		--ring: 211 74.7% 29.4%;
-		--radius: 0.75rem;
+		--radius: 0.5rem;
 		--sidebar-background: 0 0% 98%;
 		--sidebar-foreground: 240 5.3% 26.1%;
 		--sidebar-primary: 240 5.9% 10%;
@@ -54,7 +54,7 @@
 		--border: 211 30% 26%;
 		--input: 211 30% 26%;
 		--ring: 211 74.7% 29.4%;
-		--radius: 0.75rem;
+		--radius: 0.5rem;
 		--sidebar-background: 240 5.9% 10%;
 		--sidebar-foreground: 240 4.8% 95.9%;
 		--sidebar-primary: 224.3 76.3% 48%;
