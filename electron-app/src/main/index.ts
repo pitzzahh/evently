@@ -64,16 +64,19 @@ function createAdminAccount() {
     //@ts-ignore
     const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL;
     //@ts-ignore
-    const ADMIN_PASS = import.meta.env.VITE_ADMIN_PASS;
+    const ADMIN_PASS = import.meta.env.VITE_ADMIN_PASSWORD;
     if (!ADMIN_EMAIL && !ADMIN_PASS) {
       return reject(new Error('Admin email or password not set'))
     }
+    const command = is.dev ? `${pocketbaseDevPath} superuser create ${ADMIN_EMAIL} ${ADMIN_PASS}` : `${pocketbaseProdPath} superuser create ${ADMIN_EMAIL} ${ADMIN_PASS}`
+
+    console.log(`Executing: ${command}`);
     if (is.dev) {
-      createAdmin = spawn(pocketbaseDevPath, ['superuser', 'create', ADMIN_EMAIL, ADMIN_PASS])
+      createAdmin = spawn(command)
     } else {
-      createAdmin = spawn(pocketbaseProdPath, ['superuser', 'create', ADMIN_EMAIL, ADMIN_PASS])
+      console.log(`Executing: ${pocketbaseProdPath} superuser create ${ADMIN_EMAIL} ${ADMIN_PASS}`);
+      createAdmin = spawn(command)
     }
-    console.log({ createAdmin })
     if (createAdmin.stdout) {
       createAdmin.stdout.on('data', () => {
         console.log('Create admin PocketBase account if not already exist.')
