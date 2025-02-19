@@ -56,9 +56,11 @@
 				</DropdownMenu.Label>
 				<DropdownMenu.Separator />
 				<DropdownMenu.Group>
-					<DropdownMenu.Item>
-						<Sparkles />
-						Upgrade to Pro
+					<DropdownMenu.Item onclick={() => newWindow({
+						url: 'http://127.0.0.1:8090'
+					})}>
+						<Sparkles />	
+						Admin Dashboard
 					</DropdownMenu.Item>
 				</DropdownMenu.Group>
 				<DropdownMenu.Separator />
