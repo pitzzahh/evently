@@ -1,139 +1,99 @@
 <script lang="ts">
-	import * as Tabs from '$lib/components/ui/tabs/index.js';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { Input } from '$lib/components/ui/input/index.js';
-	import { LocateIcon, MapPin, Pin, Users, UsersRound } from 'lucide-svelte';
+	import { Button } from '@/components/ui/button';
+	import { Calendar, ChartBar, MapPin, Settings, TrendingUp, UsersRound } from 'lucide-svelte';
 
 	import type { PageData } from './$types';
+	import { cn } from '@/utils';
 
 	let { data }: { data: PageData } = $props();
+	let see_more = $state(false);
+
+	function toggleSeeMore() {
+		see_more = !see_more;
+	}
 </script>
 
-<div>
-	<Tabs.Root value="upcoming">
-		<div class="flex items-center justify-between gap-4">
-			<p class="text-4xl font-semibold">Event</p>
-			<Tabs.List class="grid h-auto w-full max-w-[200px] grid-cols-2">
-				<Tabs.Trigger value="upcoming" class="h-auto text-base">Upcoming</Tabs.Trigger>
-				<Tabs.Trigger value="past" class="h-auto text-base">Past</Tabs.Trigger>
-			</Tabs.List>
+<div class="grid gap-6">
+	<div class="flex items-center justify-between">
+		<h2 class="text-5xl font-semibold">Teacher's Seminar</h2>
+		<div class="flex items-center gap-2">
+			{@render StatusPill('finished')}
+			<button class="rounded-md border p-3"><Settings class="size-5" /></button>
+		</div>
+	</div>
+
+	<div class="grid gap-6 border-b-2 border-dashed pb-6">
+		<div class="flex items-end justify-between">
+			<div class="grid gap-4">
+				<div class="flex gap-5">
+					<div class="flex items-center gap-3">
+						<div class="rounded-md border p-3">
+							<Calendar class="size-5 text-muted-foreground" />
+						</div>
+						<div>
+							<p class="text-base font-medium">Wednesday, November 20, 2024</p>
+							<p class="text-muted-foreground">11:30 PM - 12:30 AM</p>
+						</div>
+					</div>
+					<div class="flex items-center gap-3">
+						<div class="rounded-md border p-3">
+							<UsersRound class="size-5 text-muted-foreground" />
+						</div>
+						<div>
+							<p class="text-base font-medium">100</p>
+							<p class=" text-muted-foreground">Attendees</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="flex items-center gap-3">
+					<div class="rounded-md border p-3"><MapPin class="size-5 text-muted-foreground" /></div>
+					<p class="text-base font-medium">Legazpi City</p>
+				</div>
+			</div>
+			<Button variant="ghost" onclick={toggleSeeMore}>{see_more ? 'See Less' : 'See More'}</Button>
 		</div>
 
-		<Tabs.Content value="upcoming" class="mt-6">
-			<ol class="relative ml-[200px] border-s-2 border-dashed border-gray-400 dark:border-gray-700">
-				{#each [...new Array(10)] as _}
-					<li
-						class="mb-10 ms-4 rounded-xl border bg-white p-4 transition duration-500 ease-in-out hover:border-black/50 dark:bg-[#1C1E20] dark:hover:border-white/50"
-					>
-						<div class="sticky-date absolute -start-[12.5rem] mt-1.5 grid gap-1">
-							<p class=" text-lg font-semibold leading-none">February 24, 2022</p>
-							<p class=" text-lg font-semibold leading-none text-muted-foreground/80">Tuesday</p>
-						</div>
+		<!-- EVENT STATS -->
+		{#if see_more}
+			<div class="grid gap-3 rounded-lg border bg-white p-4 dark:bg-[#1C1E20]">
+				<div class="flex justify-between items-center">
+					<h3 class="text-lg font-semibold">Event Stats</h3>
+					<div class="rounded-md border p-2 bg-primary/20 border-primary">
+						<ChartBar class="size-5 text-primary" />
+					</div>
+				</div>
 
-						<div
-							class="absolute -start-1.5 mt-1.5 h-3 w-3 rounded-full border border-white bg-gray-400 dark:border-gray-900 dark:bg-gray-700"
-						></div>
+				<div class="grid gap-2 text-sm">
+					<div class="flex justify-between">
+						<p class="text-muted-foreground">Total Spots</p>
+						<p>100</p>
+					</div>
+					<div class="flex justify-between">
+						<p class="text-muted-foreground">Spots Remaining</p>
+						<p>95</p>
+					</div>
+					<div class="flex justify-between">
+						<p class="text-muted-foreground">Attended</p>
+						<p>5</p>
+					</div>
+				</div>
+			</div>
+		{/if}
+	</div>
 
-						<div class="flex w-full items-start justify-between">
-							<div class="grid place-content-start gap-1">
-								<p>4:00 PM</p>
-								<h3 class="text-lg font-semibold text-gray-900 dark:text-white">Seminar</h3>
-								<div class="flex items-center gap-1 text-muted-foreground">
-									<MapPin class="size-4" />
-									<p>Legazpi City</p>
-								</div>
-
-								<a
-									href="#"
-									class="mt-3 inline-flex items-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:text-blue-700 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700"
-									>Learn more <svg
-										class="ms-2 h-3 w-3 rtl:rotate-180"
-										aria-hidden="true"
-										xmlns="http://www.w3.org/2000/svg"
-										fill="none"
-										viewBox="0 0 14 10"
-									>
-										<path
-											stroke="currentColor"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M1 5h12m0 0L9 1m4 4L9 9"
-										/>
-									</svg></a
-								>
-							</div>
-
-							<div class="flex flex-col items-center gap-1">
-								<p class="text-4xl font-semibold">100</p>
-
-								<div class="flex items-center gap-2 text-muted-foreground">
-									<UsersRound class="size-4" />
-									<p class="text-sm font-medium">Attendees</p>
-								</div>
-							</div>
-						</div>
-					</li>
-				{/each}
-			</ol>
-		</Tabs.Content>
-		<Tabs.Content value="past" class="mt-6">
-			<ol class="relative ml-[200px] border-s-2 border-dashed border-gray-400 dark:border-gray-700">
-				{#each [...new Array(10)] as _}
-					<li
-						class="mb-10 ms-4 rounded-xl border bg-white p-4 transition duration-500 ease-in-out hover:border-black/50 dark:bg-[#1C1E20] dark:hover:border-white/50"
-					>
-						<div class="sticky-date absolute -start-[12.5rem] mt-1.5 grid gap-1">
-							<p class=" text-lg font-semibold leading-none">February 24, 2022</p>
-							<p class=" text-lg font-semibold leading-none text-muted-foreground/80">Tuesday</p>
-						</div>
-
-						<div
-							class="absolute -start-1.5 mt-1.5 h-3 w-3 rounded-full border border-white bg-gray-400 dark:border-gray-900 dark:bg-gray-700"
-						></div>
-
-						<div class="flex w-full items-start justify-between">
-							<div class="grid place-content-start gap-1">
-								<p>4:00 PM</p>
-								<h3 class="text-lg font-semibold text-gray-900 dark:text-white">Seminar</h3>
-								<div class="flex items-center gap-1 text-muted-foreground">
-									<MapPin class="size-4" />
-									<p>Legazpi City</p>
-								</div>
-
-								<a
-									href="#"
-									class="mt-3 inline-flex items-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:text-blue-700 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700"
-									>Learn more <svg
-										class="ms-2 h-3 w-3 rtl:rotate-180"
-										aria-hidden="true"
-										xmlns="http://www.w3.org/2000/svg"
-										fill="none"
-										viewBox="0 0 14 10"
-									>
-										<path
-											stroke="currentColor"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M1 5h12m0 0L9 1m4 4L9 9"
-										/>
-									</svg></a
-								>
-							</div>
-
-							<div class="flex flex-col items-center gap-1">
-								<p class="text-4xl font-semibold">100</p>
-
-								<div class="flex items-center gap-2 text-muted-foreground">
-									<UsersRound class="size-4" />
-									<p class="text-sm font-medium">Attendees</p>
-								</div>
-							</div>
-						</div>
-					</li>
-				{/each}
-			</ol>
-		</Tabs.Content>
-	</Tabs.Root>
+	<div>
+		<h4 class="text-lg font-medium">Attendees</h4>
+	</div>
 </div>
+
+{#snippet StatusPill(status: 'upcoming' | 'finished' | 'ongoing')}
+	<p
+		class={cn('rounded-lg border px-4 py-3 text-sm', {
+			'border-blue-500 bg-blue-500/20': status === 'upcoming',
+			'border-green-600 bg-green-600/30': status === 'ongoing'
+		})}
+	>
+		{status.charAt(0)?.toUpperCase().concat(status.slice(1))}
+	</p>
+{/snippet}
