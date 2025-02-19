@@ -1,1 +1,1 @@
-<p>Create Event</p>
+<h2 class="text-4xl font-semibold">Create Event</h2>
