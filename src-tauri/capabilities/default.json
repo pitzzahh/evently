@@ -12,8 +12,9 @@
     "core:window:allow-start-dragging",
     "core:window:allow-set-fullscreen",
     "updater:default",
+    "shell:default",
     {
-      "identifier": "shell:allow-execute",
+      "identifier": "shell:default",
       "allow": [
         {
           "name": "binaries/pocketbase",
@@ -21,9 +22,7 @@
           "args": true
         }
       ]
-    },
-    "shell:allow-open",
-    "shell:default"
+    }
   ],
   "platforms": [
     "macOS",
