@@ -6,9 +6,6 @@ const config = {
 	preprocess: [vitePreprocess()],
 	kit: {
 		adapter: adapter(),
-		output: {
-			bundleStrategy: 'inline'
-		},
 		alias: {
 			"@/*": "./src/lib/*",
 		},

@@ -73,13 +73,9 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             get_env_var,
             get_exe_path,
-            run_pocketbase_server
+            run_pocketbase_server,
+            create_superuser
         ])
-        .setup(|app| {
-            tauri::async_runtime::spawn(run_pocketbase_server(app.handle().clone()));
-            tauri::async_runtime::spawn(create_superuser(app.handle().clone()));
-            Ok(())
-        })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
