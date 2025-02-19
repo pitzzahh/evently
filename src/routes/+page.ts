@@ -5,8 +5,8 @@ import { error } from "@sveltejs/kit";
 export async function load() {
   console.log('page.ts load')
   const email = await getEnv('ADMIN_EMAIL');
-  const pass = await getEnv('ADMIN_PASS');
-  console.log(`ADMIN_EMAIL: ${email}\nADMIN_PASS: ${pass}`);
+  const pass = await getEnv('ADMIN_PASSWORD');
+  console.log(`ADMIN_EMAIL: ${email}\nADMIN_PASSWORD: ${pass}`);
   if (!email || !pass) {
     error(404, 'ADMIN_EMAIL or ADMIN_PASS not set in environment variables');
   }
