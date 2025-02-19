@@ -1,5 +1,6 @@
 <script>
-	import { MapPin, UsersRound } from 'lucide-svelte';
+	import { Button } from '@/components/ui/button';
+	import { ChevronRightIcon, MapPin, UsersRound } from 'lucide-svelte';
 </script>
 
 <li
@@ -23,25 +24,13 @@
 				<p>Legazpi City</p>
 			</div>
 
-			<a
+			<Button
 				href="/events/20"
-				class="mt-3 inline-flex items-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:text-blue-700 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700"
-				>Learn more <svg
-					class="ms-2 h-3 w-3 rtl:rotate-180"
-					aria-hidden="true"
-					xmlns="http://www.w3.org/2000/svg"
-					fill="none"
-					viewBox="0 0 14 10"
-				>
-					<path
-						stroke="currentColor"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M1 5h12m0 0L9 1m4 4L9 9"
-					/>
-				</svg></a
+				class="mt-3 inline-flex items-center rounded-lg border px-4 py-2 text-sm font-medium dark:border-white/20 "
 			>
+				See Details
+				<ChevronRightIcon />
+			</Button>
 		</div>
 
 		<div class="flex flex-col items-center gap-1">
