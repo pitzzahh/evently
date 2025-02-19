@@ -24,6 +24,8 @@
       }
     ],
     "security": {
+      "csp": null,
+      "devCsp": null,
       "capabilities": [
         "default"
       ]
