@@ -2,9 +2,10 @@
 	import PocketBase from 'pocketbase';
 
 	let { data } = $props();
+	const { POCKETBASE_INSTANCE } = data;
 	const notes = $state(data.notes);
 
-	const pb = new PocketBase(import.meta.env.VITE_POCKETBASE_INSTANCE);
+	const pb = new PocketBase(POCKETBASE_INSTANCE!);
 
 	$effect(() => {
 		console.log(import.meta.env.VITE_POCKETBASE_INSTANCE);
