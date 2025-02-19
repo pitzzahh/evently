@@ -14,10 +14,10 @@
     "updater:default",
     "shell:default",
     {
-      "identifier": "shell:default",
+      "identifier": "shell:allow-execute",
       "allow": [
         {
-          "name": "binaries/pocketbase",
+          "name": "pocketbase",
           "sidecar": true,
           "args": true
         }
