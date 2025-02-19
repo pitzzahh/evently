@@ -47,9 +47,9 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "externalBin": [
-      "binaries/pocketbase"
-    ]
+    "resources": {
+      "binaries/pocketbase-x86_64-pc-windows-msvc.exe": "binaries/pocketbase-x86_64-pc-windows-msvc.exe"
+    }
   },
   "plugins": {
     "updater": {

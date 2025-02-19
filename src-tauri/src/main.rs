@@ -3,32 +3,6 @@
 
 use std::env;
 use std::path::{PathBuf};
-use tauri_plugin_shell::ShellExt;
-
-#[tauri::command]
-async fn run_pocketbase_server(app: tauri::AppHandle) {
-  let sidecar_command = app
-    .shell()
-    .sidecar("pocketbase")
-    .unwrap()
-    .args(["serve"]);
-  let (mut _rx, mut _child) = sidecar_command.spawn().unwrap();
-}
-
-#[tauri::command]
-async fn create_superuser(app: tauri::AppHandle, email: String, password: String) {
-  let sidecar_command = app
-    .shell()
-    .sidecar("pocketbase")
-    .unwrap()
-    .args([
-      "superuser", 
-      "create", 
-      &email, 
-      &password
-    ]);
-  let (mut _rx, mut _child) = sidecar_command.spawn().unwrap();
-}
 
 #[tauri::command]
 fn get_env_var(key: String) -> String {
@@ -69,12 +43,11 @@ fn main() {
                 .timezone_strategy(tauri_plugin_log::TimezoneStrategy::UseLocal)
                 .build(),
         )
+        .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .invoke_handler(tauri::generate_handler![
             get_env_var,
-            get_exe_path,
-            run_pocketbase_server,
-            create_superuser
+            get_exe_path
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

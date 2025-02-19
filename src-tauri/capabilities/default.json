@@ -7,6 +7,8 @@
   ],
   "permissions": [
     "core:default",
+    "core:window:allow-center",
+    "core:window:allow-create",
     "log:default",
     "process:default",
     "core:window:allow-start-dragging",
@@ -29,8 +31,8 @@
       "identifier": "shell:allow-execute",
       "allow": [
         {
-          "name": "binaries/pocketbase",
-          "sidecar": true,
+          "name": "binaries/pocketbase-x86_64-pc-windows-msvc",
+          "cmd": "cmd",
           "args": true
         }
       ]
