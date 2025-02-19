@@ -2,7 +2,7 @@ import { Command } from '@tauri-apps/plugin-shell';
 
 export async function create_pocketbase_superuser(email: string, pass: string) {
   console.log(`create_pocketbase_superuser email: ${email}`);
-  const command = Command.sidecar('binaries/pocketbase-x86_64-pc-windows-msvc', [
+  const command = Command.create('binaries/pocketbase-x86_64-pc-windows-msvc', [
     'superuser',
     'create',
     email,
@@ -15,7 +15,7 @@ export async function create_pocketbase_superuser(email: string, pass: string) {
 
 export async function run_pocketbase_server() {
   console.log('run_pocketbase_server');
-  const command = Command.sidecar('binaries/pocketbase-x86_64-pc-windows-msvc', [
+  const command = Command.create('binaries/pocketbase-x86_64-pc-windows-msvc', [
     'serve',
   ]);
   console.log(`run_pocketbase_server command: ${JSON.stringify(command, null, 2)}`);

@@ -1,17 +1,36 @@
-import { getCurrentWebview, type WebviewLabel, type WebviewOptions } from "@tauri-apps/api/webview"
-import { WebviewWindow } from '@tauri-apps/api/webviewWindow';
-import type { WindowOptions } from "@tauri-apps/api/window";
+interface WindowOptions {
+  url: string;
+  target?: '_blank' | '_self' | '_parent' | '_top';
+  features?: {
+    toolbar?: boolean;
+    location?: boolean;
+    directories?: boolean;
+    status?: boolean;
+    menubar?: boolean;
+    scrollbars?: boolean;
+    resizable?: boolean;
+    copyhistory?: boolean;
+    width?: number;
+    height?: number;
+  };
+}
 
-export function newWindow(label: WebviewLabel = 'New Window', options?: Omit<WebviewOptions, 'x' | 'y' | 'width' | 'height'> & WindowOptions) {
-  const webView = new WebviewWindow(label, {
-    ...options,
-    parent: getCurrentWebview().window
-  });
-  webView.once('tauri://created', function () {
-    console.log('tauri://created');
-  });
-  webView.once('tauri://error', function (e) {
-    console.error('tauri://error', e);
-  });
-  webView.center();
+export function newWindow(options: WindowOptions) {
+  if (!window) return;
+
+  const features = options.features ?? {};
+  const featureString = Object.entries({
+    toolbar: false,
+    location: false,
+    directories: false,
+    status: false,
+    menubar: false,
+    scrollbars: true,
+    resizable: false,
+    copyhistory: true,
+    width: 900,
+    height: 700,
+    ...features
+  }).map(([key, value]) => `${key}=${value}`).join(', ');
+  window.open(options.url, options.target ?? '_blank', featureString);
 }
