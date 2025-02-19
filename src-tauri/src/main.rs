@@ -24,8 +24,8 @@ async fn create_superuser(app: tauri::AppHandle, email: String, password: String
     .args([
       "superuser", 
       "create", 
-      email, 
-      password
+      &email, 
+      &password
     ]);
   let (mut _rx, mut _child) = sidecar_command.spawn().unwrap();
 }
