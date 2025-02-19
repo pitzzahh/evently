@@ -6,6 +6,19 @@ const config = {
 	preprocess: [vitePreprocess()],
 	kit: {
 		adapter: adapter(),
+		csp: {
+			directives: {
+				"default-src": ["*", "unsafe-inline"],
+				"style-src": ["self", "unsafe-inline"],
+				"img-src": [
+					"self",
+					"githubusercontent.com",
+					"*.githubusercontent.com",
+					"data:"
+				],
+				"connect-src": ["self", "http://127.0.0.1:8090"],
+			},
+		},
 		alias: {
 			"@/*": "./src/lib/*",
 		},
