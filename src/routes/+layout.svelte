@@ -6,6 +6,10 @@
 	import { Separator } from '@/components/ui/separator/index.js';
 	import * as Sidebar from '@/components/ui/sidebar/index.js';
 	import { warn, debug, trace, info, error } from '@tauri-apps/plugin-log';
+	import { getCurrentWindow } from '@tauri-apps/api/window';
+	import { getEnv } from '@/utils/invokes';
+	import { create_pocketbase_superuser, run_pocketbase_server } from '@/utils/db';
+	import { onMount } from 'svelte';
 
 	let { children } = $props();
 
@@ -25,6 +29,21 @@
 	forwardConsole('info', info);
 	forwardConsole('warn', warn);
 	forwardConsole('error', error);
+
+	onMount(() => {
+		const current_window = getCurrentWindow();
+		current_window.once('tauri://created', async () => {
+			console.log('tauri://create');
+			const email = await getEnv('ADMIN_EMAIL');
+			const pass = await getEnv('ADMIN_PASSWORD');
+			console.log(`ADMIN_EMAIL: ${email}\nADMIN_PASSWORD: ${pass}`);
+			if (!email || !pass) {
+				throw new Error('ADMIN_EMAIL and ADMIN_PASSWORD must be set in the environment');
+			}
+			await run_pocketbase_server();
+			await create_pocketbase_superuser(email, pass);
+		});
+	});
 </script>
 
 <ModeWatcher />
