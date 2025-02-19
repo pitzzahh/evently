@@ -16,7 +16,7 @@ const config = {
 					"*.githubusercontent.com",
 					"data:"
 				],
-				"connect-src": ["self", "http://127.0.0.1:8090"],
+				"connect-src": ["self", "http://127.0.0.1:*", "ws://127.0.0.1:*"],
 			},
 		},
 		alias: {
