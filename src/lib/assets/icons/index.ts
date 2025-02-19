@@ -119,7 +119,7 @@ export { default as LoaderCircle } from 'lucide-svelte/icons/loader-circle';
 export { default as Settings2 } from 'lucide-svelte/icons/settings-2';
 export { default as X } from 'lucide-svelte/icons/x';
 
-export { default as home_image } from './home.png';
-export { default as mail_image } from './email.png';
-export { default as phone_image } from './phone.png';
-export { default as www_image } from './www.png';
+// export { default as home_image } from './home.png';
+// export { default as mail_image } from './email.png';
+// export { default as phone_image } from './phone.png';
+// export { default as www_image } from './www.png';

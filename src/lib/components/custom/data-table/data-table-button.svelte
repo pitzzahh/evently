@@ -1,4 +1,4 @@
-<script lang="ts">
+<!-- <script lang="ts">
 	import { Button, type ButtonVariant } from "@/components/ui/button";
 	import * as Tooltip from "@/components/ui/tooltip";
 	import { goto } from "$app/navigation";
@@ -59,4 +59,4 @@
 			</Tooltip.Content>
 		</Tooltip.Root>
 	</Tooltip.Provider>
-{/key}
+{/key} -->
