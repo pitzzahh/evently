@@ -2,10 +2,12 @@
 	import '../app.css';
 	import { ModeWatcher } from 'mode-watcher';
 	import AppSidebar from '@/components/app-sidebar.svelte';
-	import * as Breadcrumb from '@/components/ui/breadcrumb/index.js';
-	import { Separator } from '@/components/ui/separator/index.js';
-	import * as Sidebar from '@/components/ui/sidebar/index.js';
+	// import * as Breadcrumb from '@/components/ui/breadcrumb/index.js';
+	// import { Separator } from '@/components/ui/separator/index.js';
+	// import * as Sidebar from '@/components/ui/sidebar/index.js';
 	import { warn, debug, trace, info, error } from '@tauri-apps/plugin-log';
+	// import { Button } from '@/components/ui/button';
+	import AppNavbar from '@/components/app-navbar.svelte';
 
 	let { children } = $props();
 
@@ -28,30 +30,12 @@
 </script>
 
 <ModeWatcher />
-<Sidebar.Provider>
+<!-- <Sidebar.Provider>
 	<AppSidebar />
-	<Sidebar.Inset>
-		<header
-			class="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12"
-		>
-			<div class="flex items-center gap-2 px-4">
-				<Sidebar.Trigger class="-ml-1" />
-				<Separator orientation="vertical" class="mr-2 h-4" />
-				<Breadcrumb.Root>
-					<Breadcrumb.List>
-						<Breadcrumb.Item class="hidden md:block">
-							<Breadcrumb.Link href="#">Building Your Application</Breadcrumb.Link>
-						</Breadcrumb.Item>
-						<Breadcrumb.Separator class="hidden md:block" />
-						<Breadcrumb.Item>
-							<Breadcrumb.Page>Data Fetching</Breadcrumb.Page>
-						</Breadcrumb.Item>
-					</Breadcrumb.List>
-				</Breadcrumb.Root>
-			</div>
-		</header>
-		<div class="flex flex-1 flex-col gap-4 p-4 pt-0">
-			{@render children()}
-		</div>
-	</Sidebar.Inset>
-</Sidebar.Provider>
+	<Sidebar.Inset> -->
+<AppNavbar />
+<div class="flex size-full justify-center">
+	<div class="flex flex-1 flex-col gap-4 p-4 pt-8 md:max-w-[60%] md:px-0">
+		{@render children()}
+	</div>
+</div>
