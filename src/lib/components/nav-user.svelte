@@ -1,14 +1,15 @@
 <script lang="ts">
-	import * as Avatar from "$lib/components/ui/avatar/index.js";
-	import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
-	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
-	import { useSidebar } from "$lib/components/ui/sidebar/index.js";
-	import BadgeCheck from "lucide-svelte/icons/badge-check";
-	import Bell from "lucide-svelte/icons/bell";
-	import ChevronsUpDown from "lucide-svelte/icons/chevrons-up-down";
-	import CreditCard from "lucide-svelte/icons/credit-card";
-	import LogOut from "lucide-svelte/icons/log-out";
-	import Sparkles from "lucide-svelte/icons/sparkles";
+	import * as Avatar from '@/components/ui/avatar/index.js';
+	import * as DropdownMenu from '@/components/ui/dropdown-menu/index.js';
+	import * as Sidebar from '@/components/ui/sidebar/index.js';
+	import { useSidebar } from '@/components/ui/sidebar/index.js';
+	import { newWindow } from '@/utils/windows';
+	import BadgeCheck from 'lucide-svelte/icons/badge-check';
+	import Bell from 'lucide-svelte/icons/bell';
+	import ChevronsUpDown from 'lucide-svelte/icons/chevrons-up-down';
+	import CreditCard from 'lucide-svelte/icons/credit-card';
+	import LogOut from 'lucide-svelte/icons/log-out';
+	import Sparkles from 'lucide-svelte/icons/sparkles';
 
 	let { user }: { user: { name: string; email: string; avatar: string } } = $props();
 	const sidebar = useSidebar();
@@ -38,7 +39,7 @@
 			</DropdownMenu.Trigger>
 			<DropdownMenu.Content
 				class="w-[--bits-dropdown-menu-anchor-width] min-w-56 rounded-lg"
-				side={sidebar.isMobile ? "bottom" : "right"}
+				side={sidebar.isMobile ? 'bottom' : 'right'}
 				align="end"
 				sideOffset={4}
 			>
@@ -56,10 +57,13 @@
 				</DropdownMenu.Label>
 				<DropdownMenu.Separator />
 				<DropdownMenu.Group>
-					<DropdownMenu.Item onclick={() => newWindow({
-						url: 'http://127.0.0.1:8090'
-					})}>
-						<Sparkles />	
+					<DropdownMenu.Item
+						onclick={() =>
+							newWindow({
+								url: 'http://127.0.0.1:8090'
+							})}
+					>
+						<Sparkles />
 						Admin Dashboard
 					</DropdownMenu.Item>
 				</DropdownMenu.Group>
