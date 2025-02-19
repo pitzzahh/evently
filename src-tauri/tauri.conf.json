@@ -46,9 +46,6 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "resources": [
-      "pb_data"
-    ],
     "externalBin": [
       "binaries/pocketbase"
     ]
