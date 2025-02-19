@@ -59,12 +59,8 @@
 				<DropdownMenu.Group>
 					<DropdownMenu.Item
 						onclick={() =>
-							newWindow({
-								url: 'http://127.0.0.1:8090',
-								height: 800,
-								width: 1000,
-								x: 100,
-								y: 100
+							newWindow('PocketBase Admin Dashboard', {
+								url: 'http://127.0.0.1:8090'
 							})}
 					>
 						<Sparkles />
