@@ -1,7 +1,5 @@
 <script lang="ts">
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
-	import { LocateIcon, MapPin, Pin, Users, UsersRound } from 'lucide-svelte';
-
 	import type { PageData } from './$types';
 	import EventList from './(components)/event-list.svelte';
 
