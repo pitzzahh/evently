@@ -13,7 +13,8 @@ export async function load() {
   await run_pocketbase_server();
   await create_pocketbase_superuser(email, pass);
   return {
-    notes: []
+    notes: [],
+    POCKETBASE_INSTANCE: await getEnv('POCKETBASE_INSTANCE')
   }
 }
 
