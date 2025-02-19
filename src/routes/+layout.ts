@@ -13,5 +13,5 @@ export async function load() {
     error(404, 'ADMIN_EMAIL or ADMIN_PASS not set in environment variables');
   }
   await run_pocketbase_server();
-  await create_pocketbase_superuser();
+  await create_pocketbase_superuser(email, pass);
 }

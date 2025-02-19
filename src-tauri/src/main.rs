@@ -16,7 +16,7 @@ async fn run_pocketbase_server(app: tauri::AppHandle) {
 }
 
 #[tauri::command]
-async fn create_superuser(app: tauri::AppHandle) {
+async fn create_superuser(app: tauri::AppHandle, email: String, password: String) {
   let sidecar_command = app
     .shell()
     .sidecar("pocketbase")
@@ -24,8 +24,8 @@ async fn create_superuser(app: tauri::AppHandle) {
     .args([
       "superuser", 
       "create", 
-      &get_env_var("ADMIN_EMAIL".to_string()), 
-      &get_env_var("ADMIN_PASSWORD".to_string())
+      email, 
+      password
     ]);
   let (mut _rx, mut _child) = sidecar_command.spawn().unwrap();
 }
