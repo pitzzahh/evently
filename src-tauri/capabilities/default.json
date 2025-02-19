@@ -16,7 +16,7 @@
       "identifier": "shell:allow-execute",
       "allow": [
         {
-          "name": "pocketbase",
+          "name": "binaries/pocketbase",
           "sidecar": true,
           "args": true
         }
