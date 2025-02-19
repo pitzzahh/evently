@@ -34,15 +34,19 @@
           "unsafe-inline"
         ],
         "img-src": [
-          "self",
-          "githubusercontent.com",
-          "*.githubusercontent.com",
+          "'self'",
+          "https://githubusercontent.com",
+          "https://*.githubusercontent.com",
           "data:"
         ],
         "connect-src": [
           "self",
           "http://127.0.0.1:*",
-          "ws://127.0.0.1:*"
+          "ws://127.0.0.1:*",
+          "http://ipc.localhost/*",
+          "http://ipc.localhost/run_pocketbase_server",
+          "http://ipc.localhost/create_superuser",
+          "http://ipc.localhost/get_env_var"
         ]
       },
       "capabilities": [
