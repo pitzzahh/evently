@@ -2,7 +2,7 @@
 	import { Button } from './ui/button';
 	import { page } from '$app/state';
 	import { cn } from '@/utils';
-	import { Ticket, Calendar } from 'lucide-svelte';
+	import { Ticket, Calendar, Plus } from 'lucide-svelte';
 	import NavbarTime from './navbar-time.svelte';
 
 	const isActive = (pathname: string) => page.url.pathname === pathname;
@@ -35,7 +35,7 @@
 		</div>
 		<div class="flex items-center gap-4">
 			<NavbarTime />
-			<Button href="/events/create">Create Event</Button>
+			<Button href="/events/create">Create Event <Plus class="size-4" /></Button>
 		</div>
 	</div>
 </header>
