@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { Button } from '@/components/ui/button';
-	import { Calendar, ChartBar, MapPin, Settings, UsersRound } from 'lucide-svelte';
+	import { Calendar, ChartBar, ChevronLeft, MapPin, Settings, UsersRound } from 'lucide-svelte';
 
 	import type { PageData } from './$types';
 	import { cn } from '@/utils';
 	import AttendeesDataTable from '../(components)/attendees-data-table.svelte';
+	import { browser } from '$app/environment';
 
 	let { data }: { data: PageData } = $props();
-	let see_more = $state(false);
+	let see_more = $state(true);
 
 	function toggleSeeMore() {
 		see_more = !see_more;
@@ -16,7 +17,19 @@
 
 <div class="grid gap-6">
 	<div class="flex items-center justify-between">
-		<h2 class="text-5xl font-semibold">Teacher's Seminar</h2>
+		<div class="flex flex-col gap-4">
+			<Button
+				variant="outline"
+				size="icon"
+				onclick={async () => {
+					if (browser) window.history.back();
+				}}
+			>
+				<ChevronLeft class="size-4" />
+			</Button>
+			<h2 class="text-5xl font-semibold">Teacher's Seminar</h2>
+		</div>
+
 		<div class="flex items-center gap-2">
 			{@render StatusPill('finished')}
 			<button class="rounded-md border p-3"><Settings class="size-5" /></button>
