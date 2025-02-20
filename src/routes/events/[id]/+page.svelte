@@ -60,8 +60,8 @@
 			<div class="grid gap-3 rounded-lg border bg-white p-4 dark:bg-[#1C1E20]">
 				<div class="flex items-center justify-between">
 					<h3 class="text-lg font-semibold">Event Stats</h3>
-					<div class="rounded-md border border-primary bg-primary/20 p-2">
-						<ChartBar class="size-5 text-primary" />
+					<div class="rounded-md border border-blue-500 bg-blue-500/20 p-2">
+						<ChartBar class="size-5 text-blue-500" />
 					</div>
 				</div>
 
