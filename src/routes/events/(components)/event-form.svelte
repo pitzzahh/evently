@@ -2,6 +2,15 @@
 	interface Props {
 		event_form: SuperValidated<EventSchema>;
 	}
+
+	export interface EventDateTime {
+		id: string;
+		date: Date;
+		am_start: string;
+		am_end: string;
+		pm_start: string;
+		pm_end: string;
+	}
 </script>
 
 <script lang="ts">
@@ -13,6 +22,7 @@
 	import { Circle, Dot, MapPin, Ticket } from 'lucide-svelte';
 	import { type SuperValidated, type Infer, superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { nanoid } from 'nanoid';
 
 	import CalendarIcon from 'lucide-svelte/icons/calendar';
 	import type { DateRange } from 'bits-ui';
@@ -58,32 +68,28 @@
 					new Date(date_range.start.toString()).getTime()
 			: 0
 	);
-	let difference_in_days = $derived(Math.round(difference_in_time / (1000 * 3600 * 24)) + 1);
-	let event_dates: {
-		date: Date;
-		am_start: string;
-		am_end: string;
-		pm_start: string;
-		pm_end: string;
-	}[] = $state([]);
+	// let difference_in_days = $derived(Math.round(difference_in_time / (1000 * 3600 * 24)) + 1);
+	let event_dates: EventDateTime[] = $state([]);
 
 	function getDatesInRange(start: Date, end: Date): Date[] {
-		const dateArray = [];
+		const date_arr = [];
 		let currentDate = new Date(start);
 
 		while (currentDate <= end) {
-			dateArray.push(new Date(currentDate));
+			date_arr.push(new Date(currentDate));
 			currentDate.setDate(currentDate.getDate() + 1);
+			console.log('dasd');
 		}
 
-		return dateArray;
+		return date_arr;
 	}
 
 	$effect(() => {
 		if (date_range?.start && date_range?.end) {
-			const start_date = new Date(date_range.end.toString());
+			const start_date = new Date(date_range.start.toString());
 			const end_date = new Date(date_range.end.toString());
 			event_dates = getDatesInRange(start_date, end_date).map((date) => ({
+				id: nanoid(),
 				date,
 				am_start: '8:00',
 				am_end: '12:00',
@@ -178,6 +184,7 @@
 					onStartValueChange={(v) => {
 						start_value = v;
 					}}
+					onValueChange={() => {}}
 					numberOfMonths={2}
 				/>
 			</Popover.Content>
@@ -205,7 +212,7 @@
 				<div class="max-h-[400px] overflow-y-auto">
 					<div class="flex flex-col gap-2">
 						{#each event_dates as event_date}
-							<EventTimePicker />
+							<EventTimePicker {event_date} />
 						{/each}
 					</div>
 				</div>
