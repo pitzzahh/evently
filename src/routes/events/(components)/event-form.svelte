@@ -62,12 +62,12 @@
 			current_date.getDate()
 		)
 	});
-	let difference_in_time = $derived(
-		date_range?.start && date_range.end
-			? new Date(date_range.end.toString()).getTime() -
-					new Date(date_range.start.toString()).getTime()
-			: 0
-	);
+	// let difference_in_time = $derived(
+	// 	date_range?.start && date_range.end
+	// 		? new Date(date_range.end.toString()).getTime() -
+	// 				new Date(date_range.start.toString()).getTime()
+	// 		: 0
+	// );
 	// let difference_in_days = $derived(Math.round(difference_in_time / (1000 * 3600 * 24)) + 1);
 	let event_dates: EventDateTime[] = $state([]);
 
@@ -85,9 +85,13 @@
 	}
 
 	$effect(() => {
-		if (date_range?.start && date_range?.end) {
+		if (!date_range?.end && !date_range?.start) {
+			event_dates = [];
+		}
+
+		if (date_range?.start) {
 			const start_date = new Date(date_range.start.toString());
-			const end_date = new Date(date_range.end.toString());
+			const end_date = new Date(date_range.end?.toString() || date_range.start.toString());
 			event_dates = getDatesInRange(start_date, end_date).map((date) => ({
 				id: nanoid(),
 				date,
@@ -184,7 +188,6 @@
 					onStartValueChange={(v) => {
 						start_value = v;
 					}}
-					onValueChange={() => {}}
 					numberOfMonths={2}
 				/>
 			</Popover.Content>
