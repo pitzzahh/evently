@@ -1,6 +1,16 @@
 <script lang="ts">
+	import type { EventDateTime } from './event-form.svelte';
 
-	
+	let { event_date }: { event_date: EventDateTime } = $props();
+	let formatted_date = $derived(formatDate(event_date.date));
+
+	function formatDate(date: Date): string {
+		return date.toLocaleDateString('en-US', {
+			weekday: 'short',
+			month: 'short',
+			day: 'numeric'
+		});
+	}
 </script>
 
 <div class="flex w-full gap-2">
@@ -9,9 +19,17 @@
 
 		<div class="flex w-full flex-col gap-1">
 			<!-- START -->
-			{@render time_period({ title: 'AM Start', date: 'Thu, Feb 20', time: '12:30 PM' })}
+			{@render time_period({
+				title: 'AM Start',
+				date: formatted_date,
+				time: '12:30 PM'
+			})}
 			<!-- END -->
-			{@render time_period({ title: 'AM End', date: 'Thu, Feb 20', time: '12:30 PM' })}
+			{@render time_period({
+				title: 'AM End',
+				date: formatted_date,
+				time: '12:30 PM'
+			})}
 		</div>
 	</div>
 	<div class="flex w-full items-center gap-2 rounded-lg bg-gray-700/10 p-4 dark:bg-white/10">
@@ -19,9 +37,9 @@
 
 		<div class="flex w-full flex-col gap-1">
 			<!-- START -->
-			{@render time_period({ title: 'PM Start', date: 'Thu, Feb 20', time: '12:30 PM' })}
+			{@render time_period({ title: 'PM Start', date: formatted_date, time: '12:30 PM' })}
 			<!-- END -->
-			{@render time_period({ title: 'PM End', date: 'Thu, Feb 20', time: '12:30 PM' })}
+			{@render time_period({ title: 'PM End', date: formatted_date, time: '12:30 PM' })}
 		</div>
 	</div>
 </div>
