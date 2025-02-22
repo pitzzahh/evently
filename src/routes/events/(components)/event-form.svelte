@@ -14,14 +14,84 @@
 	import { type SuperValidated, type Infer, superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 
-	let { event_form }: Props = $props();
+	import CalendarIcon from 'lucide-svelte/icons/calendar';
+	import type { DateRange } from 'bits-ui';
+	import {
+		CalendarDate,
+		DateFormatter,
+		type DateValue,
+		getLocalTimeZone
+	} from '@internationalized/date';
+	import { cn } from '$lib/utils.js';
+	import { buttonVariants } from '$lib/components/ui/button/index.js';
+	import { RangeCalendar } from '$lib/components/ui/range-calendar/index.js';
+	import * as Popover from '$lib/components/ui/popover/index.js';
+	import EventTimePicker from './event-time-picker.svelte';
 
+	let { event_form }: Props = $props();
 	const form = superForm(event_form, {
 		SPA: true,
 		validators: zodClient(eventSchema)
 	});
-
 	const { form: formData, enhance } = form;
+
+	const current_date = new Date();
+	const df = new DateFormatter('en-US', {
+		dateStyle: 'medium'
+	});
+	let start_value = $state<DateValue | undefined>(undefined);
+	let date_range = $state<DateRange | undefined>({
+		start: new CalendarDate(
+			current_date.getFullYear(),
+			current_date.getMonth() + 1,
+			current_date.getDate()
+		),
+		end: new CalendarDate(
+			current_date.getFullYear(),
+			current_date.getMonth() + 1,
+			current_date.getDate()
+		)
+	});
+	let difference_in_time = $derived(
+		date_range?.start && date_range.end
+			? new Date(date_range.end.toString()).getTime() -
+					new Date(date_range.start.toString()).getTime()
+			: 0
+	);
+	let difference_in_days = $derived(Math.round(difference_in_time / (1000 * 3600 * 24)) + 1);
+	let event_dates: {
+		date: Date;
+		am_start: string;
+		am_end: string;
+		pm_start: string;
+		pm_end: string;
+	}[] = $state([]);
+
+	function getDatesInRange(start: Date, end: Date): Date[] {
+		const dateArray = [];
+		let currentDate = new Date(start);
+
+		while (currentDate <= end) {
+			dateArray.push(new Date(currentDate));
+			currentDate.setDate(currentDate.getDate() + 1);
+		}
+
+		return dateArray;
+	}
+
+	$effect(() => {
+		if (date_range?.start && date_range?.end) {
+			const start_date = new Date(date_range.end.toString());
+			const end_date = new Date(date_range.end.toString());
+			event_dates = getDatesInRange(start_date, end_date).map((date) => ({
+				date,
+				am_start: '8:00',
+				am_end: '12:00',
+				pm_start: '1:00',
+				pm_end: '4:00'
+			}));
+		}
+	});
 </script>
 
 <form method="POST" use:enhance class="flex flex-col gap-1">
@@ -75,12 +145,51 @@
 		<Form.FieldErrors />
 	</Form.Field>
 
+	<div class="mb-3 grid gap-2">
+		<p class="text-sm">Event Date</p>
+		<Popover.Root>
+			<Popover.Trigger
+				class={cn(
+					buttonVariants({
+						variant: 'outline',
+						class: 'w-[300px] justify-start text-left font-normal'
+					}),
+					!date_range && 'text-muted-foreground'
+				)}
+			>
+				<CalendarIcon />
+				{#if date_range && date_range.start}
+					{#if date_range.end}
+						{df.format(date_range.start.toDate(getLocalTimeZone()))} - {df.format(
+							date_range.end.toDate(getLocalTimeZone())
+						)}
+					{:else}
+						{df.format(date_range.start.toDate(getLocalTimeZone()))}
+					{/if}
+				{:else if start_value}
+					{df.format(start_value.toDate(getLocalTimeZone()))}
+				{:else}
+					Pick a date
+				{/if}
+			</Popover.Trigger>
+			<Popover.Content class="w-auto p-0" align="start">
+				<RangeCalendar
+					bind:value={date_range}
+					onStartValueChange={(v) => {
+						start_value = v;
+					}}
+					numberOfMonths={2}
+				/>
+			</Popover.Content>
+		</Popover.Root>
+	</div>
+
 	<Form.Field {form} name="description">
 		<Form.Control>
 			{#snippet children({ props })}
 				<div class="flex justify-between">
 					<Form.Label>Time</Form.Label>
-					<Form.Field {form} name="is_multi_day_event" >
+					<!-- <Form.Field {form} name="is_multi_day_event">
 						<Form.Control>
 							{#snippet children({ props })}
 								<div class="flex items-center gap-2">
@@ -90,66 +199,14 @@
 							{/snippet}
 						</Form.Control>
 						<Form.FieldErrors />
-					</Form.Field>
+					</Form.Field> -->
 				</div>
-				<div class="flex w-full gap-4">
-					<div
-						class="flex w-full items-center gap-2 rounded-lg bg-gray-700/10 p-4 dark:bg-white/10"
-					>
-						<div class="flex flex-col items-center gap-1">
-							<div class="size-3 rounded-full border bg-gray-400"></div>
-							<div class="h-6 border-s-2 border-dashed border-gray-400"></div>
-							<div class="size-3 rounded-full border border-gray-400"></div>
-						</div>
 
-						<div class="flex w-full flex-col gap-1">
-							<!-- START -->
-							<div class="flex items-center justify-between">
-								<p class="text-sm text-muted-foreground">Start</p>
-								<div class="flex items-center gap-1">
-									<p class="rounded-bl-sm rounded-tl-sm bg-background p-2 text-sm">Thu, Feb 20</p>
-									<p class="rounded-br-sm rounded-tr-sm bg-background p-2 text-sm">12:30 PM</p>
-								</div>
-							</div>
-
-							<!-- END -->
-							<div class="flex items-center justify-between">
-								<p class="text-sm text-muted-foreground">End</p>
-								<div class="flex items-center gap-1">
-									<p class="rounded-bl-sm rounded-tl-sm bg-background p-2 text-sm">Thu, Feb 20</p>
-									<p class="rounded-br-sm rounded-tr-sm bg-background p-2 text-sm">12:30 PM</p>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div
-						class="flex w-full items-center gap-2 rounded-lg bg-gray-700/10 p-4 dark:bg-white/10"
-					>
-						<div class="flex flex-col items-center gap-1">
-							<div class="size-3 rounded-full border bg-gray-400"></div>
-							<div class="h-6 border-s-2 border-dashed border-gray-400"></div>
-							<div class="size-3 rounded-full border border-gray-400"></div>
-						</div>
-
-						<div class="flex w-full flex-col gap-1">
-							<!-- START -->
-							<div class="flex items-center justify-between">
-								<p class="text-sm text-muted-foreground">Start</p>
-								<div class="flex items-center gap-1">
-									<p class="rounded-bl-sm rounded-tl-sm bg-background p-2 text-sm">Thu, Feb 20</p>
-									<p class="rounded-br-sm rounded-tr-sm bg-background p-2 text-sm">12:30 PM</p>
-								</div>
-							</div>
-
-							<!-- END -->
-							<div class="flex items-center justify-between">
-								<p class="text-sm text-muted-foreground">End</p>
-								<div class="flex items-center gap-1">
-									<p class="rounded-bl-sm rounded-tl-sm bg-background p-2 text-sm">Thu, Feb 20</p>
-									<p class="rounded-br-sm rounded-tr-sm bg-background p-2 text-sm">12:30 PM</p>
-								</div>
-							</div>
-						</div>
+				<div class="max-h-[400px] overflow-y-auto">
+					<div class="flex flex-col gap-2">
+						{#each event_dates as event_date}
+							<EventTimePicker />
+						{/each}
 					</div>
 				</div>
 			{/snippet}
