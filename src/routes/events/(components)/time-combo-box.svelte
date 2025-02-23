@@ -7,8 +7,10 @@
 
 	let {
 		time_options,
-		selected_time = $bindable()
-	}: { time_options: string[]; selected_time: string } = $props();
+		selected_time,
+		onTimeSelect
+	}: { time_options: string[]; selected_time: string; onTimeSelect: (new_time: string) => void } =
+		$props();
 
 	let open = $state(false);
 	let triggerRef = $state<HTMLButtonElement>(null!);
@@ -49,7 +51,8 @@
 						<Command.Item
 							value={time}
 							onSelect={() => {
-								selected_time = time;
+								onTimeSelect(time);
+								// selected_time = time;
 								closeAndFocusTrigger();
 							}}
 						>
