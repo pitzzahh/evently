@@ -3,7 +3,19 @@
 	import TimeComboBox from './time-combo-box.svelte';
 	import { time_options } from '@/constants';
 
-	let { event_date }: { event_date: EventDateTime } = $props();
+	let {
+		event_date,
+		updateDateEventPeriodStartEnd
+	}: {
+		event_date: EventDateTime;
+		updateDateEventPeriodStartEnd: (params: {
+			id: string;
+			am_start?: string;
+			am_end?: string;
+			pm_start?: string;
+			pm_end?: string;
+		}) => void;
+	} = $props();
 	let formatted_date = formatDate(event_date.date);
 
 	function formatDate(date: Date): string {
@@ -15,10 +27,10 @@
 	}
 
 	// TODO: PUT THE UPDATED START AND END TIME IN THE ARRAY STATE OF EVENT DATES
-	let am_start_time = $state('8:00 AM');
-	let am_end_time = $state('12:00 PM');
-	let pm_start_time = $state('1:00 PM');
-	let pm_end_time = $state('5:00 PM');
+	// let am_start_time = $state('8:00 AM');
+	// let am_end_time = $state('12:00 PM');
+	// let pm_start_time = $state('1:00 PM');
+	// let pm_end_time = $state('5:00 PM');
 
 	function getFilteredEndTimes(startTime: string) {
 		const startIndex = time_options.indexOf(startTime);
@@ -26,10 +38,13 @@
 	}
 
 	// automatically change the end time if theres some changes in start time
-	$effect(() => {
-		am_end_time = getFilteredEndTimes(am_start_time).at(0) as string;
-		pm_end_time = getFilteredEndTimes(pm_start_time).at(0) as string;
-	});
+	// $effect(() => {
+	// 	updateDateEventPeriodStartEnd({
+	// 		id: event_date.id,
+	// 		am_end: getFilteredEndTimes(am_start).at(0),
+	// 		pm_end: getFilteredEndTimes(pm_start).at(0)
+	// 	});
+	// });
 </script>
 
 <div class="flex w-full gap-2">
@@ -44,7 +59,15 @@
 					<p class="w-[100px] rounded-bl-sm rounded-tl-sm bg-background p-2 text-center text-sm">
 						{formatted_date}
 					</p>
-					<TimeComboBox {time_options} bind:selected_time={am_start_time} />
+					<TimeComboBox
+						{time_options}
+						selected_time={event_date.am_start}
+						onTimeSelect={(time) => {
+							updateDateEventPeriodStartEnd({ id: event_date.id, am_start: time,
+								
+							 });
+						}}
+					/>
 				</div>
 			</div>
 			<!-- AM END -->
@@ -56,8 +79,11 @@
 						{formatted_date}
 					</p>
 					<TimeComboBox
-						time_options={getFilteredEndTimes(am_start_time)}
-						bind:selected_time={am_end_time}
+						time_options={getFilteredEndTimes(event_date.am_start)}
+						selected_time={event_date.am_end}
+						onTimeSelect={(time) => {
+							updateDateEventPeriodStartEnd({ id: event_date.id, am_end: time });
+						}}
 					/>
 				</div>
 			</div>
@@ -74,7 +100,13 @@
 					<p class="w-[100px] rounded-bl-sm rounded-tl-sm bg-background p-2 text-center text-sm">
 						{formatted_date}
 					</p>
-					<TimeComboBox {time_options} bind:selected_time={pm_start_time} />
+					<TimeComboBox
+						{time_options}
+						selected_time={event_date.pm_start}
+						onTimeSelect={(time) => {
+							updateDateEventPeriodStartEnd({ id: event_date.id, pm_start: time });
+						}}
+					/>
 				</div>
 			</div>
 			<!-- PM END -->
@@ -86,8 +118,11 @@
 						{formatted_date}
 					</p>
 					<TimeComboBox
-						time_options={getFilteredEndTimes(pm_start_time)}
-						bind:selected_time={pm_end_time}
+						time_options={getFilteredEndTimes(event_date.pm_start)}
+						selected_time={event_date.pm_end}
+						onTimeSelect={(time) => {
+							updateDateEventPeriodStartEnd({ id: event_date.id, pm_end: time });
+						}}
 					/>
 				</div>
 			</div>
