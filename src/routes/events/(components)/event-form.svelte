@@ -37,6 +37,7 @@
 	import { RangeCalendar } from '$lib/components/ui/range-calendar/index.js';
 	import * as Popover from '$lib/components/ui/popover/index.js';
 	import EventTimePicker from './event-time-picker.svelte';
+	import { time_options } from '@/constants';
 
 	let { event_form }: Props = $props();
 	const form = superForm(event_form, {
@@ -78,7 +79,6 @@
 		while (currentDate <= end) {
 			date_arr.push(new Date(currentDate));
 			currentDate.setDate(currentDate.getDate() + 1);
-			console.log('dasd');
 		}
 
 		return date_arr;
@@ -95,13 +95,63 @@
 			event_dates = getDatesInRange(start_date, end_date).map((date) => ({
 				id: nanoid(),
 				date,
-				am_start: '8:00',
-				am_end: '12:00',
-				pm_start: '1:00',
-				pm_end: '4:00'
+				am_start: '8:00 AM',
+				am_end: '12:00 AM',
+				pm_start: '1:00 PM',
+				pm_end: '4:00 PM'
 			}));
 		}
 	});
+
+	$effect(() => {
+		console.log(event_dates);
+	});
+
+	function updateDateEventPeriodStartEnd({
+		id,
+		am_start,
+		am_end,
+		pm_start,
+		pm_end
+	}: {
+		id: string;
+		am_start?: string;
+		am_end?: string;
+		pm_start?: string;
+		pm_end?: string;
+	}) {
+		event_dates = event_dates.map((event) => {
+			if (event.id !== id) return event;
+
+			const selected_am_start_idx = time_options.findIndex((o) => o === am_start);
+			const selected_pm_start_idx = time_options.findIndex((o) => o === pm_start);
+			const current_am_end_idx = time_options.findIndex((o) => o === event.am_end);
+			const current_pm_end_idx = time_options.findIndex((o) => o === event.pm_end);
+
+			let adjusted_am_end = event.am_end;
+			let adjusted_pm_end = event.pm_end;
+
+			if (am_start && selected_am_start_idx !== -1) {
+				if (current_am_end_idx === -1 || selected_am_start_idx >= current_am_end_idx) {
+					adjusted_am_end = time_options[selected_am_start_idx + 1] || event.am_end;
+				}
+			}
+
+			if (pm_start && selected_pm_start_idx !== -1) {
+				if (current_pm_end_idx === -1 || selected_pm_start_idx >= current_pm_end_idx) {
+					adjusted_pm_end = time_options[selected_pm_start_idx + 1] || event.pm_end;
+				}
+			}
+
+			return {
+				...event,
+				am_start: am_start || event.am_start,
+				am_end: am_end || adjusted_am_end,
+				pm_start: pm_start || event.pm_start,
+				pm_end: pm_end || adjusted_pm_end
+			};
+		});
+	}
 </script>
 
 <form method="POST" use:enhance class="flex flex-col gap-1">
@@ -215,7 +265,7 @@
 				<div class="max-h-[400px] overflow-y-auto">
 					<div class="flex flex-col gap-2">
 						{#each event_dates as event_date}
-							<EventTimePicker {event_date} />
+							<EventTimePicker {event_date} {updateDateEventPeriodStartEnd} />
 						{/each}
 					</div>
 				</div>
