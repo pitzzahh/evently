@@ -1,15 +1,13 @@
 <script lang="ts">
-	import { Button } from './ui/button';
 	import { page } from '$app/state';
 	import { cn } from '@/utils';
-	import { Ticket, Calendar, Plus, Computer } from 'lucide-svelte';
+	import { scale } from 'svelte/transition';
+	import { cubicOut } from 'svelte/easing';
+	import { Ticket, Calendar, Plus } from 'lucide-svelte';
 	import NavbarTime from './navbar-time.svelte';
-	import Sun from 'lucide-svelte/icons/sun';
-	import Moon from 'lucide-svelte/icons/moon';
-
-	import { resetMode, setMode } from 'mode-watcher';
-	import { buttonVariants } from '$lib/components/ui/button/index.js';
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
+	import { toggleMode, mode } from 'mode-watcher';
+	import { Sun, Moon } from '@/assets/icons';
+	import { Button } from '@/components/ui/button/index.js';
 
 	const isActive = (pathname: string) => page.url.pathname === pathname;
 	const routes = [
@@ -40,28 +38,42 @@
 			{/each}
 		</div>
 		<div class="flex items-center gap-4">
-			<DropdownMenu.Root>
-				<DropdownMenu.Trigger class={buttonVariants({ variant: 'outline', size: 'icon' })}>
-					<Sun
-						class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"
-					/>
-					<Moon
-						class="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100"
-					/>
-					<span class="sr-only">Toggle theme</span>
-				</DropdownMenu.Trigger>
-				<DropdownMenu.Content align="end">
-					<DropdownMenu.Item onclick={() => setMode('light')}>
-						<Sun class="size-4" /> Light
-					</DropdownMenu.Item>
-					<DropdownMenu.Item onclick={() => setMode('dark')}>
-						<Moon class="size-4" />Dark</DropdownMenu.Item
+			<Button
+				onclick={toggleMode}
+				role="switch"
+				variant="outline"
+				size="icon"
+				aria-label="Light Switch"
+				aria-checked={$mode === 'light'}
+				class="!shrink-0 [&_svg]:size-5"
+				title="Toggle {$mode === 'dark' ? 'Dark' : 'Light'} Mode"
+			>
+				{#if $mode === 'light'}
+					<div
+						class="absolute inline-flex items-center justify-center"
+						transition:scale={{
+							delay: 50,
+							duration: 200,
+							start: 0.7,
+							easing: cubicOut
+						}}
 					>
-					<DropdownMenu.Item onclick={() => resetMode()}>
-						<Computer class="size-4" />System</DropdownMenu.Item
+						<Moon strokeWidth={1.5} class="size-6" aria-label="Moon" />
+					</div>
+				{:else}
+					<div
+						class="absolute inline-flex items-center justify-center"
+						transition:scale={{
+							delay: 50,
+							duration: 200,
+							start: 0.7,
+							easing: cubicOut
+						}}
 					>
-				</DropdownMenu.Content>
-			</DropdownMenu.Root>
+						<Sun strokeWidth={1.5} class="size-6" aria-label="Sun" />
+					</div>
+				{/if}
+			</Button>
 			<NavbarTime />
 			<Button href="/events/create">Create Event <Plus class="size-4" /></Button>
 		</div>
