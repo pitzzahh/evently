@@ -1,8 +1,10 @@
 <script lang="ts">
-	import { createTauriFilesystemAdapter, svelteReactivityAdapter } from '@/db/adapter/index.svelte';
+	import { svelteReactivityAdapter } from '@/db/adapter/index.svelte';
 	import { Collection } from '@signaldb/core';
+	import createOPFSAdapter from '@signaldb/opfs';
+	
 	const Posts = new Collection({
-		persistence: createTauriFilesystemAdapter('posts.json'),
+		persistence: createOPFSAdapter('posts.json'),
 		reactivity: svelteReactivityAdapter()
 	});
 
