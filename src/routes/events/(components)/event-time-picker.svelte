@@ -1,7 +1,8 @@
 <script lang="ts">
-	import type { EventDateTime } from './event-form.svelte';
+	import type { EventSchedule } from '@/db/models/types';
 	import TimeComboBox from './time-combo-box.svelte';
 	import { time_options } from '@/constants';
+	import { formatDateToTimeOption } from '@/utils/format';
 
 	let {
 		event_date,
@@ -9,9 +10,9 @@
 		updateDateEventPeriodStartEnd,
 		isSelectionDisabled
 	}: {
-		event_date: EventDateTime;
 		isSelectionDisabled?: boolean;
-		updateDateEventPeriodStartEnd?: (params: {
+		event_date: EventSchedule;
+		updateDateEventPeriodStartEnd: (params: {
 			id: string;
 			am_start?: string;
 			am_end?: string;
@@ -20,7 +21,7 @@
 		}) => void;
 		day: number;
 	} = $props();
-	let formatted_date = formatDate(event_date.date);
+	let formatted_date = formatDate(event_date.event_date);
 
 	function formatDate(date: Date): string {
 		return date.toLocaleDateString('en-US', {
@@ -51,7 +52,7 @@
 				formatted_date,
 				time_options: getFilteredTimeByPeriod('AM'),
 				day,
-				selected_time: event_date.am_start,
+				selected_time: formatDateToTimeOption(event_date.am_start),
 				onTimeSelect: (time) => {
 					if (updateDateEventPeriodStartEnd)
 						updateDateEventPeriodStartEnd({ id: event_date.id, am_start: time });
@@ -63,8 +64,8 @@
 			{@render period_time_picker({
 				period_title: 'AM End',
 				formatted_date,
-				time_options: getFilteredEndTimes(event_date.am_start),
-				selected_time: event_date.am_end,
+				time_options: getFilteredEndTimes(formatDateToTimeOption(event_date.am_start)),
+				selected_time: formatDateToTimeOption(event_date.am_end),
 				onTimeSelect: (time) => {
 					if (updateDateEventPeriodStartEnd)
 						updateDateEventPeriodStartEnd({ id: event_date.id, am_end: time });
@@ -81,9 +82,9 @@
 			{@render period_time_picker({
 				period_title: 'PM Start',
 				formatted_date,
-				time_options: getFilteredEndTimes(event_date.am_end),
+				time_options: getFilteredEndTimes(formatDateToTimeOption(event_date.am_end)),
 				day,
-				selected_time: event_date.pm_start,
+				selected_time: formatDateToTimeOption(event_date.pm_start),
 				onTimeSelect: (time) => {
 					if (updateDateEventPeriodStartEnd)
 						updateDateEventPeriodStartEnd({ id: event_date.id, pm_start: time });
@@ -95,8 +96,8 @@
 			{@render period_time_picker({
 				period_title: 'PM End',
 				formatted_date,
-				time_options: getFilteredEndTimes(event_date.pm_start),
-				selected_time: event_date.pm_end,
+				time_options: getFilteredEndTimes(formatDateToTimeOption(event_date.pm_start)),
+				selected_time: formatDateToTimeOption(event_date.pm_end),
 				onTimeSelect: (time) => {
 					if (updateDateEventPeriodStartEnd)
 						updateDateEventPeriodStartEnd({ id: event_date.id, pm_end: time });
