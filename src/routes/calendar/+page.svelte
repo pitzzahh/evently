@@ -21,7 +21,7 @@
 
 <script lang="ts">
 	import Calendar from './(components)/calendar.svelte';
-	import { createEventDispatcher, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 
 	const dayNames = $state(['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']);
 	const monthNames = $state([
@@ -200,17 +200,16 @@
 	}
 </script>
 
-<div class="calendar-container">
-	<div class="calendar-header">
-		<h1>
-			<button onclick={() => year--}>&Lt;</button>
-			<button onclick={prevMonth}>&lt;</button>
-			{monthNames[month]}
-			{year}
-			<button onclick={nextMonth}>&gt;</button>
-			<button onclick={() => year++}>&Gt;</button>
-		</h1>
-		<p>{eventText}</p>
+<div class="mx-auto w-full max-w-4xl rounded-lg bg-card shadow-lg">
+	<div class="border-b border-border/20 p-6">
+		<div class="flex items-center justify-center gap-4">
+			<button class="btn btn-ghost btn-sm" onclick={() => year--}>&Lt;</button>
+			<button class="btn btn-ghost btn-sm" onclick={prevMonth}>&lt;</button>
+			<h1 class="text-xl font-semibold">{monthNames[month]} {year}</h1>
+			<button class="btn btn-ghost btn-sm" onclick={nextMonth}>&gt;</button>
+			<button class="btn btn-ghost btn-sm" onclick={() => year++}>&Gt;</button>
+		</div>
+		<p class="mt-2 text-sm text-muted-foreground">{eventText}</p>
 	</div>
 
 	<Calendar
@@ -222,40 +221,3 @@
 		itemClick={handleItemClick}
 	/>
 </div>
-
-<style>
-	.calendar-container {
-		width: 90%;
-		margin: auto;
-		overflow: hidden;
-		box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
-		border-radius: 10px;
-		background: #fff;
-		max-width: 1200px;
-	}
-
-	.calendar-header {
-		text-align: center;
-		padding: 20px 0;
-		background: #eef;
-		border-bottom: 1px solid rgba(166, 168, 179, 0.12);
-	}
-
-	.calendar-header h1 {
-		margin: 0;
-		font-size: 18px;
-	}
-
-	.calendar-header button {
-		background: #eef;
-		border: 1px solid transparent;
-		padding: 6px;
-		color: rgba(81, 86, 93, 0.7);
-		cursor: pointer;
-		outline: 0;
-	}
-
-	.calendar-header button:hover {
-		background: #ddf;
-	}
-</style>
