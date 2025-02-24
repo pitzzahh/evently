@@ -59,9 +59,9 @@
 
 		return events;
 	}
-	const events = $state(generateSampleEvents(100));
+	const events = $state(generateSampleEvents(10));
 </script>
 
 <div class="min-h-dvh bg-background p-4">
-	<EventCalendar {events} />
+<EventCalendar {events} />
 </div>

@@ -1,11 +1,8 @@
 <script lang="ts">
-	import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-	import { Button } from '@/components/ui/button';
-	// TODO: Change to the correct import path from assets
-	import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-svelte';
+	import * as Calendar from '$lib/components/ui/calendar';
 	import { today, getLocalTimeZone, CalendarDate } from '@internationalized/date';
 	import type { CalendarEvent } from '@routes/calendar/(data)/types';
-	import { CalendarCell } from '.';
+	import { EventCell } from '.';
 
 	type Props = {
 		events: CalendarEvent[];
@@ -13,24 +10,9 @@
 
 	let { events }: Props = $props();
 
-	// Current date state
-	let currentDate = $state(today(getLocalTimeZone()));
-
-	// Days headers
-	const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
-	// Get calendar dates
-	const getCalendarDates = () => {
-		const dates = [];
-		const firstDay = new CalendarDate(currentDate.year, currentDate.month, 1);
-		const startDay = firstDay.subtract({ days: firstDay.dayOfWeek });
-
-		for (let i = 0; i < 42; i++) {
-			dates.push(startDay.add({ days: i }));
-		}
-
-		return dates;
-	};
+	// Calendar state
+	const currentDate = $state(today(getLocalTimeZone()));
+	let value = $state<CalendarDate>();
 
 	// Get events for a specific date
 	const getDateEvents = (date: CalendarDate) => {
@@ -40,49 +22,54 @@
 			return isAfterStart && isBeforeEnd;
 		});
 	};
-
-	// Navigation
-	const prevMonth = () => {
-		currentDate = currentDate.subtract({ months: 1 });
-	};
-
-	const nextMonth = () => {
-		currentDate = currentDate.add({ months: 1 });
-	};
-
-	// Format month and year
-	const formatMonthYear = (date: CalendarDate) => {
-		return new Intl.DateTimeFormat('en-US', {
-			month: 'long',
-			year: 'numeric'
-		}).format(date.toDate(getLocalTimeZone()));
-	};
 </script>
 
-<div class="flex items-center justify-center">
-	<div class="flex items-center gap-4">
-		<Button variant="outline" size="icon" onclick={prevMonth}>
-			<ChevronLeftIcon class="h-4 w-4" />
-		</Button>
-		<span class="text-lg font-semibold">
-			{formatMonthYear(currentDate)}
-		</span>
-		<Button variant="outline" size="icon" onclick={nextMonth}>
-			<ChevronRightIcon class="h-4 w-4" />
-		</Button>
-	</div>
-</div>
-<!-- Calendar Grid -->
-<div class="grid grid-cols-7 gap-px bg-muted">
-	<!-- Week days -->
-	{#each weekDays as day}
-		<div class="bg-background p-3 text-center font-semibold">
-			{day}
-		</div>
-	{/each}
-
-	<!-- Calendar days -->
-	{#each getCalendarDates() as date}
-		<CalendarCell {date} currentMonth={currentDate.month} events={getDateEvents(date)} />
-	{/each}
-</div>
+<Calendar.Root bind:value class="rounded-md border">
+	{#snippet children({ months, weekdays })}
+		<Calendar.Header>
+			<Calendar.PrevButton />
+			<Calendar.Heading />
+			<Calendar.NextButton />
+		</Calendar.Header>
+		<Calendar.Months>
+			{#each months as month}
+				<Calendar.Grid>
+					<Calendar.GridHead>
+						<Calendar.GridRow>
+							{#each weekdays as weekday}
+								<Calendar.HeadCell>
+									{weekday}
+								</Calendar.HeadCell>
+							{/each}
+						</Calendar.GridRow>
+					</Calendar.GridHead>
+					<Calendar.GridBody>
+						{#each month.weeks as weekDates, weekIndex}
+							<Calendar.GridRow>
+								{#each weekDates as date}
+									<div
+										class="min-h-[120px] border-t p-2 first:border-l [&:not(:last-child)]:border-r"
+									>
+										<div class="text-sm font-medium">
+											<Calendar.Day {date} month={month.value} />
+										</div>
+										<div class="mt-2">
+											{#each getDateEvents(date).slice(0, 3) as event, index}
+												<EventCell {event} {date} isFirstColumn={weekIndex === 0} {index} />
+											{/each}
+											{#if getDateEvents(date).length > 3}
+												<div class="mt-1 text-xs text-muted-foreground">
+													+{getDateEvents(date).length - 3} more
+												</div>
+											{/if}
+										</div>
+									</div>
+								{/each}
+							</Calendar.GridRow>
+						{/each}
+					</Calendar.GridBody>
+				</Calendar.Grid>
+			{/each}
+		</Calendar.Months>
+	{/snippet}
+</Calendar.Root>
