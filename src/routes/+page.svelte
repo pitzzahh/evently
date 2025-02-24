@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { createTauriFilesystemAdapter, svelteReactivityAdapter } from '@/db/adapter/index.svelte';
-	import { Collection, combinePersistenceAdapters } from '@signaldb/core';
+	import { Collection } from '@signaldb/core';
 	const Posts = new Collection({
 		persistence: createTauriFilesystemAdapter('posts.json'),
 		reactivity: svelteReactivityAdapter()
