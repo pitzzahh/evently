@@ -49,7 +49,9 @@
 					<Calendar.GridHead>
 						<Calendar.GridRow class="grid grid-cols-7 divide-x divide-border">
 							{#each weekdays as weekday}
-								<Calendar.HeadCell class="flex h-12 w-full items-center justify-center font-medium">
+								<Calendar.HeadCell
+									class="flex h-12 w-full items-center justify-center rounded-none  font-medium"
+								>
 									{weekday}
 								</Calendar.HeadCell>
 							{/each}
