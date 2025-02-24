@@ -14,7 +14,6 @@
 	import { type SuperValidated, type Infer, superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { nanoid } from 'nanoid';
-
 	import CalendarIcon from 'lucide-svelte/icons/calendar';
 	import type { DateRange } from 'bits-ui';
 	import {
@@ -79,7 +78,6 @@
 	const { form: formData, enhance } = form;
 
 	const current_date = new Date();
-
 	let comp_state = $state<ComponentState>({
 		start_value: undefined,
 		date_range: {
@@ -233,7 +231,7 @@
 		<Form.FieldErrors />
 	</Form.Field>
 
-	<Form.Field {form} name="description" class="w-full">
+	<Form.Field {form} name="location" class="w-full">
 		<Form.Control>
 			{#snippet children({ props })}
 				<Form.Label class="flex items-center gap-1"><MapPin class="size-4" />Location</Form.Label>
