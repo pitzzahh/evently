@@ -53,7 +53,11 @@
 	const form = superForm(event_form, {
 		SPA: true,
 		validators: zodClient(eventSchema),
-		onUpdate: async ({ form, cancel }) => {
+		onSubmit: () => {
+			toast.loading('Submitting form');
+		},
+		onUpdate: async ({ form }) => {
+			toast.loading('Validating form');
 			// toast the values
 			if (!form.valid) {
 				toast.error('Form is invalid');
@@ -66,6 +70,10 @@
 						new Date(comp_state.date_range.start.toString()).getTime()
 					: 0;
 			const difference_in_days = Math.round(difference_in_time / (1000 * 3600 * 24)) + 1;
+
+			toast.success('Form is valid', {
+				description: `Event is ${difference_in_days} days long`
+			});
 		}
 	});
 	const { form: formData, enhance } = form;
@@ -302,20 +310,24 @@
 			{#snippet children({ props })}
 				<div class="flex justify-between">
 					<Form.Label>Time</Form.Label>
-					<!-- <Form.Field {form} name="is_multi_day_event">
+					<Form.Field {form} name="is_multi_day_event">
 						<Form.Control>
 							{#snippet children({ props })}
 								<div class="flex items-center gap-2">
-									<Form.Label class="flex items-center gap-1">Multi-day Event</Form.Label>
-									<Switch {...props} bind:checked={$formData.is_multi_day_event} />
+									<Form.Label
+										class={cn('flex items-center gap-1', {
+											'text-muted-foreground': !$formData.is_multi_day_event
+										})}>Multi-day Event</Form.Label
+									>
+									<Switch disabled {...props} bind:checked={$formData.is_multi_day_event} />
 								</div>
 							{/snippet}
 						</Form.Control>
 						<Form.FieldErrors />
-					</Form.Field> -->
+					</Form.Field>
 				</div>
 
-				<div class="max-h-[400px] overflow-y-auto">
+				<div class="max-h-[400px] overflow-y-auto pr-1">
 					<div class="flex flex-col gap-2">
 						{#each comp_state.event_dates as event_date}
 							<EventTimePicker {event_date} {updateDateEventPeriodStartEnd} />
