@@ -8,9 +8,14 @@
 	let {
 		time_options,
 		selected_time,
-		onTimeSelect
-	}: { time_options: string[]; selected_time: string; onTimeSelect: (new_time: string) => void } =
-		$props();
+		onTimeSelect,
+		isDisabled
+	}: {
+		time_options: string[];
+		selected_time: string;
+		onTimeSelect: (new_time: string) => void;
+		isDisabled?: boolean;
+	} = $props();
 
 	let open = $state(false);
 	let triggerRef = $state<HTMLButtonElement>(null!);
@@ -31,10 +36,10 @@
 </script>
 
 <Popover.Root bind:open>
-	<Popover.Trigger bind:ref={triggerRef}>
+	<Popover.Trigger bind:ref={triggerRef} disabled={isDisabled}> 
 		{#snippet child({ props })}
 			<button
-				class="w-[120px] border rounded-br-sm rounded-tr-sm bg-background p-2 text-sm active:scale-95 active:opacity-60"
+				class="w-[120px] rounded-br-sm rounded-tr-sm border bg-background p-2 text-sm active:scale-95 active:opacity-60"
 				{...props}
 			>
 				{selected_time}
