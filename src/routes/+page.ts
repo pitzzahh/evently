@@ -11,8 +11,7 @@ export async function load() {
     error(404, 'ADMIN_EMAIL or ADMIN_PASS not set in environment variables');
   }
   return {
-    notes: [],
-    POCKETBASE_INSTANCE: await getEnv('POCKETBASE_INSTANCE')
+    notes: []
   }
 }
 
