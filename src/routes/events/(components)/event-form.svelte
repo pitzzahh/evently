@@ -32,7 +32,12 @@
 	import { toast } from 'svelte-sonner';
 	import { COLLECTIONS } from '@/db/index';
 	import type { EventDetails, EventSchedule } from '@/db/models/types';
-	import { extractHoursAndMinutes, formatDateToTimeOption, monthFormatter } from '@/utils/format';
+	import {
+		createDate,
+		extractHoursAndMinutes,
+		formatDateToTimeOption,
+		monthFormatter
+	} from '@/utils/format';
 
 	interface ComponentState {
 		start_value: DateValue | undefined;
@@ -195,16 +200,6 @@
 				pm_end: createDate(event.event_date, pm_end, formatDateToTimeOption(event.pm_end))
 			};
 
-			function createDate(event_date: Date, time: string | undefined, defaultTime: string) {
-				const { hours, minutes } = extractHoursAndMinutes(time || defaultTime);
-				return new Date(
-					event_date.getFullYear(),
-					event_date.getMonth(),
-					event_date.getDate(),
-					hours,
-					minutes
-				);
-			}
 			console.log('returned_data', returned_data);
 
 			return returned_data;
