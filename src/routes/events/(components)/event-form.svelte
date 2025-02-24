@@ -96,7 +96,7 @@
 				id: nanoid(),
 				date,
 				am_start: '8:00 AM',
-				am_end: '12:00 AM',
+				am_end: '12:00 PM',
 				pm_start: '1:00 PM',
 				pm_end: '4:00 PM'
 			}));
