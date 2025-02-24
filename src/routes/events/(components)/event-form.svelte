@@ -250,7 +250,7 @@
 				<div class="max-h-[400px] overflow-y-auto">
 					<div class="flex flex-col gap-2">
 						{#each event_dates as event_date, index}
-							<EventTimePicker {event_date} day={index + 1} {updateDateEventPeriodStartEnd} />
+							<EventTimePicker action="create" {event_date} day={index + 1} {updateDateEventPeriodStartEnd} />
 						{/each}
 					</div>
 				</div>
