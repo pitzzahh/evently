@@ -1,9 +1,10 @@
 <script>
 	import EventCard from './event-card.svelte';
+	import { Timeline } from 'svelte-vertical-timeline';
 </script>
 
-<ol class="relative ml-[200px] border-s-2 border-dashed border-gray-400 dark:border-gray-700">
-	{#each [...new Array(10)] as _}
+<Timeline style="width: 100%;  padding: 0;">
+	{#each { length: 10 }}
 		<EventCard />
 	{/each}
-</ol>
+</Timeline>
