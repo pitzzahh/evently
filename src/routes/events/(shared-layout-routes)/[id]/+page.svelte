@@ -5,6 +5,9 @@
 	import { type PageData } from './$types';
 	import { cn } from '@/utils';
 	import AttendeesDataTable from '../../(components)/attendees-data-table.svelte';
+	import { nanoid } from 'nanoid';
+	import type { EventDateTime } from '../../(components)/event-form.svelte';
+	import EventTimePicker from '../../(components)/event-time-picker.svelte';
 
 	let { data }: { data: PageData } = $props();
 	let see_more = $state(true);
@@ -12,6 +15,33 @@
 	function toggleSeeMore() {
 		see_more = !see_more;
 	}
+
+	const event_dates: EventDateTime[] = [
+		{
+			id: nanoid(),
+			date: new Date(2025, 1, 24), // February 24, 2025
+			am_start: '8:00 AM',
+			am_end: '12:00 PM',
+			pm_start: '1:00 PM',
+			pm_end: '5:00 PM'
+		},
+		{
+			id: nanoid(),
+			date: new Date(2025, 1, 25), // February 25, 2025
+			am_start: '9:00 AM',
+			am_end: '12:30 PM',
+			pm_start: '1:30 PM',
+			pm_end: '6:00 PM'
+		},
+		{
+			id: nanoid(),
+			date: new Date(2025, 1, 26), // February 26, 2025
+			am_start: '7:30 AM',
+			am_end: '11:30 AM',
+			pm_start: '12:30 PM',
+			pm_end: '4:30 PM'
+		}
+	];
 </script>
 
 <div class="grid gap-6">
@@ -23,7 +53,6 @@
 			<button class="rounded-md border p-3"><Settings class="size-5" /></button>
 		</div>
 	</div>
-
 
 	<!-- EVENT DETAILS -->
 	<div class="grid gap-6 border-b-2 border-dashed pb-6">
@@ -86,11 +115,11 @@
 		{/if}
 	</div>
 
-	<div>
-		
+	<div class="grid gap-2">
+		{#each event_dates as event_date, index}
+			<EventTimePicker {event_date} day={index + 1} isSelectionDisabled={true} />
+		{/each}
 	</div>
-
-
 
 	<!-- TODO: ADD ATTENDEES TABLE HERE -->
 	<div class="grid gap-4">
