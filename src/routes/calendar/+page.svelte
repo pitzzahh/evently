@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { EventCalendar } from '@routes/calendar/(components)';
 	import { today, getLocalTimeZone, CalendarDate } from '@internationalized/date';
-	import type { CalendarEvent, EventType } from './types';
+	import type { CalendarEvent, EventType } from '@routes/calendar/(data)/types';
 
 	const eventTitles = [
 		'Team Meeting',
@@ -63,5 +63,5 @@
 </script>
 
 <div class="min-h-dvh bg-background p-4">
-<EventCalendar {events} />
+	<EventCalendar type="single" {events} />
 </div>
