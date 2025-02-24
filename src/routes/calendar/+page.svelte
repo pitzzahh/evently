@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { EventCalendar } from '@routes/calendar/(components)';
-	import { today, getLocalTimeZone, CalendarDate } from '@internationalized/date';
+	import { today, getLocalTimeZone } from '@internationalized/date';
 	import type { CalendarEvent, EventType } from '@routes/calendar/(data)/types';
+	import { scale } from 'svelte/transition';
 
 	const eventTitles = [
 		'Team Meeting',
@@ -62,6 +63,6 @@
 	const events = $state(generateSampleEvents(50));
 </script>
 
-<div class="min-h-dvh bg-background p-4">
+<div in:scale class="min-h-dvh bg-background p-4">
 	<EventCalendar type="single" {events} />
 </div>
