@@ -9,6 +9,7 @@
 	});
 
 	let items: any[] = $state.raw([]);
+
 	$effect(() => {
 		const cursor = Posts.find({});
 		items = cursor.fetch();
@@ -25,6 +26,7 @@
 	{#each items as post}
 		<li>
 			<strong>{post.title}</strong> by {post.author}
+			<button onclick={() => Posts.removeOne(post._id)}>Delete</button>
 		</li>
 	{/each}
 </ul>
