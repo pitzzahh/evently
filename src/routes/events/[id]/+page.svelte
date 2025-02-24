@@ -19,6 +19,7 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import ParticipantsDialog from '../(components)/participants-dialog.svelte';
 	import type { EventSchedule } from '@/db/models/types';
+	import { scale } from 'svelte/transition';
 
 	let { data }: { data: PageData } = $props();
 	let see_more = $state(true);
@@ -55,7 +56,7 @@
 	];
 </script>
 
-<div class="grid gap-6">
+<div in:scale class="grid gap-6">
 	<div class="flex items-center justify-between">
 		<h2 class="text-5xl font-semibold">Teacher's Seminar</h2>
 
