@@ -51,7 +51,7 @@
 
 					<div class="flex items-center gap-2 text-muted-foreground">
 						<UsersRound class="size-4" />
-						<p class="text-sm font-medium">Attendees</p>
+						<p class="text-sm font-medium">Participants</p>
 					</div>
 				</div>
 			</div>
