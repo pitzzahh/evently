@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Button } from '@/components/ui/button';
-	import { Calendar, ChartBar, MapPin, Settings, UsersRound } from 'lucide-svelte';
+	import { Calendar, ChartBar, MapPin, Settings, UsersRound, Edit, Trash } from 'lucide-svelte';
 
 	import { type PageData } from './$types';
 	import { cn } from '@/utils';
@@ -8,6 +8,7 @@
 	import { nanoid } from 'nanoid';
 	import type { EventDateTime } from '../../(components)/event-form.svelte';
 	import EventTimePicker from '../../(components)/event-time-picker.svelte';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 
 	let { data }: { data: PageData } = $props();
 	let see_more = $state(true);
@@ -50,7 +51,18 @@
 
 		<div class="flex items-center gap-2">
 			{@render StatusPill('finished')}
-			<button class="rounded-md border p-3"><Settings class="size-5" /></button>
+
+			<DropdownMenu.Root>
+				<DropdownMenu.Trigger>
+					<button class="rounded-md border p-3"><Settings class="size-5" /></button>
+				</DropdownMenu.Trigger>
+				<DropdownMenu.Content side="bottom" align="end" sideOffset={10}>
+					<DropdownMenu.Group>
+						<DropdownMenu.Item><Edit class="size-4" /> Edit event</DropdownMenu.Item>
+						<DropdownMenu.Item class="!text-red-600 hover:!bg-red-600/20"><Trash class="size-4" />Delete event</DropdownMenu.Item>
+					</DropdownMenu.Group>
+				</DropdownMenu.Content>
+			</DropdownMenu.Root>
 		</div>
 	</div>
 
