@@ -4,10 +4,10 @@
 	import { cn } from '$lib/utils';
 	import type { CalendarDate, DateValue } from '@internationalized/date';
 	import type { CalendarEvent } from '@routes/calendar/(data)/types';
+	import { EventCell } from '.';
 
 	let {
 		ref = $bindable(null),
-		value = $bindable(),
 		placeholder = $bindable(),
 		class: className,
 		weekdayFormat = 'short',
@@ -36,7 +36,6 @@
 </script>
 
 <CalendarPrimitive.Root
-	bind:value={value as never}
 	bind:ref
 	bind:placeholder
 	{weekdayFormat}
@@ -75,8 +74,8 @@
 												</div>
 
 												<div class="mt-2 space-y-1">
-													{#each getDateEvents(date).slice(0, 3) as event}
-														<div
+													{#each getDateEvents(date).slice(0, 3) as event, i}
+														<!-- <div
 															class={cn(
 																'truncate rounded px-1.5 py-0.5 text-xs',
 																eventColors[event.type]
@@ -87,7 +86,13 @@
 																{event.time}
 															{/if}
 															{event.title}
-														</div>
+														</div> -->
+														<EventCell
+															{event}
+															date={event.startDate}
+															isFirstColumn={date.compare(event.startDate) === 0}
+															index={i}
+														/>
 													{/each}
 
 													{#if getDateEvents(date).length > 3}
