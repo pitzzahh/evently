@@ -1,6 +1,15 @@
 <script lang="ts">
 	import { Button } from '@/components/ui/button';
-	import { Calendar, ChartBar, MapPin, Settings, UsersRound, Edit, Trash } from 'lucide-svelte';
+	import {
+		Calendar,
+		ChartBar,
+		MapPin,
+		Settings,
+		UsersRound,
+		Edit,
+		Trash,
+		View
+	} from 'lucide-svelte';
 
 	import { type PageData } from './$types';
 	import { cn } from '@/utils';
@@ -9,6 +18,7 @@
 	import type { EventDateTime } from '../(components)/event-form.svelte';
 	import EventTimePicker from '../(components)/event-time-picker.svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
+	import ParticipantsDialog from '../(components)/participants-dialog.svelte';
 
 	let { data }: { data: PageData } = $props();
 	let see_more = $state(true);
@@ -71,34 +81,42 @@
 	<!-- EVENT DETAILS -->
 	<div class="grid gap-6 border-b-2 border-dashed pb-6">
 		<div class="flex items-end justify-between">
-			<div class="grid gap-4">
-				<div class="flex gap-5">
-					<div class="flex items-center gap-3">
-						<div class="rounded-md border p-3">
-							<Calendar class="size-5 text-muted-foreground" />
+			<div class="grid w-full gap-4">
+				<div class="flex w-full justify-between gap-4">
+					<div class="flex gap-5">
+						<div class="flex items-center gap-3">
+							<div class="rounded-md border p-3">
+								<Calendar class="size-5 text-muted-foreground" />
+							</div>
+							<div>
+								<p class="text-base font-medium">Wednesday, November 20, 2024</p>
+								<p class="text-muted-foreground">11:30 PM - 12:30 AM</p>
+							</div>
 						</div>
-						<div>
-							<p class="text-base font-medium">Wednesday, November 20, 2024</p>
-							<p class="text-muted-foreground">11:30 PM - 12:30 AM</p>
+						<div class="flex items-center gap-3">
+							<div class="rounded-md border p-3">
+								<UsersRound class="size-5 text-muted-foreground" />
+							</div>
+							<div>
+								<p class="text-base font-medium">100</p>
+								<p class=" text-muted-foreground">Participants</p>
+							</div>
 						</div>
 					</div>
-					<div class="flex items-center gap-3">
-						<div class="rounded-md border p-3">
-							<UsersRound class="size-5 text-muted-foreground" />
-						</div>
-						<div>
-							<p class="text-base font-medium">100</p>
-							<p class=" text-muted-foreground">Attendees</p>
-						</div>
-					</div>
+					<ParticipantsDialog />
 				</div>
 
-				<div class="flex items-center gap-3">
-					<div class="rounded-md border p-3"><MapPin class="size-5 text-muted-foreground" /></div>
-					<p class="text-base font-medium">Legazpi City</p>
+				<div class="flex items-center justify-between gap-4">
+					<div class="flex items-center gap-3">
+						<div class="rounded-md border p-3"><MapPin class="size-5 text-muted-foreground" /></div>
+						<p class="text-base font-medium">Legazpi City</p>
+					</div>
+
+					<Button variant="ghost" onclick={toggleSeeMore}>
+						{see_more ? 'See Less' : 'See More'}
+					</Button>
 				</div>
 			</div>
-			<Button variant="ghost" onclick={toggleSeeMore}>{see_more ? 'See Less' : 'See More'}</Button>
 		</div>
 
 		<!-- EVENT STATS -->
