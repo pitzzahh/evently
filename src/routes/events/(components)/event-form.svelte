@@ -88,7 +88,7 @@
 			),
 			end: new CalendarDate(
 				current_date.getFullYear(),
-				current_date.getMonth() + 1,
+				current_date.getMonth(),
 				current_date.getDate()
 			)
 		},
