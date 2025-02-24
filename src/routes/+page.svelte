@@ -1,34 +1,26 @@
 <script lang="ts">
-	import PocketBase from 'pocketbase';
+	import * as Tabs from '$lib/components/ui/tabs/index.js';
+	import type { PageData } from './$types';
+	import EventList from './events/(components)/event-list.svelte';
 
-	let { data } = $props();
-	const { POCKETBASE_INSTANCE } = data;
-	const notes = $state(data.notes);
-
-	const pb = new PocketBase(POCKETBASE_INSTANCE!);
-
-	$effect(() => {
-		console.log(import.meta.env.VITE_POCKETBASE_INSTANCE);
-		pb.collection('notes').subscribe('*', (e) => {
-			console.log('action', e.action);
-			console.log('record', e.record);
-			if (e.action === 'delete') {
-				notes.splice(
-					notes.findIndex((note) => note.id === e.record.id),
-					1
-				);
-				return;
-			}
-			notes.push(e.record);
-		});
-	});
+	let { data }: { data: PageData } = $props();
 </script>
 
-<h1>Welcome to SvelteKit</h1>
-<p>
-	Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation.
-</p>
+<div>
+	<Tabs.Root value="upcoming">
+		<div class="flex items-center justify-between gap-4">
+			<h2 class="text-4xl font-semibold">Events</h2>
+			<Tabs.List class="grid h-auto w-full max-w-[300px] grid-cols-2">
+				<Tabs.Trigger value="upcoming" class="h-auto text-base">Upcoming</Tabs.Trigger>
+				<Tabs.Trigger value="past" class="h-auto text-base">Past</Tabs.Trigger>
+			</Tabs.List>
+		</div>
 
-{#each notes as notes}
-	<h2>{notes.title}</h2>
-{/each}
+		<Tabs.Content value="upcoming" class="mt-6">
+			<EventList />
+		</Tabs.Content>
+		<Tabs.Content value="past" class="mt-6">
+			<EventList />
+		</Tabs.Content>
+	</Tabs.Root>
+</div>
