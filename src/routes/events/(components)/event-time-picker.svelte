@@ -5,6 +5,7 @@
 
 	let {
 		event_date,
+		day,
 		updateDateEventPeriodStartEnd
 	}: {
 		event_date: EventDateTime;
@@ -15,6 +16,7 @@
 			pm_start?: string;
 			pm_end?: string;
 		}) => void;
+		day: number;
 	} = $props();
 	let formatted_date = formatDate(event_date.date);
 
@@ -26,25 +28,10 @@
 		});
 	}
 
-	// TODO: PUT THE UPDATED START AND END TIME IN THE ARRAY STATE OF EVENT DATES
-	// let am_start_time = $state('8:00 AM');
-	// let am_end_time = $state('12:00 PM');
-	// let pm_start_time = $state('1:00 PM');
-	// let pm_end_time = $state('5:00 PM');
-
 	function getFilteredEndTimes(startTime: string) {
 		const startIndex = time_options.indexOf(startTime);
 		return time_options.slice(startIndex + 1);
 	}
-
-	// automatically change the end time if theres some changes in start time
-	// $effect(() => {
-	// 	updateDateEventPeriodStartEnd({
-	// 		id: event_date.id,
-	// 		am_end: getFilteredEndTimes(am_start).at(0),
-	// 		pm_end: getFilteredEndTimes(pm_start).at(0)
-	// 	});
-	// });
 </script>
 
 <div class="flex w-full gap-2">
@@ -54,18 +41,22 @@
 		<div class="flex w-full flex-col gap-1">
 			<!-- AM START -->
 			<div class="flex items-center justify-between">
-				<p class="text-sm text-muted-foreground">AM Start</p>
+				<div class="flex items-center gap-2">
+					<p class="text-sm text-muted-foreground">AM Start</p>
+					<p class="rounded-sm border bg-primary px-3 py-1 text-xs">Day {day}</p>
+				</div>
+
 				<div class="flex items-center gap-1">
-					<p class="w-[100px] rounded-bl-sm rounded-tl-sm bg-background p-2 text-center text-sm">
+					<p
+						class="w-[120px] rounded-bl-sm rounded-tl-sm border bg-background p-2 text-center text-sm"
+					>
 						{formatted_date}
 					</p>
 					<TimeComboBox
 						{time_options}
 						selected_time={event_date.am_start}
 						onTimeSelect={(time) => {
-							updateDateEventPeriodStartEnd({ id: event_date.id, am_start: time,
-								
-							 });
+							updateDateEventPeriodStartEnd({ id: event_date.id, am_start: time });
 						}}
 					/>
 				</div>
@@ -75,7 +66,9 @@
 				<p class="text-sm text-muted-foreground">AM End</p>
 
 				<div class="flex items-center gap-1">
-					<p class="w-[100px] rounded-bl-sm rounded-tl-sm bg-background p-2 text-center text-sm">
+					<p
+						class="w-[120px] rounded-bl-sm rounded-tl-sm border bg-background p-2 text-center text-sm"
+					>
 						{formatted_date}
 					</p>
 					<TimeComboBox
@@ -95,9 +88,14 @@
 		<div class="flex w-full flex-col gap-1">
 			<!-- PM START -->
 			<div class="flex items-center justify-between">
-				<p class="text-sm text-muted-foreground">PM Start</p>
+				<div class="flex items-center gap-2">
+					<p class="text-sm text-muted-foreground">PM Start</p>
+					<p class="rounded-sm border bg-primary px-3 py-1 text-xs">Day {day}</p>
+				</div>
 				<div class="flex items-center gap-1">
-					<p class="w-[100px] rounded-bl-sm rounded-tl-sm bg-background p-2 text-center text-sm">
+					<p
+						class="w-[120px] rounded-bl-sm rounded-tl-sm border bg-background p-2 text-center text-sm"
+					>
 						{formatted_date}
 					</p>
 					<TimeComboBox
@@ -114,7 +112,9 @@
 				<p class="text-sm text-muted-foreground">PM End</p>
 
 				<div class="flex items-center gap-1">
-					<p class="w-[100px] rounded-bl-sm rounded-tl-sm bg-background p-2 text-center text-sm">
+					<p
+						class="w-[120px] rounded-bl-sm rounded-tl-sm border bg-background p-2 text-center text-sm"
+					>
 						{formatted_date}
 					</p>
 					<TimeComboBox
