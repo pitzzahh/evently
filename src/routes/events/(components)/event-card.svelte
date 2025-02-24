@@ -18,9 +18,11 @@
 	</TimelineOppositeContent>
 	<TimelineSeparator>
 		<div
-			class="h-3 w-3 rounded-full border border-white bg-gray-400 dark:border-gray-900 dark:bg-gray-700"
+			class="sticky top-[5rem] mb-[4.9rem] h-3 w-3 rounded-full border border-white bg-gray-400 dark:border-gray-900 dark:bg-gray-700"
 		></div>
-		<div class="h-full border-s-2 border-dashed border-gray-400 dark:border-gray-700"></div>
+		<div
+			class="absolute h-full border-s-2 border-dashed border-gray-400 dark:border-gray-700"
+		></div>
 	</TimelineSeparator>
 	<TimelineContent style="margin: 0;">
 		<div
