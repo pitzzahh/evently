@@ -14,6 +14,19 @@ export function formatDateToTimeOption(date?: Date): string {
 	return `${formattedHours}:${formattedMinutes} ${ampm}`;
 }
 
+export function extractHoursAndMinutes(time: string): { hours: number, minutes: number } {
+	const [timePart, modifier] = time.split(' ');
+	let [hours, minutes] = timePart.split(':').map(Number);
+
+	if (modifier === 'PM' && hours !== 12) {
+		hours += 12;
+	} else if (modifier === 'AM' && hours === 12) {
+		hours = 0;
+	}
+
+	return { hours, minutes };
+}
+
 export function formatPath(path: string): string {
 	return path.replace(/^C:\\/, '').replace(/\\/g, '/');
 }
