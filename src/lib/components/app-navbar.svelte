@@ -28,7 +28,7 @@
 				<a href={route.pathname}>
 					<p
 						class={cn('flex items-center gap-2 font-semibold text-muted-foreground opacity-50', {
-							'opacity-1 text-inherit': isActive(route.pathname)
+							'opacity-1 text-inherit transition-colors duration-200': isActive(route.pathname)
 						})}
 					>
 						<route.icon class="size-6" />
