@@ -19,6 +19,14 @@
           "path": "$APPLOCALDATA/*"
         }
       ]
+    },
+    {
+      "identifier": "fs:write-files",
+      "allow": [
+        {
+          "path": "$APPLOCALDATA/*"
+        }
+      ]
     }
   ],
   "platforms": [
