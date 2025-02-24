@@ -14,6 +14,17 @@ export function formatDateToTimeOption(date?: Date): string {
 	return `${formattedHours}:${formattedMinutes} ${ampm}`;
 }
 
+export function createDate(event_date: Date, time: string | undefined, defaultTime: string) {
+	const { hours, minutes } = extractHoursAndMinutes(time || defaultTime);
+	return new Date(
+		event_date.getFullYear(),
+		event_date.getMonth(),
+		event_date.getDate(),
+		hours,
+		minutes
+	);
+}
+
 export function extractHoursAndMinutes(time: string): { hours: number, minutes: number } {
 	const [timePart, modifier] = time.split(' ');
 	let [hours, minutes] = timePart.split(':').map(Number);
