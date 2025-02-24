@@ -1,4 +1,4 @@
-import { createPersistenceAdapter } from '@signaldb/core'
+import { createPersistenceAdapter, createReactivityAdapter } from '@signaldb/core'
 import { open, BaseDirectory, watch, exists, readFile } from '@tauri-apps/plugin-fs'
 
 export function createTauriFilesystemAdapter(filename: string) {
@@ -36,7 +36,7 @@ export function createTauriFilesystemAdapter(filename: string) {
 }
 
 export function svelteReactivityAdapter() {
-  return {
+  return createReactivityAdapter({
     create() {
       let dep = $state(0);
       return {
@@ -48,6 +48,9 @@ export function svelteReactivityAdapter() {
         }
       };
     },
-    isInScope: () => !!$effect.tracking()
-  };
+    isInScope: () => !!$effect.tracking(),
+    onDispose: (dispose) => {
+      dispose();
+    }
+  });
 }
