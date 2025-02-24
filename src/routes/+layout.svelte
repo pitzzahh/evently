@@ -1,8 +1,8 @@
 <script lang="ts">
 	import '../app.css';
 	import { ModeWatcher } from 'mode-watcher';
-	import { RenderScan } from "svelte-render-scan";
-	import { dev } from "$app/environment";
+	import { RenderScan } from 'svelte-render-scan';
+	import { dev } from '$app/environment';
 	import AppSidebar from '@/components/app-sidebar.svelte';
 	// import * as Breadcrumb from '@/components/ui/breadcrumb/index.js';
 	// import { Separator } from '@/components/ui/separator/index.js';
@@ -13,27 +13,27 @@
 
 	let { children } = $props();
 
-	function forwardConsole(
-		fnName: 'log' | 'debug' | 'info' | 'warn' | 'error',
-		logger: (message: string) => Promise<void>
-	) {
-		const original = console[fnName];
-		console[fnName] = (message) => {
-			original(message);
-			logger(message);
-		};
-	}
+	// function forwardConsole(
+	// 	fnName: 'log' | 'debug' | 'info' | 'warn' | 'error',
+	// 	logger: (message: string) => Promise<void>
+	// ) {
+	// 	const original = console[fnName];
+	// 	console[fnName] = (message) => {
+	// 		original(message);
+	// 		logger(message);
+	// 	};
+	// }
 
-	forwardConsole('log', trace);
-	forwardConsole('debug', debug);
-	forwardConsole('info', info);
-	forwardConsole('warn', warn);
-	forwardConsole('error', error);
+	// forwardConsole('log', trace);
+	// forwardConsole('debug', debug);
+	// forwardConsole('info', info);
+	// forwardConsole('warn', warn);
+	// forwardConsole('error', error);
 </script>
 
 <ModeWatcher />
 {#if dev}
-  <RenderScan />
+	<RenderScan />
 {/if}
 <!-- <Sidebar.Provider>
 	<AppSidebar />

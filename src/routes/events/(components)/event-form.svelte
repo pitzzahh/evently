@@ -117,8 +117,6 @@
 		}
 	});
 
-	$inspect(comp_state.event_dates);
-
 	function updateDateEventPeriodStartEnd({
 		id,
 		am_start,
@@ -132,7 +130,9 @@
 		pm_start?: string;
 		pm_end?: string;
 	}) {
+		console.log({ id, am_start, am_end, pm_start, pm_end });
 		comp_state.event_dates = comp_state.event_dates.map((event) => {
+			$state.snapshot(event);
 			if (event.id !== id) return event;
 
 			const selected_am_start_idx = time_options.findIndex((o) => o === am_start);
@@ -148,7 +148,16 @@
 			let adjusted_pm_end = formatDateToTimeOption(event.pm_end);
 
 			if (am_start && selected_am_start_idx !== -1) {
+				console.log(am_start && selected_am_start_idx !== -1);
+				console.log({
+					current_am_end_idx,
+					selected_am_start_idx
+				});
 				if (current_am_end_idx === -1 || selected_am_start_idx >= current_am_end_idx) {
+					console.log(
+						'time_options[selected_am_start_idx + 1]',
+						time_options[selected_am_start_idx + 1]
+					);
 					adjusted_am_end =
 						time_options[selected_am_start_idx + 1] || formatDateToTimeOption(event.am_end);
 				}
@@ -160,8 +169,21 @@
 						time_options[selected_pm_start_idx + 1] || formatDateToTimeOption(event.pm_end);
 				}
 			}
+			console.log('adjusted_am_end', adjusted_am_end);
+			console.log('adjusted_pm_end', adjusted_pm_end);
+			const am_start_extract = am_start ? extractHoursAndMinutes(am_start) : event.am_start;
+			const am_end_extract = extractHoursAndMinutes(adjusted_am_end);
+			const pm_start_extract = pm_start ? extractHoursAndMinutes(pm_start) : event.pm_start;
+			const pm_end_extract = extractHoursAndMinutes(adjusted_pm_end);
 
-			return {
+			console.log({
+				am_start_extract,
+				am_end_extract,
+				pm_start_extract,
+				pm_end_extract
+			});
+
+			const returned_data = {
 				...event,
 				am_start: am_start
 					? new Date(
@@ -196,6 +218,10 @@
 							extractHoursAndMinutes(adjusted_pm_end).minutes
 						)
 			};
+
+			console.log('returned_data', returned_data);
+
+			return returned_data;
 		});
 	}
 </script>

@@ -64,6 +64,7 @@
 						{time_options}
 						selected_time={formatDateToTimeOption(event_date.am_start)}
 						onTimeSelect={(time) => {
+							console.log(`AM START onTimeSelect: ${time}`);
 							updateDateEventPeriodStartEnd({ id: event_date.id, am_start: time });
 						}}
 					/>
@@ -81,6 +82,7 @@
 						time_options={getFilteredEndTimes(formatDateToTimeOption(event_date.am_start))}
 						selected_time={formatDateToTimeOption(event_date.am_end)}
 						onTimeSelect={(time) => {
+							console.log(`AM END onTimeSelect: ${time}`);
 							updateDateEventPeriodStartEnd({ id: event_date.id, am_end: time });
 						}}
 					/>
@@ -103,6 +105,7 @@
 						{time_options}
 						selected_time={formatDateToTimeOption(event_date.pm_start)}
 						onTimeSelect={(time) => {
+							console.log(`PM START onTimeSelect: ${time}`);
 							updateDateEventPeriodStartEnd({ id: event_date.id, pm_start: time });
 						}}
 					/>
@@ -120,6 +123,7 @@
 						time_options={getFilteredEndTimes(formatDateToTimeOption(event_date.pm_start))}
 						selected_time={formatDateToTimeOption(event_date.pm_end)}
 						onTimeSelect={(time) => {
+							console.log(`PM END onTimeSelect: ${time}`);
 							updateDateEventPeriodStartEnd({ id: event_date.id, pm_end: time });
 						}}
 					/>
