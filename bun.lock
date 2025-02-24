@@ -15,6 +15,7 @@
         "nanoid": "^5.1.0",
         "pocketbase": "^0.25.1",
         "svelte-infinite": "^0.4.0",
+        "svelte-vertical-timeline": "^2.0.0",
         "zod": "^3.24.2",
       },
       "devDependencies": {
@@ -717,6 +718,8 @@
     "svelte-infinite": ["svelte-infinite@0.4.0", "", { "peerDependencies": { "svelte": "^5.0.0-0" } }, "sha512-FKSVW9lCanNclz74haheI92leyPjlxF8RxnPO7wVxr7HDw9jRLwoTA535dLGWqTOdok93bzq5mEscSD5bJsU/A=="],
 
     "svelte-toolbelt": ["svelte-toolbelt@0.7.1", "", { "dependencies": { "clsx": "^2.1.1", "runed": "^0.23.2", "style-to-object": "^1.0.8" }, "peerDependencies": { "svelte": "^5.0.0" } }, "sha512-HcBOcR17Vx9bjaOceUvxkY3nGmbBmCBBbuWLLEWO6jtmWH8f/QoWmbyUfQZrpDINH39en1b8mptfPQT9VKQ1xQ=="],
+
+    "svelte-vertical-timeline": ["svelte-vertical-timeline@2.0.0", "", { "peerDependencies": { "svelte": "^5.0.0" } }, "sha512-I2Lb+J23mhG8Vf4dLi/qXEo3hVBG2+xilCXpGazMPze8Dhdwad0W+EqxRDvXmlkEdF5HdI+nizO5bNVRe+IgYA=="],
 
     "sveltekit-superforms": ["sveltekit-superforms@2.23.1", "", { "dependencies": { "devalue": "^5.1.1", "memoize-weak": "^1.0.2", "ts-deepmerge": "^7.0.2" }, "optionalDependencies": { "@exodus/schemasafe": "^1.3.0", "@gcornut/valibot-json-schema": "^0.31.0", "@sinclair/typebox": "^0.34.14", "@typeschema/class-validator": "^0.3.0", "@vinejs/vine": "^3.0.0", "arktype": "^2.0.0", "class-validator": "^0.14.1", "effect": "^3.12.5", "joi": "^17.13.3", "json-schema-to-ts": "^3.1.1", "superstruct": "^2.0.2", "valibot": "1.0.0-beta.11", "yup": "^1.6.1", "zod": "^3.24.1", "zod-to-json-schema": "^3.24.1" }, "peerDependencies": { "@sveltejs/kit": "1.x || 2.x", "svelte": "3.x || 4.x || >=5.0.0-next.51" } }, "sha512-SPj5ac4SMg8SPyP0Zi3ynwXJa7r9U1CTyn+YSyck67zLsjt367Sro4SZnl3yASrLd5kJ6Y57cgIdYJ2aWNArXw=="],
 
