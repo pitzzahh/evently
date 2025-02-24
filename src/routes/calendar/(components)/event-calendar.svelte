@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-	import { Button } from "@/components/ui/button";
-  // TODO: Change to the correct import path from assets
-	import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from "lucide-svelte";
-	import { today, getLocalTimeZone, CalendarDate } from "@internationalized/date";
-	import type { CalendarEvent } from "@routes/calendar/(data)/types";
-	import {CalendarCell} from ".";
+	import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+	import { Button } from '@/components/ui/button';
+	// TODO: Change to the correct import path from assets
+	import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-svelte';
+	import { today, getLocalTimeZone, CalendarDate } from '@internationalized/date';
+	import type { CalendarEvent } from '@routes/calendar/(data)/types';
+	import { CalendarCell } from '.';
 
 	type Props = {
 		events: CalendarEvent[];
@@ -17,7 +17,7 @@
 	let currentDate = $state(today(getLocalTimeZone()));
 
 	// Days headers
-	const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+	const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 	// Get calendar dates
 	const getCalendarDates = () => {
@@ -34,7 +34,12 @@
 
 	// Get events for a specific date
 	const getDateEvents = (date: CalendarDate) => {
-		return events.filter((event) => event.date.year === date.year && event.date.month === date.month && event.date.day === date.day);
+		return events.filter(
+			(event) =>
+				event.date.year === date.year &&
+				event.date.month === date.month &&
+				event.date.day === date.day
+		);
 	};
 
 	// Navigation
@@ -48,46 +53,37 @@
 
 	// Format month and year
 	const formatMonthYear = (date: CalendarDate) => {
-		return new Intl.DateTimeFormat("en-US", {
-			month: "long",
-			year: "numeric",
+		return new Intl.DateTimeFormat('en-US', {
+			month: 'long',
+			year: 'numeric'
 		}).format(date.toDate(getLocalTimeZone()));
 	};
 </script>
 
-<Card class="w-full">
-	<CardHeader>
-		<div class="flex items-center justify-between">
-			<CardTitle class="flex items-center gap-2">
-				<CalendarIcon /> Event Calendar
-			</CardTitle>
-			<div class="flex items-center gap-4">
-				<Button variant="outline" size="icon" onclick={prevMonth}>
-					<ChevronLeftIcon class="h-4 w-4" />
-				</Button>
-				<span class="text-lg font-semibold">
-					{formatMonthYear(currentDate)}
-				</span>
-				<Button variant="outline" size="icon" onclick={nextMonth}>
-					<ChevronRightIcon class="h-4 w-4" />
-				</Button>
-			</div>
+<div class="flex items-center justify-center">
+	<div class="flex items-center gap-4">
+		<Button variant="outline" size="icon" onclick={prevMonth}>
+			<ChevronLeftIcon class="h-4 w-4" />
+		</Button>
+		<span class="text-lg font-semibold">
+			{formatMonthYear(currentDate)}
+		</span>
+		<Button variant="outline" size="icon" onclick={nextMonth}>
+			<ChevronRightIcon class="h-4 w-4" />
+		</Button>
+	</div>
+</div>
+<!-- Calendar Grid -->
+<div class="grid grid-cols-7 gap-px bg-muted">
+	<!-- Week days -->
+	{#each weekDays as day}
+		<div class="bg-background p-3 text-center font-semibold">
+			{day}
 		</div>
-	</CardHeader>
-	<CardContent>
-		<!-- Calendar Grid -->
-		<div class="grid grid-cols-7 gap-px bg-muted">
-			<!-- Week days -->
-			{#each weekDays as day}
-				<div class="bg-background p-3 text-center font-semibold">
-					{day}
-				</div>
-			{/each}
+	{/each}
 
-			<!-- Calendar days -->
-			{#each getCalendarDates() as date}
-				<CalendarCell {date} currentMonth={currentDate.month} events={getDateEvents(date)} />
-			{/each}
-		</div>
-	</CardContent>
-</Card>
+	<!-- Calendar days -->
+	{#each getCalendarDates() as date}
+		<CalendarCell {date} currentMonth={currentDate.month} events={getDateEvents(date)} />
+	{/each}
+</div>
