@@ -186,39 +186,25 @@
 			const returned_data = {
 				...event,
 				am_start: am_start
-					? new Date(
-							event.event_date.setHours(extractHoursAndMinutes(am_start).hours),
-							extractHoursAndMinutes(am_start).minutes
-						)
+					? createDate(event.event_date, am_start, formatDateToTimeOption(event.am_start))
 					: event.am_start,
-				am_end: am_end
-					? new Date(
-							event.event_date.setHours(extractHoursAndMinutes(am_end).hours),
-							extractHoursAndMinutes(am_end).minutes
-						)
-					: new Date(
-							event.event_date.setHours(
-								extractHoursAndMinutes(adjusted_am_end).hours,
-								extractHoursAndMinutes(adjusted_am_end).minutes
-							)
-						),
+				am_end: createDate(event.event_date, am_end, formatDateToTimeOption(event.am_end)),
 				pm_start: pm_start
-					? new Date(
-							event.event_date.setHours(extractHoursAndMinutes(pm_start).hours),
-							extractHoursAndMinutes(pm_start).minutes
-						)
+					? createDate(event.event_date, pm_start, formatDateToTimeOption(event.pm_start))
 					: event.pm_start,
-				pm_end: pm_end
-					? new Date(
-							event.event_date.setHours(extractHoursAndMinutes(pm_end).hours),
-							extractHoursAndMinutes(pm_end).minutes
-						)
-					: new Date(
-							event.event_date.setHours(extractHoursAndMinutes(adjusted_pm_end).hours),
-							extractHoursAndMinutes(adjusted_pm_end).minutes
-						)
+				pm_end: createDate(event.event_date, pm_end, formatDateToTimeOption(event.pm_end))
 			};
 
+			function createDate(event_date: Date, time: string | undefined, defaultTime: string) {
+				const { hours, minutes } = extractHoursAndMinutes(time || defaultTime);
+				return new Date(
+					event_date.getFullYear(),
+					event_date.getMonth(),
+					event_date.getDate(),
+					hours,
+					minutes
+				);
+			}
 			console.log('returned_data', returned_data);
 
 			return returned_data;
