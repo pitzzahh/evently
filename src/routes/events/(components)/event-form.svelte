@@ -103,10 +103,6 @@
 		}
 	});
 
-	$effect(() => {
-		console.log(event_dates);
-	});
-
 	function updateDateEventPeriodStartEnd({
 		id,
 		am_start,
@@ -249,23 +245,12 @@
 			{#snippet children({ props })}
 				<div class="flex justify-between">
 					<Form.Label>Time</Form.Label>
-					<!-- <Form.Field {form} name="is_multi_day_event">
-						<Form.Control>
-							{#snippet children({ props })}
-								<div class="flex items-center gap-2">
-									<Form.Label class="flex items-center gap-1">Multi-day Event</Form.Label>
-									<Switch {...props} bind:checked={$formData.is_multi_day_event} />
-								</div>
-							{/snippet}
-						</Form.Control>
-						<Form.FieldErrors />
-					</Form.Field> -->
 				</div>
 
 				<div class="max-h-[400px] overflow-y-auto">
 					<div class="flex flex-col gap-2">
-						{#each event_dates as event_date}
-							<EventTimePicker {event_date} {updateDateEventPeriodStartEnd} />
+						{#each event_dates as event_date, index}
+							<EventTimePicker {event_date} day={index + 1} {updateDateEventPeriodStartEnd} />
 						{/each}
 					</div>
 				</div>
