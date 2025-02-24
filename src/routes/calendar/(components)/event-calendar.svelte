@@ -2,7 +2,7 @@
 	import { Calendar as CalendarPrimitive, type WithoutChildrenOrChild } from 'bits-ui';
 	import * as Calendar from '@/components/ui/calendar';
 	import { cn } from '$lib/utils';
-	import type { CalendarDate, DateValue } from '@internationalized/date';
+	import type { DateValue } from '@internationalized/date';
 	import type { CalendarEvent } from '@routes/calendar/(data)/types';
 	import { EventCell } from '.';
 
@@ -27,12 +27,6 @@
 			return isAfterStart && isBeforeEnd;
 		});
 	}
-
-	const eventColors = {
-		meeting: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-		event: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-		workshop: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-	};
 </script>
 
 <CalendarPrimitive.Root
