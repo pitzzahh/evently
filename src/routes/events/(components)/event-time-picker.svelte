@@ -1,13 +1,14 @@
 <script lang="ts">
-	import type { EventDateTime } from './event-form.svelte';
+	import type { EventSchedule } from '@/db/models/types';
 	import TimeComboBox from './time-combo-box.svelte';
 	import { time_options } from '@/constants';
+	import { formatDateToTimeOption } from '@/utils/format';
 
 	let {
 		event_date,
 		updateDateEventPeriodStartEnd
 	}: {
-		event_date: EventDateTime;
+		event_date: EventSchedule;
 		updateDateEventPeriodStartEnd: (params: {
 			id: string;
 			am_start?: string;
@@ -16,7 +17,7 @@
 			pm_end?: string;
 		}) => void;
 	} = $props();
-	let formatted_date = formatDate(event_date.date);
+	let formatted_date = formatDate(event_date.event_date);
 
 	function formatDate(date: Date): string {
 		return date.toLocaleDateString('en-US', {
@@ -61,11 +62,9 @@
 					</p>
 					<TimeComboBox
 						{time_options}
-						selected_time={event_date.am_start}
+						selected_time={formatDateToTimeOption(event_date.am_start)}
 						onTimeSelect={(time) => {
-							updateDateEventPeriodStartEnd({ id: event_date.id, am_start: time,
-								
-							 });
+							updateDateEventPeriodStartEnd({ id: event_date.id, am_start: time });
 						}}
 					/>
 				</div>
@@ -79,8 +78,8 @@
 						{formatted_date}
 					</p>
 					<TimeComboBox
-						time_options={getFilteredEndTimes(event_date.am_start)}
-						selected_time={event_date.am_end}
+						time_options={getFilteredEndTimes(formatDateToTimeOption(event_date.am_start))}
+						selected_time={formatDateToTimeOption(event_date.am_end)}
 						onTimeSelect={(time) => {
 							updateDateEventPeriodStartEnd({ id: event_date.id, am_end: time });
 						}}
@@ -102,7 +101,7 @@
 					</p>
 					<TimeComboBox
 						{time_options}
-						selected_time={event_date.pm_start}
+						selected_time={formatDateToTimeOption(event_date.pm_start)}
 						onTimeSelect={(time) => {
 							updateDateEventPeriodStartEnd({ id: event_date.id, pm_start: time });
 						}}
@@ -118,8 +117,8 @@
 						{formatted_date}
 					</p>
 					<TimeComboBox
-						time_options={getFilteredEndTimes(event_date.pm_start)}
-						selected_time={event_date.pm_end}
+						time_options={getFilteredEndTimes(formatDateToTimeOption(event_date.pm_start))}
+						selected_time={formatDateToTimeOption(event_date.pm_end)}
 						onTimeSelect={(time) => {
 							updateDateEventPeriodStartEnd({ id: event_date.id, pm_end: time });
 						}}
