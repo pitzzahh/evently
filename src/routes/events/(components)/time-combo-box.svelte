@@ -57,7 +57,6 @@
 							value={time}
 							onSelect={() => {
 								onTimeSelect(time);
-								// selected_time = time;
 								closeAndFocusTrigger();
 							}}
 						>
