@@ -1,9 +1,9 @@
 import { svelteReactivityAdapter } from '@/db/adapter/index.svelte';
-import type { ClassProperties } from '@/types/generic';
 import { Collection } from '@signaldb/core';
 import createOPFSAdapter from '@signaldb/opfs';
+import type { AttendanceRecord, EventDetails, EventSchedule, Note, Participant, QRCode } from './types';
 
-export class AttendanceRecordCollection extends Collection {
+export class AttendanceRecordCollection extends Collection<AttendanceRecord> {
   id!: string;
   user_id!: string;
   event_id!: string;
@@ -13,7 +13,7 @@ export class AttendanceRecordCollection extends Collection {
   created?: Date;
   updated?: Date;
 
-  constructor(data?: AttendanceRecordCollection) {
+  constructor(data?: AttendanceRecord) {
     super({
       name: 'attendance_records',
       reactivity: svelteReactivityAdapter(),
@@ -31,7 +31,7 @@ export class AttendanceRecordCollection extends Collection {
   }
 }
 
-export class EventScheduleCollection extends Collection {
+export class EventScheduleCollection extends Collection<EventSchedule> {
   id!: string;
   event_id?: string;
   event_date?: Date;
@@ -42,7 +42,7 @@ export class EventScheduleCollection extends Collection {
   created?: Date;
   updated?: Date;
 
-  constructor(data?: EventScheduleCollection) {
+  constructor(data?: EventSchedule) {
     super({
       name: 'event_schedules',
       reactivity: svelteReactivityAdapter(),
@@ -61,7 +61,7 @@ export class EventScheduleCollection extends Collection {
   }
 }
 
-export class EventDetailsCollection extends Collection {
+export class EventDetailsCollection extends Collection<EventDetails> {
   id!: string;
   event_name?: string;
   start_date?: Date;
@@ -69,7 +69,7 @@ export class EventDetailsCollection extends Collection {
   created?: Date;
   updated?: Date;
 
-  constructor(data?: EventDetailsCollection) {
+  constructor(data?: EventDetails) {
     super({
       name: 'event_details',
       reactivity: svelteReactivityAdapter(),
@@ -85,13 +85,13 @@ export class EventDetailsCollection extends Collection {
   }
 }
 
-export class NoteCollection extends Collection {
+export class NoteCollection extends Collection<Note> {
   id!: string;
   title?: string;
   created?: Date;
   updated?: Date;
 
-  constructor(data?: NoteCollection) {
+  constructor(data?: Note) {
     super({
       name: 'notes',
       reactivity: svelteReactivityAdapter(),
@@ -105,9 +105,7 @@ export class NoteCollection extends Collection {
   }
 }
 
-type PartCol = Pick<ParticipantCollection, 'first_name' | 'id' | 'last_name'>
-
-export class ParticipantCollection extends Collection<PartCol> {
+export class ParticipantCollection extends Collection<Participant> {
   id!: string;
   first_name!: string;
   middle_initial?: string;
@@ -116,7 +114,7 @@ export class ParticipantCollection extends Collection<PartCol> {
   created?: Date;
   updated?: Date;
 
-  constructor(data?: ParticipantCollection) {
+  constructor(data?: Participant) {
     super({
       name: 'participants',
       reactivity: svelteReactivityAdapter(),
@@ -133,13 +131,13 @@ export class ParticipantCollection extends Collection<PartCol> {
   }
 }
 
-export class QRCodeCollection extends Collection {
+export class QRCodeCollection extends Collection<QRCode> {
   id!: string;
   code!: string;
   created?: Date;
   updated?: Date;
 
-  constructor(data?: QRCodeCollection) {
+  constructor(data?: QRCode) {
     super({
       name: 'qr_codes',
       reactivity: svelteReactivityAdapter(),
