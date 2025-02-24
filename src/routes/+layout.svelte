@@ -1,6 +1,8 @@
 <script lang="ts">
 	import '../app.css';
 	import { ModeWatcher } from 'mode-watcher';
+	import { RenderScan } from "svelte-render-scan";
+	import { dev } from "$app/environment";
 	import AppSidebar from '@/components/app-sidebar.svelte';
 	// import * as Breadcrumb from '@/components/ui/breadcrumb/index.js';
 	// import { Separator } from '@/components/ui/separator/index.js';
@@ -30,6 +32,9 @@
 </script>
 
 <ModeWatcher />
+{#if dev}
+  <RenderScan />
+{/if}
 <!-- <Sidebar.Provider>
 	<AppSidebar />
 	<Sidebar.Inset> -->
