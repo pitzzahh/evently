@@ -6,15 +6,18 @@
 	let { children } = $props();
 </script>
 
-<div class="flex flex-col gap-4">
+<div class="flex flex-col items-start gap-4">
 	<Button
 		variant="outline"
-		size="icon"
+		class="h-auto p-3"
 		onclick={async () => {
 			if (browser) window.history.back();
 		}}
 	>
-		<ChevronLeft class="size-4" />
+		<ChevronLeft class="size-8" />
 	</Button>
-	{@render children()}
+
+	<div class="w-full">
+		{@render children()}
+	</div>
 </div>
