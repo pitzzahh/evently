@@ -4,10 +4,10 @@
 
 	import { type PageData } from './$types';
 	import { cn } from '@/utils';
-	import AttendeesDataTable from '../../(components)/attendees-data-table.svelte';
+	import AttendeesDataTable from '../(components)/attendees-data-table.svelte';
 	import { nanoid } from 'nanoid';
-	import type { EventDateTime } from '../../(components)/event-form.svelte';
-	import EventTimePicker from '../../(components)/event-time-picker.svelte';
+	import type { EventDateTime } from '../(components)/event-form.svelte';
+	import EventTimePicker from '../(components)/event-time-picker.svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 
 	let { data }: { data: PageData } = $props();
@@ -59,7 +59,9 @@
 				<DropdownMenu.Content side="bottom" align="end" sideOffset={10}>
 					<DropdownMenu.Group>
 						<DropdownMenu.Item><Edit class="size-4" /> Edit event</DropdownMenu.Item>
-						<DropdownMenu.Item class="!text-red-600 hover:!bg-red-600/20"><Trash class="size-4" />Delete event</DropdownMenu.Item>
+						<DropdownMenu.Item class="!text-red-600 hover:!bg-red-600/20"
+							><Trash class="size-4" />Delete event</DropdownMenu.Item
+						>
 					</DropdownMenu.Group>
 				</DropdownMenu.Content>
 			</DropdownMenu.Root>
