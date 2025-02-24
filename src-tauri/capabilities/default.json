@@ -1,0 +1,33 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "enables the default permissions",
+  "windows": [
+    "main"
+  ],
+  "permissions": [
+    "core:default",
+    "log:default",
+    "process:default",
+    "core:window:allow-start-dragging",
+    "core:window:allow-set-fullscreen",
+    "updater:default",
+    {
+      "identifier": "shell:allow-execute",
+      "allow": [
+        {
+          "name": "pocketbase",
+          "sidecar": true,
+          "args": true
+        }
+      ]
+    },
+    "shell:allow-open",
+    "shell:default"
+  ],
+  "platforms": [
+    "macOS",
+    "windows",
+    "linux"
+  ]
+}
