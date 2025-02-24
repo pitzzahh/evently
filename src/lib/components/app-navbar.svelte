@@ -22,7 +22,8 @@
 	class="bg-gray-1100/50 sticky top-0 z-10 flex h-auto w-full shrink-0 items-center justify-between gap-8 border-b bg-clip-padding px-4 py-3
  	backdrop-blur-md backdrop-filter transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 md:gap-0"
 >
-	<a href="/"><p class="text-lg font-bold">evently</p></a>
+	<a href="/" class="cursor-pointer text-lg font-bold">evently</a>
+
 	<div class="flex w-full justify-between md:max-w-[80.6%]">
 		<div class="flex items-center gap-5">
 			{#each routes as route}

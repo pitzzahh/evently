@@ -3,6 +3,41 @@ import { DateFormatter } from '@internationalized/date';
 export const monthFormatter = new DateFormatter('fil', {
 	dateStyle: 'long'
 });
+
+export function formatDateToTimeOption(date?: Date): string {
+	if (!date) return 'Invalid date';
+	const hours = date.getHours();
+	const minutes = date.getMinutes();
+	const ampm = hours >= 12 ? 'PM' : 'AM';
+	const formattedHours = hours % 12 === 0 ? 12 : hours % 12;
+	const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
+	return `${formattedHours}:${formattedMinutes} ${ampm}`;
+}
+
+export function createDate(event_date: Date, time: string | undefined, defaultTime: string) {
+	const { hours, minutes } = extractHoursAndMinutes(time || defaultTime);
+	return new Date(
+		event_date.getFullYear(),
+		event_date.getMonth(),
+		event_date.getDate(),
+		hours,
+		minutes
+	);
+}
+
+export function extractHoursAndMinutes(time: string): { hours: number, minutes: number } {
+	const [timePart, modifier] = time.split(' ');
+	let [hours, minutes] = timePart.split(':').map(Number);
+
+	if (modifier === 'PM' && hours !== 12) {
+		hours += 12;
+	} else if (modifier === 'AM' && hours === 12) {
+		hours = 0;
+	}
+
+	return { hours, minutes };
+}
+
 export function formatPath(path: string): string {
 	return path.replace(/^C:\\/, '').replace(/\\/g, '/');
 }
