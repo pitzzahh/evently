@@ -39,13 +39,19 @@
 	}
 
 	// automatically change the end time if theres some changes in start time
-	// $effect(() => {
-	// 	updateDateEventPeriodStartEnd({
-	// 		id: event_date.id,
-	// 		am_end: getFilteredEndTimes(am_start).at(0),
-	// 		pm_end: getFilteredEndTimes(pm_start).at(0)
-	// 	});
-	// });
+	// watch(
+	// 	[() => event_date.am_start, () => event_date.pm_start],
+	// 	() => {
+	// 		updateDateEventPeriodStartEnd({
+	// 			id: event_date.id,
+	// 			am_end: getFilteredEndTimes(formatDateToTimeOption(event_date.am_start)).at(0),
+	// 			pm_end: getFilteredEndTimes(formatDateToTimeOption(event_date.pm_start)).at(0)
+	// 		});
+	// 	},
+	// 	{
+	// 		lazy: true
+	// 	}
+	// );
 </script>
 
 <div class="flex w-full gap-2">
