@@ -34,7 +34,6 @@ export class AttendanceRecordCollection extends Collection<AttendanceRecord> {
 export class EventScheduleCollection extends Collection<EventSchedule> {
   id!: string;
   event_id?: string;
-  event_date?: Date;
   am_start?: Date;
   am_end?: Date;
   pm_start?: Date;
@@ -51,7 +50,6 @@ export class EventScheduleCollection extends Collection<EventSchedule> {
     if (!data) return
     this.id = data.id;
     this.event_id = data.event_id;
-    this.event_date = data.event_date ? new Date(data.event_date) : undefined;
     this.am_start = data.am_start ? new Date(data.am_start) : undefined;
     this.am_end = data.am_end ? new Date(data.am_end) : undefined;
     this.pm_start = data.pm_start ? new Date(data.pm_start) : undefined;
@@ -64,6 +62,8 @@ export class EventScheduleCollection extends Collection<EventSchedule> {
 export class EventDetailsCollection extends Collection<EventDetails> {
   id!: string;
   event_name?: string;
+  is_multi_day?: boolean;
+  event_date?: Date;
   start_date?: Date;
   end_date?: Date;
   created?: Date;
@@ -78,6 +78,8 @@ export class EventDetailsCollection extends Collection<EventDetails> {
     if (!data) return
     this.id = data.id;
     this.event_name = data.event_name;
+    this.is_multi_day = data.is_multi_day;
+    this.event_date = data.event_date ? new Date(data.event_date) : undefined;
     this.start_date = data.start_date ? new Date(data.start_date) : undefined;
     this.end_date = data.end_date ? new Date(data.end_date) : undefined;
     this.created = data.created ? new Date(data.created) : undefined;
