@@ -59,7 +59,7 @@
 
 		return events;
 	}
-	const events = $state(generateSampleEvents(10));
+	const events = $state(generateSampleEvents(50));
 </script>
 
 <div class="min-h-dvh bg-background p-4">
