@@ -1,15 +1,15 @@
 import { createPersistenceAdapter, createReactivityAdapter } from '@signaldb/core'
-import { open, BaseDirectory, watch, exists, readFile } from '@tauri-apps/plugin-fs'
+import { open, BaseDirectory, watch, exists, readFile, writeFile } from '@tauri-apps/plugin-fs'
 
 export function createTauriFilesystemAdapter(filename: string) {
   return createPersistenceAdapter({
     async register(onChange) {
       console.info(`registering filesystem adapter for ${filename}`)
-      const file = await open(filename, { read: true, write: true, create: true, baseDir: BaseDirectory.AppLocalData })
-      await file.close()
-
+      const fileExists = await exists(filename, { baseDir: BaseDirectory.AppLocalData });
+      console.info(`file exists: ${fileExists}`)
+      if (!fileExists) return writeFile(filename, new Uint8Array([]), { baseDir: BaseDirectory.AppLocalData })
       // Watch for changes in the file
-      await watch(filename, async () => {
+      watch(filename, async () => {
         console.info(`filesystem change detected ${filename}`)
         await onChange()
       }, { baseDir: BaseDirectory.AppLocalData })
@@ -48,9 +48,6 @@ export function svelteReactivityAdapter() {
         }
       };
     },
-    isInScope: () => !!$effect.tracking(),
-    onDispose: (dispose) => {
-      dispose();
-    }
+    isInScope: () => !!$effect.tracking()
   });
 }
