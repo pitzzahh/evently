@@ -2,13 +2,19 @@
 	import { svelteReactivityAdapter } from '@/db/adapter/index.svelte';
 	import { Collection } from '@signaldb/core';
 	import createOPFSAdapter from '@signaldb/opfs';
-	
+
 	const Posts = new Collection({
 		persistence: createOPFSAdapter('posts.json'),
 		reactivity: svelteReactivityAdapter()
 	});
 
 	let items: any[] = $state.raw([]);
+
+	function remove(id: string) {
+		Posts.removeOne({
+			id
+		});
+	}
 
 	$effect(() => {
 		const cursor = Posts.find({});
@@ -26,7 +32,7 @@
 	{#each items as post}
 		<li>
 			<strong>{post.title}</strong> by {post.author}
-			<button onclick={() => Posts.removeOne(post._id)}>Delete</button>
+			<button onclick={() => remove(post.id)}>Delete</button>
 		</li>
 	{/each}
 </ul>
