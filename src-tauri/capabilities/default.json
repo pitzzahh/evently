@@ -11,7 +11,15 @@
     "process:default",
     "core:window:allow-start-dragging",
     "core:window:allow-set-fullscreen",
-    "updater:default"
+    "updater:default",
+    {
+      "identifier": "fs:read-files",
+      "allow": [
+        {
+          "path": "$APPLOCALDATA/*"
+        }
+      ]
+    }
   ],
   "platforms": [
     "macOS",
