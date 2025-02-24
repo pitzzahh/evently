@@ -1,13 +1,10 @@
 <script lang="ts">
 	import { Button } from '@/components/ui/button';
 	import { Calendar, ChartBar, ChevronLeft, MapPin, Settings, UsersRound } from 'lucide-svelte';
-
-	import type { PageData } from './$types';
 	import { cn } from '@/utils';
 	import AttendeesDataTable from '../(components)/attendees-data-table.svelte';
 	import { browser } from '$app/environment';
 
-	let { data }: { data: PageData } = $props();
 	let see_more = $state(true);
 
 	function toggleSeeMore() {
@@ -36,7 +33,7 @@
 		</div>
 	</div>
 
-	<div class="grid gap-6 border-b-2 border-dashed pb-6">
+	<div class="grid h-auto gap-6 border-b-2 border-dashed pb-6">
 		<div class="flex items-end justify-between">
 			<div class="grid gap-4">
 				<div class="flex gap-5">
@@ -67,10 +64,22 @@
 			</div>
 			<Button variant="ghost" onclick={toggleSeeMore}>{see_more ? 'See Less' : 'See More'}</Button>
 		</div>
-
-		<!-- EVENT STATS -->
-		{#if see_more}
-			<div class="grid gap-3 rounded-lg border bg-white p-4 dark:bg-[#1C1E20]">
+		<div
+			class={cn(
+				'grid gap-3 rounded-lg border bg-white p-4 transition-all duration-300 dark:bg-[#1C1E20]',
+				{
+					'm-0 h-0 p-0': !see_more,
+					'h-auto': see_more
+				}
+			)}
+		>
+			<!-- EVENT STATS -->
+			<div
+				class={cn('transition-scale grid gap-3 rounded-lg border p-4 duration-300', {
+					'origin-top scale-y-0 opacity-0': !see_more,
+					'scale-y-100 opacity-100': see_more
+				})}
+			>
 				<div class="flex items-center justify-between">
 					<h3 class="text-lg font-semibold">Event Stats</h3>
 					<div class="rounded-md border border-blue-500 bg-blue-500/20 p-2">
@@ -93,7 +102,7 @@
 					</div>
 				</div>
 			</div>
-		{/if}
+		</div>
 	</div>
 
 	<!-- TODO: ADD ATTENDEES TABLE HERE -->
