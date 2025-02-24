@@ -1,38 +1,56 @@
 <script lang="ts">
-	import { svelteReactivityAdapter } from '@/db/adapter/index.svelte';
-	import { Collection } from '@signaldb/core';
-	import createOPFSAdapter from '@signaldb/opfs';
+	import { COLLECTIONS } from '@/db/index';
+	import type { ParticipantCollection } from '@/db/models';
+	import { watch } from 'runed';
 
-	const Posts = new Collection({
-		persistence: createOPFSAdapter('posts.json'),
-		reactivity: svelteReactivityAdapter()
+	let comp_state = $state({
+		count: 50
 	});
 
-	let items: any[] = $state.raw([]);
-
-	function remove(id: string) {
-		Posts.removeOne({
-			id
-		});
-	}
+	let items: ParticipantCollection[] = $state.raw([]);
 
 	$effect(() => {
-		const cursor = Posts.find({});
+		const cursor = COLLECTIONS.PARTICIPANT_COLLECTION.find({});
 		items = cursor.fetch();
-
 		return () => {
 			cursor.cleanup();
 		};
 	});
 </script>
 
-<button onclick={() => Posts.insert({ title: 'Post', author: 'Author' })}> Add Post </button>
+<button
+	onclick={() => {
+		for (let i = 0; i <= comp_state.count; i++) {
+			COLLECTIONS.PARTICIPANT_COLLECTION.insert({
+				first_name: 'John',
+				last_name: 'Doe: ' + i
+			});
+		}
+	}}
+>
+	Add Post
+</button>
 
+<input type="number" bind:value={comp_state.count} />
+
+<button
+	onclick={() => {
+		COLLECTIONS.PARTICIPANT_COLLECTION.removeMany({});
+		items = [];
+	}}
+>
+	Remove All
+</button>
 <ul>
 	{#each items as post}
 		<li>
-			<strong>{post.title}</strong> by {post.author}
-			<button onclick={() => remove(post.id)}>Delete</button>
+			<strong>{post.first_name}</strong> by {post.last_name}
+			<button
+				onclick={() =>
+					COLLECTIONS.PARTICIPANT_COLLECTION.removeOne({
+						id: post.id
+					})}>Delete</button
+			>
 		</li>
 	{/each}
 </ul>

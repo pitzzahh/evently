@@ -17,6 +17,7 @@
         "@tauri-apps/plugin-shell": "^2.2.0",
         "mode-watcher": "^0.5.1",
         "nanoid": "^5.1.0",
+        "runed": "^0.23.4",
         "svelte-infinite": "^0.4.0",
         "zod": "^3.24.2",
       },

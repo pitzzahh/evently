@@ -104,7 +104,7 @@ export class NoteCollection extends Collection {
   }
 }
 
-export class ParticipantCollection extends Collection {
+export class ParticipantCollection extends Collection<Pick<ParticipantCollection, 'first_name' | 'id' | 'last_name'>, string, ParticipantCollection> {
   id!: string;
   first_name!: string;
   middle_initial?: string;
