@@ -34,12 +34,11 @@
 
 	// Get events for a specific date
 	const getDateEvents = (date: CalendarDate) => {
-		return events.filter(
-			(event) =>
-				event.date.year === date.year &&
-				event.date.month === date.month &&
-				event.date.day === date.day
-		);
+		return events.filter((event) => {
+			const isAfterStart = date.compare(event.startDate) >= 0;
+			const isBeforeEnd = date.compare(event.endDate) <= 0;
+			return isAfterStart && isBeforeEnd;
+		});
 	};
 
 	// Navigation
