@@ -16,12 +16,7 @@
 	import EventTimePicker from './event-time-picker.svelte';
 	import CalendarIcon from 'lucide-svelte/icons/calendar';
 
-	import {
-		CalendarDate,
-		DateFormatter,
-		type DateValue,
-		getLocalTimeZone
-	} from '@internationalized/date';
+	import { CalendarDate, type DateValue, getLocalTimeZone } from '@internationalized/date';
 	import { cn } from '$lib/utils.js';
 	import { buttonVariants } from '$lib/components/ui/button/index.js';
 	import { RangeCalendar } from '$lib/components/ui/range-calendar/index.js';
@@ -75,7 +70,7 @@
 		date_range: {
 			start: new CalendarDate(
 				current_date.getFullYear(),
-				current_date.getMonth(),
+				current_date.getMonth() + 1,
 				current_date.getDate()
 			),
 			end: new CalendarDate(
@@ -135,7 +130,7 @@
 	}) {
 		console.log({ id, am_start, am_end, pm_start, pm_end });
 		comp_state.event_dates = comp_state.event_dates.map((event) => {
-			$state.snapshot(event);
+			// $state.snapshot(event);
 			if (event.id !== id) return event;
 
 			const selected_am_start_idx = time_options.findIndex((o) => o === am_start);
@@ -157,19 +152,15 @@
 					selected_am_start_idx
 				});
 				if (current_am_end_idx === -1 || selected_am_start_idx >= current_am_end_idx) {
-					console.log(
-						'time_options[selected_am_start_idx + 1]',
-						time_options[selected_am_start_idx + 1]
-					);
 					adjusted_am_end =
-						time_options[selected_am_start_idx + 1] || formatDateToTimeOption(event.am_end);
+						time_options[selected_am_start_idx + 2] || formatDateToTimeOption(event.am_end);
 				}
 			}
 
 			if (pm_start && selected_pm_start_idx !== -1) {
 				if (current_pm_end_idx === -1 || selected_pm_start_idx >= current_pm_end_idx) {
 					adjusted_pm_end =
-						time_options[selected_pm_start_idx + 1] || formatDateToTimeOption(event.pm_end);
+						time_options[selected_pm_start_idx + 2] || formatDateToTimeOption(event.pm_end);
 				}
 			}
 			console.log('adjusted_am_end', adjusted_am_end);
@@ -191,11 +182,15 @@
 				am_start: am_start
 					? createDate(event.event_date, am_start, formatDateToTimeOption(event.am_start))
 					: event.am_start,
-				am_end: createDate(event.event_date, am_end, formatDateToTimeOption(event.am_end)),
+				am_end: am_end
+					? createDate(event.event_date, am_end, formatDateToTimeOption(event.am_end))
+					: createDate(event.event_date, adjusted_am_end, formatDateToTimeOption(event.am_end)),
 				pm_start: pm_start
 					? createDate(event.event_date, pm_start, formatDateToTimeOption(event.pm_start))
 					: event.pm_start,
-				pm_end: createDate(event.event_date, pm_end, formatDateToTimeOption(event.pm_end))
+				pm_end: pm_end
+					? createDate(event.event_date, pm_end, formatDateToTimeOption(event.pm_end))
+					: createDate(event.event_date, adjusted_pm_end, formatDateToTimeOption(event.pm_end))
 			};
 
 			console.log('returned_data', returned_data);
@@ -263,7 +258,7 @@
 				class={cn(
 					buttonVariants({
 						variant: 'outline',
-						class: 'w-[300px] justify-start text-left font-normal'
+						class: 'w-auto justify-start place-self-start text-left font-normal'
 					}),
 					!comp_state.date_range && 'text-muted-foreground'
 				)}
