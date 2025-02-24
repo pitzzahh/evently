@@ -105,43 +105,45 @@ export class Note extends Collection {
 }
 
 export class Participant extends Collection {
-  id: string;
-  first_name: string;
+  id!: string;
+  first_name!: string;
   middle_initial?: string;
-  last_name: string;
+  last_name!: string;
   email?: string;
-  created: Date;
-  updated: Date;
+  created?: Date;
+  updated?: Date;
 
-  constructor(data: Participant) {
+  constructor(data?: Participant) {
     super({
       name: 'participants',
       reactivity: svelteReactivityAdapter(),
       persistence: createOPFSAdapter('participants.json')
     })
+    if (!data) return;
     this.id = data.id;
     this.first_name = data.first_name;
     this.middle_initial = data.middle_initial;
     this.last_name = data.last_name;
     this.email = data.email;
-    this.created = new Date(data.created);
-    this.updated = new Date(data.updated);
+    this.created = data.created ? new Date(data.created) : undefined;
+    this.updated = data.updated ? new Date(data.updated) : undefined;
   }
 }
 
 export class QRCode extends Collection {
-  id: string;
-  created: Date;
-  updated: Date;
+  id!: string;
+  created?: Date;
+  updated?: Date;
 
-  constructor(data: any) {
+  constructor(data?: QRCode) {
     super({
       name: 'qr_codes',
       reactivity: svelteReactivityAdapter(),
       persistence: createOPFSAdapter('qr_codes.json')
     })
+    if (!data) return;
     this.id = data.id;
-    this.created = new Date(data.created);
-    this.updated = new Date(data.updated);
+    this.created = data.created ? new Date(data.created) : undefined;
+    this.updated = data.updated ? new Date(data.updated) : undefined;
   }
 }
