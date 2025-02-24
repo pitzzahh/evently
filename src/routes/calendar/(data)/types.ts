@@ -2,12 +2,12 @@ import type { CalendarDate } from "@internationalized/date";
 
 export type EventType = "meeting" | "event" | "workshop";
 
-export type CalendarEvent = {
+export interface CalendarEvent {
   id: string;
   title: string;
-  description: string;
-  type: 'meeting' | 'event' | 'workshop';
+  description?: string;
+  type: EventType;
   startDate: CalendarDate;
   endDate: CalendarDate;
   time?: string;
-};
+}
