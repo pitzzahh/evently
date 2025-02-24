@@ -7,10 +7,10 @@
 		event_date,
 		day,
 		updateDateEventPeriodStartEnd,
-		action
+		isSelectionDisabled
 	}: {
 		event_date: EventDateTime;
-		action: 'create' | 'edit';
+		isSelectionDisabled?: boolean;
 		updateDateEventPeriodStartEnd?: (params: {
 			id: string;
 			am_start?: string;
@@ -51,7 +51,8 @@
 				onTimeSelect: (time) => {
 					if (updateDateEventPeriodStartEnd)
 						updateDateEventPeriodStartEnd({ id: event_date.id, am_start: time });
-				}
+				},
+				isSelectionDisabled
 			})}
 
 			<!-- AM END -->
@@ -63,7 +64,8 @@
 				onTimeSelect: (time) => {
 					if (updateDateEventPeriodStartEnd)
 						updateDateEventPeriodStartEnd({ id: event_date.id, am_end: time });
-				}
+				},
+				isSelectionDisabled
 			})}
 		</div>
 	</div>
@@ -81,7 +83,8 @@
 				onTimeSelect: (time) => {
 					if (updateDateEventPeriodStartEnd)
 						updateDateEventPeriodStartEnd({ id: event_date.id, pm_start: time });
-				}
+				},
+				isSelectionDisabled
 			})}
 
 			<!-- PM END -->
@@ -93,7 +96,8 @@
 				onTimeSelect: (time) => {
 					if (updateDateEventPeriodStartEnd)
 						updateDateEventPeriodStartEnd({ id: event_date.id, pm_end: time });
-				}
+				},
+				isSelectionDisabled
 			})}
 		</div>
 	</div>
@@ -113,13 +117,15 @@
 	time_options,
 	formatted_date,
 	selected_time,
-	day
+	day,
+	isSelectionDisabled
 }: {
 	period_title: string;
 	formatted_date: string;
 	selected_time: string;
 	time_options: string[];
 	day?: number;
+	isSelectionDisabled?: boolean;
 	onTimeSelect: (time: string) => void;
 })}
 	<div class="flex items-center justify-between">
@@ -136,7 +142,12 @@
 			<p class="w-[120px] rounded-bl-sm rounded-tl-sm border bg-background p-2 text-center text-sm">
 				{formatted_date}
 			</p>
-			<TimeComboBox {time_options} {selected_time} {onTimeSelect} />
+			<TimeComboBox
+				{time_options}
+				{selected_time}
+				{onTimeSelect}
+				isDisabled={isSelectionDisabled}
+			/>
 		</div>
 	</div>
 {/snippet}
