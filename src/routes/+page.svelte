@@ -1,75 +1,40 @@
 <script lang="ts">
 	import { Collection } from '@signaldb/core';
 
-	class Post {
-		authorId!: string;
-		_id!: string;
-
-		constructor(data: any) {
-			Object.assign(this, data);
+	const Posts = new Collection({
+		reactivity: {
+			create() {
+				let dep = $state(0);
+				return {
+					depend() {
+						dep;
+					},
+					notify() {
+						dep += 1;
+					}
+				};
+			},
+			isInScope: () => !!$effect.tracking()
 		}
+	});
 
-		getAuthor() {
-			return Users.findOne({ _id: this.authorId });
-		}
+	let items: any[] = $state.raw([]);
+	$effect(() => {
+		const cursor = Posts.find({});
+		items = cursor.fetch();
 
-		getComments() {
-			return Comments.find({ postId: this._id });
-		}
-	}
-
-	class Comment {
-		authorId!: string;
-
-		constructor(data: any) {
-			Object.assign(this, data);
-		}
-
-		getAuthor() {
-			return Users.findOne(this.authorId);
-		}
-	}
-
-	class User {
-		_id!: string;
-
-		constructor(data: any) {
-			Object.assign(this, data);
-		}
-
-		getPosts() {
-			return Posts.find({ authorId: this._id });
-		}
-	}
-
-	const Posts = new Collection({ name: 'posts', transform: (item) => new Post(item) });
-	const Users = new Collection({ name: 'users', transform: (item) => new User(item) });
-	const Comments = new Collection({ name: 'comments', transform: (item) => new Comment(item) });
-
-	let newPostContent = $state('');
-
-	function addPost() {
-		const newPost = new Post({
-			authorId: 'author1',
-			_id: Date.now().toString(),
-			content: newPostContent
-		});
-		Posts.insert(newPost);
-		newPostContent = '';
-		console.log('Post added:', newPost);
-		posts.push(newPost);
-	}
-
-	const posts = $derived<Post[]>(Posts.find().fetch());
+		return () => {
+			cursor.cleanup();
+		};
+	});
 </script>
 
-<form onsubmit={addPost}>
-	<input type="text" bind:value={newPostContent} placeholder="Write a new post..." />
-	<button type="submit">Add Post</button>
-</form>
+<button onclick={() => Posts.insert({ title: 'Post', author: 'Author' })}> Add Post </button>
 
 <ul>
-	{#each posts as post}
-		<li>{JSON.stringify(post, null, 2)}</li>
+	{#each items as post}
+		<li>
+			<strong>{post.title}</strong> by {post.author}
+		</li>
 	{/each}
 </ul>
