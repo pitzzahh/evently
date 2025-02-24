@@ -72,21 +72,9 @@
 												<div class="flex justify-between">
 													<Calendar.Day />
 												</div>
-
+												{@const events = getDateEvents(date)}
 												<div class="mt-2 space-y-1">
-													{#each getDateEvents(date).slice(0, 3) as event, i}
-														<!-- <div
-															class={cn(
-																'truncate rounded px-1.5 py-0.5 text-xs',
-																eventColors[event.type]
-															)}
-															title={event.title}
-														>
-															{#if date.compare(event.startDate) === 0}
-																{event.time}
-															{/if}
-															{event.title}
-														</div> -->
+													{#each events.slice(0, 3) as event, i}
 														<EventCell
 															{event}
 															date={event.startDate}
@@ -94,10 +82,9 @@
 															index={i}
 														/>
 													{/each}
-
-													{#if getDateEvents(date).length > 3}
+													{#if events.length > 3}
 														<div class="px-1.5 text-xs text-muted-foreground">
-															+{getDateEvents(date).length - 3} more
+															+{events.length - 3} more
 														</div>
 													{/if}
 												</div>
