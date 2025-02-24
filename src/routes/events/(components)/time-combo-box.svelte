@@ -34,7 +34,7 @@
 	<Popover.Trigger bind:ref={triggerRef}>
 		{#snippet child({ props })}
 			<button
-				class="w-[100px] rounded-br-sm rounded-tr-sm bg-background p-2 text-sm active:scale-95 active:opacity-60"
+				class="w-[120px] border rounded-br-sm rounded-tr-sm bg-background p-2 text-sm active:scale-95 active:opacity-60"
 				{...props}
 			>
 				{selected_time}
