@@ -1,11 +1,10 @@
 <script lang="ts">
 	import { Button } from '@/components/ui/button';
-	import { Calendar, ChartBar, ChevronLeft, MapPin, Settings, UsersRound } from 'lucide-svelte';
+	import { Calendar, ChartBar, MapPin, Settings, UsersRound } from 'lucide-svelte';
 
 	import { type PageData } from './$types';
 	import { cn } from '@/utils';
 	import AttendeesDataTable from '../../(components)/attendees-data-table.svelte';
-	import { browser } from '$app/environment';
 
 	let { data }: { data: PageData } = $props();
 	let see_more = $state(true);
@@ -25,6 +24,8 @@
 		</div>
 	</div>
 
+
+	<!-- EVENT DETAILS -->
 	<div class="grid gap-6 border-b-2 border-dashed pb-6">
 		<div class="flex items-end justify-between">
 			<div class="grid gap-4">
@@ -84,6 +85,12 @@
 			</div>
 		{/if}
 	</div>
+
+	<div>
+		
+	</div>
+
+
 
 	<!-- TODO: ADD ATTENDEES TABLE HERE -->
 	<div class="grid gap-4">

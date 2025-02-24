@@ -7,5 +7,5 @@
 	let { data } = $props();
 </script>
 
-<h2 class="text-4xl font-semibold">Create Event</h2>
+<h2 class="text-4xl font-semibold mb-4">Create Event</h2>
 <EventForm event_form={data.event_form} />

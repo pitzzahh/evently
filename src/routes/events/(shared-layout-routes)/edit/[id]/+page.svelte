@@ -7,17 +7,5 @@
 	let { data } = $props();
 </script>
 
-<div class="flex flex-col gap-4">
-	<Button
-		variant="outline"
-		size="icon"
-		onclick={async () => {
-			if (browser) window.history.back();
-		}}
-	>
-		<ChevronLeft class="size-4" />
-	</Button>
-	<h2 class="text-4xl font-semibold">Edit Event</h2>
-</div>
-
+<h2 class="mb-4 text-4xl font-semibold">Edit Event</h2>
 <EventForm event_form={data.event_form} />
