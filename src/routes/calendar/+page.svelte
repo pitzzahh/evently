@@ -200,7 +200,7 @@
 	}
 </script>
 
-<div class="mx-auto w-full max-w-4xl rounded-lg bg-card shadow-lg">
+<div class="w-fullx mx-auto">
 	<div class="border-b border-border/20 p-6">
 		<div class="flex items-center justify-center gap-4">
 			<button class="btn btn-ghost btn-sm" onclick={() => year--}>&Lt;</button>

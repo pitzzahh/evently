@@ -20,7 +20,7 @@
 	} = $props();
 </script>
 
-<div class="grid w-full auto-rows-[120px] grid-cols-7 overflow-auto">
+<div class="grid w-full auto-rows-[120px] grid-cols-7 gap-1 overflow-auto">
 	{#each headers as header}
 		<Button variant="ghost" onclick={() => headerClick(header)}>
 			{header}
@@ -29,7 +29,7 @@
 
 	{#each days as day}
 		<Button
-			variant="ghost"
+			variant="outline"
 			class={day.enabled ? '' : 'cursor-not-allowed opacity-50'}
 			onclick={() => dayClick(day)}
 			disabled={!day.enabled}
