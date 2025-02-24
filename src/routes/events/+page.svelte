@@ -11,8 +11,15 @@
 		<div class="flex items-center justify-between gap-4">
 			<h2 class="text-4xl font-semibold">Events</h2>
 			<Tabs.List class="grid h-auto w-full max-w-[300px] grid-cols-2">
-				<Tabs.Trigger value="upcoming" class="h-auto text-base">Upcoming</Tabs.Trigger>
-				<Tabs.Trigger value="past" class="h-auto text-base">Past</Tabs.Trigger>
+				<Tabs.Trigger
+					value="upcoming"
+					class="h-auto text-base transition-all duration-200 hover:bg-muted/50"
+					>Upcoming</Tabs.Trigger
+				>
+				<Tabs.Trigger
+					value="past"
+					class="h-auto text-base transition-all duration-200 hover:bg-muted/50">Past</Tabs.Trigger
+				>
 			</Tabs.List>
 		</div>
 
