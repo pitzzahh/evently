@@ -12,7 +12,7 @@
 	}: {
 		isSelectionDisabled?: boolean;
 		event_date: EventSchedule;
-		updateDateEventPeriodStartEnd: (params: {
+		updateDateEventPeriodStartEnd?: (params: {
 			id: string;
 			am_start?: string;
 			am_end?: string;
