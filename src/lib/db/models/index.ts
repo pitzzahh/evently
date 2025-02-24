@@ -2,7 +2,7 @@ import { svelteReactivityAdapter } from '@/db/adapter/index.svelte';
 import { Collection } from '@signaldb/core';
 import createOPFSAdapter from '@signaldb/opfs';
 
-export class AttendanceRecord extends Collection {
+export class AttendanceRecordCollection extends Collection {
   id!: string;
   user_id!: string;
   event_id!: string;
@@ -12,7 +12,7 @@ export class AttendanceRecord extends Collection {
   created?: Date;
   updated?: Date;
 
-  constructor(data?: AttendanceRecord) {
+  constructor(data?: AttendanceRecordCollection) {
     super({
       name: 'attendance_records',
       reactivity: svelteReactivityAdapter(),
@@ -30,7 +30,7 @@ export class AttendanceRecord extends Collection {
   }
 }
 
-export class EventSchedule extends Collection {
+export class EventScheduleCollection extends Collection {
   id!: string;
   event_id?: string;
   event_date?: Date;
@@ -41,7 +41,7 @@ export class EventSchedule extends Collection {
   created?: Date;
   updated?: Date;
 
-  constructor(data?: EventSchedule) {
+  constructor(data?: EventScheduleCollection) {
     super({
       name: 'event_schedules',
       reactivity: svelteReactivityAdapter(),
@@ -60,7 +60,7 @@ export class EventSchedule extends Collection {
   }
 }
 
-export class EventDetails extends Collection {
+export class EventDetailsCollection extends Collection {
   id!: string;
   event_name?: string;
   start_date?: Date;
@@ -68,7 +68,7 @@ export class EventDetails extends Collection {
   created?: Date;
   updated?: Date;
 
-  constructor(data?: EventDetails) {
+  constructor(data?: EventDetailsCollection) {
     super({
       name: 'event_details',
       reactivity: svelteReactivityAdapter(),
@@ -84,13 +84,13 @@ export class EventDetails extends Collection {
   }
 }
 
-export class Note extends Collection {
+export class NoteCollection extends Collection {
   id!: string;
   title?: string;
   created?: Date;
   updated?: Date;
 
-  constructor(data?: Note) {
+  constructor(data?: NoteCollection) {
     super({
       name: 'notes',
       reactivity: svelteReactivityAdapter(),
@@ -104,7 +104,7 @@ export class Note extends Collection {
   }
 }
 
-export class Participant extends Collection {
+export class ParticipantCollection extends Collection {
   id!: string;
   first_name!: string;
   middle_initial?: string;
@@ -113,7 +113,7 @@ export class Participant extends Collection {
   created?: Date;
   updated?: Date;
 
-  constructor(data?: Participant) {
+  constructor(data?: ParticipantCollection) {
     super({
       name: 'participants',
       reactivity: svelteReactivityAdapter(),
@@ -130,12 +130,12 @@ export class Participant extends Collection {
   }
 }
 
-export class QRCode extends Collection {
+export class QRCodeCollection extends Collection {
   id!: string;
   created?: Date;
   updated?: Date;
 
-  constructor(data?: QRCode) {
+  constructor(data?: QRCodeCollection) {
     super({
       name: 'qr_codes',
       reactivity: svelteReactivityAdapter(),

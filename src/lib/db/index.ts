@@ -1,8 +1,8 @@
-import { AttendanceRecord, EventSchedule, EventDetails, Note, Participant , QRCode} from "./models";
+import { AttendanceRecordCollection, EventScheduleCollection, EventDetailsCollection, NoteCollection, ParticipantCollection, QRCodeCollection } from "./models";
 
-const ATTENDANCE_RECORDS_COLLECTION = new AttendanceRecord();
-const EVENT_SCHEDULE_COLLECTION = new EventSchedule();
-const EVENT_DETAILS_COLLECTION = new EventDetails();
-const NOTE_COLLECTION = new Note();
-const PARTICIPANT_COLLECTION = new Participant();
-const QRCODE_COLLECTION = new QRCode();
+const ATTENDANCE_RECORDS_COLLECTION = new AttendanceRecordCollection();
+const EVENT_SCHEDULE_COLLECTION = new EventScheduleCollection();
+const EVENT_DETAILS_COLLECTION = new EventDetailsCollection();
+const NOTE_COLLECTION = new NoteCollection();
+const PARTICIPANT_COLLECTION = new ParticipantCollection();
+const QRCODE_COLLECTION = new QRCodeCollection();
