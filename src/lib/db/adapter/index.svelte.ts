@@ -1,7 +1,7 @@
 import { createPersistenceAdapter } from '@signaldb/core'
 import { open, BaseDirectory, watch, exists, readFile } from '@tauri-apps/plugin-fs'
 
-export default function createTauriFilesystemAdapter(filename: string) {
+export function createTauriFilesystemAdapter(filename: string) {
   return createPersistenceAdapter({
     async register(onChange) {
       console.info('registering filesystem adapter for', filename)
@@ -33,4 +33,21 @@ export default function createTauriFilesystemAdapter(filename: string) {
       console.info('saved to filesystem', filename, items)
     },
   })
+}
+
+export function svelteReactivityAdapter() {
+  return {
+    create() {
+      let dep = $state(0);
+      return {
+        depend() {
+          dep;
+        },
+        notify() {
+          dep += 1;
+        }
+      };
+    },
+    isInScope: () => !!$effect.tracking()
+  };
 }
