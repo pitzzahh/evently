@@ -5,6 +5,7 @@
 		TooltipProvider,
 		TooltipTrigger
 	} from '@/components/ui/tooltip';
+	import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 	import type { DateValue } from '@internationalized/date';
 	import type { CalendarEvent } from '@routes/calendar/(data)/types';
 
@@ -36,39 +37,57 @@
 
 {#if position.isStart || isFirstColumn}
 	<TooltipProvider>
-		<Tooltip>
-			<TooltipTrigger
-				class="absolute left-0 w-full text-left"
-				style="width: {position.duration * 100}%; z-index: {index + 1};"
-			>
+		<Popover>
+			<Tooltip>
 				<div
-					class={[
-						'truncate px-1.5 py-0.5 text-xs',
-						typeColors[event.type],
-						position.isStart && 'rounded-l',
-						position.isEnd && 'rounded-r',
-						position.isBetween && 'rounded-none',
-						!position.isBetween && !position.isEnd && 'mr-0',
-						!position.isBetween && !position.isStart && 'ml-0',
-						position.isStart && position.isEnd && 'rounded'
-					]}
-					style="margin-top: {index * 24}px;"
+					class="absolute left-0 w-full text-left"
+					style="width: {position.duration * 100}%; z-index: {index + 1};"
 				>
-					{#if position.isStart}
-						{event.time}
-					{/if}
-					{event.title}
+					<TooltipTrigger>
+						<PopoverTrigger>
+							<div
+								class={[
+									'truncate px-1.5 py-0.5 text-xs',
+									typeColors[event.type],
+									position.isStart && 'rounded-l',
+									position.isEnd && 'rounded-r',
+									position.isBetween && 'rounded-none',
+									!position.isBetween && !position.isEnd && 'mr-0',
+									!position.isBetween && !position.isStart && 'ml-0',
+									position.isStart && position.isEnd && 'rounded'
+								]}
+								style="margin-top: {index * 24}px;"
+							>
+								{#if position.isStart}
+									{event.time}
+								{/if}
+								{event.title}
+							</div>
+						</PopoverTrigger>
+					</TooltipTrigger>
+					<TooltipContent>
+						{@render EventContent(event)}
+					</TooltipContent>
+					<PopoverContent>
+						{@render EventContent(event)}
+					</PopoverContent>
 				</div>
-			</TooltipTrigger>
-			<TooltipContent>
-				<div class="text-sm">
-					<p class="font-semibold">{event.title}</p>
-					<p class="text-xs text-muted-foreground">
-						{event.startDate.toString()} - {event.endDate.toString()}
-					</p>
-					<p class="text-xs">{event.description}</p>
-				</div>
-			</TooltipContent>
-		</Tooltip>
+			</Tooltip>
+		</Popover>
 	</TooltipProvider>
 {/if}
+
+{#snippet EventContent(event: CalendarEvent)}
+	<div class="text-sm">
+		<p class="font-semibold">{event.title}</p>
+		<p class="text-xs text-muted-foreground">
+			{event.startDate.toString()} - {event.endDate.toString()}
+		</p>
+		<p class="text-xs">{event.description}</p>
+		<!-- Add more detailed content for popover here -->
+		<div class="mt-2 space-y-1">
+			<p class="text-xs">Time: {event.time || 'N/A'}</p>
+			<p class="text-xs">Type: {event.type}</p>
+		</div>
+	</div>
+{/snippet}
