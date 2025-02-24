@@ -34,6 +34,10 @@
 		const startIndex = time_options.indexOf(startTime);
 		return time_options.slice(startIndex + 1);
 	}
+
+	function getFilteredTimeByPeriod(period: 'AM' | 'PM') {
+		return time_options.filter((time) => time.includes(period));
+	}
 </script>
 
 <div class="flex w-full gap-2">
@@ -45,7 +49,7 @@
 			{@render period_time_picker({
 				period_title: 'AM Start',
 				formatted_date,
-				time_options,
+				time_options: getFilteredTimeByPeriod('AM'),
 				day,
 				selected_time: event_date.am_start,
 				onTimeSelect: (time) => {
@@ -77,7 +81,7 @@
 			{@render period_time_picker({
 				period_title: 'PM Start',
 				formatted_date,
-				time_options,
+				time_options: getFilteredEndTimes(event_date.am_end),
 				day,
 				selected_time: event_date.pm_start,
 				onTimeSelect: (time) => {
