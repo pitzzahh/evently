@@ -1,4 +1,5 @@
 import { svelteReactivityAdapter } from '@/db/adapter/index.svelte';
+import type { ClassProperties } from '@/types/generic';
 import { Collection } from '@signaldb/core';
 import createOPFSAdapter from '@signaldb/opfs';
 
@@ -104,7 +105,9 @@ export class NoteCollection extends Collection {
   }
 }
 
-export class ParticipantCollection extends Collection<Pick<ParticipantCollection, 'first_name' | 'id' | 'last_name'>, string, ParticipantCollection> {
+type PartCol = Pick<ParticipantCollection, 'first_name' | 'id' | 'last_name'>
+
+export class ParticipantCollection extends Collection<PartCol> {
   id!: string;
   first_name!: string;
   middle_initial?: string;
