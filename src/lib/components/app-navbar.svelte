@@ -1,9 +1,13 @@
 <script lang="ts">
-	import { Button } from './ui/button';
 	import { page } from '$app/state';
 	import { cn } from '@/utils';
+	import { scale } from 'svelte/transition';
+	import { cubicOut } from 'svelte/easing';
 	import { Ticket, Calendar, Plus } from 'lucide-svelte';
 	import NavbarTime from './navbar-time.svelte';
+	import { toggleMode, mode } from 'mode-watcher';
+	import { Sun, Moon } from '@/assets/icons';
+	import { Button } from '@/components/ui/button/index.js';
 
 	const isActive = (pathname: string) => page.url.pathname === pathname;
 	const routes = [
@@ -35,6 +39,42 @@
 		</div>
 		<div class="flex items-center gap-4">
 			<NavbarTime />
+			<Button
+				onclick={toggleMode}
+				role="switch"
+				variant="outline"
+				size="icon"
+				aria-label="Light Switch"
+				aria-checked={$mode === 'light'}
+				class="!shrink-0 [&_svg]:size-5"
+				title="Toggle {$mode === 'dark' ? 'Dark' : 'Light'} Mode"
+			>
+				{#if $mode === 'light'}
+					<div
+						class="absolute inline-flex items-center justify-center"
+						transition:scale={{
+							delay: 50,
+							duration: 200,
+							start: 0.7,
+							easing: cubicOut
+						}}
+					>
+						<Moon strokeWidth={1.5} class="size-6" aria-label="Moon" />
+					</div>
+				{:else}
+					<div
+						class="absolute inline-flex items-center justify-center"
+						transition:scale={{
+							delay: 50,
+							duration: 200,
+							start: 0.7,
+							easing: cubicOut
+						}}
+					>
+						<Sun strokeWidth={1.5} class="size-6" aria-label="Sun" />
+					</div>
+				{/if}
+			</Button>
 			<Button href="/events/create">Create Event <Plus class="size-4" /></Button>
 		</div>
 	</div>
