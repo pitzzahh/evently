@@ -1,13 +1,12 @@
 <script lang="ts">
 	import { COLLECTIONS } from '@/db/index';
-	import type { ParticipantCollection } from '@/db/models';
-	import { watch } from 'runed';
+	import type { Participant } from '@/db/models/types';
 
 	let comp_state = $state({
 		count: 50
 	});
 
-	let items: ParticipantCollection[] = $state.raw([]);
+	let items: Participant[] = $state.raw([]);
 
 	$effect(() => {
 		const cursor = COLLECTIONS.PARTICIPANT_COLLECTION.find({});
