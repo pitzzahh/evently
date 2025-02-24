@@ -1,4 +1,3 @@
-import type { ClassProperties } from "@/types/generic";
 import type { AttendanceRecordCollection, EventDetailsCollection, EventScheduleCollection, NoteCollection, ParticipantCollection, QRCodeCollection } from ".";
 
 export type AttendanceRecord = Pick<AttendanceRecordCollection, 'id' | 'user_id' | 'event_id' | 'time_in' | 'time_out' | 'period' | 'created' | 'updated'>;
