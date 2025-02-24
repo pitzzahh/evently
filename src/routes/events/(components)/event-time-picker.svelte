@@ -57,7 +57,7 @@
 			<div class="flex items-center justify-between">
 				<p class="text-sm text-muted-foreground">AM Start</p>
 				<div class="flex items-center gap-1">
-					<p class="w-[100px] rounded-bl-sm rounded-tl-sm bg-background p-2 text-center text-sm">
+					<p class="w-[100px] rounded-bl-sm rounded-tl-sm bg-muted p-2 text-center text-sm">
 						{formatted_date}
 					</p>
 					<TimeComboBox
@@ -75,7 +75,7 @@
 				<p class="text-sm text-muted-foreground">AM End</p>
 
 				<div class="flex items-center gap-1">
-					<p class="w-[100px] rounded-bl-sm rounded-tl-sm bg-background p-2 text-center text-sm">
+					<p class="w-[100px] rounded-bl-sm rounded-tl-sm bg-muted p-2 text-center text-sm">
 						{formatted_date}
 					</p>
 					<TimeComboBox
@@ -98,7 +98,7 @@
 			<div class="flex items-center justify-between">
 				<p class="text-sm text-muted-foreground">PM Start</p>
 				<div class="flex items-center gap-1">
-					<p class="w-[100px] rounded-bl-sm rounded-tl-sm bg-background p-2 text-center text-sm">
+					<p class="w-[100px] rounded-bl-sm rounded-tl-sm bg-muted p-2 text-center text-sm">
 						{formatted_date}
 					</p>
 					<TimeComboBox
@@ -116,7 +116,7 @@
 				<p class="text-sm text-muted-foreground">PM End</p>
 
 				<div class="flex items-center gap-1">
-					<p class="w-[100px] rounded-bl-sm rounded-tl-sm bg-background p-2 text-center text-sm">
+					<p class="w-[100px] rounded-bl-sm rounded-tl-sm bg-muted p-2 text-center text-sm">
 						{formatted_date}
 					</p>
 					<TimeComboBox
