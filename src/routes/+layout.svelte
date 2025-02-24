@@ -10,6 +10,7 @@
 	import { warn, debug, trace, info, error } from '@tauri-apps/plugin-log';
 	// import { Button } from '@/components/ui/button';
 	import AppNavbar from '@/components/app-navbar.svelte';
+	import { toast } from 'svelte-sonner';
 
 	let { children } = $props();
 
@@ -30,6 +31,18 @@
 	// forwardConsole('warn', warn);
 	// forwardConsole('error', error);
 </script>
+
+<svelte:document
+	oncontextmenu={(e) => e.preventDefault()}
+	onkeydown={(e) => {
+		if (e.key === 'F5') {
+			toast.info('F5 is disabled', {
+				description: 'This is a system message, F5 is disabled in this application.'
+			});
+			e.preventDefault();
+		}
+	}}
+/>
 
 <ModeWatcher />
 {#if dev}
