@@ -1,6 +1,6 @@
 import { DateFormatter } from '@internationalized/date';
 
-export const monthFormatter = new DateFormatter('fil', {
+export const monthFormatter = new DateFormatter('en-US', {
 	dateStyle: 'long'
 });
 
