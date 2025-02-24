@@ -36,19 +36,24 @@
 		const baseDate = today(getLocalTimeZone());
 
 		for (let i = 0; i < count; i++) {
-			const randomDays = Math.floor(Math.random() * 30); // Random day within next 30 days
-			const duration = Math.floor(Math.random() * 3); // Random duration 0-2 days
+			// Generate random hour (0-23) and minute (0-59)
+			const hour = Math.floor(Math.random() * 24);
+			const minute = Math.floor(Math.random() * 4) * 15; // 15-minute intervals
+
+			// Generate random day within next 90 days for better distribution
+			const randomDays = Math.floor(Math.random() * 90);
+			const duration = Math.max(1, Math.floor(Math.random() * 4)); // 1-3 days duration
 			const startDate = baseDate.add({ days: randomDays });
 			const endDate = startDate.add({ days: duration });
 
 			events.push({
-				id: (i + 1).toString(),
+				id: crypto.randomUUID(),
 				title: eventTitles[Math.floor(Math.random() * eventTitles.length)],
 				description: eventDescriptions[Math.floor(Math.random() * eventDescriptions.length)],
 				type: eventTypes[Math.floor(Math.random() * eventTypes.length)],
 				startDate,
 				endDate,
-				time: `${Math.floor(Math.random() * 12 + 1)}:00 ${Math.random() < 0.5 ? 'AM' : 'PM'}`
+				time: `${hour % 12 || 12}:${minute.toString().padStart(2, '0')} ${hour < 12 ? 'AM' : 'PM'}`
 			});
 		}
 
