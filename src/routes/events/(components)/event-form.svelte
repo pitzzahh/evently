@@ -32,7 +32,7 @@
 	import { toast } from 'svelte-sonner';
 	import { COLLECTIONS } from '@/db/index';
 	import type { EventDetails, EventSchedule } from '@/db/models/types';
-	import { formatDateToTimeOption, monthFormatter } from '@/utils/format';
+	import { extractHoursAndMinutes, formatDateToTimeOption, monthFormatter } from '@/utils/format';
 
 	interface ComponentState {
 		start_value: DateValue | undefined;
@@ -108,6 +108,7 @@
 			);
 			comp_state.event_dates = getDatesInRange(start_date, end_date).map((date) => ({
 				id: nanoid(),
+				event_date: date,
 				am_start: new Date(`1970-01-01T08:00:00`),
 				am_end: new Date('1970-01-01T12:00:00'),
 				pm_start: new Date('1970-01-01T13:00:00'),
@@ -131,7 +132,7 @@
 		pm_start?: string;
 		pm_end?: string;
 	}) {
-		const a = comp_state.event_dates.map((event) => {
+		comp_state.event_dates = comp_state.event_dates.map((event) => {
 			if (event.id !== id) return event;
 
 			const selected_am_start_idx = time_options.findIndex((o) => o === am_start);
@@ -162,10 +163,38 @@
 
 			return {
 				...event,
-				am_start: am_start || event.am_start,
-				am_end: am_end || adjusted_am_end,
-				pm_start: pm_start || event.pm_start,
-				pm_end: pm_end || adjusted_pm_end
+				am_start: am_start
+					? new Date(
+							event.event_date.setHours(extractHoursAndMinutes(am_start).hours),
+							extractHoursAndMinutes(am_start).minutes
+						)
+					: event.am_start,
+				am_end: am_end
+					? new Date(
+							event.event_date.setHours(extractHoursAndMinutes(am_end).hours),
+							extractHoursAndMinutes(am_end).minutes
+						)
+					: new Date(
+							event.event_date.setHours(
+								extractHoursAndMinutes(adjusted_am_end).hours,
+								extractHoursAndMinutes(adjusted_am_end).minutes
+							)
+						),
+				pm_start: pm_start
+					? new Date(
+							event.event_date.setHours(extractHoursAndMinutes(pm_start).hours),
+							extractHoursAndMinutes(pm_start).minutes
+						)
+					: event.pm_start,
+				pm_end: pm_end
+					? new Date(
+							event.event_date.setHours(extractHoursAndMinutes(pm_end).hours),
+							extractHoursAndMinutes(pm_end).minutes
+						)
+					: new Date(
+							event.event_date.setHours(extractHoursAndMinutes(adjusted_pm_end).hours),
+							extractHoursAndMinutes(adjusted_pm_end).minutes
+						)
 			};
 		});
 	}
