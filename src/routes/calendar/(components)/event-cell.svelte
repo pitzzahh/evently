@@ -4,13 +4,13 @@
 		TooltipContent,
 		TooltipProvider,
 		TooltipTrigger
-	} from '$lib/components/ui/tooltip';
-	import type { CalendarDate } from '@internationalized/date';
+	} from '@/components/ui/tooltip';
+	import type { DateValue } from '@internationalized/date';
 	import type { CalendarEvent } from '@routes/calendar/(data)/types';
 
 	type Props = {
 		event: CalendarEvent;
-		date: CalendarDate;
+		date: DateValue;
 		isFirstColumn: boolean;
 		index: number;
 	};
