@@ -3,6 +3,17 @@ import { DateFormatter } from '@internationalized/date';
 export const monthFormatter = new DateFormatter('fil', {
 	dateStyle: 'long'
 });
+
+export function formatDateToTimeOption(date?: Date): string {
+	if (!date) return 'Invalid date';
+	const hours = date.getHours();
+	const minutes = date.getMinutes();
+	const ampm = hours >= 12 ? 'PM' : 'AM';
+	const formattedHours = hours % 12 === 0 ? 12 : hours % 12;
+	const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
+	return `${formattedHours}:${formattedMinutes} ${ampm}`;
+}
+
 export function formatPath(path: string): string {
 	return path.replace(/^C:\\/, '').replace(/\\/g, '/');
 }
