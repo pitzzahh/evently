@@ -15,10 +15,10 @@
 	import { cn } from '@/utils';
 	import AttendeesDataTable from '../(components)/attendees-data-table.svelte';
 	import { nanoid } from 'nanoid';
-	import type { EventDateTime } from '../(components)/event-form.svelte';
 	import EventTimePicker from '../(components)/event-time-picker.svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import ParticipantsDialog from '../(components)/participants-dialog.svelte';
+	import type { EventSchedule } from '@/db/models/types';
 
 	let { data }: { data: PageData } = $props();
 	let see_more = $state(true);
@@ -27,30 +27,30 @@
 		see_more = !see_more;
 	}
 
-	const event_dates: EventDateTime[] = [
+	const event_dates: EventSchedule[] = [
 		{
 			id: nanoid(),
-			date: new Date(2025, 1, 24), // February 24, 2025
-			am_start: '8:00 AM',
-			am_end: '12:00 PM',
-			pm_start: '1:00 PM',
-			pm_end: '5:00 PM'
+			event_date: new Date(2025, 1, 24),
+			am_start: new Date(2025, 1, 24, 8, 0), // 8:00 AM
+			am_end: new Date(2025, 1, 24, 12, 0), // 12:00 PM
+			pm_start: new Date(2025, 1, 24, 13, 0), // 1:00 PM
+			pm_end: new Date(2025, 1, 24, 17, 0) // 5:00 PM
 		},
 		{
 			id: nanoid(),
-			date: new Date(2025, 1, 25), // February 25, 2025
-			am_start: '9:00 AM',
-			am_end: '12:30 PM',
-			pm_start: '1:30 PM',
-			pm_end: '6:00 PM'
+			event_date: new Date(2025, 1, 25),
+			am_start: new Date(2025, 1, 25, 9, 0), // 9:00 AM
+			am_end: new Date(2025, 1, 25, 12, 30), // 12:30 PM
+			pm_start: new Date(2025, 1, 25, 13, 30), // 1:30 PM
+			pm_end: new Date(2025, 1, 25, 18, 0) // 6:00 PM
 		},
 		{
 			id: nanoid(),
-			date: new Date(2025, 1, 26), // February 26, 2025
-			am_start: '7:30 AM',
-			am_end: '11:30 AM',
-			pm_start: '12:30 PM',
-			pm_end: '4:30 PM'
+			event_date: new Date(2025, 1, 26),
+			am_start: new Date(2025, 1, 26, 7, 30), // 7:30 AM
+			am_end: new Date(2025, 1, 26, 11, 30), // 11:30 AM
+			pm_start: new Date(2025, 1, 26, 12, 30), // 12:30 PM
+			pm_end: new Date(2025, 1, 26, 16, 30) // 4:30 PM
 		}
 	];
 </script>
