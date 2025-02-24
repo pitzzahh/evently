@@ -11,7 +11,7 @@
 	// import { Button } from '@/components/ui/button';
 	import AppNavbar from '@/components/app-navbar.svelte';
 	import { toast } from 'svelte-sonner';
-
+	import { Toaster } from '@/components/ui/sonner/index.js';
 	let { children } = $props();
 
 	// function forwardConsole(
@@ -43,7 +43,7 @@
 		}
 	}}
 />
-
+<Toaster richColors position="top-right" />
 <ModeWatcher />
 {#if dev}
 	<RenderScan />
