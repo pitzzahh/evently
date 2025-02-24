@@ -132,6 +132,7 @@ export class ParticipantCollection extends Collection {
 
 export class QRCodeCollection extends Collection {
   id!: string;
+  code!: string;
   created?: Date;
   updated?: Date;
 
@@ -143,6 +144,7 @@ export class QRCodeCollection extends Collection {
     })
     if (!data) return;
     this.id = data.id;
+    this.code = data.code;
     this.created = data.created ? new Date(data.created) : undefined;
     this.updated = data.updated ? new Date(data.updated) : undefined;
   }
