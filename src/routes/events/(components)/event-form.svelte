@@ -34,6 +34,7 @@
 	} from '@/utils/format';
 	import { dev } from '$app/environment';
 	import { hasRequiredData } from '@/utils/validation';
+	import { Label } from '@/components/ui/label';
 
 	interface ComponentState {
 		start_value: DateValue | undefined;
@@ -302,24 +303,20 @@
 		</Popover.Root>
 	</div>
 
-	<Form.Field {form} name="description">
-		<Form.Control>
-			{#snippet children({ props })}
-				<div class="flex justify-between">
-					<Form.Label>Time</Form.Label>
-				</div>
-
-				<div class="max-h-[400px] overflow-y-auto">
-					<div class="flex flex-col gap-2 pr-1">
-						{#each comp_state.event_dates as event_date, index}
-							<EventTimePicker {event_date} day={index + 1} {updateDateEventPeriodStartEnd} />
-						{/each}
-					</div>
-				</div>
-			{/snippet}
-		</Form.Control>
-		<Form.FieldErrors />
-	</Form.Field>
+	<div
+		class={cn({
+			hidden: !hasRequiredData($formData, ['title', 'location', 'description'])
+		})}
+	>
+		<Label>Time</Label>
+		<div class="max-h-[400px] overflow-y-auto">
+			<div class="flex flex-col gap-2 pr-1">
+				{#each comp_state.event_dates as event_date, index}
+					<EventTimePicker {event_date} day={index + 1} {updateDateEventPeriodStartEnd} />
+				{/each}
+			</div>
+		</div>
+	</div>
 	<Form.Button>Submit</Form.Button>
 </form>
 
