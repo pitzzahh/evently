@@ -42,11 +42,11 @@
 
 		{@const contents = ['upcoming', 'past']}
 		{#each contents as content (content)}
-			{#if content === comp_state.current_tab}
-				<Tabs.Content value={content} class="mt-10">
+			<Tabs.Content value={content} class="mt-10">
+				{#if content === comp_state.current_tab}
 					<EventList type={content as 'upcoming' | 'past'} />
-				</Tabs.Content>
-			{/if}
+				{/if}
+			</Tabs.Content>
 		{/each}
 	</Tabs.Root>
 </div>
