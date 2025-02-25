@@ -4,6 +4,7 @@
 	import * as Command from '$lib/components/ui/command/index.js';
 	import * as Popover from '$lib/components/ui/popover/index.js';
 	import { cn } from '$lib/utils.js';
+	import { Clock } from 'lucide-svelte';
 
 	let {
 		time_options,
@@ -32,13 +33,14 @@
 </script>
 
 <Popover.Root bind:open>
-	<Popover.Trigger bind:ref={triggerRef} disabled={isDisabled}> 
+	<Popover.Trigger bind:ref={triggerRef} disabled={isDisabled}>
 		{#snippet child({ props })}
 			<button
-				class="w-[120px] rounded-br-sm rounded-tr-sm border bg-background p-2 text-sm active:scale-95 active:opacity-60"
+				class="w-[120px] flex items-center justify-center gap-2 rounded-sm border bg-primary p-2 px-3 py-1 text-sm text-white active:scale-95 active:opacity-60 dark:border-white/20"
 				{...props}
 			>
 				{selected_time}
+				<Clock class="size-4" />
 			</button>
 		{/snippet}
 	</Popover.Trigger>
