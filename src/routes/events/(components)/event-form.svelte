@@ -56,7 +56,6 @@
 				toast.error('Form is invalid');
 				return;
 			}
-			COLLECTIONS.EVENT_DETAILS_COLLECTION.removeMany({});
 			const difference_in_time =
 				comp_state.date_range?.start && comp_state.date_range.end
 					? new Date(comp_state.date_range.end.toString()).getTime() -
