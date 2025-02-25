@@ -6,6 +6,20 @@ const config = {
 	preprocess: vitePreprocess(),
 	kit: {
 		adapter: adapter(),
+		csp: {
+			mode: "nonce",
+			directives: {
+				"default-src": ["*"],
+				"img-src": ["*"],
+				"script-src": ["*"],
+				"style-src": ["*"],
+				"font-src": ["*"],
+				"object-src": ["*"],
+				"media-src": ["*"],
+				"frame-src": ["*"],
+				"connect-src": ["*"],
+			},
+		},
 		alias: {
 			"@/*": "./src/lib/*",
 			"@routes": "./src/routes",
