@@ -14,7 +14,6 @@
 	import { StatusPill } from '@/components/snippets';
 
 	let { data } = $props();
-	let see_more = $state(true);
 
 	interface ComponentState {
 		event_details: EventDetails | undefined;
@@ -137,8 +136,8 @@
 						<p class="text-base font-medium">{comp_state.event_details?.location ?? 'N/A'}</p>
 					</div>
 
-					<Button variant="ghost" onclick={() => (see_more = !see_more)}>
-						{see_more ? 'See Less' : 'See More'}
+					<Button variant="ghost" onclick={() => (comp_state.see_more = !comp_state.see_more)}>
+						{comp_state.see_more ? 'See Less' : 'See More'}
 					</Button>
 				</div>
 			</div>
@@ -147,16 +146,16 @@
 			class={cn(
 				'grid gap-3 overflow-hidden rounded-lg border bg-white p-4 transition-all duration-300 dark:bg-[#1C1E20]',
 				{
-					'm-0 h-0 p-0 opacity-0': !see_more,
-					'h-auto opacity-100': see_more
+					'm-0 h-0 p-0 opacity-0': !comp_state.see_more,
+					'h-auto opacity-100': comp_state.see_more
 				}
 			)}
 		>
 			<!-- EVENT STATS -->
 			<div
 				class={cn('transition-scale grid gap-3 rounded-lg border p-4 duration-300', {
-					'origin-top scale-y-0 opacity-0': !see_more,
-					'scale-y-100 opacity-100': see_more
+					'origin-top scale-y-0 opacity-0': !comp_state.see_more,
+					'scale-y-100 opacity-100': comp_state.see_more
 				})}
 			>
 				<div class="flex items-center justify-between">
