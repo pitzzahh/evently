@@ -27,7 +27,6 @@
 	import { hasRequiredData } from '@/utils/validation';
 	import { Label } from '@/components/ui/label';
 	import { goto } from '$app/navigation';
-	import { AspectRatio } from '@/components/ui/aspect-ratio';
 	import { onMount } from 'svelte';
 
 	interface EventFormProps {
@@ -233,9 +232,9 @@
 </script>
 
 <form method="POST" use:enhance class="flex flex-col gap-1">
-	<div class="grid grid-cols-[1fr,auto] gap-4">
-		<div class="flex flex-col gap-4">
-			<Form.Field {form} name="title">
+	<div class="flex gap-4">
+		<div class="flex w-full flex-1 flex-col gap-4">
+			<Form.Field {form} name="title" class="w-full">
 				<Form.Control>
 					{#snippet children({ props })}
 						<Form.Label class="flex items-center gap-1"
@@ -253,7 +252,7 @@
 				<Form.FieldErrors />
 			</Form.Field>
 
-			<Form.Field {form} name="location">
+			<Form.Field {form} name="location" class="w-full">
 				<Form.Control>
 					{#snippet children({ props })}
 						<Form.Label class="flex items-center gap-1"
@@ -270,32 +269,29 @@
 				</Form.Control>
 				<Form.FieldErrors />
 			</Form.Field>
+			<Form.Field {form} name="description" class="w-full">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label>Description</Form.Label>
+						<Textarea
+							{...props}
+							bind:value={$formData.description}
+							rows={5}
+							class="bg-gray-700/10 dark:bg-white/10"
+							placeholder="Provide details about the event, including agenda, speakers, or any special requirements"
+							aria-label="Event description"
+						/>
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
 		</div>
-		<AspectRatio ratio={1} class="w-[200px] bg-muted">
-			<img
-				src="https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=800&dpr=2&q=80"
-				alt="Gray by Drew Beamer"
-				class="h-full w-full rounded-md object-cover"
-			/>
-		</AspectRatio>
+		<img
+			src="https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=800&dpr=2&q=80"
+			alt="Gray by Drew Beamer"
+			class="w-80 shrink-0 rounded-md bg-muted object-cover"
+		/>
 	</div>
-
-	<Form.Field {form} name="description">
-		<Form.Control>
-			{#snippet children({ props })}
-				<Form.Label>Description</Form.Label>
-				<Textarea
-					{...props}
-					bind:value={$formData.description}
-					rows={5}
-					class="bg-gray-700/10 dark:bg-white/10"
-					placeholder="Provide details about the event, including agenda, speakers, or any special requirements"
-					aria-label="Event description"
-				/>
-			{/snippet}
-		</Form.Control>
-		<Form.FieldErrors />
-	</Form.Field>
 
 	<div class="mb-3 grid gap-2">
 		<p class="text-sm">Event Date</p>
@@ -363,9 +359,3 @@
 		>Add</Form.Button
 	>
 </form>
-
-<style>
-	* {
-		border: 1px solid red;
-	}
-</style>
