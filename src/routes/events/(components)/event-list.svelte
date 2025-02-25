@@ -93,7 +93,7 @@
 			const now = new Date();
 			const events_cursor = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(
 				{
-					start_date: type === 'upcoming' ? { $gte: now } : { $lt: now }
+					end_date: type === 'upcoming' ? { $gte: now } : { $lt: now }
 				},
 				{
 					sort: {
@@ -110,7 +110,7 @@
 	);
 </script>
 
-<Timeline style="width: 100%;  padding: 0;">
+<Timeline style="width: 100%;  padding: 0;;">
 	<InfiniteLoader triggerLoad={loadMore}>
 		{#each comp_state.infinite_loader.events as event, i}
 			<div transition:fly={{ y: 100, duration: 400, delay: i * 100, easing: quartInOut }}>
