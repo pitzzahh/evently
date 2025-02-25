@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 	import { Badge } from '$lib/components/ui/badge';
-	import type { CalendarEvent } from '@routes/calendar/(data)/types';
+	import type { EventDetails } from '@/db/models/types';
 
 	type Props = {
-		event: CalendarEvent;
+		event: EventDetails;
 		badgeVariant?: 'default' | 'secondary' | 'destructive';
 	};
 
@@ -14,7 +14,7 @@
 <Card>
 	<CardHeader class="p-4">
 		<div class="flex items-center justify-between">
-			<CardTitle class="text-base">{event.title}</CardTitle>
+			<CardTitle class="text-base">{event.event_name}</CardTitle>
 			<Badge variant={badgeVariant}>{event.type}</Badge>
 		</div>
 		<CardDescription>{event.description}</CardDescription>
