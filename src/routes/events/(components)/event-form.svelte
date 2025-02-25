@@ -28,13 +28,13 @@
 	import {
 		createDate,
 		extractHoursAndMinutes,
-		formatDate,
 		formatDateToTimeOption,
 		monthFormatter
 	} from '@/utils/format';
 	import { dev } from '$app/environment';
 	import { hasRequiredData } from '@/utils/validation';
 	import { Label } from '@/components/ui/label';
+	import { goto } from '$app/navigation';
 
 	interface ComponentState {
 		start_value: DateValue | undefined;
@@ -63,7 +63,7 @@
 					: 0;
 			const difference_in_days = Math.round(difference_in_time / (1000 * 3600 * 24)) + 1;
 
-			const added_event_details = COLLECTIONS.EVENT_DETAILS_COLLECTION.insert({
+			const added_event_details_id = COLLECTIONS.EVENT_DETAILS_COLLECTION.insert({
 				event_name: $formData.title,
 				location: $formData.location,
 				description: $formData.description,
@@ -73,7 +73,8 @@
 				end_date: $formData.end_date
 			});
 
-			console.log('added_event_details', added_event_details);
+			goto(`/events/${added_event_details_id}`);
+			console.log('added_event_details', added_event_details_id);
 			toast.success(`Event is added and has ${difference_in_days} days`);
 		}
 	});
