@@ -5,9 +5,8 @@ export const participant_schema = z.object({
 		.string()
 		.min(1, { message: 'First name is required' })
 		.max(50, { message: 'First name cannot exceed 50 characters' }),
-	middle_initial: z
+	middle_name: z
 		.string()
-		.max(1, { message: 'Middle initial must be a single character' })
 		.optional(),
 	last_name: z
 		.string()
