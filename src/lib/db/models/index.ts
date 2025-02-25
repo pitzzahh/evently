@@ -1,7 +1,7 @@
 import { svelteReactivityAdapter } from '@/db/adapter/index.svelte';
 import { Collection } from '@signaldb/core';
 import createOPFSAdapter from '@signaldb/opfs';
-import type { AttendanceRecord, EventDetails, EventSchedule, Note, Participant, QRCode } from './types';
+import type { AttendanceRecord, EventDetails, EventSchedule, Participant, QRCode } from './types';
 import { COLLECTIONS } from '..';
 
 export class AttendanceRecordCollection extends Collection<AttendanceRecord> {
