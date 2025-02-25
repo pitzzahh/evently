@@ -1,18 +1,16 @@
 <script lang="ts">
 	import { EventCalendar } from '@routes/calendar/(components)';
 	import { scale } from 'svelte/transition';
-	import type { EventDetails, EventSchedule } from '@/db/models/types';
+	import type { EventDetails } from '@/db/models/types';
 	import { watch } from 'runed';
 	import { COLLECTIONS } from '@/db';
 
 	interface ComponentState {
 		event_details: EventDetails[];
-		event_schedules: EventSchedule[];
 	}
 
 	let comp_state = $state<ComponentState>({
-		event_details: [],
-		event_schedules: []
+		event_details: []
 	});
 
 	watch([() => COLLECTIONS.EVENT_DETAILS_COLLECTION.isLoading], () => {
@@ -21,6 +19,7 @@
 			{ fieldTracking: true }
 		);
 		comp_state.event_details = event_details_cursor.fetch();
+		console.log(comp_state.event_details);
 		return () => {
 			event_details_cursor.cleanup();
 		};
