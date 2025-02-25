@@ -1,10 +1,11 @@
 import type { ColumnDef } from "@tanstack/table-core";
 import { renderComponent } from "@/components/ui/data-table/index.js";
-import type { EventRecord } from "@/types/pb-types";
 import { DataTableCheckbox, DataTableColumnHeader, DataTableBadge } from "@/components/custom/data-table";
-import { ArchiveDataTableRowActions, ArchiveDataTableDialog } from "@routes/archives/(components)";
+import { ParticipantDataTableRowActions } from "@routes/events/(components)";
+import type { Participant } from "@/db/models/types";
+import { formatDateTime } from "@/utils/format";
 
-export function archivesTableColumns(): ColumnDef<EventRecord>[] {
+export function participantTableColumns(): ColumnDef<Participant>[] {
   return [
     {
       id: "select",
@@ -26,44 +27,40 @@ export function archivesTableColumns(): ColumnDef<EventRecord>[] {
       enableHiding: false,
     },
     {
-      accessorKey: "type",
+      accessorKey: "first_name",
       header: ({ column }) => {
-        return renderComponent(DataTableColumnHeader<EventRecord, unknown>, {
+        return renderComponent(DataTableColumnHeader<Participant, unknown>, {
           column,
-          title: "Type",
+          title: "First Name",
         });
       },
-      cell: ({ row }) => renderComponent(DataTableBadge, { variant: "outline", value: row.original.type }),
+      cell: ({ row }) => renderComponent(DataTableBadge, { variant: "outline", value: row.original.first_name }),
       filterFn: (row, id, value) => {
         return String(row.getValue(id)).toLowerCase().includes(String(value ?? "").toLowerCase());
       }
     }, {
-      accessorKey: "reason",
+      accessorKey: "middle_initial",
       header: ({ column }) =>
-        renderComponent(DataTableColumnHeader<EventRecord, unknown>, { column, title: "Reason" }),
-      cell: ({ row }) => row.original.reason,
+        renderComponent(DataTableColumnHeader<Participant, unknown>, { column, title: "Middle Name" }),
+      cell: ({ row }) => row.original.middle_initial,
       filterFn: (row, id, value) => {
         return String(row.getValue(id)).toLowerCase().includes(String(value ?? "").toLowerCase());
-      }
-    }, {
-      accessorKey: "more_info",
-      header: ({ column }) =>
-        renderComponent(DataTableColumnHeader<EventRecord, unknown>, { column, title: "More Info" }),
-      cell: ({ row }) => {
-        return renderComponent(ArchiveDataTableDialog, {
-          more_info: row.original.more_info,
-        });
-      },
-      filterFn: (row, id, value) => {
-        const { grade } = row.getValue(id) as PositionSalaryInfo;
-        return grade === value || grade.toLowerCase().includes(value);
       }
     },
     {
-      accessorKey: "created_at",
+      accessorKey: "last_name",
       header: ({ column }) =>
-        renderComponent(DataTableColumnHeader<EventRecord, unknown>, { column, title: "Created At" }),
-      cell: ({ row }) => renderComponent(DataTableBadge, { variant: "outline", value: row.original.created_at! }),
+        renderComponent(DataTableColumnHeader<Participant, unknown>, { column, title: "Last Name" }),
+      cell: ({ row }) => row.original.last_name,
+      filterFn: (row, id, value) => {
+        return String(row.getValue(id)).toLowerCase().includes(String(value ?? "").toLowerCase());
+      }
+    },
+    {
+      accessorKey: "created",
+      header: ({ column }) =>
+        renderComponent(DataTableColumnHeader<Participant, unknown>, { column, title: "Created At" }),
+      cell: ({ row }) => renderComponent(DataTableBadge, { variant: "outline", value: formatDateTime(row.original.created) }),
       filterFn: (row, id, value) => {
         const date = new Date(row.getValue(id));
         const searchValue = value.toLowerCase();
@@ -77,7 +74,7 @@ export function archivesTableColumns(): ColumnDef<EventRecord>[] {
     },
     {
       id: "actions",
-      cell: ({ row }) => renderComponent(ArchiveDataTableRowActions, { row }),
+      cell: ({ row }) => renderComponent(ParticipantDataTableRowActions, { row }),
     },
   ]
 }
