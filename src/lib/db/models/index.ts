@@ -65,6 +65,7 @@ export class EventDetailsCollection extends Collection<EventDetails> {
   id!: string;
   event_name?: string;
   is_multi_day?: boolean;
+  difference_in_days!: number;
   event_date?: Date;
   start_date?: Date;
   end_date?: Date;
@@ -81,6 +82,7 @@ export class EventDetailsCollection extends Collection<EventDetails> {
     this.id = data.id;
     this.event_name = data.event_name;
     this.is_multi_day = data.is_multi_day;
+    this.difference_in_days = data.difference_in_days;
     this.event_date = data.event_date ? new Date(data.event_date) : undefined;
     this.start_date = data.start_date ? new Date(data.start_date) : undefined;
     this.end_date = data.end_date ? new Date(data.end_date) : undefined;
