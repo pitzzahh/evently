@@ -32,7 +32,7 @@
 </script>
 
 <Popover.Root bind:open>
-	<Popover.Trigger bind:ref={triggerRef} disabled={isDisabled}> 
+	<Popover.Trigger bind:ref={triggerRef} disabled={isDisabled}>
 		{#snippet child({ props })}
 			<button
 				class="w-[120px] rounded-br-sm rounded-tr-sm border bg-background p-2 text-sm active:scale-95 active:opacity-60"
