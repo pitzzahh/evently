@@ -53,7 +53,7 @@
 			{
 				first_name: '',
 				last_name: '',
-				middle_initial: '',
+				middle_name: '',
 				email: '',
 				event_id: event_id || ''
 			}
@@ -107,23 +107,21 @@
 									{...props}
 									placeholder="Enter first name"
 									bind:value={$formData.participants[index].first_name}
-									aria-required="true"
 								/>
 							{/snippet}
 						</Form.Control>
 
 						<Form.FieldErrors />
 					</Form.Field>
-					<Form.Field {form} name={`participants[${index}].middle_initial`}>
+					<Form.Field {form} name={`participants[${index}].middle_name`}>
 						<Form.Control>
 							{#snippet children({ props })}
-								<Form.Label>Middle Initial</Form.Label>
+								<Form.Label>Middle Name</Form.Label>
 								<Input
 									maxlength={1}
 									{...props}
-									placeholder="Enter middle initial"
-									bind:value={$formData.participants[index].middle_initial}
-									aria-required="false"
+									placeholder="Enter middle name"
+									bind:value={$formData.participants[index].middle_name}
 								/>
 							{/snippet}
 						</Form.Control>
@@ -138,7 +136,6 @@
 									{...props}
 									placeholder="Enter last name"
 									bind:value={$formData.participants[index].last_name}
-									aria-required="true"
 								/>
 							{/snippet}
 						</Form.Control>
@@ -154,7 +151,6 @@
 									type="email"
 									placeholder="email@example.com"
 									bind:value={$formData.participants[index].email}
-									aria-required="true"
 								/>
 							{/snippet}
 						</Form.Control>
