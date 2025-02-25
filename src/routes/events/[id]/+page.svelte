@@ -68,7 +68,9 @@
 		<h2 class="text-5xl font-semibold">{comp_state.event_details?.event_name ?? 'N/A'}</h2>
 
 		<div class="flex items-center gap-2">
-			{@render StatusPill('ongoing')}
+			{@render StatusPill(
+				(comp_state.event_details?.start_date ?? 0) > new Date() ? 'upcoming' : 'ongoing'
+			)}
 
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger>
