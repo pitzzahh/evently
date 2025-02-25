@@ -118,7 +118,6 @@
 							{#snippet children({ props })}
 								<Form.Label>Middle Name</Form.Label>
 								<Input
-									maxlength={1}
 									{...props}
 									placeholder="Enter middle name"
 									bind:value={$formData.participants[index].middle_name}
