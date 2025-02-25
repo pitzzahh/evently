@@ -19,17 +19,20 @@
 	});
 
 	$effect(() => {
-		const cursor = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(
-			{},
+		const now = new Date();
+		const event_details = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(
+			{
+				start_date: type === 'upcoming' ? { $gte: now } : { $lt: now }
+			},
 			{
 				sort: {
 					start_date: type === 'upcoming' ? 1 : -1
 				}
 			}
 		);
-		comp_state.events = cursor.fetch();
+		comp_state.events = event_details.fetch();
 		return () => {
-			cursor.cleanup();
+			event_details.cleanup();
 		};
 	});
 </script>
