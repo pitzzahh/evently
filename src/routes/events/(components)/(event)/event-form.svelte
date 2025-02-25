@@ -227,6 +227,8 @@
 
 	onMount(() => {
 		handleGenerateEventDates();
+		$formData.start_date = comp_state.date_range.start.toDate(getLocalTimeZone());
+		$formData.end_date = comp_state.date_range.end.toDate(getLocalTimeZone());
 	});
 </script>
 
