@@ -186,8 +186,7 @@
 			</div>
 		</div>
 	</div>
-
-	<div class="grid gap-2">
+	<div class="flex max-h-[400px] flex-col gap-2 overflow-y-auto pr-1">
 		{#each comp_state.event_schedules as event_date, index}
 			<EventTimePicker {event_date} day={index + 1} isSelectionDisabled={true} />
 		{/each}
