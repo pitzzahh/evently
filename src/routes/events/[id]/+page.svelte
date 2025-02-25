@@ -41,15 +41,24 @@
 	});
 
 	$effect(() => {
-		const participants_cursor = COLLECTIONS.PARTICIPANT_COLLECTION.find({});
-		const event_schedule_cursor = COLLECTIONS.EVENT_SCHEDULE_COLLECTION.find({
-			event_id
-		});
+		const participants_cursor = COLLECTIONS.PARTICIPANT_COLLECTION.find(
+			{},
+			{ fieldTracking: true }
+		);
+		const event_schedule_cursor = COLLECTIONS.EVENT_SCHEDULE_COLLECTION.find(
+			{
+				event_id
+			},
+			{ fieldTracking: true }
+		);
 		comp_state.participants = participants_cursor.fetch();
 		comp_state.event_schedule = event_schedule_cursor.fetch();
-		comp_state.event_details = COLLECTIONS.EVENT_DETAILS_COLLECTION.findOne({
-			id: event_id
-		});
+		comp_state.event_details = COLLECTIONS.EVENT_DETAILS_COLLECTION.findOne(
+			{
+				id: event_id
+			},
+			{ fieldTracking: true }
+		);
 
 		return () => {
 			participants_cursor.cleanup();
