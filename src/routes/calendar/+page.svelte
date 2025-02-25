@@ -24,7 +24,7 @@
 			start_date: new Date(e.start_date),
 			end_date: new Date(e.end_date)
 		}));
-		console.log(comp_state.event_details);
+		$inspect(comp_state.event_details);
 		return () => {
 			event_details_cursor.cleanup();
 		};

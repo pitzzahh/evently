@@ -11,6 +11,7 @@
 	import * as Alert from '@/components/ui/alert/index.js';
 	import { CircleAlert } from '@/assets/icons';
 	import Button from '@/components/ui/button/button.svelte';
+	import { onMount } from 'svelte';
 
 	interface ComponentState {
 		infinite_loader: {
@@ -29,8 +30,8 @@
 	let comp_state = $state<ComponentState>({
 		infinite_loader: {
 			events: [],
-			limit: 20,
-			skip: 20
+			limit: 3,
+			skip: 3
 		}
 	});
 
@@ -87,27 +88,20 @@
 		}
 	}
 
-	watch(
-		() => COLLECTIONS.EVENT_DETAILS_COLLECTION.isLoading,
-		() => {
-			const now = new Date();
-			const events_cursor = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(
-				{
-					end_date: type === 'upcoming' ? { $gte: now } : { $lte: now }
+	onMount(() => {
+		const events_cursor = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(
+			{},
+			{
+				sort: {
+					start_date: type === 'upcoming' ? 1 : -1
 				},
-				{
-					sort: {
-						start_date: type === 'upcoming' ? 1 : -1
-					},
-					limit: comp_state.infinite_loader.limit
-				}
-			);
-			comp_state.infinite_loader.events = events_cursor
-				.fetch()
-				.slice(0, comp_state.infinite_loader.skip);
-			return () => events_cursor.cleanup();
-		}
-	);
+				limit: comp_state.infinite_loader.limit
+			}
+		);
+		comp_state.infinite_loader.events = events_cursor.fetch();
+		$inspect(comp_state.infinite_loader.events);
+		return () => events_cursor.cleanup();
+	});
 </script>
 
 <Timeline style="width: 100%;  padding: 0;;">
