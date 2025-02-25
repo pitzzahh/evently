@@ -10,7 +10,7 @@
 	import Textarea from '@/components/ui/textarea/textarea.svelte';
 	import { eventSchema, type EventSchema } from '@/schema/event';
 	import { MapPin, Ticket } from 'lucide-svelte';
-	import SuperDebug, { type SuperValidated, superForm } from 'sveltekit-superforms';
+	import { type SuperValidated, superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { nanoid } from 'nanoid';
 	import { EventTimePicker } from '..';
@@ -30,7 +30,6 @@
 		formatDateToTimeOption,
 		monthFormatter
 	} from '@/utils/format';
-	import { dev } from '$app/environment';
 	import { hasRequiredData } from '@/utils/validation';
 	import { Label } from '@/components/ui/label';
 	import { goto } from '$app/navigation';
@@ -347,7 +346,3 @@
 		])}>Add</Form.Button
 	>
 </form>
-
-{#if dev}
-	<SuperDebug data={$formData} />
-{/if}
