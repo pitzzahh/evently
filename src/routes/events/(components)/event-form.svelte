@@ -10,7 +10,7 @@
 	import Textarea from '@/components/ui/textarea/textarea.svelte';
 	import { eventSchema, type EventSchema } from '@/schema/event';
 	import { MapPin, Ticket } from 'lucide-svelte';
-	import { type SuperValidated, superForm } from 'sveltekit-superforms';
+	import SuperDebug, { type SuperValidated, superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { nanoid } from 'nanoid';
 	import EventTimePicker from './event-time-picker.svelte';
@@ -28,9 +28,11 @@
 	import {
 		createDate,
 		extractHoursAndMinutes,
+		formatDate,
 		formatDateToTimeOption,
 		monthFormatter
 	} from '@/utils/format';
+	import { dev } from '$app/environment';
 
 	interface ComponentState {
 		start_value: DateValue | undefined;
@@ -59,6 +61,7 @@
 						new Date(comp_state.date_range.start.toString()).getTime()
 					: 0;
 			const difference_in_days = Math.round(difference_in_time / (1000 * 3600 * 24)) + 1;
+			toast.success(`Form is valid and has ${difference_in_days} days`);
 		}
 	});
 	const { form: formData, enhance } = form;
@@ -218,7 +221,7 @@
 		<Form.FieldErrors />
 	</Form.Field>
 
-	<Form.Field {form} name="description" class="w-full">
+	<Form.Field {form} name="location" class="w-full">
 		<Form.Control>
 			{#snippet children({ props })}
 				<Form.Label class="flex items-center gap-1"><MapPin class="size-4" />Location</Form.Label>
@@ -284,6 +287,12 @@
 					onStartValueChange={(v) => {
 						comp_state.start_value = v;
 					}}
+					onValueChange={(v) => {
+						const { start, end } = v;
+						if (!start || !end) return;
+						$formData.start_date = start?.toDate(getLocalTimeZone());
+						$formData.end_date = end?.toDate(getLocalTimeZone());
+					}}
 					numberOfMonths={2}
 				/>
 			</Popover.Content>
@@ -310,3 +319,7 @@
 	</Form.Field>
 	<Form.Button>Submit</Form.Button>
 </form>
+
+{#if dev}
+	<SuperDebug data={$formData} />
+{/if}
