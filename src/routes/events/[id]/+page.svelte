@@ -10,19 +10,44 @@
 		Trash,
 		View
 	} from 'lucide-svelte';
-
-	import { type PageData } from './$types';
 	import { cn } from '@/utils';
 	import AttendeesDataTable from '../(components)/attendees-data-table.svelte';
 	import { nanoid } from 'nanoid';
 	import EventTimePicker from '../(components)/event-time-picker.svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import ParticipantsDialog from '../(components)/participants-dialog.svelte';
-	import type { EventSchedule } from '@/db/models/types';
+	import type { EventSchedule, EventDetails } from '@/db/models/types';
 	import { scale } from 'svelte/transition';
+	import { COLLECTIONS } from '@/db/index';
+	import type { Participant } from '@/db/models/types';
 
-	let { data }: { data: PageData } = $props();
+	let { data } = $props();
+	const { event_id } = $derived(data);
 	let see_more = $state(true);
+
+	interface ComponentState {
+		event_details: EventDetails | undefined;
+		participants: Participant[];
+		see_more: boolean;
+	}
+
+	let comp_state = $state<ComponentState>({
+		event_details: undefined,
+		participants: [],
+		see_more: false
+	});
+
+	$effect(() => {
+		const participants_cursor = COLLECTIONS.PARTICIPANT_COLLECTION.find({});
+		comp_state.participants = participants_cursor.fetch();
+		comp_state.event_details = COLLECTIONS.EVENT_DETAILS_COLLECTION.findOne({
+			id: event_id
+		});
+
+		return () => {
+			participants_cursor.cleanup();
+		};
+	});
 
 	function toggleSeeMore() {
 		see_more = !see_more;
