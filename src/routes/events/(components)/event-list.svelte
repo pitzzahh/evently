@@ -50,13 +50,15 @@
 			const current_date = new Date();
 			const events_cursor = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(
 				{
-					end_date: type === 'upcoming' ? { $gte: current_date } : { $lt: current_date }
+					end_date: type === 'upcoming' ? { $lte: current_date } : { $gte: current_date }
 				},
 				{
 					skip: skip,
 					limit: comp_state.infinite_loader.limit
 				}
 			);
+
+			console.log(events_cursor.count);
 
 			// Ideally, like most paginated endpoints, this should return the data
 			// you've requested for your page, as well as the total amount of data
@@ -94,14 +96,11 @@
 	onMount(() => {
 		const current_date = new Date();
 		const events_cursor = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(
-			{
-				end_date: type === 'upcoming' ? { $gte: current_date } : { $lt: current_date }
-			},
+			{},
 			{
 				sort: {
 					start_date: type === 'upcoming' ? 1 : -1
-				},
-				limit: comp_state.infinite_loader.limit
+				}
 			}
 		);
 		comp_state.infinite_loader.events = events_cursor.fetch();
@@ -110,7 +109,7 @@
 	});
 </script>
 
-<Timeline style="width: 100%;  padding: 0;;">
+<Timeline style="width: 100%;  padding: 0;">
 	<InfiniteLoader triggerLoad={loadMore}>
 		{#each comp_state.infinite_loader.events as event, i}
 			<div transition:fly={{ y: 100, duration: 400, delay: i * 100, easing: quartInOut }}>
@@ -122,8 +121,6 @@
 			<Badge variant="secondary">Nore More Data</Badge>
 		{/snippet}
 
-		<!-- 3. There are a few optional snippets for customizing what is shown at the bottom
-				 of the scroller in various states, see the 'Snippets' section for more details -->
 		{#snippet loading()}
 			<Badge class="text-sm">Loading...</Badge>
 		{/snippet}
