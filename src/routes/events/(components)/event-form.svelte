@@ -56,14 +56,26 @@
 				toast.error('Form is invalid');
 				return;
 			}
-
+			COLLECTIONS.EVENT_DETAILS_COLLECTION.removeMany({});
 			const difference_in_time =
 				comp_state.date_range?.start && comp_state.date_range.end
 					? new Date(comp_state.date_range.end.toString()).getTime() -
 						new Date(comp_state.date_range.start.toString()).getTime()
 					: 0;
 			const difference_in_days = Math.round(difference_in_time / (1000 * 3600 * 24)) + 1;
-			toast.success(`Form is valid and has ${difference_in_days} days`);
+
+			const added_event_details = COLLECTIONS.EVENT_DETAILS_COLLECTION.insert({
+				event_name: $formData.title,
+				location: $formData.location,
+				description: $formData.description,
+				is_multi_day: difference_in_days > 1,
+				difference_in_days,
+				start_date: $formData.start_date,
+				end_date: $formData.end_date
+			});
+
+			console.log('added_event_details', added_event_details);
+			toast.success(`Event is added and has ${difference_in_days} days`);
 		}
 	});
 	const { form: formData, enhance } = form;
