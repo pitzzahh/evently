@@ -9,12 +9,17 @@
 	interface AddParticipantsDialogProps {
 		add_participants_form: SuperValidated<AddParticipantsSchema>;
 		event_id: string;
+		open_add_participants_dialog?: boolean;
 	}
 
-	let { add_participants_form, event_id }: AddParticipantsDialogProps = $props();
+	let {
+		add_participants_form,
+		event_id,
+		open_add_participants_dialog = $bindable(false)
+	}: AddParticipantsDialogProps = $props();
 </script>
 
-<Dialog.Root>
+<Dialog.Root bind:open={open_add_participants_dialog}>
 	<Dialog.Trigger class={buttonVariants({ class: 'rounded-lg border px-4 py-3 text-sm' })}>
 		Add Participants <Plus class="size-4" />
 	</Dialog.Trigger>
@@ -24,6 +29,10 @@
 			<Dialog.Description>Fill up the form to add participants</Dialog.Description>
 		</Dialog.Header>
 
-		<ParticipantForm {add_participants_form} {event_id} />
+		<ParticipantForm
+			success_callback={() => (open_add_participants_dialog = false)}
+			{add_participants_form}
+			{event_id}
+		/>
 	</Dialog.Content>
 </Dialog.Root>

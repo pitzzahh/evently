@@ -19,9 +19,14 @@
 	interface ParticipantFormProps {
 		add_participants_form: SuperValidated<AddParticipantsSchema>;
 		event_id: string;
+		success_callback?: () => void;
 	}
 
-	let { add_participants_form, event_id }: ParticipantFormProps = $props();
+	let {
+		add_participants_form,
+		event_id,
+		success_callback
+	}: ParticipantFormProps = $props();
 	const form = superForm(add_participants_form, {
 		SPA: true,
 		validators: zodClient(add_participants_schema),
@@ -39,7 +44,7 @@
 					event_id: event_id
 				}))
 			);
-
+			success_callback?.();
 			toast.success('Participants added successfully');
 		}
 	});
