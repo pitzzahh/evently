@@ -69,8 +69,8 @@ export class EventScheduleCollection extends Collection<EventSchedule> {
     return this.findOne({ id });
   }
 
-  getEvent() {
-    return COLLECTIONS.EVENT_DETAILS_COLLECTION.findOne({ id: this.event_id });
+  getByEventID(event_id?: string) {
+    return this.find({ id: event_id ?? this.event_id }).fetch();
   }
 }
 
