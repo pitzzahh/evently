@@ -10,8 +10,7 @@
 	import { Badge } from '@/components/ui/badge';
 	import * as Alert from '@/components/ui/alert/index.js';
 	import { CircleAlert } from '@/assets/icons';
-	import Button from '@/components/ui/button/button.svelte';
-	import { onMount } from 'svelte';
+	import { Button } from '@/components/ui/button';
 
 	interface ComponentState {
 		infinite_loader: {
