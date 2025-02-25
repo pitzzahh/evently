@@ -1,5 +1,11 @@
+<!--
+	jsrepo 1.40.1
+	Installed from github/ieedan/shadcn-svelte-extras
+	2-25-2025
+-->
+
 <script lang="ts">
-	import { type ButtonProps, Button } from '$lib/components/ui/button';
+	import { type ButtonProps, Button } from '../button';
 	import type { WithoutChildren } from 'bits-ui';
 	import { useImageCropperCrop } from './image-cropper.svelte.js';
 	import { Crop } from 'lucide-svelte';

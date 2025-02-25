@@ -1,3 +1,9 @@
+<!--
+	jsrepo 1.40.1
+	Installed from github/ieedan/shadcn-svelte-extras
+	2-25-2025
+-->
+
 <script lang="ts">
 	import { box } from 'svelte-toolbelt';
 	import { useImageCropperRoot } from './image-cropper.svelte.js';

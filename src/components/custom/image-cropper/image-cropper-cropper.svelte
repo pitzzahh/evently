@@ -1,3 +1,9 @@
+<!--
+	jsrepo 1.40.1
+	Installed from github/ieedan/shadcn-svelte-extras
+	2-25-2025
+-->
+
 <script lang="ts">
 	import Cropper, { type CropperProps } from 'svelte-easy-crop';
 	import { useImageCropperCropper } from './image-cropper.svelte.js';

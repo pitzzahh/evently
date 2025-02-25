@@ -1,3 +1,9 @@
+/*
+	jsrepo 1.40.1
+	Installed from github/ieedan/shadcn-svelte-extras
+	2-25-2025
+*/
+
 import type { CropArea } from 'svelte-easy-crop';
 
 export const getFileFromUrl = async (url: string, fileName = 'cropped.png'): Promise<File> => {

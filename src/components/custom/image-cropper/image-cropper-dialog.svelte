@@ -1,6 +1,12 @@
+<!--
+	jsrepo 1.40.1
+	Installed from github/ieedan/shadcn-svelte-extras
+	2-25-2025
+-->
+
 <script lang="ts">
-	import * as Dialog from '$lib/components/ui/dialog';
-	import { cn } from '@/utils/styles';
+	import * as Dialog from '../dialog';
+	import { cn } from '../../blocks/utils/utils';
 	import { useImageCropperDialog } from './image-cropper.svelte.js';
 	import type { ImageCropperDialogProps } from './types';
 
@@ -12,6 +18,7 @@
 <Dialog.Root bind:open={dialogState.rootState.open}>
 	<Dialog.Content
 		{...rest}
+		hideClose
 		class={cn(
 			'min-h-96 max-w-full rounded-none border-x-0 sm:max-w-lg sm:rounded-lg sm:border-x',
 			className

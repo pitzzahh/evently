@@ -1,9 +1,15 @@
+<!--
+	jsrepo 1.40.1
+	Installed from github/ieedan/shadcn-svelte-extras
+	2-25-2025
+-->
+
 <script lang="ts">
-	import * as Avatar from '$lib/components/ui/avatar';
+	import * as Avatar from '../avatar';
 	import type { ImageCropperPreviewProps } from './types';
 	import { useImageCropperPreview } from './image-cropper.svelte.js';
 	import { Upload } from 'lucide-svelte';
-	import { cn } from '@/utils/styles';
+	import { cn } from '../../blocks/utils/utils';
 
 	let { child, class: className }: ImageCropperPreviewProps = $props();
 

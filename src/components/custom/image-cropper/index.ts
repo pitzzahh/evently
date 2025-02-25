@@ -1,3 +1,9 @@
+/*
+	jsrepo 1.40.1
+	Installed from github/ieedan/shadcn-svelte-extras
+	2-25-2025
+*/
+
 import Root from './image-cropper.svelte';
 import UploadTrigger from './image-cropper-upload-trigger.svelte';
 import Preview from './image-cropper-preview.svelte';
