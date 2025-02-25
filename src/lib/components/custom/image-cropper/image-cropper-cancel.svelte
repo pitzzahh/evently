@@ -5,7 +5,7 @@
 -->
 
 <script lang="ts">
-	import { type ButtonProps, Button } from '../button';
+	import { type ButtonProps, Button } from '@/components/ui/button';
 	import type { WithoutChildren } from 'bits-ui';
 	import { useImageCropperCancel } from './image-cropper.svelte.js';
 	import { Trash2 } from 'lucide-svelte';

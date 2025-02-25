@@ -8,7 +8,7 @@
 	"formatter": "prettier",
 	"configFiles": {},
 	"paths": {
-		"*": "./src/components/blocks",
-		"ui": "./src/components/custom"
+		"*": "./src/lib/components/blocks",
+		"ui": "./src/lib/components/custom"
 	}
 }

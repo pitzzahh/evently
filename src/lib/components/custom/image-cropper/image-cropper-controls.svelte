@@ -5,7 +5,7 @@
 -->
 
 <script lang="ts">
-	import { cn } from '../../blocks/utils/utils';
+	import { cn } from '@/utils/styles';
 	import type { HTMLAttributes } from 'svelte/elements';
 
 	let { class: className, children, ...rest }: HTMLAttributes<HTMLDivElement> = $props();

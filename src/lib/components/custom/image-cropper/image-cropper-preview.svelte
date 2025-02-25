@@ -5,11 +5,11 @@
 -->
 
 <script lang="ts">
-	import * as Avatar from '../avatar';
+	import * as Avatar from '@/components/ui/avatar';
 	import type { ImageCropperPreviewProps } from './types';
 	import { useImageCropperPreview } from './image-cropper.svelte.js';
 	import { Upload } from 'lucide-svelte';
-	import { cn } from '../../blocks/utils/utils';
+	import { cn } from '@/utils/styles';
 
 	let { child, class: className }: ImageCropperPreviewProps = $props();
 
