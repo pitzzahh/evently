@@ -93,7 +93,7 @@
 			const now = new Date();
 			const events_cursor = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(
 				{
-					end_date: type === 'upcoming' ? { $gt: now } : { $lt: now }
+					end_date: type === 'upcoming' ? { $gte: now } : { $lte: now }
 				},
 				{
 					sort: {
