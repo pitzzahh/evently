@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { EventSchedule } from '@/db/models/types';
-	import TimeComboBox from './time-combo-box.svelte';
+	import { TimeComboBox } from '..';
 	import { time_options } from '@/constants';
 	import { formatDateToTimeOption } from '@/utils/format';
 
