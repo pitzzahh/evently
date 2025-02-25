@@ -122,6 +122,10 @@ export class EventDetailsCollection extends Collection<EventDetails> {
   getSchedules() {
     return COLLECTIONS.EVENT_SCHEDULE_COLLECTION.find({ event_id: this.id }).fetch();
   }
+
+  getNumberOfParticipants(event_id?: string) {
+    return COLLECTIONS.PARTICIPANT_COLLECTION.find({ event_id: event_id ?? this.id }).count();
+  }
 }
 
 export class ParticipantCollection extends Collection<Participant> {
