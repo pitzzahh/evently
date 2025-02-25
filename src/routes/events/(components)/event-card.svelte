@@ -68,8 +68,8 @@
 						<ChevronRightIcon />
 					</Button>
 				</div>
-				<div class="absolute -right-6 -top-12">
-					{@render StatusPill((start_date ?? 0) > new Date() ? 'upcoming' : 'ongoing')}
+				<div class="absolute -right-6 -top-10">
+					{@render StatusPill((start_date ?? 0) > new Date() ? 'upcoming' : 'ongoing', 'sm')}
 				</div>
 				<div class="flex flex-col items-center gap-1">
 					<p class="text-4xl font-semibold">100</p>
