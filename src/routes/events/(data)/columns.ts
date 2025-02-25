@@ -57,6 +57,15 @@ export function participantTableColumns(): ColumnDef<Participant>[] {
       }
     },
     {
+      accessorKey: "email",
+      header: ({ column }) =>
+        renderComponent(DataTableColumnHeader<Participant, unknown>, { column, title: "Email" }),
+      cell: ({ row }) => row.original.email,
+      filterFn: (row, id, value) => {
+        return String(row.getValue(id)).toLowerCase().includes(String(value ?? "").toLowerCase());
+      }
+    },
+    {
       accessorKey: "created",
       header: ({ column }) =>
         renderComponent(DataTableColumnHeader<Participant, unknown>, { column, title: "Created At" }),
