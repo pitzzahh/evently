@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { cn } from '@/utils/style/utils';
+	import { cn } from '@/utils/styles';
 	import { scale } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
 	import { Ticket, Calendar, Plus } from 'lucide-svelte';
