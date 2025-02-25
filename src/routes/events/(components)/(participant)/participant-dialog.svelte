@@ -47,7 +47,7 @@
 	>
 		View Participants <View class="size-5" />
 	</Dialog.Trigger>
-	<Dialog.Content class="max-h-[60vh] overflow-y-auto">
+	<Dialog.Content class="max-w-[750px]">
 		<Dialog.Header>
 			<div class="flex items-center justify-between pr-4">
 				<div class="grid gap-2">
