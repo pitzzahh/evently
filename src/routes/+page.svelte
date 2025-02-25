@@ -4,7 +4,7 @@
 	import EventList from './events/(components)/event-list.svelte';
 	import { COLLECTIONS } from '@/db/index';
 	import type { Participant } from '@/db/models/types';
-
+	import { CalendarArrowDown, CalendarArrowUp } from '@/assets/icons';
 	interface ComponentState {
 		participants: Participant[];
 	}
@@ -27,8 +27,14 @@
 		<div class="flex items-center justify-between gap-4">
 			<h2 class="text-4xl font-semibold">Events</h2>
 			<Tabs.List class="grid h-auto w-full max-w-[300px] grid-cols-2">
-				<Tabs.Trigger value="upcoming" class="h-auto text-base">Upcoming</Tabs.Trigger>
-				<Tabs.Trigger value="past" class="h-auto text-base">Past</Tabs.Trigger>
+				<Tabs.Trigger value="upcoming" class="h-auto text-base">
+					<CalendarArrowUp class="md:mr-1" />
+					Upcoming</Tabs.Trigger
+				>
+				<Tabs.Trigger value="past" class="h-auto text-base">
+					<CalendarArrowDown class="md:mr-1" />
+					Past</Tabs.Trigger
+				>
 			</Tabs.List>
 		</div>
 
