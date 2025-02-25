@@ -56,6 +56,10 @@
 				{ fieldTracking: true }
 			);
 
+			$inspect(
+				comp_state.event_details?.start_date && comp_state.event_details.start_date > new Date()
+			);
+
 			return () => {
 				participants_cursor.cleanup();
 				event_schedule_cursor.cleanup();
@@ -69,8 +73,17 @@
 		<h2 class="text-5xl font-semibold">{comp_state.event_details?.event_name ?? 'N/A'}</h2>
 
 		<div class="flex items-center gap-2">
+			{comp_state.event_details?.start_date}
 			{@render StatusPill(
-				(comp_state.event_details?.start_date ?? 0) > new Date() ? 'upcoming' : 'ongoing'
+				comp_state.event_details?.start_date &&
+					comp_state.event_details?.end_date &&
+					new Date() >= new Date(comp_state.event_details.start_date) &&
+					new Date() <= new Date(comp_state.event_details.end_date)
+					? 'ongoing'
+					: comp_state.event_details?.end_date &&
+						  new Date() > new Date(comp_state.event_details.end_date)
+						? 'finished'
+						: 'upcoming'
 			)}
 
 			<DropdownMenu.Root>
