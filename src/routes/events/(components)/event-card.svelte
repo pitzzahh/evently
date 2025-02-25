@@ -60,7 +60,7 @@
 					</div>
 
 					<Button
-						href="/events/20"
+						href="/events/{id}"
 						class="mt-3 inline-flex items-center rounded-lg border px-4 py-2 text-sm font-medium dark:border-white/20"
 					>
 						See Details
