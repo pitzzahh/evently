@@ -11,15 +11,31 @@
 	import { onMount } from 'svelte';
 	import { Button } from '@/components/ui/button';
 	import { PlusCircle, Trash } from 'lucide-svelte';
+	import { toast } from 'svelte-sonner';
+	import { COLLECTIONS } from '@/db';
 
 	let {
 		add_participants_form,
 		event_id
 	}: { add_participants_form: SuperValidated<AddParticipantsSchema>; event_id?: string } = $props();
 	const form = superForm(add_participants_form, {
-		validators: zodClient(add_participants_schema)
+		SPA: true,
+		validators: zodClient(add_participants_schema),
+		onUpdate: async ({ form }) => {
+			// toast the values
+			if (!form.valid) {
+				toast.error('Form is invalid');
+				return;
+			}
+
+			COLLECTIONS.PARTICIPANT_COLLECTION.insertMany($formData.participants);
+
+			toast.success('Form is valid');
+		}
 	});
-	const { form: formData, enhance, errors } = form;
+	const { form: formData, enhance, capture, restore } = form;
+
+	export const snapshot = { capture, restore };
 
 	function addParticipant() {
 		$formData.participants = [
