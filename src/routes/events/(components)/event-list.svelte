@@ -7,6 +7,10 @@
 	import { fly } from 'svelte/transition';
 	import { cubicIn } from 'svelte/easing';
 	import { InfiniteLoader, loaderState } from 'svelte-infinite';
+	import { Badge } from '@/components/ui/badge';
+	import * as Alert from '@/components/ui/alert/index.js';
+	import { CircleAlert } from '@/assets/icons';
+	import Button from '@/components/ui/button/button.svelte';
 
 	interface ComponentState {
 		infinite_loader: {
@@ -114,14 +118,21 @@
 			</div>
 		{/each}
 
+		{#snippet noData()}
+			<Badge variant="secondary">Nore More Data</Badge>
+		{/snippet}
+
 		<!-- 3. There are a few optional snippets for customizing what is shown at the bottom
 				 of the scroller in various states, see the 'Snippets' section for more details -->
 		{#snippet loading()}
-			Loading...
+			<Badge class="text-sm">Loading...</Badge>
 		{/snippet}
 		{#snippet error(load)}
-			<div>Error fetching data</div>
-			<button onclick={load}>Retry</button>
+			<Alert.Root variant="destructive">
+				<CircleAlert class="size-4" />
+				<Alert.Description>Error fetching data</Alert.Description>
+				<Button onclick={load}>Retry</Button>
+			</Alert.Root>
 		{/snippet}
 	</InfiniteLoader>
 </Timeline>
