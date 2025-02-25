@@ -1,10 +1,9 @@
 <script lang="ts">
-	import Check from 'lucide-svelte/icons/check';
+	import { Check, Clock } from '@/assets/icons';
 	import { tick } from 'svelte';
-	import * as Command from '$lib/components/ui/command/index.js';
-	import * as Popover from '$lib/components/ui/popover/index.js';
-	import { cn } from '$lib/utils.js';
-	import { Clock } from 'lucide-svelte';
+	import * as Command from '@/components/ui/command';
+	import * as Popover from '@/components/ui/popover';
+	import { cn } from '@/utils/styles';
 
 	let {
 		time_options,
@@ -36,7 +35,7 @@
 	<Popover.Trigger bind:ref={triggerRef} disabled={isDisabled}>
 		{#snippet child({ props })}
 			<button
-				class="w-[120px] flex items-center justify-center gap-2 rounded-sm border bg-primary p-2 px-3 py-1 text-sm text-white active:scale-95 active:opacity-60 dark:border-white/20"
+				class="flex w-[120px] items-center justify-center gap-2 rounded-sm border bg-primary p-2 px-3 py-1 text-sm text-white active:scale-95 active:opacity-60 dark:border-white/20"
 				{...props}
 			>
 				{selected_time}
