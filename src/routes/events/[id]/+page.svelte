@@ -20,6 +20,7 @@
 	import { scale } from 'svelte/transition';
 	import { COLLECTIONS } from '@/db/index';
 	import type { Participant } from '@/db/models/types';
+	import { formatDateTime } from '@/utils/format';
 
 	let { data } = $props();
 	const { event_id } = $derived(data);
@@ -27,66 +28,42 @@
 
 	interface ComponentState {
 		event_details: EventDetails | undefined;
+		event_schedule: EventSchedule[];
 		participants: Participant[];
 		see_more: boolean;
 	}
 
 	let comp_state = $state<ComponentState>({
 		event_details: undefined,
+		event_schedule: [],
 		participants: [],
 		see_more: false
 	});
 
 	$effect(() => {
 		const participants_cursor = COLLECTIONS.PARTICIPANT_COLLECTION.find({});
+		const event_schedule_cursor = COLLECTIONS.EVENT_SCHEDULE_COLLECTION.find({
+			event_id
+		});
 		comp_state.participants = participants_cursor.fetch();
+		comp_state.event_schedule = event_schedule_cursor.fetch();
 		comp_state.event_details = COLLECTIONS.EVENT_DETAILS_COLLECTION.findOne({
 			id: event_id
 		});
 
 		return () => {
 			participants_cursor.cleanup();
+			event_schedule_cursor.cleanup();
 		};
 	});
-
-	function toggleSeeMore() {
-		see_more = !see_more;
-	}
-
-	const event_dates: EventSchedule[] = [
-		{
-			id: nanoid(),
-			event_date: new Date(2025, 1, 24),
-			am_start: new Date(2025, 1, 24, 8, 0), // 8:00 AM
-			am_end: new Date(2025, 1, 24, 12, 0), // 12:00 PM
-			pm_start: new Date(2025, 1, 24, 13, 0), // 1:00 PM
-			pm_end: new Date(2025, 1, 24, 17, 0) // 5:00 PM
-		},
-		{
-			id: nanoid(),
-			event_date: new Date(2025, 1, 25),
-			am_start: new Date(2025, 1, 25, 9, 0), // 9:00 AM
-			am_end: new Date(2025, 1, 25, 12, 30), // 12:30 PM
-			pm_start: new Date(2025, 1, 25, 13, 30), // 1:30 PM
-			pm_end: new Date(2025, 1, 25, 18, 0) // 6:00 PM
-		},
-		{
-			id: nanoid(),
-			event_date: new Date(2025, 1, 26),
-			am_start: new Date(2025, 1, 26, 7, 30), // 7:30 AM
-			am_end: new Date(2025, 1, 26, 11, 30), // 11:30 AM
-			pm_start: new Date(2025, 1, 26, 12, 30), // 12:30 PM
-			pm_end: new Date(2025, 1, 26, 16, 30) // 4:30 PM
-		}
-	];
 </script>
 
 <div in:scale class="grid gap-6">
 	<div class="flex items-center justify-between">
-		<h2 class="text-5xl font-semibold">Teacher's Seminar</h2>
+		<h2 class="text-5xl font-semibold">{comp_state.event_details?.event_name ?? 'N/A'}</h2>
 
 		<div class="flex items-center gap-2">
-			{@render StatusPill('finished')}
+			{@render StatusPill('ongoing')}
 
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger>
@@ -115,7 +92,9 @@
 								<Calendar class="size-5 text-muted-foreground" />
 							</div>
 							<div>
-								<p class="text-base font-medium">Wednesday, November 20, 2024</p>
+								<p class="text-base font-medium">
+									{formatDateTime(comp_state.event_details?.start_date)}
+								</p>
 								<p class="text-muted-foreground">11:30 PM - 12:30 AM</p>
 							</div>
 						</div>
@@ -135,10 +114,10 @@
 				<div class="flex items-center justify-between gap-4">
 					<div class="flex items-center gap-3">
 						<div class="rounded-md border p-3"><MapPin class="size-5 text-muted-foreground" /></div>
-						<p class="text-base font-medium">Legazpi City</p>
+						<p class="text-base font-medium">{comp_state.event_details?.location ?? 'N/A'}</p>
 					</div>
 
-					<Button variant="ghost" onclick={toggleSeeMore}>
+					<Button variant="ghost" onclick={() => (see_more = !see_more)}>
 						{see_more ? 'See Less' : 'See More'}
 					</Button>
 				</div>
@@ -186,15 +165,9 @@
 	</div>
 
 	<div class="grid gap-2">
-		{#each event_dates as event_date, index}
+		{#each comp_state.event_schedule as event_date, index}
 			<EventTimePicker {event_date} day={index + 1} isSelectionDisabled={true} />
 		{/each}
-	</div>
-
-	<!-- TODO: ADD ATTENDEES TABLE HERE -->
-	<div class="grid gap-4">
-		<h4 class="text-lg font-medium">Attendees</h4>
-		<AttendeesDataTable />
 	</div>
 </div>
 
