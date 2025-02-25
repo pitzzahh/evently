@@ -48,7 +48,7 @@
 	</Dialog.Trigger>
 	<Dialog.Content class="max-w-[90vw]">
 		<Dialog.Header>
-			<div class="flex items-center justify-between">
+			<div class="flex items-center justify-between pr-4">
 				<div class="grid gap-2">
 					<Dialog.Title>Participants</Dialog.Title>
 					<Dialog.Description>These are the participants of Teacher's Seminar</Dialog.Description>
