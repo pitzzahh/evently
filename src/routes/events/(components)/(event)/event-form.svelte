@@ -1,9 +1,3 @@
-<script module lang="ts">
-	interface Props {
-		event_form: SuperValidated<EventSchema>;
-	}
-</script>
-
 <script lang="ts">
 	import * as Form from '@/components/ui/form';
 	import { Input } from '@/components/ui/input';
@@ -35,6 +29,10 @@
 	import { goto } from '$app/navigation';
 	import { AspectRatio } from '@/components/ui/aspect-ratio';
 
+	interface EventFormProps {
+		event_form: SuperValidated<EventSchema>;
+	}
+
 	interface ComponentState {
 		start_value: DateValue | undefined;
 		date_range: {
@@ -44,7 +42,7 @@
 		event_dates: Omit<EventSchedule, 'event_id' | 'updated' | 'created'>[];
 	}
 
-	let { event_form }: Props = $props();
+	let { event_form }: EventFormProps = $props();
 
 	const form = superForm(event_form, {
 		SPA: true,
