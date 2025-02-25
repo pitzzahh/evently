@@ -47,7 +47,7 @@
 	>
 		View Participants <View class="size-5" />
 	</Dialog.Trigger>
-	<Dialog.Content class="max-w-[750px]">
+	<Dialog.Content class="max-w-[90vw]">
 		<Dialog.Header>
 			<div class="flex items-center justify-between pr-4">
 				<div class="grid gap-2">
@@ -59,10 +59,12 @@
 				<AddParticipantsDialog {add_participants_form} event_id={event_details.id} />
 			</div>
 		</Dialog.Header>
-		{#if COLLECTIONS.PARTICIPANT_COLLECTION.isPulling()}
-			<TableSkeleton />
-		{:else}
-			<ParticipantDataTable participants={comp_state.participants} />
-		{/if}
+		<div class="max-h-[500px] overflow-y-auto">
+			{#if COLLECTIONS.PARTICIPANT_COLLECTION.isPulling()}
+				<TableSkeleton />
+			{:else}
+				<ParticipantDataTable participants={comp_state.participants} />
+			{/if}
+		</div>
 	</Dialog.Content>
 </Dialog.Root>
