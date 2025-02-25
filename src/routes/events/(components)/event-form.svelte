@@ -33,6 +33,7 @@
 		monthFormatter
 	} from '@/utils/format';
 	import { dev } from '$app/environment';
+	import { hasRequiredData } from '@/utils/validation';
 
 	interface ComponentState {
 		start_value: DateValue | undefined;
@@ -97,7 +98,7 @@
 		return date_arr;
 	}
 
-	$effect(() => {
+	function handleGenerateEventDates() {
 		if (!comp_state.date_range?.end && !comp_state.date_range?.start) {
 			comp_state.event_dates = [];
 		}
@@ -116,7 +117,7 @@
 				pm_end: new Date('1970-01-01T16:00:00')
 			}));
 		}
-	});
+	}
 
 	function updateDateEventPeriodStartEnd({
 		id,
@@ -258,6 +259,7 @@
 		<p class="text-sm">Event Date</p>
 		<Popover.Root>
 			<Popover.Trigger
+				disabled={!hasRequiredData($formData, ['title', 'location', 'description'])}
 				class={cn(
 					buttonVariants({
 						variant: 'outline',
@@ -290,6 +292,7 @@
 					onValueChange={(v) => {
 						const { start, end } = v;
 						if (!start || !end) return;
+						handleGenerateEventDates();
 						$formData.start_date = start?.toDate(getLocalTimeZone());
 						$formData.end_date = end?.toDate(getLocalTimeZone());
 					}}
@@ -307,7 +310,7 @@
 				</div>
 
 				<div class="max-h-[400px] overflow-y-auto">
-					<div class="flex flex-col gap-2">
+					<div class="flex flex-col gap-2 pr-1">
 						{#each comp_state.event_dates as event_date, index}
 							<EventTimePicker {event_date} day={index + 1} {updateDateEventPeriodStartEnd} />
 						{/each}
