@@ -42,7 +42,7 @@
 </script>
 
 <div class="flex w-full gap-2">
-	<div class="flex w-full items-center gap-4 rounded-lg border bg-gray-700/10 p-4 dark:bg-white/10">
+	<div class="flex w-full items-center gap-4 rounded-lg border bg-gray-700/10 p-4 dark:bg-[#1C1E20]">
 		{@render start_end_pattern()}
 
 		<div class="flex w-full flex-col gap-2">
@@ -82,7 +82,7 @@
 			</p>
 		</div>
 	</div>
-	<div class="flex w-full items-center gap-4 rounded-lg border bg-gray-700/10 p-4 dark:bg-white/10">
+	<div class="flex w-full items-center gap-4 rounded-lg border bg-gray-700/10 p-4 dark:bg-[#1C1E20]">
 		{@render start_end_pattern()}
 
 		<div class="flex w-full flex-col gap-2">

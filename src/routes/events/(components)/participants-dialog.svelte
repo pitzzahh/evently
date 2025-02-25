@@ -3,6 +3,7 @@
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import { View } from 'lucide-svelte';
 	import AttendeesDataTable from './attendees-data-table.svelte';
+	import AddParticipantsDialog from './add-participants-dialog.svelte';
 </script>
 
 <Dialog.Root>
@@ -13,8 +14,13 @@
 	</Dialog.Trigger>
 	<Dialog.Content class="max-w-[90vw]">
 		<Dialog.Header>
-			<Dialog.Title>Participants</Dialog.Title>
-			<Dialog.Description>These are the participants of Teacher's Seminar</Dialog.Description>
+			<div class="flex justify-between items-center">
+				<div class="grid gap-2">
+					<Dialog.Title>Participants</Dialog.Title>
+					<Dialog.Description>These are the participants of Teacher's Seminar</Dialog.Description>
+				</div>
+				<AddParticipantsDialog />
+			</div>
 		</Dialog.Header>
 		<AttendeesDataTable />
 		<!-- <Dialog.Footer>
