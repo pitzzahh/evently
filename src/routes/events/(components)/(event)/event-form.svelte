@@ -28,6 +28,7 @@
 	import { Label } from '@/components/ui/label';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
+	import * as ImageCropper from '@/components/custom/image-cropper';
 
 	interface EventFormProps {
 		event_form: SuperValidated<EventSchema>;
@@ -269,76 +270,87 @@
 				</Form.Control>
 				<Form.FieldErrors />
 			</Form.Field>
-			<Form.Field {form} name="description" class="w-full">
-				<Form.Control>
-					{#snippet children({ props })}
-						<Form.Label>Description</Form.Label>
-						<Textarea
-							{...props}
-							bind:value={$formData.description}
-							rows={5}
-							class="bg-gray-700/10 dark:bg-white/10"
-							placeholder="Provide details about the event, including agenda, speakers, or any special requirements"
-							aria-label="Event description"
+			<div class="mb-3 grid gap-2">
+				<p class="text-sm">Event Date</p>
+				<Popover.Root>
+					<Popover.Trigger
+						disabled={!hasRequiredData($formData, ['title', 'location'])}
+						class={cn(
+							buttonVariants({
+								variant: 'outline',
+								class: 'w-auto justify-start place-self-start text-left font-normal'
+							}),
+							!comp_state.date_range && 'text-muted-foreground'
+						)}
+					>
+						<CalendarIcon />
+						{#if comp_state.date_range && comp_state.date_range.start}
+							{#if comp_state.date_range.end}
+								{monthFormatter.format(comp_state.date_range.start.toDate(getLocalTimeZone()))} - {monthFormatter.format(
+									comp_state.date_range.end.toDate(getLocalTimeZone())
+								)}
+							{:else}
+								{monthFormatter.format(comp_state.date_range.start.toDate(getLocalTimeZone()))}
+							{/if}
+						{:else if comp_state.start_value}
+							{monthFormatter.format(comp_state.start_value.toDate(getLocalTimeZone()))}
+						{:else}
+							Pick a date
+						{/if}
+					</Popover.Trigger>
+					<Popover.Content class="w-auto p-0" align="start">
+						<RangeCalendar
+							bind:value={comp_state.date_range}
+							onStartValueChange={(v) => {
+								comp_state.start_value = v;
+							}}
+							onValueChange={(v) => {
+								const { start, end } = v;
+								if (!start || !end) return;
+								handleGenerateEventDates();
+								$formData.start_date = start?.toDate(getLocalTimeZone());
+								$formData.end_date = end?.toDate(getLocalTimeZone());
+							}}
+							numberOfMonths={2}
 						/>
-					{/snippet}
-				</Form.Control>
-				<Form.FieldErrors />
-			</Form.Field>
+					</Popover.Content>
+				</Popover.Root>
+			</div>
 		</div>
-		<img
+		<!-- <img
 			src="https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=800&dpr=2&q=80"
 			alt="Gray by Drew Beamer"
 			class="flex w-80 shrink-0 items-center justify-center rounded-md bg-muted object-cover text-center text-sm text-muted-foreground"
-		/>
+		/> -->
+		<ImageCropper.Root>
+			<ImageCropper.UploadTrigger>
+				<ImageCropper.Preview class="h-64 w-64 rounded-md" />
+			</ImageCropper.UploadTrigger>
+			<ImageCropper.Dialog>
+				<ImageCropper.Cropper cropShape="round" />
+				<ImageCropper.Controls>
+					<ImageCropper.Cancel />
+					<ImageCropper.Crop />
+				</ImageCropper.Controls>
+			</ImageCropper.Dialog>
+		</ImageCropper.Root>
 	</div>
-
-	<div class="mb-3 grid gap-2">
-		<p class="text-sm">Event Date</p>
-		<Popover.Root>
-			<Popover.Trigger
-				disabled={!hasRequiredData($formData, ['title', 'location'])}
-				class={cn(
-					buttonVariants({
-						variant: 'outline',
-						class: 'w-auto justify-start place-self-start text-left font-normal'
-					}),
-					!comp_state.date_range && 'text-muted-foreground'
-				)}
-			>
-				<CalendarIcon />
-				{#if comp_state.date_range && comp_state.date_range.start}
-					{#if comp_state.date_range.end}
-						{monthFormatter.format(comp_state.date_range.start.toDate(getLocalTimeZone()))} - {monthFormatter.format(
-							comp_state.date_range.end.toDate(getLocalTimeZone())
-						)}
-					{:else}
-						{monthFormatter.format(comp_state.date_range.start.toDate(getLocalTimeZone()))}
-					{/if}
-				{:else if comp_state.start_value}
-					{monthFormatter.format(comp_state.start_value.toDate(getLocalTimeZone()))}
-				{:else}
-					Pick a date
-				{/if}
-			</Popover.Trigger>
-			<Popover.Content class="w-auto p-0" align="start">
-				<RangeCalendar
-					bind:value={comp_state.date_range}
-					onStartValueChange={(v) => {
-						comp_state.start_value = v;
-					}}
-					onValueChange={(v) => {
-						const { start, end } = v;
-						if (!start || !end) return;
-						handleGenerateEventDates();
-						$formData.start_date = start?.toDate(getLocalTimeZone());
-						$formData.end_date = end?.toDate(getLocalTimeZone());
-					}}
-					numberOfMonths={2}
+	<Form.Field {form} name="description" class="w-full">
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Label>Description</Form.Label>
+				<Textarea
+					{...props}
+					bind:value={$formData.description}
+					rows={5}
+					class="bg-gray-700/10 dark:bg-white/10"
+					placeholder="Provide details about the event, including agenda, speakers, or any special requirements"
+					aria-label="Event description"
 				/>
-			</Popover.Content>
-		</Popover.Root>
-	</div>
+			{/snippet}
+		</Form.Control>
+		<Form.FieldErrors />
+	</Form.Field>
 
 	<div
 		class={cn({
