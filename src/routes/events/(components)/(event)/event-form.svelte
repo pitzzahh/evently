@@ -28,6 +28,7 @@
 	import { Label } from '@/components/ui/label';
 	import { goto } from '$app/navigation';
 	import { AspectRatio } from '@/components/ui/aspect-ratio';
+	import { onMount } from 'svelte';
 
 	interface EventFormProps {
 		event_form: SuperValidated<EventSchema>;
@@ -223,11 +224,15 @@
 			return returned_data;
 		});
 	}
+
+	onMount(() => {
+		handleGenerateEventDates();
+	});
 </script>
 
 <form method="POST" use:enhance class="flex flex-col gap-1">
-	<div class="grid grid-cols-2">
-		<div class="flex flex-col">
+	<div class="grid grid-cols-[1fr,auto] gap-4">
+		<div class="flex flex-col gap-4">
 			<Form.Field {form} name="title">
 				<Form.Control>
 					{#snippet children({ props })}
@@ -246,7 +251,7 @@
 				<Form.FieldErrors />
 			</Form.Field>
 
-			<Form.Field {form} name="location" class="w-full">
+			<Form.Field {form} name="location">
 				<Form.Control>
 					{#snippet children({ props })}
 						<Form.Label class="flex items-center gap-1"
@@ -264,7 +269,7 @@
 				<Form.FieldErrors />
 			</Form.Field>
 		</div>
-		<AspectRatio ratio={16 / 9} class="bg-muted">
+		<AspectRatio ratio={1} class="w-[200px] bg-muted">
 			<img
 				src="https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=800&dpr=2&q=80"
 				alt="Gray by Drew Beamer"
@@ -294,7 +299,7 @@
 		<p class="text-sm">Event Date</p>
 		<Popover.Root>
 			<Popover.Trigger
-				disabled={!hasRequiredData($formData, ['title', 'location', 'description'])}
+				disabled={!hasRequiredData($formData, ['title', 'location'])}
 				class={cn(
 					buttonVariants({
 						variant: 'outline',
@@ -339,7 +344,7 @@
 
 	<div
 		class={cn({
-			hidden: !hasRequiredData($formData, ['title', 'location', 'description'])
+			hidden: !hasRequiredData($formData, ['title', 'location'])
 		})}
 	>
 		<Label>Time</Label>
@@ -352,12 +357,13 @@
 		</div>
 	</div>
 	<Form.Button
-		disabled={!hasRequiredData($formData, [
-			'title',
-			'location',
-			'description',
-			'start_date',
-			'end_date'
-		])}>Add</Form.Button
+		disabled={!hasRequiredData($formData, ['title', 'location', 'start_date', 'end_date'])}
+		>Add</Form.Button
 	>
 </form>
+
+<style>
+	* {
+		border: 1px solid red;
+	}
+</style>
