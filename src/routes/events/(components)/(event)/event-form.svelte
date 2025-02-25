@@ -5,22 +5,21 @@
 </script>
 
 <script lang="ts">
-	import * as Form from '$lib/components/ui/form/index.js';
-	import { Input } from '$lib/components/ui/input/index.js';
+	import * as Form from '@/components/ui/form';
+	import { Input } from '@/components/ui/input';
 	import Textarea from '@/components/ui/textarea/textarea.svelte';
 	import { eventSchema, type EventSchema } from '@/schema/event';
 	import { MapPin, Ticket } from 'lucide-svelte';
 	import SuperDebug, { type SuperValidated, superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { nanoid } from 'nanoid';
-	import EventTimePicker from './event-time-picker.svelte';
+	import { EventTimePicker } from '..';
 	import CalendarIcon from 'lucide-svelte/icons/calendar';
-
 	import { CalendarDate, type DateValue, getLocalTimeZone } from '@internationalized/date';
-	import { cn } from '$lib/utils.js';
-	import { buttonVariants } from '$lib/components/ui/button/index.js';
-	import { RangeCalendar } from '$lib/components/ui/range-calendar/index.js';
-	import * as Popover from '$lib/components/ui/popover/index.js';
+	import { cn } from '@/utils/styles';
+	import { buttonVariants } from '@/components/ui/button';
+	import { RangeCalendar } from '@/components/ui/range-calendar';
+	import * as Popover from '@/components/ui/popover';
 	import { time_options } from '@/constants';
 	import { toast } from 'svelte-sonner';
 	import { COLLECTIONS } from '@/db/index';
