@@ -118,6 +118,7 @@ export class ParticipantCollection extends Collection<Participant> {
   first_name!: string;
   middle_initial?: string;
   last_name!: string;
+  event_id!: string;
   email?: string;
   created?: Date;
   updated?: Date;
@@ -133,6 +134,7 @@ export class ParticipantCollection extends Collection<Participant> {
     this.first_name = data.first_name;
     this.middle_initial = data.middle_initial;
     this.last_name = data.last_name;
+    this.event_id = data.event_id;
     this.email = data.email;
     this.created = data.created ? new Date(data.created) : undefined;
     this.updated = data.updated ? new Date(data.updated) : undefined;
