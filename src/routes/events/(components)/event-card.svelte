@@ -1,5 +1,7 @@
-<script>
+<script lang="ts">
 	import { Button } from '@/components/ui/button';
+	import type { EventDetails } from '@/db/models/types';
+	import { formatDate } from '@/utils/format';
 	import { ChevronRightIcon, MapPin, UsersRound } from 'lucide-svelte';
 	import {
 		TimelineItem,
@@ -7,12 +9,25 @@
 		TimelineContent,
 		TimelineOppositeContent
 	} from 'svelte-vertical-timeline';
+
+	let {
+		id,
+		event_name,
+		location,
+		description,
+		created,
+		difference_in_days,
+		is_multi_day,
+		end_date,
+		start_date,
+		updated
+	}: EventDetails = $props();
 </script>
 
 <TimelineItem>
 	<TimelineOppositeContent slot="opposite-content" style="flex: 0; margin: 0;">
 		<div class="sticky top-[5rem] mb-[3rem] flex w-[200px] flex-col items-start gap-2">
-			<p class="text-lg font-semibold leading-none">February 24, 2022</p>
+			<p class="text-lg font-semibold leading-none">{formatDate(start_date)}</p>
 			<p class="text-lg font-semibold leading-none text-muted-foreground/80">Tuesday</p>
 		</div>
 	</TimelineOppositeContent>
@@ -31,10 +46,10 @@
 			<div class="flex w-full items-start justify-between">
 				<div class="grid place-content-start gap-1">
 					<p>4:00 PM</p>
-					<h3 class="text-lg font-semibold text-gray-900 dark:text-white">Seminar</h3>
+					<h3 class="text-lg font-semibold text-gray-900 dark:text-white">{event_name}</h3>
 					<div class="flex items-center gap-1 text-muted-foreground">
 						<MapPin class="size-4" />
-						<p>Legazpi City</p>
+						<p>{location}</p>
 					</div>
 
 					<Button
