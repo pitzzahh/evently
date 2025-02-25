@@ -28,9 +28,12 @@
 	};
 
 	const typeColors = {
-		meeting: 'border-l-4 border-blue-500 bg-blue-50 hover:bg-blue-100',
-		event: 'border-l-4 border-green-500 bg-green-50 hover:bg-green-100',
-		workshop: 'border-l-4 border-red-500 bg-red-50 hover:bg-red-100'
+		meeting:
+			'border-l-4 border-blue-500 bg-blue-50 hover:bg-blue-100 dark:border-blue-300 dark:bg-blue-900 dark:hover:bg-blue-800',
+		event:
+			'border-l-4 border-green-500 bg-green-50 hover:bg-green-100 dark:border-green-300 dark:bg-green-900 dark:hover:bg-green-800',
+		workshop:
+			'border-l-4 border-red-500 bg-red-50 hover:bg-red-100 dark:border-red-300 dark:bg-red-900 dark:hover:bg-red-800'
 	};
 
 	const position = getEventPosition(event);
@@ -75,7 +78,7 @@
 						{@render EventContent(event)}
 					</TooltipContent>
 
-					<PopoverContent class="w-80">
+					<PopoverContent class="w-full sm:w-80">
 						{@render EventContent(event)}
 					</PopoverContent>
 				</div>
@@ -88,7 +91,7 @@
 	<div class="space-y-2 p-2">
 		<div class="flex items-center gap-2">
 			<div
-				class={`h-3 w-3 rounded-full bg-${event.type === 'meeting' ? 'blue' : event.type === 'event' ? 'green' : 'red'}-500`}
+				class={`h-3 w-3 rounded-full bg-${event.type === 'meeting' ? 'blue' : event.type === 'event' ? 'green' : 'red'}-500 dark:bg-${event.type === 'meeting' ? 'blue' : event.type === 'event' ? 'green' : 'red'}-300`}
 			></div>
 			<h4 class="font-medium">{event.title}</h4>
 		</div>
@@ -107,16 +110,3 @@
 		</div>
 	</div>
 {/snippet}
-
-<style>
-	/* Smooth transitions */
-	.group {
-		transition: all 0.2s ease;
-	}
-
-	/* Override default tooltip styles for better positioning */
-	:global(.tooltip-content) {
-		padding: 8px !important;
-		margin-top: -4px;
-	}
-</style>

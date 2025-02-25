@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Button } from '@/components/ui/button';
 	import type { EventDetails } from '@/db/models/types';
-	import { formatDate, formatDateToTimeOption } from '@/utils/format';
+	import { formatDate } from '@/utils/format';
 	import { ChevronRightIcon, MapPin, UsersRound } from 'lucide-svelte';
 	import {
 		TimelineItem,
@@ -60,7 +60,7 @@
 					</div>
 
 					<Button
-						href="/events/20"
+						href="/events/{id}"
 						class="mt-3 inline-flex items-center rounded-lg border px-4 py-2 text-sm font-medium dark:border-white/20"
 					>
 						See Details

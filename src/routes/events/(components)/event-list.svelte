@@ -3,26 +3,48 @@
 	import { Timeline } from 'svelte-vertical-timeline';
 	import { COLLECTIONS } from '@/db/index';
 	import type { EventDetails } from '@/db/models/types';
+	import { watch } from 'runed';
+	import { fly } from 'svelte/transition';
+	import { cubicIn } from 'svelte/easing';
 
 	interface ComponentState {
 		events: EventDetails[];
 	}
 
+	export interface EventListProps {
+		type: 'upcoming' | 'past';
+	}
+
+	let { type }: EventListProps = $props();
+
 	let comp_state = $state<ComponentState>({
 		events: []
 	});
 
-	$effect(() => {
-		const cursor = COLLECTIONS.EVENT_DETAILS_COLLECTION.find({});
-		comp_state.events = cursor.fetch();
-		return () => {
-			cursor.cleanup();
-		};
-	});
+	watch(
+		() => COLLECTIONS.EVENT_DETAILS_COLLECTION.isLoading,
+		() => {
+			const now = new Date();
+			const events = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(
+				{
+					start_date: type === 'upcoming' ? { $gte: now } : { $lt: now }
+				},
+				{
+					sort: {
+						start_date: type === 'upcoming' ? 1 : -1
+					}
+				}
+			);
+			comp_state.events = events.fetch();
+			return () => events.cleanup();
+		}
+	);
 </script>
 
 <Timeline style="width: 100%;  padding: 0;">
-	{#each comp_state.events as event}
-		<EventCard {...event} />
+	{#each comp_state.events as event, i}
+		<div transition:fly={{ y: 100, duration: 400, delay: i * 100, easing: cubicIn }}>
+			<EventCard {...event} />
+		</div>
 	{/each}
 </Timeline>
