@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { buttonVariants } from '$lib/components/ui/button/index.js';
-	import * as Dialog from '$lib/components/ui/dialog/index.js';
+	import { buttonVariants } from '@/components/ui/button';
+	import * as Dialog from '@/components/ui/dialog';
 	import type { AddParticipantsSchema, ParticipantSchema } from '@/schema/participant';
-	import { Plus } from 'lucide-svelte';
+	import { Plus } from '@/asets/icons';
 	import type { SuperValidated } from 'sveltekit-superforms';
-	import ParticipantForm from './participant-form.svelte';
+	import { ParticipantForm } from '..';
 
 	let {
 		add_participants_form

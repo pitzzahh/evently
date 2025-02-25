@@ -3,7 +3,7 @@
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import { View } from 'lucide-svelte';
 	import { ParticipantDataTable } from '..';
-	import AddParticipantsDialog from '../add-participants-dialog.svelte';
+	import AddParticipantsDialog from './add-participants-dialog.svelte';
 	import type { SuperValidated } from 'sveltekit-superforms';
 	import type { AddParticipantsSchema, ParticipantSchema } from '@/schema/participant';
 
