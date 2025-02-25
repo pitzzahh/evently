@@ -30,8 +30,8 @@
 	let comp_state = $state<ComponentState>({
 		infinite_loader: {
 			events: [],
-			limit: 3,
-			skip: 3
+			limit: 20,
+			skip: 20
 		}
 	});
 
@@ -47,8 +47,11 @@
 				return;
 			}
 
-			const events_collection_cursor = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(
-				{},
+			const current_date = new Date();
+			const events_cursor = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(
+				{
+					end_date: type === 'upcoming' ? { $gte: current_date } : { $lt: current_date }
+				},
 				{
 					skip: skip,
 					limit: comp_state.infinite_loader.limit
@@ -59,7 +62,7 @@
 			// you've requested for your page, as well as the total amount of data
 			// available to page through
 
-			if (!events_collection_cursor.count) {
+			if (!events_cursor.count) {
 				loaderState.error(); // <--- using loaderState
 
 				// On errors, set the pageNumber back so we can retry
@@ -67,7 +70,7 @@
 				comp_state.infinite_loader.skip -= 1;
 				return;
 			}
-			const data = events_collection_cursor.fetch();
+			const data = events_cursor.fetch();
 
 			// If we've successfully received data, push it to the reactive state variable
 			if (data.length) {
@@ -89,8 +92,11 @@
 	}
 
 	onMount(() => {
+		const current_date = new Date();
 		const events_cursor = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(
-			{},
+			{
+				end_date: type === 'upcoming' ? { $gte: current_date } : { $lt: current_date }
+			},
 			{
 				sort: {
 					start_date: type === 'upcoming' ? 1 : -1
