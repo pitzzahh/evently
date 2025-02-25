@@ -94,7 +94,7 @@
 	}
 
 	watch(
-		() => COLLECTIONS.EVENT_DETAILS_COLLECTION.isLoading,
+		() => COLLECTIONS.EVENT_DETAILS_COLLECTION.isLoading(),
 		() => {
 			const current_date = new Date();
 			const events_cursor = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(
