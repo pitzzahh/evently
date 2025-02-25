@@ -1,4 +1,4 @@
-import { AttendanceRecordCollection, EventScheduleCollection, EventDetailsCollection, NoteCollection, ParticipantCollection, QRCodeCollection } from "./models";
+import { AttendanceRecordCollection, EventScheduleCollection, EventDetailsCollection, ParticipantCollection, QRCodeCollection } from "./models";
 
 export class Collections {
   private static instance: Collections;
@@ -6,7 +6,6 @@ export class Collections {
   public ATTENDANCE_RECORDS_COLLECTION: AttendanceRecordCollection;
   public EVENT_SCHEDULE_COLLECTION: EventScheduleCollection;
   public EVENT_DETAILS_COLLECTION: EventDetailsCollection;
-  public NOTE_COLLECTION: NoteCollection;
   public PARTICIPANT_COLLECTION: ParticipantCollection;
   public QRCODE_COLLECTION: QRCodeCollection;
 
@@ -14,7 +13,6 @@ export class Collections {
     this.ATTENDANCE_RECORDS_COLLECTION = new AttendanceRecordCollection();
     this.EVENT_SCHEDULE_COLLECTION = new EventScheduleCollection();
     this.EVENT_DETAILS_COLLECTION = new EventDetailsCollection();
-    this.NOTE_COLLECTION = new NoteCollection();
     this.PARTICIPANT_COLLECTION = new ParticipantCollection();
     this.QRCODE_COLLECTION = new QRCodeCollection();
   }
