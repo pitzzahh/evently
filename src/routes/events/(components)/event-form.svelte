@@ -74,6 +74,13 @@
 				end_date: $formData.end_date
 			});
 
+			COLLECTIONS.EVENT_SCHEDULE_COLLECTION.insertMany(
+				comp_state.event_dates.map((event) => ({
+					...event,
+					event_id: added_event_details_id
+				}))
+			);
+
 			goto(`/events/${added_event_details_id}`);
 			console.log('added_event_details', added_event_details_id);
 			toast.success(`Event is added and has ${difference_in_days} days`);

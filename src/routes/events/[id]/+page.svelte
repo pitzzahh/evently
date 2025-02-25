@@ -73,7 +73,6 @@
 		<h2 class="text-5xl font-semibold">{comp_state.event_details?.event_name ?? 'N/A'}</h2>
 
 		<div class="flex items-center gap-2">
-			{comp_state.event_details?.start_date}
 			{@render StatusPill(
 				comp_state.event_details?.start_date &&
 					comp_state.event_details?.end_date &&
