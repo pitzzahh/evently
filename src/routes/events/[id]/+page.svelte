@@ -1,18 +1,7 @@
 <script lang="ts">
 	import { Button } from '@/components/ui/button';
-	import {
-		Calendar,
-		ChartBar,
-		MapPin,
-		Settings,
-		UsersRound,
-		Edit,
-		Trash,
-		View
-	} from 'lucide-svelte';
+	import { Calendar, ChartBar, MapPin, Settings, UsersRound, Edit, Trash } from 'lucide-svelte';
 	import { cn } from '@/utils';
-	import AttendeesDataTable from '../(components)/attendees-data-table.svelte';
-	import { nanoid } from 'nanoid';
 	import EventTimePicker from '../(components)/event-time-picker.svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import ParticipantsDialog from '../(components)/participants-dialog.svelte';
@@ -21,50 +10,58 @@
 	import { COLLECTIONS } from '@/db/index';
 	import type { Participant } from '@/db/models/types';
 	import { formatDateTime } from '@/utils/format';
+	import { watch } from 'runed';
+	import { StatusPill } from '@/components/snippets';
 
 	let { data } = $props();
-	const { event_id } = $derived(data);
 	let see_more = $state(true);
 
 	interface ComponentState {
 		event_details: EventDetails | undefined;
-		event_schedule: EventSchedule[];
+		event_schedules: EventSchedule[];
 		participants: Participant[];
 		see_more: boolean;
 	}
 
 	let comp_state = $state<ComponentState>({
 		event_details: undefined,
-		event_schedule: [],
+		event_schedules: [],
 		participants: [],
 		see_more: false
 	});
 
-	$effect(() => {
-		const participants_cursor = COLLECTIONS.PARTICIPANT_COLLECTION.find(
-			{},
-			{ fieldTracking: true }
-		);
-		const event_schedule_cursor = COLLECTIONS.EVENT_SCHEDULE_COLLECTION.find(
-			{
-				event_id
-			},
-			{ fieldTracking: true }
-		);
-		comp_state.participants = participants_cursor.fetch();
-		comp_state.event_schedule = event_schedule_cursor.fetch();
-		comp_state.event_details = COLLECTIONS.EVENT_DETAILS_COLLECTION.findOne(
-			{
-				id: event_id
-			},
-			{ fieldTracking: true }
-		);
+	watch(
+		[
+			() => COLLECTIONS.PARTICIPANT_COLLECTION.isLoading,
+			() => COLLECTIONS.EVENT_SCHEDULE_COLLECTION.isLoading,
+			() => COLLECTIONS.EVENT_DETAILS_COLLECTION.isLoading
+		],
+		() => {
+			const participants_cursor = COLLECTIONS.PARTICIPANT_COLLECTION.find(
+				{},
+				{ fieldTracking: true }
+			);
+			const event_schedule_cursor = COLLECTIONS.EVENT_SCHEDULE_COLLECTION.find(
+				{
+					event_id: data.event_id
+				},
+				{ fieldTracking: true }
+			);
+			comp_state.participants = participants_cursor.fetch();
+			comp_state.event_schedules = event_schedule_cursor.fetch();
+			comp_state.event_details = COLLECTIONS.EVENT_DETAILS_COLLECTION.findOne(
+				{
+					id: data.event_id
+				},
+				{ fieldTracking: true }
+			);
 
-		return () => {
-			participants_cursor.cleanup();
-			event_schedule_cursor.cleanup();
-		};
-	});
+			return () => {
+				participants_cursor.cleanup();
+				event_schedule_cursor.cleanup();
+			};
+		}
+	);
 </script>
 
 <div in:scale class="grid gap-6">
@@ -72,7 +69,9 @@
 		<h2 class="text-5xl font-semibold">{comp_state.event_details?.event_name ?? 'N/A'}</h2>
 
 		<div class="flex items-center gap-2">
-			{@render StatusPill('ongoing')}
+			{@render StatusPill(
+				(comp_state.event_details?.start_date ?? 0) > new Date() ? 'upcoming' : 'ongoing'
+			)}
 
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger>
@@ -174,19 +173,8 @@
 	</div>
 
 	<div class="grid gap-2">
-		{#each comp_state.event_schedule as event_date, index}
+		{#each comp_state.event_schedules as event_date, index}
 			<EventTimePicker {event_date} day={index + 1} isSelectionDisabled={true} />
 		{/each}
 	</div>
 </div>
-
-{#snippet StatusPill(status: 'upcoming' | 'finished' | 'ongoing')}
-	<p
-		class={cn('rounded-lg border px-4 py-3 text-sm', {
-			'border-blue-500 bg-blue-500/20': status === 'upcoming',
-			'border-green-600 bg-green-600/30': status === 'ongoing'
-		})}
-	>
-		{status.charAt(0)?.toUpperCase().concat(status.slice(1))}
-	</p>
-{/snippet}

@@ -2,9 +2,9 @@
 	import { Calendar as CalendarPrimitive, type WithoutChildrenOrChild } from 'bits-ui';
 	import * as Calendar from '@/components/ui/calendar';
 	import { cn } from '$lib/utils';
-	import type { DateValue } from '@internationalized/date';
-	import type { CalendarEvent } from '@routes/calendar/(data)/types';
+	import { getLocalTimeZone, type DateValue } from '@internationalized/date';
 	import { EventCell } from '.';
+	import type { EventDetails } from '@/db/models/types';
 
 	let {
 		ref = $bindable(null),
@@ -15,15 +15,15 @@
 		...restProps
 	}: WithoutChildrenOrChild<
 		CalendarPrimitive.RootProps & {
-			events: CalendarEvent[];
+			events: EventDetails[];
 		}
 	> = $props();
 
 	// Get events for a specific date
 	function getDateEvents(date: DateValue) {
 		return events.filter((event) => {
-			const isAfterStart = date.compare(event.startDate) >= 0;
-			const isBeforeEnd = date.compare(event.endDate) <= 0;
+			const isAfterStart = date.toDate(getLocalTimeZone()).getTime() >= event.start_date.getTime();
+			const isBeforeEnd = date.toDate(getLocalTimeZone()).getTime() <= event.end_date.getTime();
 			return isAfterStart && isBeforeEnd;
 		});
 	}
@@ -74,7 +74,8 @@
 														<EventCell
 															{event}
 															{date}
-															isFirstColumn={date.compare(event.startDate) === 0}
+															isFirstColumn={date.toDate(getLocalTimeZone()).getTime() <
+																event.start_date.getTime()}
 															index={i}
 														/>
 													{/each}

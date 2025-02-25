@@ -1,21 +1,14 @@
-<script module lang="ts">
-	interface Props {
-		event_form: SuperValidated<EventSchema>;
-	}
-</script>
-
 <script lang="ts">
 	import * as Form from '$lib/components/ui/form/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import Textarea from '@/components/ui/textarea/textarea.svelte';
 	import { eventSchema, type EventSchema } from '@/schema/event';
 	import { MapPin, Ticket } from 'lucide-svelte';
-	import SuperDebug, { type SuperValidated, superForm } from 'sveltekit-superforms';
+	import { type SuperValidated, superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { nanoid } from 'nanoid';
 	import EventTimePicker from './event-time-picker.svelte';
 	import CalendarIcon from 'lucide-svelte/icons/calendar';
-
 	import { CalendarDate, type DateValue, getLocalTimeZone } from '@internationalized/date';
 	import { cn } from '$lib/utils.js';
 	import { buttonVariants } from '$lib/components/ui/button/index.js';
@@ -31,10 +24,13 @@
 		formatDateToTimeOption,
 		monthFormatter
 	} from '@/utils/format';
-	import { dev } from '$app/environment';
 	import { hasRequiredData } from '@/utils/validation';
 	import { Label } from '@/components/ui/label';
 	import { goto } from '$app/navigation';
+
+	interface EventFormProps {
+		event_form: SuperValidated<EventSchema>;
+	}
 
 	interface ComponentState {
 		start_value: DateValue | undefined;
@@ -45,7 +41,7 @@
 		event_dates: EventSchedule[];
 	}
 
-	let { event_form }: Props = $props();
+	let { event_form }: EventFormProps = $props();
 
 	const form = superForm(event_form, {
 		SPA: true,
@@ -72,6 +68,13 @@
 				start_date: $formData.start_date,
 				end_date: $formData.end_date
 			});
+
+			COLLECTIONS.EVENT_SCHEDULE_COLLECTION.insertMany(
+				comp_state.event_dates.map((event) => ({
+					...event,
+					event_id: added_event_details_id
+				}))
+			);
 
 			goto(`/events/${added_event_details_id}`);
 			console.log('added_event_details', added_event_details_id);
@@ -339,7 +342,3 @@
 		])}>Add</Form.Button
 	>
 </form>
-
-{#if dev}
-	<SuperDebug data={$formData} />
-{/if}

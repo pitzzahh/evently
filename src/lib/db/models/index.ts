@@ -33,7 +33,7 @@ export class AttendanceRecordCollection extends Collection<AttendanceRecord> {
 
 export class EventScheduleCollection extends Collection<EventSchedule> {
   id!: string;
-  event_id?: string;
+  event_id!: string;
   event_date!: Date;
   am_start?: Date;
   am_end?: Date;
@@ -64,12 +64,13 @@ export class EventScheduleCollection extends Collection<EventSchedule> {
 export class EventDetailsCollection extends Collection<EventDetails> {
   id!: string;
   event_name!: string;
+  type!: 'meeting' | 'seminar' | 'workshop' | 'conference' | 'webinar' | 'other';
   location!: string;
   description?: string;
   is_multi_day?: boolean;
   difference_in_days!: number;
-  start_date?: Date;
-  end_date?: Date;
+  start_date!: Date;
+  end_date!: Date;
   created?: Date;
   updated?: Date;
 
@@ -82,12 +83,13 @@ export class EventDetailsCollection extends Collection<EventDetails> {
     if (!data) return
     this.id = data.id;
     this.event_name = data.event_name;
+    this.type = data.type;
     this.location = data.location;
     this.description = data.description;
     this.is_multi_day = data.is_multi_day;
     this.difference_in_days = data.difference_in_days;
-    this.start_date = data.start_date ? new Date(data.start_date) : undefined;
-    this.end_date = data.end_date ? new Date(data.end_date) : undefined;
+    this.start_date = new Date(data.start_date);
+    this.end_date = new Date(data.end_date);
     this.created = data.created ? new Date(data.created) : undefined;
     this.updated = data.updated ? new Date(data.updated) : undefined;
   }
