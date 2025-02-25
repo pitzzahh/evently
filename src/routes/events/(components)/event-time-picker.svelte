@@ -11,7 +11,7 @@
 		isSelectionDisabled
 	}: {
 		isSelectionDisabled?: boolean;
-		event_date: EventSchedule;
+		event_date:  Omit<EventSchedule, 'event_id' | 'updated' | 'created'>;
 		updateDateEventPeriodStartEnd?: (params: {
 			id: string;
 			am_start?: string;
