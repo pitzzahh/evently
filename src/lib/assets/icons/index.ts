@@ -23,3 +23,5 @@ export { default as CalendarArrowDown } from 'lucide-svelte/icons/calendar-arrow
 export { default as CalendarArrowUp } from 'lucide-svelte/icons/calendar-arrow-up';
 export { default as Clock } from 'lucide-svelte/icons/clock';
 export { default as Plus } from 'lucide-svelte/icons/plus';
+export { default as Mail } from 'lucide-svelte/icons/mail';
+export { default as Phone } from 'lucide-svelte/icons/phone';
