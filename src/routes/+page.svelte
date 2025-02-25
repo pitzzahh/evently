@@ -7,10 +7,12 @@
 	import { CalendarArrowDown, CalendarArrowUp } from '@/assets/icons';
 	interface ComponentState {
 		participants: Participant[];
+		current_tab: 'upcoming' | 'past';
 	}
 
 	let comp_state = $state<ComponentState>({
-		participants: []
+		participants: [],
+		current_tab: 'upcoming'
 	});
 
 	$effect(() => {
@@ -23,7 +25,7 @@
 </script>
 
 <div in:fade>
-	<Tabs.Root value="upcoming">
+	<Tabs.Root bind:value={comp_state.current_tab}>
 		<div class="flex items-center justify-between gap-4">
 			<h2 class="text-4xl font-semibold">Events</h2>
 			<Tabs.List class="grid h-auto w-full max-w-[300px] grid-cols-2">
@@ -40,9 +42,11 @@
 
 		{@const contents = ['upcoming', 'past']}
 		{#each contents as content (content)}
-			<Tabs.Content value={content} class="mt-6">
-				<EventList type={content as 'upcoming' | 'past'} />
-			</Tabs.Content>
+			{#if content === comp_state.current_tab}
+				<Tabs.Content value={content} class="mt-6">
+					<EventList type={content as 'upcoming' | 'past'} />
+				</Tabs.Content>
+			{/if}
 		{/each}
 	</Tabs.Root>
 </div>
