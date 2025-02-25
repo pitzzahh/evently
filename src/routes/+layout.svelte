@@ -40,7 +40,7 @@
 	<Sidebar.Inset> -->
 <AppNavbar />
 <div class="flex size-full justify-center">
-	<div class="flex flex-1 flex-col gap-4 p-4 pt-8 md:max-w-[60%] md:px-0">
+	<div class="flex flex-1 flex-col gap-4 p-4 pt-8 md:max-w-[80%] md:px-0">
 		{@render children()}
 	</div>
 </div>

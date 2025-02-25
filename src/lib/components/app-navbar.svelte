@@ -22,7 +22,7 @@
 >
 	<a href="/" class="cursor-pointer text-lg font-bold">evently</a>
 
-	<div class="flex w-full justify-between md:max-w-[80.6%]">
+	<div class="flex w-full justify-between md:max-w-[90.6%]">
 		<div class="flex items-center gap-5">
 			{#each routes as route}
 				<a href={route.pathname}>
