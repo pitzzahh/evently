@@ -22,7 +22,7 @@
   type ComponentState = {
     search: string;
     where_to_search: keyof ArchiveDTO;
-    timeout?: Timer;
+    timeout?: number;
   };
 
   let { table, reasons, types }: ArchiveDataTableToolbarProps = $props();
