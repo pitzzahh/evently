@@ -1,10 +1,9 @@
 <script lang="ts">
 	import { Button } from '@/components/ui/button';
 	import { Calendar, ChartBar, MapPin, Settings, UsersRound, Edit, Trash } from 'lucide-svelte';
-	import { cn } from '@/utils';
-	import EventTimePicker from '../(components)/event-time-picker.svelte';
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
-	import ParticipantsDialog from '../(components)/participants-dialog.svelte';
+	import { cn } from '@/utils/styles';
+	import { EventTimePicker, ParticipantDialog } from '@routes/events/(components)';
+	import * as DropdownMenu from '@/components/ui/dropdown-menu/index.js';
 	import type { EventSchedule, EventDetails } from '@/db/models/types';
 	import { scale } from 'svelte/transition';
 	import { COLLECTIONS } from '@/db/index';
@@ -127,7 +126,7 @@
 							</div>
 						</div>
 					</div>
-					<ParticipantsDialog add_participants_form={data.add_participants_form} />
+					<ParticipantDialog add_participants_form={data.add_participants_form} />
 				</div>
 
 				<div class="flex items-center justify-between gap-4">
