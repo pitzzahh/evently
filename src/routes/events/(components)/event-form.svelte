@@ -71,8 +71,7 @@
 				is_multi_day: difference_in_days > 1,
 				difference_in_days,
 				start_date: $formData.start_date,
-				end_date: $formData.end_date,
-				type: "other"
+				end_date: $formData.end_date
 			});
 
 			goto(`/events/${added_event_details_id}`);
