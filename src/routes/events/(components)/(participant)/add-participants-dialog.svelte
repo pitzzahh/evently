@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { buttonVariants } from '@/components/ui/button';
 	import * as Dialog from '@/components/ui/dialog';
-	import type { AddParticipantsSchema, ParticipantSchema } from '@/schema/participant';
-	import { Plus } from '@/asets/icons';
+	import type { AddParticipantsSchema } from '@/schema/participant';
+	import { Plus } from '@/assets/icons';
 	import type { SuperValidated } from 'sveltekit-superforms';
 	import { ParticipantForm } from '..';
 
