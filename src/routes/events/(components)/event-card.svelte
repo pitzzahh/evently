@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Button } from '@/components/ui/button';
 	import type { EventDetails } from '@/db/models/types';
-	import { formatDate, formatDateToTimeOption } from '@/utils/format';
+	import { formatDate } from '@/utils/format';
 	import { ChevronRightIcon, MapPin, UsersRound } from 'lucide-svelte';
 	import {
 		TimelineItem,
