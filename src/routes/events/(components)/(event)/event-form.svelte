@@ -289,7 +289,7 @@
 		<img
 			src="https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=800&dpr=2&q=80"
 			alt="Gray by Drew Beamer"
-			class="w-80 shrink-0 rounded-md bg-muted object-cover"
+			class="flex w-80 shrink-0 items-center justify-center rounded-md bg-muted object-cover text-center text-sm text-muted-foreground"
 		/>
 	</div>
 
