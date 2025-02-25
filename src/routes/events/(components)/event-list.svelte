@@ -5,6 +5,7 @@
 	import type { EventDetails } from '@/db/models/types';
 	import { watch } from 'runed';
 	import { fly } from 'svelte/transition';
+	import { cubicIn } from 'svelte/easing';
 
 	interface ComponentState {
 		events: EventDetails[];
@@ -42,7 +43,7 @@
 
 <Timeline style="width: 100%;  padding: 0;">
 	{#each comp_state.events as event, i}
-		<div transition:fly={{ y: 100, duration: 500, delay: i * 100 }}>
+		<div transition:fly={{ y: 100, duration: 400, delay: i * 100, easing: cubicIn }}>
 			<EventCard {...event} />
 		</div>
 	{/each}
