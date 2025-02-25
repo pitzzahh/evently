@@ -1,7 +1,7 @@
 <script lang="ts">
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
 	import { fade } from 'svelte/transition';
-	import EventList from './events/(components)/event-list.svelte';
+	import { EventList } from '@routes/events/(components)';
 	import { COLLECTIONS } from '@/db/index';
 	import type { Participant } from '@/db/models/types';
 	import { CalendarArrowDown, CalendarArrowUp } from '@/assets/icons';
