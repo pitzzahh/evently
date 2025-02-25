@@ -5,21 +5,21 @@
 	import { ParticipantDataTable, AddParticipantsDialog } from '..';
 	import type { SuperValidated } from 'sveltekit-superforms';
 	import type { AddParticipantsSchema } from '@/schema/participant';
-	import type { Participant } from '@/db/models/types';
+	import type { EventDetails, Participant } from '@/db/models/types';
 	import { watch } from 'runed';
 	import { COLLECTIONS } from '@/db';
 	import { TableSkeleton } from '@/components/custom/skeleton';
 
 	interface ParticipantDialogProps {
 		add_participants_form: SuperValidated<AddParticipantsSchema>;
-		event_id: string;
+		event_details: EventDetails;
 	}
 
 	interface ComponentState {
 		participants: Participant[];
 	}
 
-	let { add_participants_form, event_id }: ParticipantDialogProps = $props();
+	let { add_participants_form, event_details }: ParticipantDialogProps = $props();
 
 	let comp_state = $state<ComponentState>({
 		participants: []
@@ -47,14 +47,16 @@
 	>
 		View Participants <View class="size-5" />
 	</Dialog.Trigger>
-	<Dialog.Content class="max-w-[90vw]">
+	<Dialog.Content class="max-h-[60vh] overflow-y-auto">
 		<Dialog.Header>
 			<div class="flex items-center justify-between pr-4">
 				<div class="grid gap-2">
 					<Dialog.Title>Participants</Dialog.Title>
-					<Dialog.Description>These are the participants of Teacher's Seminar</Dialog.Description>
+					<Dialog.Description
+						>These are the participants of {event_details.event_name}</Dialog.Description
+					>
 				</div>
-				<AddParticipantsDialog {add_participants_form} {event_id} />
+				<AddParticipantsDialog {add_participants_form} event_id={event_details.id} />
 			</div>
 		</Dialog.Header>
 		{#if COLLECTIONS.PARTICIPANT_COLLECTION.isPulling()}
