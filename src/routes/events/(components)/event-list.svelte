@@ -6,9 +6,14 @@
 	import { watch } from 'runed';
 	import { fly } from 'svelte/transition';
 	import { cubicIn } from 'svelte/easing';
+	import { InfiniteLoader, loaderState } from 'svelte-infinite';
 
 	interface ComponentState {
-		events: EventDetails[];
+		infinite_loader: {
+			events: EventDetails[];
+			limit: number;
+			skip: number;
+		};
 	}
 
 	export interface EventListProps {
@@ -18,33 +23,105 @@
 	let { type }: EventListProps = $props();
 
 	let comp_state = $state<ComponentState>({
-		events: []
+		infinite_loader: {
+			events: [],
+			limit: 20,
+			skip: 20
+		}
 	});
+
+	async function loadMore() {
+		try {
+			comp_state.infinite_loader.skip += comp_state.infinite_loader.limit;
+			const skip = comp_state.infinite_loader.limit * (comp_state.infinite_loader.skip - 1);
+
+			// If there are less results on the first page (page.server loaded data)
+			// than the limit, don't keep trying to fetch more. We're done.
+			if (comp_state.infinite_loader.events.length < comp_state.infinite_loader.limit) {
+				loaderState.complete(); // <--- using loaderState
+				return;
+			}
+
+			const events_collection_cursor = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(
+				{},
+				{
+					skip: skip,
+					limit: comp_state.infinite_loader.limit
+				}
+			);
+
+			// Ideally, like most paginated endpoints, this should return the data
+			// you've requested for your page, as well as the total amount of data
+			// available to page through
+
+			if (!events_collection_cursor.count) {
+				loaderState.error(); // <--- using loaderState
+
+				// On errors, set the pageNumber back so we can retry
+				// that page's data on the next 'loadMore' attempt
+				comp_state.infinite_loader.skip -= 1;
+				return;
+			}
+			const data = events_collection_cursor.fetch();
+
+			// If we've successfully received data, push it to the reactive state variable
+			if (data.length) {
+				comp_state.infinite_loader.events.push(...data);
+			}
+
+			// If there are more (or equal) number of items loaded as are totally available
+			// from the API, don't keep trying to fetch more. We're done.
+			if (comp_state.infinite_loader.events.length >= data.length) {
+				loaderState.complete(); // <--- using loaderState
+			} else {
+				loaderState.loaded(); // <--- using loaderState
+			}
+		} catch (error) {
+			console.error(error);
+			loaderState.error(); // <--- using loaderState
+			comp_state.infinite_loader.skip -= 1;
+		}
+	}
 
 	watch(
 		() => COLLECTIONS.EVENT_DETAILS_COLLECTION.isLoading,
 		() => {
 			const now = new Date();
-			const events = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(
+			const events_cursor = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(
 				{
 					start_date: type === 'upcoming' ? { $gte: now } : { $lt: now }
 				},
 				{
 					sort: {
 						start_date: type === 'upcoming' ? 1 : -1
-					}
+					},
+					limit: comp_state.infinite_loader.limit
 				}
 			);
-			comp_state.events = events.fetch();
-			return () => events.cleanup();
+			comp_state.infinite_loader.events = events_cursor
+				.fetch()
+				.slice(0, comp_state.infinite_loader.skip);
+			return () => events_cursor.cleanup();
 		}
 	);
 </script>
 
 <Timeline style="width: 100%;  padding: 0;">
-	{#each comp_state.events as event, i}
-		<div transition:fly={{ y: 100, duration: 400, delay: i * 100, easing: cubicIn }}>
-			<EventCard {...event} />
-		</div>
-	{/each}
+	<InfiniteLoader triggerLoad={loadMore}>
+		{#each comp_state.infinite_loader.events as event, i}
+			<div transition:fly={{ y: 100, duration: 400, delay: i * 100, easing: cubicIn }}>
+				<EventCard {...event} />
+			</div>
+		{/each}
+
+		<!-- 3. There are a few optional snippets for customizing what is shown at the bottom
+				 of the scroller in various states, see the 'Snippets' section for more details -->
+		{#snippet loading()}
+			Loading...
+		{/snippet}
+		{#snippet error(load)}
+			<div>Error fetching data</div>
+			<button onclick={load}>Retry</button>
+		{/snippet}
+	</InfiniteLoader>
 </Timeline>
