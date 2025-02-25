@@ -33,6 +33,7 @@
 	import { hasRequiredData } from '@/utils/validation';
 	import { Label } from '@/components/ui/label';
 	import { goto } from '$app/navigation';
+	import { AspectRatio } from '@/components/ui/aspect-ratio';
 
 	interface ComponentState {
 		start_value: DateValue | undefined;
@@ -84,7 +85,9 @@
 			toast.success(`Event is added and has ${difference_in_days} days`);
 		}
 	});
-	const { form: formData, enhance } = form;
+	const { form: formData, enhance, capture, restore } = form;
+
+	export const snapshot = { capture, restore };
 
 	const current_date = new Date();
 
@@ -225,38 +228,52 @@
 </script>
 
 <form method="POST" use:enhance class="flex flex-col gap-1">
-	<Form.Field {form} name="title">
-		<Form.Control>
-			{#snippet children({ props })}
-				<Form.Label class="flex items-center gap-1"><Ticket class="size-4" /> Event Name</Form.Label
-				>
-				<Input
-					{...props}
-					class="bg-gray-700/10 dark:bg-white/10"
-					bind:value={$formData.title}
-					placeholder="Enter a clear, descriptive name (e.g., '2024 Annual Teachers Conference')"
-					aria-label="Event name"
-				/>
-			{/snippet}
-		</Form.Control>
-		<Form.FieldErrors />
-	</Form.Field>
+	<div class="grid grid-cols-2">
+		<div class="flex flex-col">
+			<Form.Field {form} name="title">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label class="flex items-center gap-1"
+							><Ticket class="size-4" /> Event Name</Form.Label
+						>
+						<Input
+							{...props}
+							class="bg-gray-700/10 dark:bg-white/10"
+							bind:value={$formData.title}
+							placeholder="Enter a clear, descriptive name (e.g., '2024 Annual Teachers Conference')"
+							aria-label="Event name"
+						/>
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
 
-	<Form.Field {form} name="location" class="w-full">
-		<Form.Control>
-			{#snippet children({ props })}
-				<Form.Label class="flex items-center gap-1"><MapPin class="size-4" />Location</Form.Label>
-				<Input
-					{...props}
-					class="w-full bg-gray-700/10 dark:bg-white/10"
-					bind:value={$formData.location}
-					placeholder="Physical address"
-					aria-label="Event location"
-				/>
-			{/snippet}
-		</Form.Control>
-		<Form.FieldErrors />
-	</Form.Field>
+			<Form.Field {form} name="location" class="w-full">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label class="flex items-center gap-1"
+							><MapPin class="size-4" />Location</Form.Label
+						>
+						<Input
+							{...props}
+							class="w-full bg-gray-700/10 dark:bg-white/10"
+							bind:value={$formData.location}
+							placeholder="Physical address"
+							aria-label="Event location"
+						/>
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
+		</div>
+		<AspectRatio ratio={16 / 9} class="bg-muted">
+			<img
+				src="https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=800&dpr=2&q=80"
+				alt="Gray by Drew Beamer"
+				class="h-full w-full rounded-md object-cover"
+			/>
+		</AspectRatio>
+	</div>
 
 	<Form.Field {form} name="description">
 		<Form.Control>
