@@ -1,14 +1,14 @@
 <script lang="ts">
-	import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-	import { Badge } from "$lib/components/ui/badge";
-	import type { CalendarEvent } from "@routes/calendar/(data)/types";
+	import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+	import { Badge } from '$lib/components/ui/badge';
+	import type { CalendarEvent } from '@routes/calendar/(data)/types';
 
 	type Props = {
 		event: CalendarEvent;
-		badgeVariant?: "default" | "secondary" | "destructive";
+		badgeVariant?: 'default' | 'secondary' | 'destructive';
 	};
 
-	let { event, badgeVariant = "default" }: Props = $props();
+	let { event, badgeVariant = 'default' }: Props = $props();
 </script>
 
 <Card>

@@ -6,12 +6,12 @@
 		TooltipTrigger
 	} from '@/components/ui/tooltip';
 	import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-	import type { DateValue } from '@internationalized/date';
-	import type { CalendarEvent } from '@routes/calendar/(data)/types';
+	import { getLocalTimeZone, type DateValue } from '@internationalized/date';
 	import type { EventDetails } from '@/db/models/types';
+	import { formatDateToTimeOption } from '@/utils/format';
 
 	type Props = {
-		event: CalendarEvent;
+		event: EventDetails;
 		date: DateValue;
 		isFirstColumn: boolean;
 		index: number;
@@ -19,11 +19,12 @@
 
 	let { event, date, isFirstColumn, index }: Props = $props();
 
-	const getEventPosition = (event: CalendarEvent) => {
-		const isStart = event.startDate.compare(date) === 0;
-		const isEnd = event.endDate.compare(date) === 0;
+	const getEventPosition = (event: EventDetails) => {
+		const isStart = event.start_date.getTime() === date.toDate(getLocalTimeZone()).getTime();
+		const isEnd = event.end_date.getTime() === date.toDate(getLocalTimeZone()).getTime();
 		const isBetween = !isStart && !isEnd;
-		const duration = event.endDate.compare(event.startDate) + 1;
+		const duration =
+			(event.end_date.getTime() - event.start_date.getTime()) / (1000 * 60 * 60 * 24) + 1;
 
 		return { isStart, isEnd, isBetween, duration };
 	};
@@ -72,11 +73,11 @@
 							>
 								<div class="flex-1 truncate">
 									{#if position.isStart}
-										<span class="font-medium">{event.time}</span>
+										<span class="font-medium">{formatDateToTimeOption(event.start_date)}</span>
 										<span class="mx-1">·</span>
 									{/if}
 									<span class={position.isStart ? '' : 'opacity-0 group-hover:opacity-100'}>
-										{event.title}
+										{event.event_name}
 									</span>
 								</div>
 							</div>
@@ -96,22 +97,22 @@
 	</TooltipProvider>
 {/if}
 
-{#snippet EventContent(event: CalendarEvent)}
+{#snippet EventContent(event: EventDetails)}
 	<div class="space-y-2 p-2">
 		<div class="flex items-center gap-2">
 			<div
 				class={`h-3 w-3 rounded-full bg-${event.type === 'meeting' ? 'blue' : event.type === 'seminar' ? 'green' : 'red'}-500 dark:bg-${event.type === 'meeting' ? 'blue' : event.type === 'conference' ? 'green' : 'red'}-300`}
 			></div>
-			<h4 class="font-medium">{event.title}</h4>
+			<h4 class="font-medium">{event.event_name}</h4>
 		</div>
 		<div class="space-y-1 text-xs text-muted-foreground">
 			<p class="flex items-center gap-1">
 				<span class="font-medium">Time:</span>
-				{event.time}
+				{formatDateToTimeOption(event.start_date)}
 			</p>
 			<p class="flex items-center gap-1">
 				<span class="font-medium">Date:</span>
-				{event.startDate.toString()} - {event.endDate.toString()}
+				{event.start_date.toString()} - {event.end_date.toString()}
 			</p>
 			{#if event.description}
 				<p class="mt-2 text-xs">{event.description}</p>
