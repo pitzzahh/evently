@@ -17,9 +17,9 @@
 		<ParticipantDataTableToolbar
 			{table}
 			first_names={generateOptions<Participant>(participants, 'first_name')}
-			middle_initials={generateOptions<Participant>(
-				participants.filter((p) => p.middle_initial),
-				'middle_initial'
+			middle_names={generateOptions<Participant>(
+				participants.filter((p) => p.middle_name),
+				'middle_name'
 			)}
 			emails={generateOptions<Participant>(
 				participants.filter((p) => p.email),

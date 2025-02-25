@@ -17,7 +17,7 @@
 	export interface ParticipantDataTableToolbarProps {
 		table: Table<Participant>;
 		first_names: FilterOption<string>[];
-      middle_initials: FilterOption<string>[];
+		middle_names: FilterOption<string>[];
 		last_names: FilterOption<string>[];
 		emails: FilterOption<string>[];
 	}
@@ -27,13 +27,8 @@
 		timeout?: number;
 	};
 
-	let {
-		table,
-		first_names,
-		middle_initials,
-		last_names,
-		emails
-	}: ParticipantDataTableToolbarProps = $props();
+	let { table, first_names, middle_names, last_names, emails }: ParticipantDataTableToolbarProps =
+		$props();
 
 	let comp_state = $state<ComponentState>({
 		search: '',
@@ -41,7 +36,7 @@
 	});
 	const is_filtered = $derived(table.getState().columnFilters.length > 0);
 	const first_name_col = $derived(table.getColumn('first_name'));
-	const middle_initial_col = $derived(table.getColumn('middle_initial'));
+	const middle_name_col = $derived(table.getColumn('middle_name'));
 	const last_name_col = $derived(table.getColumn('last_name'));
 	const email_col = $derived(table.getColumn('email'));
 
@@ -72,11 +67,11 @@
 			{#if first_name_col}
 				<DataTableFacetedFilter column={first_name_col} title="First Name" options={first_names} />
 			{/if}
-			{#if middle_initial_col}
+			{#if middle_name_col}
 				<DataTableFacetedFilter
-					column={middle_initial_col}
-					title="Middle Initial"
-					options={middle_initials}
+					column={middle_name_col}
+					title="Middle Name"
+					options={middle_names}
 				/>
 			{/if}
 			{#if last_name_col}
