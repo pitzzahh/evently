@@ -34,7 +34,7 @@
 				}
 			);
 			comp_state.events = events.fetch();
-			console.log('comp_state.events', comp_state.events);
+			return () => events.cleanup();
 		}
 	);
 </script>
