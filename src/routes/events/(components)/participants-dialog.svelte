@@ -4,6 +4,14 @@
 	import { View } from 'lucide-svelte';
 	import AttendeesDataTable from './attendees-data-table.svelte';
 	import AddParticipantsDialog from './add-participants-dialog.svelte';
+	import type { SuperValidated } from 'sveltekit-superforms';
+	import type { AddParticipantsSchema, ParticipantSchema } from '@/schema/participant';
+
+	let {
+		add_participants_form
+	}: {
+		add_participants_form: SuperValidated<AddParticipantsSchema>;
+	} = $props();
 </script>
 
 <Dialog.Root>
@@ -14,17 +22,14 @@
 	</Dialog.Trigger>
 	<Dialog.Content class="max-w-[90vw]">
 		<Dialog.Header>
-			<div class="flex justify-between items-center">
+			<div class="flex items-center justify-between">
 				<div class="grid gap-2">
 					<Dialog.Title>Participants</Dialog.Title>
 					<Dialog.Description>These are the participants of Teacher's Seminar</Dialog.Description>
 				</div>
-				<AddParticipantsDialog />
+				<AddParticipantsDialog {add_participants_form} />
 			</div>
 		</Dialog.Header>
 		<AttendeesDataTable />
-		<!-- <Dialog.Footer>
-			<Button type="submit">Save changes</Button>
-		</Dialog.Footer> -->
 	</Dialog.Content>
 </Dialog.Root>
