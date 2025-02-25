@@ -1,66 +1,146 @@
 <script lang="ts">
 	import * as Form from '$lib/components/ui/form/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
-	import { participant_schema, type ParticipantSchema } from '@/schema/participant';
+	import {
+		add_participants_schema,
+		type AddParticipantsSchema,
+		type ParticipantSchema
+	} from '@/schema/participant';
 	import { type SuperValidated, superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import { page } from '$app/state';
 	import { onMount } from 'svelte';
+	import { Button } from '@/components/ui/button';
+	import { PlusCircle, Trash } from 'lucide-svelte';
 
-	let { participant_form, event_id }: { participant_form: SuperValidated<ParticipantSchema>, event_id: string } = $props();
-	const form = superForm(participant_form, {
-		validators: zodClient(participant_schema)
+	let {
+		add_participants_form,
+		event_id
+	}: { add_participants_form: SuperValidated<AddParticipantsSchema>; event_id?: string } = $props();
+	const form = superForm(add_participants_form, {
+		validators: zodClient(add_participants_schema)
 	});
+	const { form: formData, enhance, errors } = form;
 
-	const { form: formData, enhance } = form;
+	function addParticipant() {
+		$formData.participants = [
+			...$formData.participants,
+			{
+				first_name: '',
+				last_name: '',
+				middle_initial: '',
+				email: '',
+				event_id: event_id || ''
+			}
+		];
+	}
 
-    onMount(() => {
-        $formData.event_id = event_id
-    })
+	function removeParticipant(index: number) {
+		// Early return if trying to remove when only one entry exists
+		if ($formData.participants.length <= 1) {
+			return;
+		}
 
+		// Create new array with filtered elements
+		const filteredArray = $formData.participants.filter((_, i) => i !== index);
+
+		// Type assertion to ensure the array meets the tuple constraint
+		$formData.participants = [...filteredArray] as [ParticipantSchema, ...ParticipantSchema[]];
+	}
+
+	onMount(() => {
+		addParticipant();
+	});
 </script>
 
-<form method="POST" use:enhance>
-	<Form.Field {form} name="first_name">
-		<Form.Control>
-			{#snippet children({ props })}
-				<Form.Label>First Name</Form.Label>
-				<Input {...props} bind:value={$formData.first_name} />
-			{/snippet}
-		</Form.Control>
+<div class="max-h-[500px] overflow-y-auto">
+	<form method="POST" use:enhance class="grid gap-4">
+		{#each $formData.participants as _, index}
+			<div class="rounded-lg border p-4">
+				<div class="mb-4 flex items-center justify-between">
+					<p class="font-medium">Participant {index + 1}</p>
+					{#if $formData.participants.length > 1}
+						<Button
+							variant="outline"
+							onclick={() => removeParticipant(index)}
+							class="self-end"
+							size="icon"
+							type="button"
+							aria-label="Remove participant"
+						>
+							<Trash class="h-4 w-4" />
+						</Button>
+					{/if}
+				</div>
 
-		<Form.FieldErrors />
-	</Form.Field>
-	<Form.Field {form} name="middle_initial">
-		<Form.Control>
-			{#snippet children({ props })}
-				<Form.Label>Middle Initial</Form.Label>
-				<Input {...props} bind:value={$formData.middle_initial} />
-			{/snippet}
-		</Form.Control>
+				<div class="grid gap-2 md:grid-cols-2">
+					<Form.Field {form} name={`participants[${index}].first_name`}>
+						<Form.Control>
+							{#snippet children({ props })}
+								<Form.Label>First Name</Form.Label>
+								<Input
+									{...props}
+									placeholder="Enter first name"
+									bind:value={$formData.participants[index].first_name}
+									aria-required="true"
+								/>
+							{/snippet}
+						</Form.Control>
 
-		<Form.FieldErrors />
-	</Form.Field>
-	<Form.Field {form} name="last_name">
-		<Form.Control>
-			{#snippet children({ props })}
-				<Form.Label>Last Name</Form.Label>
-				<Input {...props} bind:value={$formData.last_name} />
-			{/snippet}
-		</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+					<Form.Field {form} name={`participants[${index}].middle_initial`}>
+						<Form.Control>
+							{#snippet children({ props })}
+								<Form.Label>Middle Initial</Form.Label>
+								<Input
+									maxlength={1}
+									{...props}
+									placeholder="Enter middle initial"
+									bind:value={$formData.participants[index].middle_initial}
+									aria-required="false"
+								/>
+							{/snippet}
+						</Form.Control>
 
-		<Form.FieldErrors />
-	</Form.Field>
+						<Form.FieldErrors />
+					</Form.Field>
+					<Form.Field {form} name={`participants[${index}].last_name`}>
+						<Form.Control>
+							{#snippet children({ props })}
+								<Form.Label>Last Name</Form.Label>
+								<Input
+									{...props}
+									placeholder="Enter last name"
+									bind:value={$formData.participants[index].last_name}
+									aria-required="true"
+								/>
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
 
-	<Form.Field {form} name="email">
-		<Form.Control>
-			{#snippet children({ props })}
-				<Form.Label>Email</Form.Label>
-				<Input {...props} bind:value={$formData.email} />
-			{/snippet}
-		</Form.Control>
+					<Form.Field {form} name={`participants[${index}].email`}>
+						<Form.Control>
+							{#snippet children({ props })}
+								<Form.Label>Email</Form.Label>
+								<Input
+									{...props}
+									type="email"
+									placeholder="email@example.com"
+									bind:value={$formData.participants[index].email}
+									aria-required="true"
+								/>
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+				</div>
+			</div>
+		{/each}
 
-		<Form.FieldErrors />
-	</Form.Field>
-	<Form.Button>Submit</Form.Button>
-</form>
+		<Button onclick={addParticipant} variant="outline" class="self-end" type="button">
+			Add Participant <PlusCircle class="ml-2 h-4 w-4" />
+		</Button>
+		<Form.Button class="self-end">Register Participants</Form.Button>
+	</form>
+</div>
