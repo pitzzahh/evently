@@ -116,7 +116,7 @@
 							</div>
 						</div>
 					</div>
-					<ParticipantsDialog />
+					<ParticipantsDialog add_participants_form={data.add_participants_form} />
 				</div>
 
 				<div class="flex items-center justify-between gap-4">
