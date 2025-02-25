@@ -11,7 +11,7 @@
 		isSelectionDisabled
 	}: {
 		isSelectionDisabled?: boolean;
-		event_date:  Omit<EventSchedule, 'event_id' | 'updated' | 'created'>;
+		event_date: Omit<EventSchedule, 'event_id' | 'updated' | 'created'>;
 		updateDateEventPeriodStartEnd?: (params: {
 			id: string;
 			am_start?: string;
@@ -42,7 +42,9 @@
 </script>
 
 <div class="flex w-full gap-2">
-	<div class="flex w-full items-center gap-4 rounded-lg border bg-gray-700/10 p-4 dark:bg-[#1C1E20]">
+	<div
+		class="flex w-full items-center gap-4 rounded-lg border bg-gray-700/10 p-4 dark:bg-[#1C1E20]"
+	>
 		{@render start_end_pattern()}
 
 		<div class="flex w-full flex-col gap-2">
@@ -70,19 +72,20 @@
 				isSelectionDisabled
 			})}
 		</div>
-
-		<div class="grid w-[200px] place-content-end gap-1 self-start">
-			<p
-				class="rounded-md border border-gray-500 bg-background bg-gray-500/30 px-2 py-1 text-center text-xs font-medium"
-			>
-				Day {day}
-			</p>
-			<p class="text-center text-sm font-medium">
-				{formatted_date}
-			</p>
-		</div>
 	</div>
-	<div class="flex w-full items-center gap-4 rounded-lg border bg-gray-700/10 p-4 dark:bg-[#1C1E20]">
+	<div class="grid w-[200px] place-content-end gap-1 self-center">
+		<p
+			class="rounded-md border border-gray-500 bg-background bg-gray-500/30 px-2 py-1 text-center text-xs font-medium"
+		>
+			Day {day}
+		</p>
+		<p class="text-center text-sm font-medium">
+			{formatted_date}
+		</p>
+	</div>
+	<div
+		class="flex w-full items-center gap-4 rounded-lg border bg-gray-700/10 p-4 dark:bg-[#1C1E20]"
+	>
 		{@render start_end_pattern()}
 
 		<div class="flex w-full flex-col gap-2">
@@ -110,17 +113,6 @@
 				},
 				isSelectionDisabled
 			})}
-		</div>
-
-		<div class="grid w-[200px] place-content-end gap-1 self-start">
-			<p
-				class="rounded-md border border-gray-500 bg-background bg-gray-500/30 px-2 py-1 text-center text-xs font-medium"
-			>
-				Day {day}
-			</p>
-			<p class="text-center text-sm font-medium">
-				{formatted_date}
-			</p>
 		</div>
 	</div>
 </div>
