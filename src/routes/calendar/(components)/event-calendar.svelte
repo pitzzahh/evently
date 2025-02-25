@@ -64,24 +64,28 @@
 								{#each weekDates as date}
 									<div class="relative min-h-[120px] border-t p-2">
 										<Calendar.Cell {date} month={month.value}>
-											<div class="flex justify-between">
-												<Calendar.Day />
-											</div>
 											{@const events = getDateEvents(date)}
-											<div class="mt-2 space-y-1">
-												{#each events.slice(0, 3) as event, i}
-													<EventCell
-														{event}
-														date={event.startDate}
-														isFirstColumn={date.compare(event.startDate) === 0}
-														index={i}
-													/>
-												{/each}
-												{#if events.length > 3}
-													<div class="px-1.5 text-xs text-muted-foreground">
-														+{events.length - 3} more
-													</div>
-												{/if}
+											<div class="flex h-full flex-col">
+												<div class="flex justify-between p-1">
+													<Calendar.Day />
+												</div>
+												<div class="relative flex-1">
+													{#each events.slice(0, 4) as event, i}
+														<EventCell
+															{event}
+															{date}
+															isFirstColumn={date.compare(event.startDate) === 0}
+															index={i}
+														/>
+													{/each}
+													{#if events.length > 4}
+														<button
+															class="absolute bottom-0 left-0 w-full px-2 py-0.5 text-xs text-muted-foreground hover:bg-muted"
+														>
+															+{events.length - 4} more
+														</button>
+													{/if}
+												</div>
 											</div>
 										</Calendar.Cell>
 									</div>

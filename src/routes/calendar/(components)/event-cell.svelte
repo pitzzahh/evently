@@ -28,66 +28,95 @@
 	};
 
 	const typeColors = {
-		meeting: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-		event: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-		workshop: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+		meeting: 'border-l-4 border-blue-500 bg-blue-50 hover:bg-blue-100',
+		event: 'border-l-4 border-green-500 bg-green-50 hover:bg-green-100',
+		workshop: 'border-l-4 border-red-500 bg-red-50 hover:bg-red-100'
 	};
+
 	const position = getEventPosition(event);
 </script>
 
 {#if position.isStart || isFirstColumn}
 	<TooltipProvider>
-		<Popover>
-			<Tooltip>
+		<Tooltip>
+			<Popover>
 				<div
-					class="absolute left-0 w-full text-left"
+					class="absolute left-0 w-full"
 					style="width: {position.duration * 100}%; z-index: {index + 1};"
 				>
-					<TooltipTrigger>
-						<PopoverTrigger>
+					<TooltipTrigger class="w-full">
+						<PopoverTrigger class="w-full">
 							<div
 								class={[
-									'truncate px-1.5 py-0.5 text-xs',
+									'group relative flex cursor-pointer items-center px-2 py-0.5',
+									'text-xs transition-colors',
 									typeColors[event.type],
-									position.isStart && 'rounded-l',
-									position.isEnd && 'rounded-r',
-									position.isBetween && 'rounded-none',
-									!position.isBetween && !position.isEnd && 'mr-0',
-									!position.isBetween && !position.isStart && 'ml-0',
-									position.isStart && position.isEnd && 'rounded'
+									position.isStart ? 'ml-1 rounded-l' : 'border-l-0',
+									position.isEnd ? 'mr-1 rounded-r' : '',
+									position.isBetween ? '' : '',
+									'hover:shadow-md'
 								]}
-								style="margin-top: {index * 24}px;"
+								style="margin-top: {index * 22}px; height: 20px;"
 							>
-								{#if position.isStart}
-									{event.time}
-								{/if}
-								{event.title}
+								<div class="flex-1 truncate">
+									{#if position.isStart}
+										<span class="font-medium">{event.time}</span>
+										<span class="mx-1">·</span>
+									{/if}
+									<span class={position.isStart ? '' : 'opacity-0 group-hover:opacity-100'}>
+										{event.title}
+									</span>
+								</div>
 							</div>
 						</PopoverTrigger>
 					</TooltipTrigger>
-					<TooltipContent>
+
+					<TooltipContent side="top" class="max-w-[300px]">
 						{@render EventContent(event)}
 					</TooltipContent>
-					<PopoverContent>
+
+					<PopoverContent class="w-80">
 						{@render EventContent(event)}
 					</PopoverContent>
 				</div>
-			</Tooltip>
-		</Popover>
+			</Popover>
+		</Tooltip>
 	</TooltipProvider>
 {/if}
 
 {#snippet EventContent(event: CalendarEvent)}
-	<div class="text-sm">
-		<p class="font-semibold">{event.title}</p>
-		<p class="text-xs text-muted-foreground">
-			{event.startDate.toString()} - {event.endDate.toString()}
-		</p>
-		<p class="text-xs">{event.description}</p>
-		<!-- Add more detailed content for popover here -->
-		<div class="mt-2 space-y-1">
-			<p class="text-xs">Time: {event.time || 'N/A'}</p>
-			<p class="text-xs">Type: {event.type}</p>
+	<div class="space-y-2 p-2">
+		<div class="flex items-center gap-2">
+			<div
+				class={`h-3 w-3 rounded-full bg-${event.type === 'meeting' ? 'blue' : event.type === 'event' ? 'green' : 'red'}-500`}
+			></div>
+			<h4 class="font-medium">{event.title}</h4>
+		</div>
+		<div class="space-y-1 text-xs text-muted-foreground">
+			<p class="flex items-center gap-1">
+				<span class="font-medium">Time:</span>
+				{event.time}
+			</p>
+			<p class="flex items-center gap-1">
+				<span class="font-medium">Date:</span>
+				{event.startDate.toString()} - {event.endDate.toString()}
+			</p>
+			{#if event.description}
+				<p class="mt-2 text-xs">{event.description}</p>
+			{/if}
 		</div>
 	</div>
 {/snippet}
+
+<style>
+	/* Smooth transitions */
+	.group {
+		transition: all 0.2s ease;
+	}
+
+	/* Override default tooltip styles for better positioning */
+	:global(.tooltip-content) {
+		padding: 8px !important;
+		margin-top: -4px;
+	}
+</style>

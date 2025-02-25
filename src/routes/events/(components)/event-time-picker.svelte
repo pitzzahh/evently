@@ -42,16 +42,14 @@
 </script>
 
 <div class="flex w-full gap-2">
-	<div class="flex w-full items-center gap-2 rounded-lg border bg-gray-700/10 p-4 dark:bg-white/10">
+	<div class="flex w-full items-center gap-4 rounded-lg border bg-gray-700/10 p-4 dark:bg-white/10">
 		{@render start_end_pattern()}
 
-		<div class="flex w-full flex-col gap-1">
+		<div class="flex w-full flex-col gap-2">
 			<!-- AM START -->
 			{@render period_time_picker({
 				period_title: 'AM Start',
-				formatted_date,
 				time_options: getFilteredTimeByPeriod('AM'),
-				day,
 				selected_time: formatDateToTimeOption(event_date.am_start),
 				onTimeSelect: (time) => {
 					if (updateDateEventPeriodStartEnd)
@@ -63,7 +61,6 @@
 			<!-- AM END -->
 			{@render period_time_picker({
 				period_title: 'AM End',
-				formatted_date,
 				time_options: getFilteredEndTimes(formatDateToTimeOption(event_date.am_start)),
 				selected_time: formatDateToTimeOption(event_date.am_end),
 				onTimeSelect: (time) => {
@@ -73,17 +70,27 @@
 				isSelectionDisabled
 			})}
 		</div>
+
+		<div class="grid w-[200px] place-content-end gap-1 self-start">
+			<p
+				class="rounded-md border border-gray-500 bg-background bg-gray-500/30 px-2 py-1 text-center text-xs font-medium"
+			>
+				Day {day}
+			</p>
+			<p class="text-center text-sm font-medium">
+				{formatted_date}
+			</p>
+		</div>
 	</div>
-	<div class="flex w-full items-center gap-2 rounded-lg border bg-gray-700/10 p-4 dark:bg-white/10">
+	<div class="flex w-full items-center gap-4 rounded-lg border bg-gray-700/10 p-4 dark:bg-white/10">
 		{@render start_end_pattern()}
 
-		<div class="flex w-full flex-col gap-1">
+		<div class="flex w-full flex-col gap-2">
 			<!-- PM START -->
 			{@render period_time_picker({
 				period_title: 'PM Start',
-				formatted_date,
+
 				time_options: getFilteredEndTimes(formatDateToTimeOption(event_date.am_end)),
-				day,
 				selected_time: formatDateToTimeOption(event_date.pm_start),
 				onTimeSelect: (time) => {
 					if (updateDateEventPeriodStartEnd)
@@ -95,7 +102,6 @@
 			<!-- PM END -->
 			{@render period_time_picker({
 				period_title: 'PM End',
-				formatted_date,
 				time_options: getFilteredEndTimes(formatDateToTimeOption(event_date.pm_start)),
 				selected_time: formatDateToTimeOption(event_date.pm_end),
 				onTimeSelect: (time) => {
@@ -104,6 +110,17 @@
 				},
 				isSelectionDisabled
 			})}
+		</div>
+
+		<div class="grid w-[200px] place-content-end gap-1 self-start">
+			<p
+				class="rounded-md border border-gray-500 bg-background bg-gray-500/30 px-2 py-1 text-center text-xs font-medium"
+			>
+				Day {day}
+			</p>
+			<p class="text-center text-sm font-medium">
+				{formatted_date}
+			</p>
 		</div>
 	</div>
 </div>
@@ -120,33 +137,21 @@
 	onTimeSelect,
 	period_title,
 	time_options,
-	formatted_date,
 	selected_time,
-	day,
 	isSelectionDisabled
 }: {
 	period_title: string;
-	formatted_date: string;
 	selected_time: string;
 	time_options: string[];
-	day?: number;
 	isSelectionDisabled?: boolean;
 	onTimeSelect: (time: string) => void;
 })}
-	<div class="flex items-center justify-between">
+	<div class="flex w-full max-w-[195px] items-center justify-between gap-4">
 		<div class="flex items-center gap-2">
 			<p class="text-sm text-muted-foreground">{period_title}</p>
-			{#if day}
-				<p class="rounded-sm border bg-primary px-3 py-1 text-xs text-white dark:border-white/20">
-					Day {day}
-				</p>
-			{/if}
 		</div>
 
 		<div class="flex items-center gap-1">
-			<p class="w-[120px] rounded-bl-sm rounded-tl-sm border bg-background p-2 text-center text-sm">
-				{formatted_date}
-			</p>
 			<TimeComboBox
 				{time_options}
 				{selected_time}
