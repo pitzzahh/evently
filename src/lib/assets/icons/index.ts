@@ -22,3 +22,4 @@ export { default as X } from 'lucide-svelte/icons/x';
 export { default as CalendarArrowDown } from 'lucide-svelte/icons/calendar-arrow-down';
 export { default as CalendarArrowUp } from 'lucide-svelte/icons/calendar-arrow-up';
 export { default as Clock } from 'lucide-svelte/icons/clock';
+export { default as Plus } from 'lucide-svelte/icons/plus';
