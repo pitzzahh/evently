@@ -21,3 +21,4 @@ export { default as Settings2 } from 'lucide-svelte/icons/settings-2';
 export { default as X } from 'lucide-svelte/icons/x';
 export { default as CalendarArrowDown } from 'lucide-svelte/icons/calendar-arrow-down';
 export { default as CalendarArrowUp } from 'lucide-svelte/icons/calendar-arrow-up';
+export { default as Clock } from 'lucide-svelte/icons/clock';
