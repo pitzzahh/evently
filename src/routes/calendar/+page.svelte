@@ -18,7 +18,12 @@
 			{},
 			{ fieldTracking: true }
 		);
-		comp_state.event_details = event_details_cursor.fetch();
+		comp_state.event_details = event_details_cursor.fetch().map((e) => ({
+			...e,
+			type: 'seminar',
+			start_date: new Date(e.start_date),
+			end_date: new Date(e.end_date)
+		}));
 		console.log(comp_state.event_details);
 		return () => {
 			event_details_cursor.cleanup();
