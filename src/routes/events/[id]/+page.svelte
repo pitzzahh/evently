@@ -18,14 +18,14 @@
 
 	interface ComponentState {
 		event_details: EventDetails | undefined;
-		event_schedule: EventSchedule[];
+		event_schedules: EventSchedule[];
 		participants: Participant[];
 		see_more: boolean;
 	}
 
 	let comp_state = $state<ComponentState>({
 		event_details: undefined,
-		event_schedule: [],
+		event_schedules: [],
 		participants: [],
 		see_more: false
 	});
@@ -48,7 +48,7 @@
 				{ fieldTracking: true }
 			);
 			comp_state.participants = participants_cursor.fetch();
-			comp_state.event_schedule = event_schedule_cursor.fetch();
+			comp_state.event_schedules = event_schedule_cursor.fetch();
 			comp_state.event_details = COLLECTIONS.EVENT_DETAILS_COLLECTION.findOne(
 				{
 					id: data.event_id
@@ -173,7 +173,7 @@
 	</div>
 
 	<div class="grid gap-2">
-		{#each comp_state.event_schedule as event_date, index}
+		{#each comp_state.event_schedules as event_date, index}
 			<EventTimePicker {event_date} day={index + 1} isSelectionDisabled={true} />
 		{/each}
 	</div>
