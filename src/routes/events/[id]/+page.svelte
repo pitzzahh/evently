@@ -130,7 +130,7 @@
 					</div>
 					<ParticipantDialog
 						add_participants_form={data.add_participants_form}
-						event_id={data.event_id}
+						event_details={comp_state.event_details!}
 					/>
 				</div>
 
