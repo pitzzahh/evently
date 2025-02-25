@@ -61,6 +61,7 @@
 
 			const added_event_details_id = COLLECTIONS.EVENT_DETAILS_COLLECTION.insert({
 				event_name: $formData.title,
+				type: 'other',
 				location: $formData.location,
 				description: $formData.description,
 				is_multi_day: difference_in_days > 1,
@@ -127,6 +128,7 @@
 			comp_state.event_dates = getDatesInRange(start_date, end_date).map((date) => ({
 				id: nanoid(),
 				event_date: date,
+				event_id: '',
 				am_start: new Date(`1970-01-01T08:00:00`),
 				am_end: new Date('1970-01-01T12:00:00'),
 				pm_start: new Date('1970-01-01T13:00:00'),
