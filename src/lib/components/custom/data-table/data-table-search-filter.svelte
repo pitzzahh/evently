@@ -1,10 +1,10 @@
 <script lang="ts" generics="TData">
   import { Settings2 } from "@/assets/icons";
-  import type { StringOrTemplateHeader, Table } from "@tanstack/table-core";
+  import type { Table } from "@tanstack/table-core";
   import { buttonVariants } from "@/components/ui/button/index.js";
   import * as DropdownMenu from "@/components/ui/dropdown-menu/index.js";
-  import { untrack } from "svelte";
   import { cn } from "@/utils";
+  import { convertToNormalText } from "@/utils/text";
 
   interface Props {
     table: Table<TData>;
@@ -30,7 +30,7 @@
     all_columns: table
       .getAllColumns()
       .filter(
-        (col) => typeof col.accessorFn !== "undefined" && col.getCanHide(),
+        (col) => typeof col.accessorFn !== "undefined" && col.getCanHide()
       )
       .filter((col) => {
         if (typeof default_hidden_options !== "undefined") {
@@ -72,7 +72,7 @@
                 comp_state.all_columns.filter((c) => c.selected).length <= 1,
             })}
           >
-            {column.label}
+            {convertToNormalText(column.label, true, ["_"])}
           </DropdownMenu.RadioItem>
         {/each}
       </DropdownMenu.RadioGroup>
