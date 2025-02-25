@@ -4,6 +4,7 @@
 	import { COLLECTIONS } from '@/db/index';
 	import type { EventDetails } from '@/db/models/types';
 	import { watch } from 'runed';
+	import { fly } from 'svelte/transition';
 
 	interface ComponentState {
 		events: EventDetails[];
@@ -40,7 +41,9 @@
 </script>
 
 <Timeline style="width: 100%;  padding: 0;">
-	{#each comp_state.events as event}
-		<EventCard {...event} />
+	{#each comp_state.events as event, i}
+		<div transition:fly={{ y: 100, duration: 500, delay: i * 100 }}>
+			<EventCard {...event} />
+		</div>
 	{/each}
 </Timeline>
