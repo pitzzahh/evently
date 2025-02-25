@@ -22,11 +22,7 @@
 		success_callback?: () => void;
 	}
 
-	let {
-		add_participants_form,
-		event_id,
-		success_callback
-	}: ParticipantFormProps = $props();
+	let { add_participants_form, event_id, success_callback }: ParticipantFormProps = $props();
 	const form = superForm(add_participants_form, {
 		SPA: true,
 		validators: zodClient(add_participants_schema),
@@ -63,6 +59,12 @@
 				event_id: event_id || ''
 			}
 		];
+		// Wait for DOM update then scroll
+		setTimeout(() => {
+			const forms = document.querySelectorAll('.rounded-lg.border');
+			const lastForm = forms[forms.length - 1];
+			lastForm?.scrollIntoView({ behavior: 'smooth' });
+		}, 0);
 	}
 
 	function removeParticipant(index: number) {
@@ -83,8 +85,8 @@
 	});
 </script>
 
-<div class="max-h-[500px] overflow-y-auto">
-	<form method="POST" use:enhance class="grid gap-4">
+<form method="POST" use:enhance class="grid gap-4">
+	<div class="max-h-[450px] space-y-2 overflow-y-auto">
 		{#each $formData.participants, index}
 			<div class="rounded-lg border p-4" transition:scale={{ duration: 200, easing: quartInOut }}>
 				<div class="mb-4 flex items-center justify-between">
@@ -163,10 +165,9 @@
 				</div>
 			</div>
 		{/each}
-
-		<Button onclick={addParticipant} variant="outline" class="self-end" type="button">
-			Add Participant <PlusCircle class="ml-2 h-4 w-4" />
-		</Button>
-		<Form.Button class="self-end">Register Participants</Form.Button>
-	</form>
-</div>
+	</div>
+	<Button onclick={addParticipant} variant="outline" class="mt-2 w-full" type="button">
+		Add Participant <PlusCircle class="ml-2 h-4 w-4" />
+	</Button>
+	<Form.Button class="self-end">Register Participants</Form.Button>
+</form>
