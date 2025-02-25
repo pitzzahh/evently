@@ -13,6 +13,8 @@
 	import { PlusCircle, Trash } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 	import { COLLECTIONS } from '@/db';
+	import { scale } from 'svelte/transition';
+	import { quartInOut } from 'svelte/easing';
 
 	let {
 		add_participants_form,
@@ -70,8 +72,8 @@
 
 <div class="max-h-[500px] overflow-y-auto">
 	<form method="POST" use:enhance class="grid gap-4">
-		{#each $formData.participants as _, index}
-			<div class="rounded-lg border p-4">
+		{#each $formData.participants, index}
+			<div class="rounded-lg border p-4" transition:scale={{ duration: 200, easing: quartInOut }}>
 				<div class="mb-4 flex items-center justify-between">
 					<p class="font-medium">Participant {index + 1}</p>
 					{#if $formData.participants.length > 1}
