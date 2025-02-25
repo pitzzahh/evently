@@ -328,7 +328,15 @@
 			</div>
 		</div>
 	</div>
-	<Form.Button>Submit</Form.Button>
+	<Form.Button
+		disabled={!hasRequiredData($formData, [
+			'title',
+			'location',
+			'description',
+			'start_date',
+			'end_date'
+		])}>Add</Form.Button
+	>
 </form>
 
 {#if dev}
