@@ -8,6 +8,7 @@
 	import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 	import type { DateValue } from '@internationalized/date';
 	import type { CalendarEvent } from '@routes/calendar/(data)/types';
+	import type { EventDetails } from '@/db/models/types';
 
 	type Props = {
 		event: CalendarEvent;
@@ -27,13 +28,21 @@
 		return { isStart, isEnd, isBetween, duration };
 	};
 
-	const typeColors = {
+	const typeColors: {
+		[key in EventDetails['type']]: string;
+	} = {
 		meeting:
 			'border-l-4 border-blue-500 bg-blue-50 hover:bg-blue-100 dark:border-blue-300 dark:bg-blue-900 dark:hover:bg-blue-800',
-		event:
+		seminar:
 			'border-l-4 border-green-500 bg-green-50 hover:bg-green-100 dark:border-green-300 dark:bg-green-900 dark:hover:bg-green-800',
 		workshop:
-			'border-l-4 border-red-500 bg-red-50 hover:bg-red-100 dark:border-red-300 dark:bg-red-900 dark:hover:bg-red-800'
+			'border-l-4 border-red-500 bg-red-50 hover:bg-red-100 dark:border-red-300 dark:bg-red-900 dark:hover:bg-red-800',
+		conference:
+			'border-l-4 border-purple-500 bg-purple-50 hover:bg-purple-100 dark:border-purple-300 dark:bg-purple-900 dark:hover:bg-purple-800',
+		webinar:
+			'border-l-4 border-yellow-500 bg-yellow-50 hover:bg-yellow-100 dark:border-yellow-300 dark:bg-yellow-900 dark:hover:bg-yellow-800',
+		other:
+			'border-l-4 border-gray-500 bg-gray-50 hover:bg-gray-100 dark:border-gray-300 dark:bg-gray-900 dark:hover:bg-gray-800'
 	};
 
 	const position = getEventPosition(event);
@@ -91,7 +100,7 @@
 	<div class="space-y-2 p-2">
 		<div class="flex items-center gap-2">
 			<div
-				class={`h-3 w-3 rounded-full bg-${event.type === 'meeting' ? 'blue' : event.type === 'event' ? 'green' : 'red'}-500 dark:bg-${event.type === 'meeting' ? 'blue' : event.type === 'event' ? 'green' : 'red'}-300`}
+				class={`h-3 w-3 rounded-full bg-${event.type === 'meeting' ? 'blue' : event.type === 'seminar' ? 'green' : 'red'}-500 dark:bg-${event.type === 'meeting' ? 'blue' : event.type === 'conference' ? 'green' : 'red'}-300`}
 			></div>
 			<h4 class="font-medium">{event.title}</h4>
 		</div>
