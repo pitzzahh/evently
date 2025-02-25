@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { StatusPill } from '@/components/snippets';
 	import { Button } from '@/components/ui/button';
 	import type { EventDetails } from '@/db/models/types';
 	import { formatDate } from '@/utils/format';
@@ -43,7 +44,7 @@
 		<div
 			class="mb-10 ms-4 rounded-xl border bg-white p-4 transition duration-500 ease-in-out hover:border-black/50 dark:bg-[#1C1E20] dark:hover:border-white/50"
 		>
-			<div class="flex w-full items-start justify-between">
+			<div class="relative flex w-full items-start justify-between">
 				<div class="grid place-content-start gap-1">
 					<p>
 						{'Some time'}
@@ -67,7 +68,9 @@
 						<ChevronRightIcon />
 					</Button>
 				</div>
-
+				<div class="absolute -right-6 -top-12">
+					{@render StatusPill((start_date ?? 0) > new Date() ? 'upcoming' : 'ongoing')}
+				</div>
 				<div class="flex flex-col items-center gap-1">
 					<p class="text-4xl font-semibold">100</p>
 
