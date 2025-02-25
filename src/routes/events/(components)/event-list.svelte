@@ -5,7 +5,7 @@
 	import type { EventDetails } from '@/db/models/types';
 	import { watch } from 'runed';
 	import { fly } from 'svelte/transition';
-	import { cubicIn } from 'svelte/easing';
+	import { quartInOut } from 'svelte/easing';
 	import { InfiniteLoader, loaderState } from 'svelte-infinite';
 	import { Badge } from '@/components/ui/badge';
 	import * as Alert from '@/components/ui/alert/index.js';
@@ -113,7 +113,7 @@
 <Timeline style="width: 100%;  padding: 0;">
 	<InfiniteLoader triggerLoad={loadMore}>
 		{#each comp_state.infinite_loader.events as event, i}
-			<div transition:fly={{ y: 100, duration: 400, delay: i * 100, easing: cubicIn }}>
+			<div transition:fly={{ y: 100, duration: 400, delay: i * 100, easing: quartInOut }}>
 				<EventCard {...event} />
 			</div>
 		{/each}
