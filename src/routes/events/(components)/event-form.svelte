@@ -10,7 +10,7 @@
 	import Textarea from '@/components/ui/textarea/textarea.svelte';
 	import { eventSchema, type EventSchema } from '@/schema/event';
 	import { MapPin, Ticket } from 'lucide-svelte';
-	import { type SuperValidated, superForm } from 'sveltekit-superforms';
+	import SuperDebug, { type SuperValidated, superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { nanoid } from 'nanoid';
 	import EventTimePicker from './event-time-picker.svelte';
@@ -28,9 +28,13 @@
 	import {
 		createDate,
 		extractHoursAndMinutes,
+		formatDate,
 		formatDateToTimeOption,
 		monthFormatter
 	} from '@/utils/format';
+	import { dev } from '$app/environment';
+	import { hasRequiredData } from '@/utils/validation';
+	import { Label } from '@/components/ui/label';
 
 	interface ComponentState {
 		start_value: DateValue | undefined;
@@ -52,13 +56,25 @@
 				toast.error('Form is invalid');
 				return;
 			}
-
 			const difference_in_time =
 				comp_state.date_range?.start && comp_state.date_range.end
 					? new Date(comp_state.date_range.end.toString()).getTime() -
 						new Date(comp_state.date_range.start.toString()).getTime()
 					: 0;
 			const difference_in_days = Math.round(difference_in_time / (1000 * 3600 * 24)) + 1;
+
+			const added_event_details = COLLECTIONS.EVENT_DETAILS_COLLECTION.insert({
+				event_name: $formData.title,
+				location: $formData.location,
+				description: $formData.description,
+				is_multi_day: difference_in_days > 1,
+				difference_in_days,
+				start_date: $formData.start_date,
+				end_date: $formData.end_date
+			});
+
+			console.log('added_event_details', added_event_details);
+			toast.success(`Event is added and has ${difference_in_days} days`);
 		}
 	});
 	const { form: formData, enhance } = form;
@@ -94,7 +110,7 @@
 		return date_arr;
 	}
 
-	$effect(() => {
+	function handleGenerateEventDates() {
 		if (!comp_state.date_range?.end && !comp_state.date_range?.start) {
 			comp_state.event_dates = [];
 		}
@@ -113,7 +129,7 @@
 				pm_end: new Date('1970-01-01T16:00:00')
 			}));
 		}
-	});
+	}
 
 	function updateDateEventPeriodStartEnd({
 		id,
@@ -218,7 +234,7 @@
 		<Form.FieldErrors />
 	</Form.Field>
 
-	<Form.Field {form} name="description" class="w-full">
+	<Form.Field {form} name="location" class="w-full">
 		<Form.Control>
 			{#snippet children({ props })}
 				<Form.Label class="flex items-center gap-1"><MapPin class="size-4" />Location</Form.Label>
@@ -255,6 +271,7 @@
 		<p class="text-sm">Event Date</p>
 		<Popover.Root>
 			<Popover.Trigger
+				disabled={!hasRequiredData($formData, ['title', 'location', 'description'])}
 				class={cn(
 					buttonVariants({
 						variant: 'outline',
@@ -284,29 +301,36 @@
 					onStartValueChange={(v) => {
 						comp_state.start_value = v;
 					}}
+					onValueChange={(v) => {
+						const { start, end } = v;
+						if (!start || !end) return;
+						handleGenerateEventDates();
+						$formData.start_date = start?.toDate(getLocalTimeZone());
+						$formData.end_date = end?.toDate(getLocalTimeZone());
+					}}
 					numberOfMonths={2}
 				/>
 			</Popover.Content>
 		</Popover.Root>
 	</div>
 
-	<Form.Field {form} name="description">
-		<Form.Control>
-			{#snippet children({ props })}
-				<div class="flex justify-between">
-					<Form.Label>Time</Form.Label>
-				</div>
-
-				<div class="max-h-[400px] overflow-y-auto">
-					<div class="flex flex-col gap-2">
-						{#each comp_state.event_dates as event_date, index}
-							<EventTimePicker {event_date} day={index + 1} {updateDateEventPeriodStartEnd} />
-						{/each}
-					</div>
-				</div>
-			{/snippet}
-		</Form.Control>
-		<Form.FieldErrors />
-	</Form.Field>
+	<div
+		class={cn({
+			hidden: !hasRequiredData($formData, ['title', 'location', 'description'])
+		})}
+	>
+		<Label>Time</Label>
+		<div class="max-h-[400px] overflow-y-auto">
+			<div class="flex flex-col gap-2 pr-1">
+				{#each comp_state.event_dates as event_date, index}
+					<EventTimePicker {event_date} day={index + 1} {updateDateEventPeriodStartEnd} />
+				{/each}
+			</div>
+		</div>
+	</div>
 	<Form.Button>Submit</Form.Button>
 </form>
+
+{#if dev}
+	<SuperDebug data={$formData} />
+{/if}

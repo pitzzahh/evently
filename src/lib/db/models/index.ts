@@ -63,9 +63,11 @@ export class EventScheduleCollection extends Collection<EventSchedule> {
 
 export class EventDetailsCollection extends Collection<EventDetails> {
   id!: string;
-  event_name?: string;
+  event_name!: string;
+  location!: string;
+  description?: string;
   is_multi_day?: boolean;
-  event_date?: Date;
+  difference_in_days!: number;
   start_date?: Date;
   end_date?: Date;
   created?: Date;
@@ -80,8 +82,10 @@ export class EventDetailsCollection extends Collection<EventDetails> {
     if (!data) return
     this.id = data.id;
     this.event_name = data.event_name;
+    this.location = data.location;
+    this.description = data.description;
     this.is_multi_day = data.is_multi_day;
-    this.event_date = data.event_date ? new Date(data.event_date) : undefined;
+    this.difference_in_days = data.difference_in_days;
     this.start_date = data.start_date ? new Date(data.start_date) : undefined;
     this.end_date = data.end_date ? new Date(data.end_date) : undefined;
     this.created = data.created ? new Date(data.created) : undefined;
@@ -114,6 +118,7 @@ export class ParticipantCollection extends Collection<Participant> {
   first_name!: string;
   middle_initial?: string;
   last_name!: string;
+  event_id!: string;
   email?: string;
   created?: Date;
   updated?: Date;
@@ -129,6 +134,7 @@ export class ParticipantCollection extends Collection<Participant> {
     this.first_name = data.first_name;
     this.middle_initial = data.middle_initial;
     this.last_name = data.last_name;
+    this.event_id = data.event_id;
     this.email = data.email;
     this.created = data.created ? new Date(data.created) : undefined;
     this.updated = data.updated ? new Date(data.updated) : undefined;
