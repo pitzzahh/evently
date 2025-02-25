@@ -144,7 +144,7 @@
 		</div>
 
 		<div class="flex items-center gap-1">
-			<p class="w-[120px] rounded-bl-sm rounded-tl-sm border bg-background p-2 text-center text-sm">
+			<p class="w-[120px] rounded-bl-sm rounded-tl-sm border bg-muted p-2 text-center text-sm">
 				{formatted_date}
 			</p>
 			<TimeComboBox
