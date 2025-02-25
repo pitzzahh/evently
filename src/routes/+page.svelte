@@ -38,7 +38,5 @@
 				<EventList type={content as 'upcoming' | 'past'} />
 			</Tabs.Content>
 		{/each}
-
-		<Tabs.Content value="past" class="mt-6">Some past events</Tabs.Content>
 	</Tabs.Root>
 </div>
