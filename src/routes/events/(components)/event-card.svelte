@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Button } from '@/components/ui/button';
 	import type { EventDetails } from '@/db/models/types';
-	import { formatDate } from '@/utils/format';
+	import { formatDate, formatDateToTimeOption } from '@/utils/format';
 	import { ChevronRightIcon, MapPin, UsersRound } from 'lucide-svelte';
 	import {
 		TimelineItem,
@@ -45,7 +45,7 @@
 		>
 			<div class="flex w-full items-start justify-between">
 				<div class="grid place-content-start gap-1">
-					<p>4:00 PM</p>
+					<p>{formatDateToTimeOption(start_date)}</p>
 					<h3 class="text-lg font-semibold text-gray-900 dark:text-white">{event_name}</h3>
 					<div class="flex items-center gap-1 text-muted-foreground">
 						<MapPin class="size-4" />
