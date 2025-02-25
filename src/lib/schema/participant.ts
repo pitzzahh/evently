@@ -4,22 +4,15 @@ export const participant_schema = z.object({
 	first_name: z
 		.string()
 		.min(1, { message: 'First name is required' })
-		.max(50, { message: 'First name cannot exceed 50 characters' })
-		.regex(/^[a-zA-Z\s-']+$/, {
-			message: 'First name can only contain letters, spaces, hyphens, and apostrophes'
-		}),
+		.max(50, { message: 'First name cannot exceed 50 characters' }),
 	middle_initial: z
 		.string()
 		.max(1, { message: 'Middle initial must be a single character' })
-		.regex(/^[A-Z]?$/, { message: 'Middle initial must be a capital letter' })
 		.optional(),
 	last_name: z
 		.string()
 		.min(1, { message: 'Last name is required' })
-		.max(50, { message: 'Last name cannot exceed 50 characters' })
-		.regex(/^[a-zA-Z\s-']+$/, {
-			message: 'Last name can only contain letters, spaces, hyphens, and apostrophes'
-		}),
+		.max(50, { message: 'Last name cannot exceed 50 characters' }),
 	email: z
 		.string()
 		.email({ message: 'Invalid email address' })
@@ -31,7 +24,7 @@ export const participant_schema = z.object({
 export type ParticipantSchema = z.infer<typeof participant_schema>;
 
 export const add_participants_schema = z.object({
-	employment_information: z.array(participant_schema).nonempty({
+	participants: z.array(participant_schema).nonempty({
 		message: 'At least one employment information entry is required.'
 	})
 });
