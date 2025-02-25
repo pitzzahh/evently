@@ -8,6 +8,7 @@
 	import type { Participant } from '@/db/models/types';
 	import { watch } from 'runed';
 	import { COLLECTIONS } from '@/db';
+	import { TableSkeleton } from '@/components/custom/skeleton';
 
 	interface ComponentState {
 		participants: Participant[];
@@ -23,7 +24,7 @@
 		participants: []
 	});
 
-	watch([() => COLLECTIONS.PARTICIPANT_COLLECTION.isLoading], () => {
+	watch([() => COLLECTIONS.PARTICIPANT_COLLECTION.isLoading()], () => {
 		const participants_cursor = COLLECTIONS.PARTICIPANT_COLLECTION.find(
 			{},
 			{ fieldTracking: true }
@@ -55,6 +56,10 @@
 				<AddParticipantsDialog {add_participants_form} />
 			</div>
 		</Dialog.Header>
-		<ParticipantDataTable participants={comp_state.participants} />
+		{#if COLLECTIONS.PARTICIPANT_COLLECTION.isPulling()}
+			<TableSkeleton />
+		{:else}
+			<ParticipantDataTable participants={comp_state.participants} />
+		{/if}
 	</Dialog.Content>
 </Dialog.Root>
