@@ -30,9 +30,9 @@
 
 	watch(
 		[
-			() => COLLECTIONS.PARTICIPANT_COLLECTION.isLoading,
-			() => COLLECTIONS.EVENT_SCHEDULE_COLLECTION.isLoading,
-			() => COLLECTIONS.EVENT_DETAILS_COLLECTION.isLoading
+			() => COLLECTIONS.PARTICIPANT_COLLECTION.isLoading(),
+			() => COLLECTIONS.EVENT_SCHEDULE_COLLECTION.isLoading(),
+			() => COLLECTIONS.EVENT_DETAILS_COLLECTION.isLoading()
 		],
 		() => {
 			const participants_cursor = COLLECTIONS.PARTICIPANT_COLLECTION.find(
@@ -121,8 +121,10 @@
 								<UsersRound class="size-5 text-muted-foreground" />
 							</div>
 							<div>
-								<p class="text-base font-medium">100</p>
-								<p class=" text-muted-foreground">Participants</p>
+								<p class="text-base font-medium">{comp_state.participants.length}</p>
+								<p class=" text-muted-foreground">
+									Participant{comp_state.participants.length > 1 ? 's' : ''}
+								</p>
 							</div>
 						</div>
 					</div>
