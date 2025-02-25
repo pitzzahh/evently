@@ -3,7 +3,7 @@
 	import type { HTMLAttributes } from "svelte/elements";
 	import type { Column } from "@tanstack/table-core";
 	import type { WithoutChildren } from "bits-ui";
-	import { cn } from "@/utils";
+	import { cn } from "@/utils/style/utils";
 	import * as DropdownMenu from "@/components/ui/dropdown-menu";
 	import Button from "@/components/ui/button/button.svelte";
 

@@ -5,7 +5,7 @@
 	import * as Command from '@/components/ui/command/index.js';
 	import * as Popover from '@/components/ui/popover/index.js';
 	import { Button } from '@/components/ui/button/index.js';
-	import { cn } from '@/utils';
+	import { cn } from '@/utils/style/utils';
 	import { Separator } from '@/components/ui/separator/index.js';
 	import { Badge } from '@/components/ui/badge/index.js';
 	import type { FilterOption } from '@/types/filter';

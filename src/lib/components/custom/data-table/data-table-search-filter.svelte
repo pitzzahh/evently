@@ -3,7 +3,7 @@
   import type { Table } from "@tanstack/table-core";
   import { buttonVariants } from "@/components/ui/button/index.js";
   import * as DropdownMenu from "@/components/ui/dropdown-menu/index.js";
-  import { cn } from "@/utils";
+  import { cn } from "@/utils/style/utils";
   import { convertToNormalText } from "@/utils/text";
 
   interface Props {

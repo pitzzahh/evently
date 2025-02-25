@@ -1,5 +1,5 @@
 <script module lang="ts">
-	import { cn } from '@/utils';
+	import { cn } from '@/utils/style/utils';
 	import { Button, type ButtonSize } from '@/components/ui/button';
 
 	export { StatusPill };

@@ -3,7 +3,7 @@
 	import * as Tooltip from '@/components/ui/tooltip';
 	import { goto } from '$app/navigation';
 	import { ArrowUpRight } from '@/assets/icons';
-	import { cn } from '@/utils';
+	import { cn } from '@/utils/style/utils';
 
 	interface DataTableButtonProps {
 		content: string;
