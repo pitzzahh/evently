@@ -358,12 +358,10 @@
 		})}
 	>
 		<Label>Time</Label>
-		<div class="max-h-[400px] overflow-y-auto">
-			<div class="flex flex-col gap-2 pr-1">
-				{#each comp_state.event_dates as event_date, index}
-					<EventTimePicker {event_date} day={index + 1} {updateDateEventPeriodStartEnd} />
-				{/each}
-			</div>
+		<div class="flex max-h-[400px] flex-col gap-2 overflow-y-auto pr-1">
+			{#each comp_state.event_dates as event_date, index}
+				<EventTimePicker {event_date} day={index + 1} {updateDateEventPeriodStartEnd} />
+			{/each}
 		</div>
 	</div>
 	<Form.Button
