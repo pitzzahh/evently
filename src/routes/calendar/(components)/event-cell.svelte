@@ -8,7 +8,7 @@
 	import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 	import { getLocalTimeZone, type DateValue } from '@internationalized/date';
 	import type { EventDetails } from '@/db/models/types';
-	import { formatDateToTimeOption } from '@/utils/format';
+	import { formatDateTime, formatDateToTimeOption } from '@/utils/format';
 
 	type Props = {
 		event: EventDetails;
@@ -112,7 +112,7 @@
 			</p>
 			<p class="flex items-center gap-1">
 				<span class="font-medium">Date:</span>
-				{event.start_date.toString()} - {event.end_date.toString()}
+				{formatDateTime(event.start_date)} - {formatDateTime(event.end_date)}
 			</p>
 			{#if event.description}
 				<p class="mt-2 text-xs">{event.description}</p>
