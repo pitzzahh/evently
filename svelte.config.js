@@ -7,7 +7,7 @@ const config = {
 	kit: {
 		adapter: adapter(),
 		csp: {
-			mode: "nonce",
+			mode: "auto",
 			directives: {
 				"default-src": ["*"],
 				"img-src": ["*"],
