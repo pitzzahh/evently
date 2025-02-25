@@ -18,22 +18,18 @@
 
 	interface ParticipantFormProps {
 		add_participants_form: SuperValidated<AddParticipantsSchema>;
-		event_id?: string;
+		event_id: string;
 	}
 
 	let { add_participants_form, event_id }: ParticipantFormProps = $props();
 	const form = superForm(add_participants_form, {
 		SPA: true,
 		validators: zodClient(add_participants_schema),
-		onUpdate: async ({ form }) => {
+		onUpdate: async ({ form, cancel }) => {
 			// toast the values
 			if (!form.valid) {
 				toast.error('Form is invalid');
-				return;
-			}
-
-			if (!event_id) {
-				toast.error('Event ID is not provided');
+				cancel();
 				return;
 			}
 
@@ -44,7 +40,7 @@
 				}))
 			);
 
-			toast.success('Form is valid');
+			toast.success('Participants added successfully');
 		}
 	});
 	const { form: formData, enhance, capture, restore } = form;

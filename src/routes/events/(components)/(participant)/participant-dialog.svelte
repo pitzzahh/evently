@@ -10,15 +10,16 @@
 	import { COLLECTIONS } from '@/db';
 	import { TableSkeleton } from '@/components/custom/skeleton';
 
+	interface ParticipantDialogProps {
+		add_participants_form: SuperValidated<AddParticipantsSchema>;
+		event_id: string;
+	}
+
 	interface ComponentState {
 		participants: Participant[];
 	}
 
-	let {
-		add_participants_form
-	}: {
-		add_participants_form: SuperValidated<AddParticipantsSchema>;
-	} = $props();
+	let { add_participants_form, event_id }: ParticipantDialogProps = $props();
 
 	let comp_state = $state<ComponentState>({
 		participants: []
@@ -53,7 +54,7 @@
 					<Dialog.Title>Participants</Dialog.Title>
 					<Dialog.Description>These are the participants of Teacher's Seminar</Dialog.Description>
 				</div>
-				<AddParticipantsDialog {add_participants_form} />
+				<AddParticipantsDialog {add_participants_form} {event_id} />
 			</div>
 		</Dialog.Header>
 		{#if COLLECTIONS.PARTICIPANT_COLLECTION.isPulling()}

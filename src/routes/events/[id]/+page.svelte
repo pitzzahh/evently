@@ -126,7 +126,10 @@
 							</div>
 						</div>
 					</div>
-					<ParticipantDialog add_participants_form={data.add_participants_form} />
+					<ParticipantDialog
+						add_participants_form={data.add_participants_form}
+						event_id={data.event_id}
+					/>
 				</div>
 
 				<div class="flex items-center justify-between gap-4">

@@ -6,11 +6,12 @@
 	import type { SuperValidated } from 'sveltekit-superforms';
 	import { ParticipantForm } from '..';
 
-	let {
-		add_participants_form
-	}: {
+	interface AddParticipantsDialogProps {
 		add_participants_form: SuperValidated<AddParticipantsSchema>;
-	} = $props();
+		event_id: string;
+	}
+
+	let { add_participants_form, event_id }: AddParticipantsDialogProps = $props();
 </script>
 
 <Dialog.Root>
@@ -23,6 +24,6 @@
 			<Dialog.Description>Fill up the form to add participants</Dialog.Description>
 		</Dialog.Header>
 
-		<ParticipantForm {add_participants_form} />
+		<ParticipantForm {add_participants_form} {event_id} />
 	</Dialog.Content>
 </Dialog.Root>
