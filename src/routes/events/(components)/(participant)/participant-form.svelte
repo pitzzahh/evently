@@ -16,10 +16,12 @@
 	import { scale } from 'svelte/transition';
 	import { quartInOut } from 'svelte/easing';
 
-	let {
-		add_participants_form,
-		event_id
-	}: { add_participants_form: SuperValidated<AddParticipantsSchema>; event_id?: string } = $props();
+	interface ParticipantFormProps {
+		add_participants_form: SuperValidated<AddParticipantsSchema>;
+		event_id?: string;
+	}
+
+	let { add_participants_form, event_id }: ParticipantFormProps = $props();
 	const form = superForm(add_participants_form, {
 		SPA: true,
 		validators: zodClient(add_participants_schema),
@@ -30,7 +32,17 @@
 				return;
 			}
 
-			COLLECTIONS.PARTICIPANT_COLLECTION.insertMany($formData.participants);
+			if (!event_id) {
+				toast.error('Event ID is not provided');
+				return;
+			}
+
+			COLLECTIONS.PARTICIPANT_COLLECTION.insertMany(
+				$formData.participants.map((p) => ({
+					...p,
+					event_id: event_id
+				}))
+			);
 
 			toast.success('Form is valid');
 		}
