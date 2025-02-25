@@ -4,6 +4,7 @@
 	import { RenderScan } from 'svelte-render-scan';
 	import { dev } from '$app/environment';
 	import AppSidebar from '@/components/app-sidebar.svelte';
+	import { Toaster } from 'svelte-sonner';
 	// import * as Breadcrumb from '@/components/ui/breadcrumb/index.js';
 	// import { Separator } from '@/components/ui/separator/index.js';
 	// import * as Sidebar from '@/components/ui/sidebar/index.js';
@@ -32,6 +33,7 @@
 </script>
 
 <ModeWatcher />
+<Toaster richColors position="top-right" />
 {#if dev}
 	<RenderScan />
 {/if}
