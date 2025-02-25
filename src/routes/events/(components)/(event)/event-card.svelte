@@ -1,15 +1,21 @@
 <script lang="ts">
 	import { StatusPill } from '@/components/snippets';
 	import { Button } from '@/components/ui/button';
+	import { COLLECTIONS } from '@/db';
 	import type { EventDetails } from '@/db/models/types';
 	import { formatDate } from '@/utils/format';
 	import { ChevronRightIcon, MapPin, UsersRound } from 'lucide-svelte';
+	import { watch } from 'runed';
 	import {
 		TimelineItem,
 		TimelineSeparator,
 		TimelineContent,
 		TimelineOppositeContent
 	} from 'svelte-vertical-timeline';
+
+	interface ComponentState {
+		number_of_participants: number;
+	}
 
 	let {
 		id,
@@ -23,6 +29,18 @@
 		start_date,
 		updated
 	}: EventDetails = $props();
+
+	let comp_state = $state<ComponentState>({
+		number_of_participants: 0
+	});
+
+	watch(
+		() => COLLECTIONS.PARTICIPANT_COLLECTION.isLoading(),
+		() => {
+			comp_state.number_of_participants =
+				COLLECTIONS.EVENT_DETAILS_COLLECTION.getNumberOfParticipants(id);
+		}
+	);
 </script>
 
 <TimelineItem>
@@ -82,11 +100,13 @@
 					)}
 				</div>
 				<div class="flex flex-col items-center gap-1">
-					<p class="text-4xl font-semibold">100</p>
+					<p class="text-4xl font-semibold">{comp_state.number_of_participants}</p>
 
 					<div class="flex items-center gap-2 text-muted-foreground">
 						<UsersRound class="size-4" />
-						<p class="text-sm font-medium">Participants</p>
+						<p class="text-sm font-medium">
+							Participant{comp_state.number_of_participants > 1 ? 's' : ''}
+						</p>
 					</div>
 				</div>
 			</div>
