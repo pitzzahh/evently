@@ -63,7 +63,9 @@ export class EventScheduleCollection extends Collection<EventSchedule> {
 
 export class EventDetailsCollection extends Collection<EventDetails> {
   id!: string;
-  event_name?: string;
+  event_name!: string;
+  location!: string;
+  description?: string;
   is_multi_day?: boolean;
   difference_in_days!: number;
   start_date?: Date;
@@ -80,6 +82,8 @@ export class EventDetailsCollection extends Collection<EventDetails> {
     if (!data) return
     this.id = data.id;
     this.event_name = data.event_name;
+    this.location = data.location;
+    this.description = data.description;
     this.is_multi_day = data.is_multi_day;
     this.difference_in_days = data.difference_in_days;
     this.start_date = data.start_date ? new Date(data.start_date) : undefined;
