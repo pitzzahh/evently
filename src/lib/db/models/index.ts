@@ -2,6 +2,7 @@ import { svelteReactivityAdapter } from '@/db/adapter/index.svelte';
 import { Collection } from '@signaldb/core';
 import createOPFSAdapter from '@signaldb/opfs';
 import type { AttendanceRecord, EventDetails, EventSchedule, Note, Participant, QRCode } from './types';
+import { COLLECTIONS } from '..';
 
 export class AttendanceRecordCollection extends Collection<AttendanceRecord> {
   id!: string;
@@ -28,6 +29,10 @@ export class AttendanceRecordCollection extends Collection<AttendanceRecord> {
     this.period = data.period;
     this.created = data.created ? new Date(data.created) : undefined;
     this.updated = data.updated ? new Date(data.updated) : undefined;
+  }
+
+  getByID(id: string) {
+    return this.findOne({ id });
   }
 }
 
@@ -58,6 +63,14 @@ export class EventScheduleCollection extends Collection<EventSchedule> {
     this.pm_end = data.pm_end ? new Date(data.pm_end) : undefined;
     this.created = data.created ? new Date(data.created) : undefined;
     this.updated = data.updated ? new Date(data.updated) : undefined;
+  }
+
+  getByID(id: string) {
+    return this.findOne({ id });
+  }
+
+  getEvent() {
+    return COLLECTIONS.EVENT_DETAILS_COLLECTION.findOne({ id: this.event_id });
   }
 }
 
@@ -93,25 +106,21 @@ export class EventDetailsCollection extends Collection<EventDetails> {
     this.created = data.created ? new Date(data.created) : undefined;
     this.updated = data.updated ? new Date(data.updated) : undefined;
   }
-}
 
-export class NoteCollection extends Collection<Note> {
-  id!: string;
-  title?: string;
-  created?: Date;
-  updated?: Date;
+  getByID(id: string) {
+    return this.findOne({ id });
+  }
 
-  constructor(data?: Note) {
-    super({
-      name: 'notes',
-      reactivity: svelteReactivityAdapter(),
-      persistence: createOPFSAdapter('notes.json')
-    })
-    if (!data) return;
-    this.id = data.id;
-    this.title = data.title;
-    this.created = data.created ? new Date(data.created) : undefined;
-    this.updated = data.updated ? new Date(data.updated) : undefined;
+  getByEventName(event_name: string) {
+    return this.find({ event_name }).fetch();
+  }
+
+  getParticipants() {
+    return COLLECTIONS.PARTICIPANT_COLLECTION.find({ event_id: this.id }).fetch();
+  }
+
+  getSchedules() {
+    return COLLECTIONS.EVENT_SCHEDULE_COLLECTION.find({ event_id: this.id }).fetch();
   }
 }
 
@@ -141,6 +150,14 @@ export class ParticipantCollection extends Collection<Participant> {
     this.created = data.created ? new Date(data.created) : undefined;
     this.updated = data.updated ? new Date(data.updated) : undefined;
   }
+
+  getByID(id: string) {
+    return this.findOne({ id });
+  }
+
+  getEvent() {
+    return this.findOne({ id: this.event_id });
+  }
 }
 
 export class QRCodeCollection extends Collection<QRCode> {
@@ -160,5 +177,13 @@ export class QRCodeCollection extends Collection<QRCode> {
     this.code = data.code;
     this.created = data.created ? new Date(data.created) : undefined;
     this.updated = data.updated ? new Date(data.updated) : undefined;
+  }
+
+  getByID(id: string) {
+    return this.findOne({ id });
+  }
+
+  getByCode(code: string) {
+    return this.findOne({ code });
   }
 }
