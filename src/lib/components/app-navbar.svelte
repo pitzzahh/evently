@@ -8,6 +8,8 @@
 	import { toggleMode, mode } from 'mode-watcher';
 	import { Sun, Moon } from '@/assets/icons';
 	import { Button } from '@/components/ui/button/index.js';
+	import { dev } from '$app/environment';
+	import { COLLECTIONS } from '@/db';
 
 	const isActive = (pathname: string) => page.url.pathname === pathname;
 	const routes = [
@@ -76,6 +78,18 @@
 			</Button>
 			<NavbarTime />
 			<Button href="/events/create">Create Event <Plus class="size-4" /></Button>
+			{#if dev}
+				<Button
+					size="sm"
+					variant="destructive"
+					onclick={() => {
+						COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.removeMany({});
+						COLLECTIONS.EVENT_DETAILS_COLLECTION.removeMany({});
+						COLLECTIONS.PARTICIPANT_COLLECTION.removeMany({});
+						COLLECTIONS.QRCODE_COLLECTION.removeMany({});
+					}}>RESET</Button
+				>
+			{/if}
 		</div>
 	</div>
 </header>
