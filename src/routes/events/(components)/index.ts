@@ -9,5 +9,5 @@ export { default as EventList } from "./(event)/event-list.svelte";
 
 export { default as ParticipantForm } from "./(participant)/participant-form.svelte";
 export { default as ParticipantDialog } from "./(participant)/participant-dialog.svelte";
-
+export { default as AddParticipantsDialog } from './(participant)/add-participants-dialog.svelte'
 export { default as TimeComboBox } from "./time-combo-box.svelte";
