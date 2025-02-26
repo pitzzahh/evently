@@ -10,10 +10,11 @@
 	import * as Alert from '@/components/ui/alert/index.js';
 	import { CircleAlert } from '@/assets/icons';
 	import { Button } from '@/components/ui/button';
-	import type { Selector } from '@signaldb/core';
 	import { watch } from 'runed';
 
 	interface ComponentState {
+		refetch: boolean;
+		timeout: number;
 		infinite_loader: {
 			events: EventDetails[];
 			limit: number;
@@ -28,6 +29,8 @@
 	let { type }: EventListProps = $props();
 
 	let comp_state = $state<ComponentState>({
+		refetch: false,
+		timeout: 0,
 		infinite_loader: {
 			events: [],
 			limit: 20,
@@ -90,7 +93,8 @@
 	watch(
 		[
 			() => COLLECTIONS.EVENT_DETAILS_COLLECTION.isLoading(),
-			() => COLLECTIONS.EVENT_DETAILS_COLLECTION.isReady()
+			() => COLLECTIONS.EVENT_DETAILS_COLLECTION.isReady(),
+			() => comp_state.refetch
 		],
 		() => {
 			const events_cursor = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(
@@ -111,9 +115,13 @@
 					return e.end_date < current_date;
 				}
 			});
-
+			clearTimeout(comp_state.timeout);
+			comp_state.timeout = setTimeout(() => (comp_state.refetch = !comp_state.refetch), 1000);
 			$inspect(comp_state.infinite_loader.events);
-			return () => events_cursor.cleanup();
+			return () => {
+				events_cursor.cleanup();
+				clearTimeout(comp_state.timeout);
+			};
 		}
 	);
 </script>
