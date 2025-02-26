@@ -68,8 +68,8 @@
 				description: $formData.description,
 				is_multi_day: difference_in_days > 1,
 				difference_in_days,
-				start_date: $formData.start_date,
-				end_date: $formData.end_date
+				start_date: comp_state.event_dates.at(0)?.am_start as Date,
+				end_date: comp_state.event_dates.at(-1)?.pm_end as Date
 			});
 
 			COLLECTIONS.EVENT_SCHEDULE_COLLECTION.insertMany(
@@ -134,15 +134,26 @@
 			const end_date = new Date(
 				comp_state.date_range.end?.toString() || comp_state.date_range.start.toString()
 			);
-			comp_state.event_dates = getDatesInRange(start_date, end_date).map((date) => ({
-				id: nanoid(),
-				event_date: date,
-				event_id: '',
-				am_start: new Date(`1970-01-01T08:00:00`),
-				am_end: new Date('1970-01-01T12:00:00'),
-				pm_start: new Date('1970-01-01T13:00:00'),
-				pm_end: new Date('1970-01-01T16:00:00')
-			}));
+			comp_state.event_dates = getDatesInRange(start_date, end_date).map((date) => {
+				const am_start = new Date(date);
+				am_start.setHours(8, 0, 0, 0);
+				const am_end = new Date(date);
+				am_end.setHours(12, 0, 0, 0);
+				const pm_start = new Date(date);
+				pm_start.setHours(13, 0, 0, 0);
+				const pm_end = new Date(date);
+				pm_end.setHours(16, 0, 0, 0);
+
+				return {
+					id: nanoid(),
+					event_date: date,
+					event_id: '',
+					am_start,
+					am_end,
+					pm_start,
+					pm_end
+				};
+			});
 		}
 	}
 
