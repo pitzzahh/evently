@@ -69,8 +69,8 @@ export class EventScheduleCollection extends Collection<EventSchedule> {
     return this.findOne({ id });
   }
 
-  getEvent() {
-    return COLLECTIONS.EVENT_DETAILS_COLLECTION.findOne({ id: this.event_id });
+  getByEventID(event_id?: string) {
+    return this.find({ id: event_id ?? this.event_id }).fetch();
   }
 }
 
@@ -122,12 +122,16 @@ export class EventDetailsCollection extends Collection<EventDetails> {
   getSchedules() {
     return COLLECTIONS.EVENT_SCHEDULE_COLLECTION.find({ event_id: this.id }).fetch();
   }
+
+  getNumberOfParticipants(event_id?: string) {
+    return COLLECTIONS.PARTICIPANT_COLLECTION.find({ event_id: event_id ?? this.id }).count();
+  }
 }
 
 export class ParticipantCollection extends Collection<Participant> {
   id!: string;
   first_name!: string;
-  middle_initial?: string;
+  middle_name?: string;
   last_name!: string;
   event_id!: string;
   email?: string;
@@ -143,7 +147,7 @@ export class ParticipantCollection extends Collection<Participant> {
     if (!data) return;
     this.id = data.id;
     this.first_name = data.first_name;
-    this.middle_initial = data.middle_initial;
+    this.middle_name = data.middle_name;
     this.last_name = data.last_name;
     this.event_id = data.event_id;
     this.email = data.email;

@@ -33,7 +33,7 @@
 </script>
 
 <ModeWatcher />
-<Toaster richColors position="top-right" />
+<Toaster richColors position="top-center" />
 {#if dev}
 	<RenderScan />
 {/if}

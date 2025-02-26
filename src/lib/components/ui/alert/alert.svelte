@@ -23,7 +23,7 @@
 <script lang="ts">
 	import type { HTMLAttributes } from 'svelte/elements';
 	import type { WithElementRef } from 'bits-ui';
-	import { cn } from '@/utils.js';
+	import { cn } from '@/utils/styles';
 
 	let {
 		ref = $bindable(null),

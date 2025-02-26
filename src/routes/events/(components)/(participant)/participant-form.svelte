@@ -11,15 +11,42 @@
 	import { onMount } from 'svelte';
 	import { Button } from '@/components/ui/button';
 	import { PlusCircle, Trash } from 'lucide-svelte';
+	import { toast } from 'svelte-sonner';
+	import { COLLECTIONS } from '@/db';
+	import { scale } from 'svelte/transition';
+	import { quartInOut } from 'svelte/easing';
 
-	let {
-		add_participants_form,
-		event_id
-	}: { add_participants_form: SuperValidated<AddParticipantsSchema>; event_id?: string } = $props();
+	interface ParticipantFormProps {
+		add_participants_form: SuperValidated<AddParticipantsSchema>;
+		event_id: string;
+		success_callback?: () => void;
+	}
+
+	let { add_participants_form, event_id, success_callback }: ParticipantFormProps = $props();
 	const form = superForm(add_participants_form, {
-		validators: zodClient(add_participants_schema)
+		SPA: true,
+		validators: zodClient(add_participants_schema),
+		onUpdate: async ({ form, cancel }) => {
+			// toast the values
+			if (!form.valid) {
+				toast.error('Form is invalid');
+				cancel();
+				return;
+			}
+
+			COLLECTIONS.PARTICIPANT_COLLECTION.insertMany(
+				$formData.participants.map((p) => ({
+					...p,
+					event_id: event_id
+				}))
+			);
+			success_callback?.();
+			toast.success('Participants added successfully');
+		}
 	});
-	const { form: formData, enhance, errors } = form;
+	const { form: formData, enhance, capture, restore } = form;
+
+	export const snapshot = { capture, restore };
 
 	function addParticipant() {
 		$formData.participants = [
@@ -27,11 +54,17 @@
 			{
 				first_name: '',
 				last_name: '',
-				middle_initial: '',
+				middle_name: '',
 				email: '',
 				event_id: event_id || ''
 			}
 		];
+		// Wait for DOM update then scroll
+		setTimeout(() => {
+			const forms = document.querySelectorAll('.rounded-lg.border');
+			const lastForm = forms[forms.length - 1];
+			lastForm?.scrollIntoView({ behavior: 'smooth' });
+		}, 0);
 	}
 
 	function removeParticipant(index: number) {
@@ -52,10 +85,10 @@
 	});
 </script>
 
-<div class="max-h-[500px] overflow-y-auto">
-	<form method="POST" use:enhance class="grid gap-4">
-		{#each $formData.participants as _, index}
-			<div class="rounded-lg border p-4">
+<form method="POST" use:enhance class="grid gap-4">
+	<div class="max-h-[450px] space-y-2 overflow-y-auto">
+		{#each $formData.participants, index}
+			<div class="rounded-lg border p-4" transition:scale={{ duration: 200, easing: quartInOut }}>
 				<div class="mb-4 flex items-center justify-between">
 					<p class="font-medium">Participant {index + 1}</p>
 					{#if $formData.participants.length > 1}
@@ -81,23 +114,20 @@
 									{...props}
 									placeholder="Enter first name"
 									bind:value={$formData.participants[index].first_name}
-									aria-required="true"
 								/>
 							{/snippet}
 						</Form.Control>
 
 						<Form.FieldErrors />
 					</Form.Field>
-					<Form.Field {form} name={`participants[${index}].middle_initial`}>
+					<Form.Field {form} name={`participants[${index}].middle_name`}>
 						<Form.Control>
 							{#snippet children({ props })}
-								<Form.Label>Middle Initial</Form.Label>
+								<Form.Label>Middle Name</Form.Label>
 								<Input
-									maxlength={1}
 									{...props}
-									placeholder="Enter middle initial"
-									bind:value={$formData.participants[index].middle_initial}
-									aria-required="false"
+									placeholder="Enter middle name"
+									bind:value={$formData.participants[index].middle_name}
 								/>
 							{/snippet}
 						</Form.Control>
@@ -112,7 +142,6 @@
 									{...props}
 									placeholder="Enter last name"
 									bind:value={$formData.participants[index].last_name}
-									aria-required="true"
 								/>
 							{/snippet}
 						</Form.Control>
@@ -128,7 +157,6 @@
 									type="email"
 									placeholder="email@example.com"
 									bind:value={$formData.participants[index].email}
-									aria-required="true"
 								/>
 							{/snippet}
 						</Form.Control>
@@ -137,10 +165,9 @@
 				</div>
 			</div>
 		{/each}
-
-		<Button onclick={addParticipant} variant="outline" class="self-end" type="button">
-			Add Participant <PlusCircle class="ml-2 h-4 w-4" />
-		</Button>
-		<Form.Button class="self-end">Register Participants</Form.Button>
-	</form>
-</div>
+	</div>
+	<Button onclick={addParticipant} variant="outline" class="mt-2 w-full" type="button">
+		Add Participant <PlusCircle class="ml-2 h-4 w-4" />
+	</Button>
+	<Form.Button class="self-end">Register Participants</Form.Button>
+</form>

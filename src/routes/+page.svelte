@@ -1,7 +1,7 @@
 <script lang="ts">
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
 	import { fade } from 'svelte/transition';
-	import EventList from './events/(components)/event-list.svelte';
+	import { EventList } from '@routes/events/(components)';
 	import { COLLECTIONS } from '@/db/index';
 	import type { Participant } from '@/db/models/types';
 	import { CalendarArrowDown, CalendarArrowUp } from '@/assets/icons';
@@ -42,11 +42,11 @@
 
 		{@const contents = ['upcoming', 'past']}
 		{#each contents as content (content)}
-			{#if content === comp_state.current_tab}
-				<Tabs.Content value={content} class="mt-10">
+			<Tabs.Content value={content} class="mt-10">
+				{#if content === comp_state.current_tab}
 					<EventList type={content as 'upcoming' | 'past'} />
-				</Tabs.Content>
-			{/if}
+				{/if}
+			</Tabs.Content>
 		{/each}
 	</Tabs.Root>
 </div>

@@ -1,10 +1,9 @@
 <script lang="ts">
 	import { Button } from '@/components/ui/button';
 	import { Calendar, ChartBar, MapPin, Settings, UsersRound, Edit, Trash } from 'lucide-svelte';
-	import { cn } from '@/utils';
-	import EventTimePicker from '../(components)/event-time-picker.svelte';
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
-	import ParticipantsDialog from '../(components)/participants-dialog.svelte';
+	import { cn } from '@/utils/styles';
+	import { EventTimePicker, ParticipantDialog } from '@routes/events/(components)';
+	import * as DropdownMenu from '@/components/ui/dropdown-menu/index.js';
 	import type { EventSchedule, EventDetails } from '@/db/models/types';
 	import { scale } from 'svelte/transition';
 	import { COLLECTIONS } from '@/db/index';
@@ -14,7 +13,6 @@
 	import { StatusPill } from '@/components/snippets';
 
 	let { data } = $props();
-	let see_more = $state(true);
 
 	interface ComponentState {
 		event_details: EventDetails | undefined;
@@ -32,9 +30,9 @@
 
 	watch(
 		[
-			() => COLLECTIONS.PARTICIPANT_COLLECTION.isLoading,
-			() => COLLECTIONS.EVENT_SCHEDULE_COLLECTION.isLoading,
-			() => COLLECTIONS.EVENT_DETAILS_COLLECTION.isLoading
+			() => COLLECTIONS.PARTICIPANT_COLLECTION.isLoading(),
+			() => COLLECTIONS.EVENT_SCHEDULE_COLLECTION.isLoading(),
+			() => COLLECTIONS.EVENT_DETAILS_COLLECTION.isLoading()
 		],
 		() => {
 			const participants_cursor = COLLECTIONS.PARTICIPANT_COLLECTION.find(
@@ -56,6 +54,10 @@
 				{ fieldTracking: true }
 			);
 
+			$inspect(
+				comp_state.event_details?.start_date && comp_state.event_details.start_date > new Date()
+			);
+
 			return () => {
 				participants_cursor.cleanup();
 				event_schedule_cursor.cleanup();
@@ -70,7 +72,15 @@
 
 		<div class="flex items-center gap-2">
 			{@render StatusPill(
-				(comp_state.event_details?.start_date ?? 0) > new Date() ? 'upcoming' : 'ongoing'
+				comp_state.event_details?.start_date &&
+					comp_state.event_details?.end_date &&
+					new Date() >= new Date(comp_state.event_details.start_date) &&
+					new Date() <= new Date(comp_state.event_details.end_date)
+					? 'ongoing'
+					: comp_state.event_details?.end_date &&
+						  new Date() > new Date(comp_state.event_details.end_date)
+						? 'finished'
+						: 'upcoming'
 			)}
 
 			<DropdownMenu.Root>
@@ -111,12 +121,17 @@
 								<UsersRound class="size-5 text-muted-foreground" />
 							</div>
 							<div>
-								<p class="text-base font-medium">100</p>
-								<p class=" text-muted-foreground">Participants</p>
+								<p class="text-base font-medium">{comp_state.participants.length}</p>
+								<p class=" text-muted-foreground">
+									Participant{comp_state.participants.length > 1 ? 's' : ''}
+								</p>
 							</div>
 						</div>
 					</div>
-					<ParticipantsDialog add_participants_form={data.add_participants_form} />
+					<ParticipantDialog
+						add_participants_form={data.add_participants_form}
+						event_details={comp_state.event_details!}
+					/>
 				</div>
 
 				<div class="flex items-center justify-between gap-4">
@@ -125,8 +140,8 @@
 						<p class="text-base font-medium">{comp_state.event_details?.location ?? 'N/A'}</p>
 					</div>
 
-					<Button variant="ghost" onclick={() => (see_more = !see_more)}>
-						{see_more ? 'See Less' : 'See More'}
+					<Button variant="ghost" onclick={() => (comp_state.see_more = !comp_state.see_more)}>
+						{comp_state.see_more ? 'See Less' : 'See More'}
 					</Button>
 				</div>
 			</div>
@@ -135,16 +150,16 @@
 			class={cn(
 				'grid gap-3 overflow-hidden rounded-lg border bg-white p-4 transition-all duration-300 dark:bg-[#1C1E20]',
 				{
-					'm-0 h-0 p-0 opacity-0': !see_more,
-					'h-auto opacity-100': see_more
+					'm-0 h-0 p-0 opacity-0': !comp_state.see_more,
+					'h-auto opacity-100': comp_state.see_more
 				}
 			)}
 		>
 			<!-- EVENT STATS -->
 			<div
 				class={cn('transition-scale grid gap-3 rounded-lg border p-4 duration-300', {
-					'origin-top scale-y-0 opacity-0': !see_more,
-					'scale-y-100 opacity-100': see_more
+					'origin-top scale-y-0 opacity-0': !comp_state.see_more,
+					'scale-y-100 opacity-100': comp_state.see_more
 				})}
 			>
 				<div class="flex items-center justify-between">
@@ -171,8 +186,7 @@
 			</div>
 		</div>
 	</div>
-
-	<div class="grid gap-2">
+	<div class="flex max-h-[400px] flex-col gap-2 overflow-y-auto pr-1">
 		{#each comp_state.event_schedules as event_date, index}
 			<EventTimePicker {event_date} day={index + 1} is_selection_disabled={true} />
 		{/each}

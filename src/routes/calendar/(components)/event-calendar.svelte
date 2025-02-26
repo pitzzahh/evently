@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Calendar as CalendarPrimitive, type WithoutChildrenOrChild } from 'bits-ui';
 	import * as Calendar from '@/components/ui/calendar';
-	import { cn } from '$lib/utils';
+	import { cn } from '@/utils/styles';
 	import { getLocalTimeZone, type DateValue } from '@internationalized/date';
 	import { EventCell } from '.';
 	import type { EventDetails } from '@/db/models/types';

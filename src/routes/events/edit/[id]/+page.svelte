@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Button } from '@/components/ui/button';
-	import EventForm from '../../(components)/event-form.svelte';
-	import { ChevronLeft } from 'lucide-svelte';
+	import { EventForm } from '@routes/events/(components)';
+	import { ChevronLeft } from '@/assets/icons';
 	import { browser } from '$app/environment';
 
 	let { data } = $props();

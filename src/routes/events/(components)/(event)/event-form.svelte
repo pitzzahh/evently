@@ -1,26 +1,19 @@
-<script module lang="ts">
-	interface Props {
-		event_form: SuperValidated<EventSchema>;
-	}
-</script>
-
 <script lang="ts">
-	import * as Form from '$lib/components/ui/form/index.js';
-	import { Input } from '$lib/components/ui/input/index.js';
+	import * as Form from '@/components/ui/form';
+	import { Input } from '@/components/ui/input';
 	import Textarea from '@/components/ui/textarea/textarea.svelte';
 	import { eventSchema, type EventSchema } from '@/schema/event';
 	import { MapPin, Ticket } from 'lucide-svelte';
-	import SuperDebug, { type SuperValidated, superForm } from 'sveltekit-superforms';
+	import { type SuperValidated, superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { nanoid } from 'nanoid';
-	import EventTimePicker from './event-time-picker.svelte';
+	import { EventTimePicker } from '..';
 	import CalendarIcon from 'lucide-svelte/icons/calendar';
-
 	import { CalendarDate, type DateValue, getLocalTimeZone } from '@internationalized/date';
-	import { cn } from '$lib/utils.js';
-	import { buttonVariants } from '$lib/components/ui/button/index.js';
-	import { RangeCalendar } from '$lib/components/ui/range-calendar/index.js';
-	import * as Popover from '$lib/components/ui/popover/index.js';
+	import { cn } from '@/utils/styles';
+	import { buttonVariants } from '@/components/ui/button';
+	import { RangeCalendar } from '@/components/ui/range-calendar';
+	import * as Popover from '@/components/ui/popover';
 	import { time_options } from '@/constants';
 	import { toast } from 'svelte-sonner';
 	import { COLLECTIONS } from '@/db/index';
@@ -31,11 +24,15 @@
 		formatDateToTimeOption,
 		monthFormatter
 	} from '@/utils/format';
-	import { dev } from '$app/environment';
 	import { hasRequiredData } from '@/utils/validation';
 	import { Label } from '@/components/ui/label';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
+	import * as ImageCropper from '@/components/custom/image-cropper';
+
+	interface EventFormProps {
+		event_form: SuperValidated<EventSchema>;
+	}
 
 	interface ComponentState {
 		start_value: DateValue | undefined;
@@ -46,7 +43,7 @@
 		event_dates: Omit<EventSchedule, 'event_id' | 'updated' | 'created'>[];
 	}
 
-	let { event_form }: Props = $props();
+	let { event_form }: EventFormProps = $props();
 
 	const form = superForm(event_form, {
 		SPA: true,
@@ -66,21 +63,30 @@
 
 			const added_event_details_id = COLLECTIONS.EVENT_DETAILS_COLLECTION.insert({
 				event_name: $formData.title,
+				type: 'other',
 				location: $formData.location,
 				description: $formData.description,
 				is_multi_day: difference_in_days > 1,
 				difference_in_days,
 				start_date: $formData.start_date,
-				end_date: $formData.end_date,
-				type: 'other'
+				end_date: $formData.end_date
 			});
+
+			COLLECTIONS.EVENT_SCHEDULE_COLLECTION.insertMany(
+				comp_state.event_dates.map((event) => ({
+					...event,
+					event_id: added_event_details_id
+				}))
+			);
 
 			goto(`/events/${added_event_details_id}`);
 			console.log('added_event_details', added_event_details_id);
 			toast.success(`Event is added and has ${difference_in_days} days`);
 		}
 	});
-	const { form: formData, enhance } = form;
+	const { form: formData, enhance, capture, restore } = form;
+
+	export const snapshot = { capture, restore };
 
 	const current_date = new Date();
 
@@ -131,6 +137,7 @@
 			comp_state.event_dates = getDatesInRange(start_date, end_date).map((date) => ({
 				id: nanoid(),
 				event_date: date,
+				event_id: '',
 				am_start: new Date(`1970-01-01T08:00:00`),
 				am_end: new Date('1970-01-01T12:00:00'),
 				pm_start: new Date('1970-01-01T13:00:00'),
@@ -222,43 +229,118 @@
 			return returned_data;
 		});
 	}
+
+	onMount(() => {
+		handleGenerateEventDates();
+		$formData.start_date = comp_state.date_range.start.toDate(getLocalTimeZone());
+		$formData.end_date = comp_state.date_range.end.toDate(getLocalTimeZone());
+	});
 </script>
 
 <form method="POST" use:enhance class="flex flex-col gap-1">
-	<Form.Field {form} name="title">
-		<Form.Control>
-			{#snippet children({ props })}
-				<Form.Label class="flex items-center gap-1"><Ticket class="size-4" /> Event Name</Form.Label
-				>
-				<Input
-					{...props}
-					class="bg-gray-700/10 dark:bg-white/10"
-					bind:value={$formData.title}
-					placeholder="Enter a clear, descriptive name (e.g., '2024 Annual Teachers Conference')"
-					aria-label="Event name"
-				/>
-			{/snippet}
-		</Form.Control>
-		<Form.FieldErrors />
-	</Form.Field>
+	<div class="flex gap-4">
+		<div class="flex w-full flex-1 flex-col gap-4">
+			<Form.Field {form} name="title" class="w-full">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label class="flex items-center gap-1"
+							><Ticket class="size-4" /> Event Name</Form.Label
+						>
+						<Input
+							{...props}
+							class="bg-gray-700/10 dark:bg-white/10"
+							bind:value={$formData.title}
+							placeholder="Enter a clear, descriptive name (e.g., '2024 Annual Teachers Conference')"
+							aria-label="Event name"
+						/>
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
 
-	<Form.Field {form} name="location" class="w-full">
-		<Form.Control>
-			{#snippet children({ props })}
-				<Form.Label class="flex items-center gap-1"><MapPin class="size-4" />Location</Form.Label>
-				<Input
-					{...props}
-					class="w-full bg-gray-700/10 dark:bg-white/10"
-					bind:value={$formData.location}
-					placeholder="Physical address"
-					aria-label="Event location"
-				/>
-			{/snippet}
-		</Form.Control>
-		<Form.FieldErrors />
-	</Form.Field>
-
-	<Form.Field {form} name="description">
+			<Form.Field {form} name="location" class="w-full">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label class="flex items-center gap-1"
+							><MapPin class="size-4" />Location</Form.Label
+						>
+						<Input
+							{...props}
+							class="w-full bg-gray-700/10 dark:bg-white/10"
+							bind:value={$formData.location}
+							placeholder="Physical address"
+							aria-label="Event location"
+						/>
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
+			<div class="mb-3 grid gap-2">
+				<p class="text-sm">Event Date</p>
+				<Popover.Root>
+					<Popover.Trigger
+						disabled={!hasRequiredData($formData, ['title', 'location'])}
+						class={cn(
+							buttonVariants({
+								variant: 'outline',
+								class: 'w-auto justify-start place-self-start text-left font-normal'
+							}),
+							!comp_state.date_range && 'text-muted-foreground'
+						)}
+					>
+						<CalendarIcon />
+						{#if comp_state.date_range && comp_state.date_range.start}
+							{#if comp_state.date_range.end}
+								{monthFormatter.format(comp_state.date_range.start.toDate(getLocalTimeZone()))} - {monthFormatter.format(
+									comp_state.date_range.end.toDate(getLocalTimeZone())
+								)}
+							{:else}
+								{monthFormatter.format(comp_state.date_range.start.toDate(getLocalTimeZone()))}
+							{/if}
+						{:else if comp_state.start_value}
+							{monthFormatter.format(comp_state.start_value.toDate(getLocalTimeZone()))}
+						{:else}
+							Pick a date
+						{/if}
+					</Popover.Trigger>
+					<Popover.Content class="w-auto p-0" align="start">
+						<RangeCalendar
+							bind:value={comp_state.date_range}
+							onStartValueChange={(v) => {
+								comp_state.start_value = v;
+							}}
+							onValueChange={(v) => {
+								const { start, end } = v;
+								if (!start || !end) return;
+								handleGenerateEventDates();
+								$formData.start_date = start?.toDate(getLocalTimeZone());
+								$formData.end_date = end?.toDate(getLocalTimeZone());
+							}}
+							numberOfMonths={2}
+						/>
+					</Popover.Content>
+				</Popover.Root>
+			</div>
+		</div>
+		<!-- <img
+			src="https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=800&dpr=2&q=80"
+			alt="Gray by Drew Beamer"
+			class="flex w-80 shrink-0 items-center justify-center rounded-md bg-muted object-cover text-center text-sm text-muted-foreground"
+		/> -->
+		<ImageCropper.Root>
+			<ImageCropper.UploadTrigger>
+				<ImageCropper.Preview class="h-64 w-64 rounded-md" />
+			</ImageCropper.UploadTrigger>
+			<ImageCropper.Dialog>
+				<ImageCropper.Cropper cropShape="round" />
+				<ImageCropper.Controls>
+					<ImageCropper.Cancel />
+					<ImageCropper.Crop />
+				</ImageCropper.Controls>
+			</ImageCropper.Dialog>
+		</ImageCropper.Root>
+	</div>
+	<Form.Field {form} name="description" class="w-full">
 		<Form.Control>
 			{#snippet children({ props })}
 				<Form.Label>Description</Form.Label>
@@ -323,35 +405,27 @@
 	</div>
 
 	<!-- <div
+	<div
 		class={cn({
 			hidden: !hasRequiredData($formData, ['title', 'location'])
 		})}
 	> -->
-		<Label>Time</Label>
-		<div class="max-h-[400px] overflow-y-auto">
-			<div class="flex flex-col gap-2 pr-1">
-				{#each comp_state.event_dates as event_date, index}
-					<EventTimePicker
-						is_selection_disabled={!hasRequiredData($formData, ['title', 'location'])}
-						{event_date}
-						day={index + 1}
-						{updateDateEventPeriodStartEnd}
-					/>
-				{/each}
-			</div>
+	<Label>Time</Label>
+	<div class="max-h-[400px] overflow-y-auto">
+		<div class="flex flex-col gap-2 pr-1">
+			{#each comp_state.event_dates as event_date, index}
+				<EventTimePicker
+					is_selection_disabled={!hasRequiredData($formData, ['title', 'location'])}
+					{event_date}
+					day={index + 1}
+					{updateDateEventPeriodStartEnd}
+				/>
+			{/each}
 		</div>
+	</div>
 	<!-- </div> -->
 	<Form.Button
-		disabled={!hasRequiredData($formData, [
-			'title',
-			'location',
-			'description',
-			'start_date',
-			'end_date'
-		])}>Add</Form.Button
+		disabled={!hasRequiredData($formData, ['title', 'location', 'start_date', 'end_date'])}
+		>Add</Form.Button
 	>
 </form>
-
-{#if dev}
-	<SuperDebug data={$formData} />
-{/if}
