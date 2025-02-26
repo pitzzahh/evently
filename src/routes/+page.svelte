@@ -30,11 +30,11 @@
 			<h2 class="text-4xl font-semibold">Events</h2>
 			<Tabs.List class="grid h-auto w-full max-w-[300px] grid-cols-2">
 				<Tabs.Trigger value="upcoming" class="h-auto text-base">
-					<CalendarArrowUp class="md:mr-1" />
+					<CalendarArrowUp class="mr-2 size-[18px]" />
 					Upcoming</Tabs.Trigger
 				>
 				<Tabs.Trigger value="past" class="h-auto text-base">
-					<CalendarArrowDown class="md:mr-1" />
+					<CalendarArrowDown class="mr-2 size-[18px]" />
 					Past</Tabs.Trigger
 				>
 			</Tabs.List>

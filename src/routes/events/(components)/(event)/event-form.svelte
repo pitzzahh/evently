@@ -165,23 +165,28 @@
 			if (event.id !== id) return event;
 
 			const selected_am_start_idx = time_options.findIndex((o) => o === am_start);
+			const selected_am_end_idx = time_options.findIndex((o) => o === am_end);
 			const selected_pm_start_idx = time_options.findIndex((o) => o === pm_start);
+
 			const current_am_end_idx = time_options.findIndex(
 				(o) => o === formatDateToTimeOption(event.am_end)
 			);
 			const current_pm_end_idx = time_options.findIndex(
 				(o) => o === formatDateToTimeOption(event.pm_end)
 			);
+			const current_pm_start_idx = time_options.findIndex(
+				(o) => o === formatDateToTimeOption(event.pm_start)
+			);
 
 			let adjusted_am_end = formatDateToTimeOption(event.am_end);
 			let adjusted_pm_end = formatDateToTimeOption(event.pm_end);
 
+			if (selected_am_end_idx >= current_pm_start_idx) {
+				toast.error('The selected AM end time has conflict with the current PM start time');
+				return event;
+			}
+
 			if (am_start && selected_am_start_idx !== -1) {
-				console.log(am_start && selected_am_start_idx !== -1);
-				console.log({
-					current_am_end_idx,
-					selected_am_start_idx
-				});
 				if (current_am_end_idx === -1 || selected_am_start_idx >= current_am_end_idx) {
 					adjusted_am_end =
 						time_options[selected_am_start_idx + 2] || formatDateToTimeOption(event.am_end);
@@ -194,19 +199,6 @@
 						time_options[selected_pm_start_idx + 2] || formatDateToTimeOption(event.pm_end);
 				}
 			}
-			console.log('adjusted_am_end', adjusted_am_end);
-			console.log('adjusted_pm_end', adjusted_pm_end);
-			const am_start_extract = am_start ? extractHoursAndMinutes(am_start) : event.am_start;
-			const am_end_extract = extractHoursAndMinutes(adjusted_am_end);
-			const pm_start_extract = pm_start ? extractHoursAndMinutes(pm_start) : event.pm_start;
-			const pm_end_extract = extractHoursAndMinutes(adjusted_pm_end);
-
-			console.log({
-				am_start_extract,
-				am_end_extract,
-				pm_start_extract,
-				pm_end_extract
-			});
 
 			const returned_data = {
 				...event,
@@ -223,8 +215,6 @@
 					? createDate(event.event_date, pm_end, formatDateToTimeOption(event.pm_end))
 					: createDate(event.event_date, adjusted_pm_end, formatDateToTimeOption(event.pm_end))
 			};
-
-			console.log('returned_data', returned_data);
 
 			return returned_data;
 		});
@@ -357,75 +347,24 @@
 		<Form.FieldErrors />
 	</Form.Field>
 
-	<div class="mb-3 grid gap-2">
-		<p class="text-sm">Event Date</p>
-		<Popover.Root>
-			<Popover.Trigger
-				disabled={!hasRequiredData($formData, ['title', 'location', 'description'])}
-				class={cn(
-					buttonVariants({
-						variant: 'outline',
-						class: 'w-auto justify-start place-self-start text-left font-normal'
-					}),
-					!comp_state.date_range && 'text-muted-foreground'
-				)}
-			>
-				<CalendarIcon />
-				{#if comp_state.date_range && comp_state.date_range.start}
-					{#if comp_state.date_range.end}
-						{monthFormatter.format(comp_state.date_range.start.toDate(getLocalTimeZone()))} - {monthFormatter.format(
-							comp_state.date_range.end.toDate(getLocalTimeZone())
-						)}
-					{:else}
-						{monthFormatter.format(comp_state.date_range.start.toDate(getLocalTimeZone()))}
-					{/if}
-				{:else if comp_state.start_value}
-					{monthFormatter.format(comp_state.start_value.toDate(getLocalTimeZone()))}
-				{:else}
-					Pick a date
-				{/if}
-			</Popover.Trigger>
-			<Popover.Content class="w-auto p-0" align="start">
-				<RangeCalendar
-					bind:value={comp_state.date_range}
-					onStartValueChange={(v) => {
-						comp_state.start_value = v;
-					}}
-					onValueChange={(v) => {
-						const { start, end } = v;
-						if (!start || !end) return;
-						handleGenerateEventDates();
-						$formData.start_date = start?.toDate(getLocalTimeZone());
-						$formData.end_date = end?.toDate(getLocalTimeZone());
-					}}
-					numberOfMonths={2}
-				/>
-			</Popover.Content>
-		</Popover.Root>
-	</div>
-
-	<!-- <div
-	<div
-		class={cn({
-			hidden: !hasRequiredData($formData, ['title', 'location'])
-		})}
-	> -->
-	<Label>Time</Label>
-	<div class="max-h-[400px] overflow-y-auto">
-		<div class="flex flex-col gap-2 pr-1">
-			{#each comp_state.event_dates as event_date, index}
-				<EventTimePicker
-					is_selection_disabled={!hasRequiredData($formData, ['title', 'location'])}
-					{event_date}
-					day={index + 1}
-					{updateDateEventPeriodStartEnd}
-				/>
-			{/each}
+	<div>
+		<Label>Time</Label>
+		<div class="max-h-[400px] overflow-y-auto">
+			<div class="flex flex-col gap-4 pr-2">
+				{#each comp_state.event_dates as event_date, index}
+					<EventTimePicker
+						is_selection_disabled={!hasRequiredData($formData, ['title', 'location'])}
+						{event_date}
+						day={index + 1}
+						{updateDateEventPeriodStartEnd}
+					/>
+				{/each}
+			</div>
 		</div>
 	</div>
-	<!-- </div> -->
+
 	<Form.Button
 		disabled={!hasRequiredData($formData, ['title', 'location', 'start_date', 'end_date'])}
-		>Add</Form.Button
+		class="mt-3">Add</Form.Button
 	>
 </form>

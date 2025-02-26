@@ -31,6 +31,7 @@
 	});
 </script>
 
+<h2 class="mb-4 text-4xl font-semibold">Calendar of Events</h2>
 <div in:scale class="min-h-dvh bg-background p-4">
 	<EventCalendar type="single" events={comp_state.event_details} />
 </div>

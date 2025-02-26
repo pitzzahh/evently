@@ -26,11 +26,10 @@
 	const form = superForm(add_participants_form, {
 		SPA: true,
 		validators: zodClient(add_participants_schema),
-		onUpdate: async ({ form, cancel }) => {
+		onUpdate: async ({ form }) => {
 			// toast the values
 			if (!form.valid) {
 				toast.error('Form is invalid');
-				cancel();
 				return;
 			}
 
@@ -86,7 +85,7 @@
 </script>
 
 <form method="POST" use:enhance class="grid gap-4">
-	<div class="max-h-[450px] space-y-2 overflow-y-auto">
+	<div class="max-h-[450px] space-y-2 overflow-y-auto pb-1">
 		{#each $formData.participants, index}
 			<div class="rounded-lg border p-4" transition:scale={{ duration: 200, easing: quartInOut }}>
 				<div class="mb-4 flex items-center justify-between">
@@ -167,7 +166,7 @@
 		{/each}
 	</div>
 	<Button onclick={addParticipant} variant="outline" class="mt-2 w-full" type="button">
-		Add Participant <PlusCircle class="ml-2 h-4 w-4" />
+		Add Participant <PlusCircle class="h-4 w-4" />
 	</Button>
-	<Form.Button class="self-end">Register Participants</Form.Button>
+	<Form.Button>Register Participants</Form.Button>
 </form>
