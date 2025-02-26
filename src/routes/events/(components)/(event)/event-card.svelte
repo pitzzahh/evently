@@ -84,7 +84,7 @@
 						<ChevronRightIcon />
 					</Button>
 				</div>
-				<div class="absolute -right-6 -top-10">
+				<div class="absolute -right-6 -top-14">
 					{@render StatusPill(
 						start_date &&
 							end_date &&
