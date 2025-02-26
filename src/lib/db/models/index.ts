@@ -18,7 +18,14 @@ export class AttendanceRecordCollection extends Collection<AttendanceRecord> {
     super({
       name: 'attendance_records',
       reactivity: svelteReactivityAdapter(),
-      persistence: createOPFSAdapter('attendance_records.json')
+      persistence: createOPFSAdapter('attendance_records.json'),
+      transform: (d) => ({
+        ...d,
+        time_in: d.time_in ? new Date(d.time_in) : undefined,
+        time_out: d.time_out ? new Date(d.time_out) : undefined,
+        created: d.created ? new Date(d.created) : undefined,
+        updated: d.updated ? new Date(d.updated) : undefined
+      })
     })
     if (!data) return
     this.id = data.id;
@@ -51,7 +58,17 @@ export class EventScheduleCollection extends Collection<EventSchedule> {
     super({
       name: 'event_schedules',
       reactivity: svelteReactivityAdapter(),
-      persistence: createOPFSAdapter('event_schedules.json')
+      persistence: createOPFSAdapter('event_schedules.json'),
+      transform: (d) => ({
+        ...d,
+        event_date: new Date(d.event_date),
+        am_start: d.am_start ? new Date(d.am_start) : undefined,
+        am_end: d.am_end ? new Date(d.am_end) : undefined,
+        pm_start: d.pm_start ? new Date(d.pm_start) : undefined,
+        pm_end: d.pm_end ? new Date(d.pm_end) : undefined,
+        created: d.created ? new Date(d.created) : undefined,
+        updated: d.updated ? new Date(d.updated) : undefined
+      })
     })
     if (!data) return
     this.id = data.id;
@@ -91,7 +108,14 @@ export class EventDetailsCollection extends Collection<EventDetails> {
     super({
       name: 'event_details',
       reactivity: svelteReactivityAdapter(),
-      persistence: createOPFSAdapter('event_details.json')
+      persistence: createOPFSAdapter('event_details.json'),
+      transform: (d) => ({
+        ...d,
+        start_date: new Date(d.start_date),
+        end_date: new Date(d.end_date),
+        created: d.created ? new Date(d.created) : undefined,
+        updated: d.updated ? new Date(d.updated) : undefined
+      })
     })
     if (!data) return
     this.id = data.id;
@@ -142,7 +166,12 @@ export class ParticipantCollection extends Collection<Participant> {
     super({
       name: 'participants',
       reactivity: svelteReactivityAdapter(),
-      persistence: createOPFSAdapter('participants.json')
+      persistence: createOPFSAdapter('participants.json'),
+      transform: (d) => ({
+        ...d,
+        created: d.created ? new Date(d.created) : undefined,
+        updated: d.updated ? new Date(d.updated) : undefined
+      })
     })
     if (!data) return;
     this.id = data.id;
@@ -174,7 +203,12 @@ export class QRCodeCollection extends Collection<QRCode> {
     super({
       name: 'qr_codes',
       reactivity: svelteReactivityAdapter(),
-      persistence: createOPFSAdapter('qr_codes.json')
+      persistence: createOPFSAdapter('qr_codes.json'),
+      transform: (d) => ({
+        ...d,
+        created: d.created ? new Date(d.created) : undefined,
+        updated: d.updated ? new Date(d.updated) : undefined
+      })
     })
     if (!data) return;
     this.id = data.id;
