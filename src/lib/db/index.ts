@@ -1,6 +1,5 @@
 import { AttendanceRecordCollection, EventScheduleCollection, EventDetailsCollection, ParticipantCollection, QRCodeCollection } from "./models";
-
-export class Collections {
+class Collections {
   private static instance: Collections;
 
   public ATTENDANCE_RECORDS_COLLECTION: AttendanceRecordCollection;
