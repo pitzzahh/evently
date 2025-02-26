@@ -65,12 +65,8 @@
 			<div class="relative flex w-full items-start justify-between">
 				<div class="grid place-content-start gap-1">
 					<p>
-						{'Some time'}
-						<!-- {start_date?.toLocaleTimeString([], {
-							hour: '2-digit',
-							minute: '2-digit',
-							hour12: true
-						})} -->
+						{difference_in_days}
+						{difference_in_days > 1 ? 'days' : 'day'} event
 					</p>
 					<h3 class="text-lg font-semibold text-gray-900 dark:text-white">{event_name}</h3>
 					<div class="flex items-center gap-1 text-muted-foreground">
