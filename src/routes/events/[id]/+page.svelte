@@ -25,8 +25,20 @@
 		event_details: undefined,
 		event_schedules: [],
 		participants: [],
-		see_more: false
+		see_more: true
 	});
+
+	const event_status = $derived(
+		comp_state.event_details?.start_date &&
+			comp_state.event_details?.end_date &&
+			new Date() >= new Date(comp_state.event_details.start_date) &&
+			new Date() <= new Date(comp_state.event_details.end_date)
+			? 'ongoing'
+			: comp_state.event_details?.end_date &&
+				  new Date() > new Date(comp_state.event_details.end_date)
+				? 'finished'
+				: 'upcoming'
+	);
 
 	watch(
 		[
@@ -64,17 +76,7 @@
 		<h2 class="text-5xl font-semibold">{comp_state.event_details?.event_name ?? 'N/A'}</h2>
 
 		<div class="flex items-center gap-2">
-			{@render StatusPill(
-				comp_state.event_details?.start_date &&
-					comp_state.event_details?.end_date &&
-					new Date() >= new Date(comp_state.event_details.start_date) &&
-					new Date() <= new Date(comp_state.event_details.end_date)
-					? 'ongoing'
-					: comp_state.event_details?.end_date &&
-						  new Date() > new Date(comp_state.event_details.end_date)
-						? 'finished'
-						: 'upcoming'
-			)}
+			{@render StatusPill(event_status)}
 
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger>
@@ -172,8 +174,14 @@
 						<p>95</p>
 					</div>
 					<div class="flex justify-between">
-						<p class="text-muted-foreground">Attended</p>
-						<p>5</p>
+						<p class="text-muted-foreground">
+							{#if event_status === 'upcoming' || event_status === 'ongoing'}
+								Attending
+							{:else if event_status === 'finished'}
+								Attended
+							{/if}
+						</p>
+						<p>{comp_state.participants.length}</p>
 					</div>
 				</div>
 			</div>
