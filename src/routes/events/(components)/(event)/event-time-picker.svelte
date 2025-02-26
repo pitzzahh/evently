@@ -2,7 +2,7 @@
 	import type { EventSchedule } from '@/db/models/types';
 	import { TimeComboBox } from '..';
 	import { time_options } from '@/constants';
-	import { formatDateToTimeOption } from '@/utils/format';
+	import { formatDate, formatDateToTimeOption } from '@/utils/format';
 
 	let {
 		event_date,
@@ -23,14 +23,6 @@
 	} = $props();
 	let formatted_date = formatDate(event_date.event_date);
 
-	function formatDate(date: Date): string {
-		return date.toLocaleDateString('en-US', {
-			weekday: 'short',
-			month: 'short',
-			day: 'numeric'
-		});
-	}
-
 	function getFilteredEndTimes(startTime: string) {
 		const startIndex = time_options.indexOf(startTime);
 		return time_options.slice(startIndex + 1);
@@ -41,7 +33,7 @@
 	}
 </script>
 
-<div class="flex w-full gap-2 p-3 border rounded-xl">
+<div class="flex w-full gap-2 rounded-xl border p-3">
 	<div
 		class="flex w-full items-center gap-4 rounded-lg border bg-gray-700/10 p-4 dark:bg-[#1C1E20]"
 	>
@@ -138,7 +130,7 @@
 	is_selection_disabled?: boolean;
 	onTimeSelect: (time: string) => void;
 })}
-	<div class="flex w-full items-center justify-between ">
+	<div class="flex w-full items-center justify-between">
 		<div class="flex items-center gap-2">
 			<p class="text-sm text-muted-foreground">{period_title}</p>
 		</div>
