@@ -9,18 +9,23 @@
 	interface AddParticipantsDialogProps {
 		add_participants_form: SuperValidated<AddParticipantsSchema>;
 		event_id: string;
+		disabled?: boolean;
 		open_add_participants_dialog?: boolean;
 	}
 
 	let {
 		add_participants_form,
 		event_id,
+		disabled = false,
 		open_add_participants_dialog = $bindable(false)
 	}: AddParticipantsDialogProps = $props();
 </script>
 
 <Dialog.Root bind:open={open_add_participants_dialog}>
-	<Dialog.Trigger class={buttonVariants({ class: 'rounded-lg border px-4 py-3 text-sm' })}>
+	<Dialog.Trigger
+		{disabled}
+		class={buttonVariants({ class: 'rounded-lg border px-4 py-3 text-sm' })}
+	>
 		Add Participants <Plus class="size-4" />
 	</Dialog.Trigger>
 	<Dialog.Content class="max-w-[750px]">

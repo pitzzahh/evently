@@ -126,6 +126,7 @@
 					<ParticipantDialog
 						add_participants_form={data.add_participants_form}
 						event_details={comp_state.event_details}
+						disable_add_participants={event_status === 'finished' || event_status === 'ongoing'}
 					/>
 				</div>
 
