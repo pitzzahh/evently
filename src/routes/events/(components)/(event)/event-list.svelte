@@ -57,7 +57,7 @@
 				}
 			);
 
-			console.log(events_cursor.count);
+			$inspect(events_cursor);
 
 			// Ideally, like most paginated endpoints, this should return the data
 			// you've requested for your page, as well as the total amount of data
@@ -110,6 +110,7 @@
 				}
 			}
 		);
+		$inspect(events_cursor);
 		comp_state.infinite_loader.events = events_cursor.fetch().filter((event) => {
 			if (type === 'upcoming') {
 				return new Date(event.start_date) >= current_date;
@@ -117,7 +118,6 @@
 				return new Date(event.end_date) < current_date;
 			}
 		});
-		$inspect(comp_state.infinite_loader.events);
 		return () => events_cursor.cleanup();
 	});
 </script>
