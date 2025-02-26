@@ -9,11 +9,18 @@
 			event_to_edit: null
 		}
 	);
+
+
+	// $effect(() => ({
+
+	// }))
 </script>
 
 <h2 class="mb-4 text-4xl font-semibold">Edit Event</h2>
 <EventForm
 	event_form={data.event_form}
-	event_to_edit={data.event_to_edit}
-	event_schedules={data.event_schedules}
+
 />
+<!-- 
+event_to_edit={data.event_to_edit}
+event_schedules={data.event_schedules} -->
