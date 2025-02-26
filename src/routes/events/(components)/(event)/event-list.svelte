@@ -107,13 +107,22 @@
 				? { start_date: { $gte: current_date } }
 				: { end_date: { $lt: current_date } };
 
-		const events_cursor = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(query, {
-			limit: comp_state.infinite_loader.limit,
-			sort: {
-				start_date: type === 'upcoming' ? 1 : -1
+		const events_cursor = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(
+			{},
+			{
+				limit: comp_state.infinite_loader.limit,
+				sort: {
+					start_date: type === 'upcoming' ? 1 : -1
+				}
+			}
+		);
+		comp_state.infinite_loader.events = events_cursor.fetch().filter((e) => {
+			if (type === 'upcoming') {
+				return new Date(e.start_date) >= current_date;
+			} else {
+				return new Date(e.end_date) < current_date;
 			}
 		});
-		comp_state.infinite_loader.events = events_cursor.fetch();
 	});
 </script>
 
