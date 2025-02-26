@@ -8,9 +8,9 @@
 		event_date,
 		day,
 		updateDateEventPeriodStartEnd,
-		isSelectionDisabled
+		is_selection_disabled
 	}: {
-		isSelectionDisabled?: boolean;
+		is_selection_disabled?: boolean;
 		event_date:  Omit<EventSchedule, 'event_id' | 'updated' | 'created'>;
 		updateDateEventPeriodStartEnd?: (params: {
 			id: string;
@@ -55,7 +55,7 @@
 					if (updateDateEventPeriodStartEnd)
 						updateDateEventPeriodStartEnd({ id: event_date.id, am_start: time });
 				},
-				isSelectionDisabled
+				is_selection_disabled
 			})}
 
 			<!-- AM END -->
@@ -67,7 +67,7 @@
 					if (updateDateEventPeriodStartEnd)
 						updateDateEventPeriodStartEnd({ id: event_date.id, am_end: time });
 				},
-				isSelectionDisabled
+				is_selection_disabled
 			})}
 		</div>
 
@@ -96,7 +96,7 @@
 					if (updateDateEventPeriodStartEnd)
 						updateDateEventPeriodStartEnd({ id: event_date.id, pm_start: time });
 				},
-				isSelectionDisabled
+				is_selection_disabled
 			})}
 
 			<!-- PM END -->
@@ -108,7 +108,7 @@
 					if (updateDateEventPeriodStartEnd)
 						updateDateEventPeriodStartEnd({ id: event_date.id, pm_end: time });
 				},
-				isSelectionDisabled
+				is_selection_disabled
 			})}
 		</div>
 
@@ -138,12 +138,12 @@
 	period_title,
 	time_options,
 	selected_time,
-	isSelectionDisabled
+	is_selection_disabled
 }: {
 	period_title: string;
 	selected_time: string;
 	time_options: string[];
-	isSelectionDisabled?: boolean;
+	is_selection_disabled?: boolean;
 	onTimeSelect: (time: string) => void;
 })}
 	<div class="flex w-full max-w-[195px] items-center justify-between gap-4">
@@ -156,7 +156,7 @@
 				{time_options}
 				{selected_time}
 				{onTimeSelect}
-				isDisabled={isSelectionDisabled}
+				is_disabled={is_selection_disabled}
 			/>
 		</div>
 	</div>

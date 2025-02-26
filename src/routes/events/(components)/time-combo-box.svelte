@@ -10,12 +10,12 @@
 		time_options,
 		selected_time,
 		onTimeSelect,
-		isDisabled
+		is_disabled
 	}: {
 		time_options: string[];
 		selected_time: string;
 		onTimeSelect: (new_time: string) => void;
-		isDisabled?: boolean;
+		is_disabled?: boolean;
 	} = $props();
 
 	let open = $state(false);
@@ -33,10 +33,13 @@
 </script>
 
 <Popover.Root bind:open>
-	<Popover.Trigger bind:ref={triggerRef} disabled={isDisabled}>
+	<Popover.Trigger bind:ref={triggerRef} disabled={is_disabled}>
 		{#snippet child({ props })}
 			<button
-				class="w-[120px] flex items-center justify-center gap-2 rounded-sm border bg-primary p-2 px-3 py-1 text-sm text-white active:scale-95 active:opacity-60 dark:border-white/20"
+				class={cn(
+					'flex w-[120px] items-center justify-center gap-2 rounded-sm border bg-primary p-2 px-3 py-1 text-sm text-white active:scale-95 active:opacity-60 dark:border-white/20',
+					is_disabled && 'cursor-not-allowed'
+				)}
 				{...props}
 			>
 				{selected_time}

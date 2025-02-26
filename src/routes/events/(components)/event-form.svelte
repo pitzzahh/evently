@@ -35,6 +35,7 @@
 	import { hasRequiredData } from '@/utils/validation';
 	import { Label } from '@/components/ui/label';
 	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
 
 	interface ComponentState {
 		start_value: DateValue | undefined;
@@ -71,7 +72,7 @@
 				difference_in_days,
 				start_date: $formData.start_date,
 				end_date: $formData.end_date,
-				type: "other"
+				type: 'other'
 			});
 
 			goto(`/events/${added_event_details_id}`);
@@ -100,6 +101,10 @@
 		event_dates: []
 	});
 
+	onMount(() => {
+		handleGenerateEventDates();
+	});
+
 	function getDatesInRange(start: Date, end: Date): Date[] {
 		const date_arr = [];
 		let currentDate = new Date(start);
@@ -115,6 +120,7 @@
 	function handleGenerateEventDates() {
 		if (!comp_state.date_range?.end && !comp_state.date_range?.start) {
 			comp_state.event_dates = [];
+			console.log('true');
 		}
 
 		if (comp_state.date_range?.start) {
@@ -316,20 +322,25 @@
 		</Popover.Root>
 	</div>
 
-	<div
+	<!-- <div
 		class={cn({
-			hidden: !hasRequiredData($formData, ['title', 'location', 'description'])
+			hidden: !hasRequiredData($formData, ['title', 'location'])
 		})}
-	>
+	> -->
 		<Label>Time</Label>
 		<div class="max-h-[400px] overflow-y-auto">
 			<div class="flex flex-col gap-2 pr-1">
 				{#each comp_state.event_dates as event_date, index}
-					<EventTimePicker {event_date} day={index + 1} {updateDateEventPeriodStartEnd} />
+					<EventTimePicker
+						is_selection_disabled={!hasRequiredData($formData, ['title', 'location'])}
+						{event_date}
+						day={index + 1}
+						{updateDateEventPeriodStartEnd}
+					/>
 				{/each}
 			</div>
 		</div>
-	</div>
+	<!-- </div> -->
 	<Form.Button
 		disabled={!hasRequiredData($formData, [
 			'title',

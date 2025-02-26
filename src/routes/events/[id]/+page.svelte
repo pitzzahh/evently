@@ -174,7 +174,7 @@
 
 	<div class="grid gap-2">
 		{#each comp_state.event_schedules as event_date, index}
-			<EventTimePicker {event_date} day={index + 1} isSelectionDisabled={true} />
+			<EventTimePicker {event_date} day={index + 1} is_selection_disabled={true} />
 		{/each}
 	</div>
 </div>
