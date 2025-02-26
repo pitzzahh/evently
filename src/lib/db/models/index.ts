@@ -110,6 +110,7 @@ export class EventDetailsCollection extends Collection<EventDetails> {
   id!: string;
   event_name!: string;
   type!: 'meeting' | 'seminar' | 'workshop' | 'conference' | 'webinar' | 'other';
+  settings_id!: string;
   location!: string;
   description?: string;
   is_multi_day?: boolean;
@@ -118,7 +119,6 @@ export class EventDetailsCollection extends Collection<EventDetails> {
   end_date!: Date;
   created?: Date;
   updated?: Date;
-  settings!: Settings;
 
   constructor(data?: EventDetails) {
     super({
@@ -131,11 +131,6 @@ export class EventDetailsCollection extends Collection<EventDetails> {
         end_date: new Date(d.end_date),
         created: d.created ? new Date(d.created) : undefined,
         updated: d.updated ? new Date(d.updated) : undefined,
-        settings: {
-          ...d.settings,
-          created: d.settings.created ? new Date(d.settings.created) : undefined,
-          updated: d.settings.updated ? new Date(d.settings.updated) : undefined
-        }
       }),
       indices: [
         createIndex('id'),
