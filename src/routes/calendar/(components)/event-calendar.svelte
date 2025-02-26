@@ -5,7 +5,10 @@
 	import { getLocalTimeZone, type DateValue } from '@internationalized/date';
 	import { EventCell } from '.';
 	import type { EventDetails } from '@/db/models/types';
-
+	import * as Popover from '@/components/ui/popover/index.js';
+	import { Label } from '@/components/ui/label/index.js';
+	import { buttonVariants } from '@/components/ui/button/index.js';
+	import { Input } from '@/components/ui/input/index.js';
 	let {
 		ref = $bindable(null),
 		placeholder = $bindable(),
@@ -21,10 +24,14 @@
 
 	// Get events for a specific date
 	function getDateEvents(date: DateValue) {
+		console.log(events);
 		return events.filter((event) => {
-			const isAfterStart = date.toDate(getLocalTimeZone()).getTime() >= event.start_date.getTime();
-			const isBeforeEnd = date.toDate(getLocalTimeZone()).getTime() <= event.end_date.getTime();
-			return isAfterStart && isBeforeEnd;
+			// Check if the date falls within the event's duration (inclusive)
+			const currentDateTime = date.toDate(getLocalTimeZone()).getTime();
+			const startDateTime = event.start_date.getTime();
+			const endDateTime = event.end_date.getTime();
+
+			return currentDateTime >= startDateTime && currentDateTime <= endDateTime;
 		});
 	}
 </script>
@@ -67,9 +74,9 @@
 											{@const events = getDateEvents(date)}
 											<div class="flex h-full flex-col">
 												<div class="flex justify-between p-1">
-													<Calendar.Day />
+													<Calendar.Day data-outside-month={true} />
 												</div>
-												<div class="relative flex-1">
+												<div class="absolute flex-1">
 													{#each events.slice(0, 4) as event, i}
 														<EventCell
 															{event}
@@ -80,11 +87,44 @@
 														/>
 													{/each}
 													{#if events.length > 4}
-														<button
-															class="absolute bottom-0 left-0 w-full px-2 py-0.5 text-xs text-muted-foreground hover:bg-muted"
-														>
-															+{events.length - 4} more
-														</button>
+														<Popover.Root>
+															<Popover.Trigger
+																class={buttonVariants({
+																	variant: 'outline',
+																	size: 'xs',
+																	className:
+																		'absolute bottom-0 left-0 w-full px-2 py-0.5 text-xs text-muted-foreground hover:bg-muted'
+																})}>+{events.length - 4} more</Popover.Trigger
+															>
+															<Popover.Content class="w-80">
+																<div class="grid gap-4">
+																	<div class="space-y-2">
+																		<h4 class="font-medium leading-none">Dimensions</h4>
+																		<p class="text-sm text-muted-foreground">
+																			Set the dimensions for the layer.
+																		</p>
+																	</div>
+																	<div class="grid gap-2">
+																		<div class="grid grid-cols-3 items-center gap-4">
+																			<Label for="width">Width</Label>
+																			<Input id="width" value="100%" class="col-span-2 h-8" />
+																		</div>
+																		<div class="grid grid-cols-3 items-center gap-4">
+																			<Label for="maxWidth">Max. width</Label>
+																			<Input id="maxWidth" value="300px" class="col-span-2 h-8" />
+																		</div>
+																		<div class="grid grid-cols-3 items-center gap-4">
+																			<Label for="height">Height</Label>
+																			<Input id="height" value="25px" class="col-span-2 h-8" />
+																		</div>
+																		<div class="grid grid-cols-3 items-center gap-4">
+																			<Label for="maxHeight">Max. height</Label>
+																			<Input id="maxHeight" value="none" class="col-span-2 h-8" />
+																		</div>
+																	</div>
+																</div>
+															</Popover.Content>
+														</Popover.Root>
 													{/if}
 												</div>
 											</div>
