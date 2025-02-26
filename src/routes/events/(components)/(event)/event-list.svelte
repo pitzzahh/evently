@@ -12,6 +12,7 @@
 	import { Button } from '@/components/ui/button';
 	import { onMount } from 'svelte';
 	import type { Selector } from '@signaldb/core';
+	import { watch } from 'runed';
 
 	interface ComponentState {
 		infinite_loader: {
@@ -100,30 +101,30 @@
 		}
 	}
 
-	onMount(() => {
-		const current_date = new Date();
-		const query: Selector<EventDetails> =
-			type === 'upcoming'
-				? { start_date: { $gte: current_date } }
-				: { end_date: { $lt: current_date } };
-
-		const events_cursor = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(
-			{},
-			{
-				limit: comp_state.infinite_loader.limit,
-				sort: {
-					start_date: type === 'upcoming' ? 1 : -1
+	watch(
+		() => COLLECTIONS.EVENT_DETAILS_COLLECTION.isLoading(),
+		() => {
+			const current_date = new Date();
+			const events_cursor = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(
+				{},
+				{
+					limit: comp_state.infinite_loader.limit,
+					sort: {
+						start_date: type === 'upcoming' ? 1 : -1
+					}
 				}
-			}
-		);
-		comp_state.infinite_loader.events = events_cursor.fetch().filter((e) => {
-			if (type === 'upcoming') {
-				return new Date(e.start_date) >= current_date;
-			} else {
-				return new Date(e.end_date) < current_date;
-			}
-		});
-	});
+			);
+			comp_state.infinite_loader.events = events_cursor.fetch().filter((event) => {
+				if (type === 'upcoming') {
+					return new Date(event.start_date).getTime() > current_date.getTime();
+				} else {
+					return new Date(event.end_date).getTime() < current_date.getTime();
+				}
+			});
+
+			return () => events_cursor.cleanup();
+		}
+	);
 </script>
 
 <Timeline style="width: 100%;  padding: 0;">
