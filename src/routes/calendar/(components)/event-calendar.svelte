@@ -76,7 +76,7 @@
 												<div class="flex justify-between p-1">
 													<Calendar.Day data-outside-month={true} />
 												</div>
-												<div class="absolute flex-1">
+												<div class="relative flex-1">
 													{#each events.slice(0, 4) as event, i}
 														<EventCell
 															{event}
