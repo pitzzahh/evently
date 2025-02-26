@@ -5,7 +5,7 @@
 	import { EventTimePicker, ParticipantDialog } from '@routes/events/(components)';
 	import * as DropdownMenu from '@/components/ui/dropdown-menu/index.js';
 	import type { EventSchedule, EventDetails } from '@/db/models/types';
-	import { scale } from 'svelte/transition';
+	import { fly } from 'svelte/transition';
 	import { COLLECTIONS } from '@/db/index';
 	import type { Participant } from '@/db/models/types';
 	import { formatDateTime } from '@/utils/format';
@@ -71,7 +71,7 @@
 	);
 </script>
 
-<div in:scale class="grid gap-6">
+<div in:fly={{ y: 20 }} class="grid gap-6">
 	<div class="flex items-center justify-between">
 		<h2 class="text-5xl font-semibold">{comp_state.event_details?.event_name ?? 'N/A'}</h2>
 
