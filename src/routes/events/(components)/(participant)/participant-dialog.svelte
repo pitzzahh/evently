@@ -27,7 +27,9 @@
 
 	watch([() => COLLECTIONS.PARTICIPANT_COLLECTION.isLoading()], () => {
 		const participants_cursor = COLLECTIONS.PARTICIPANT_COLLECTION.find(
-			{},
+			{
+				event_id: event_details.id
+			},
 			{ fieldTracking: true }
 		);
 

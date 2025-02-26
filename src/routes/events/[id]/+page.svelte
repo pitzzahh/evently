@@ -36,7 +36,9 @@
 		],
 		() => {
 			const participants_cursor = COLLECTIONS.PARTICIPANT_COLLECTION.find(
-				{},
+				{
+					event_id: data.event_id
+				},
 				{ fieldTracking: true }
 			);
 			const event_schedule_cursor = COLLECTIONS.EVENT_SCHEDULE_COLLECTION.find(
