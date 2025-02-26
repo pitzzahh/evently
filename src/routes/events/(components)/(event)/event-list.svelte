@@ -92,26 +92,23 @@
 		}
 	}
 
-	watch(
-		() => COLLECTIONS.EVENT_DETAILS_COLLECTION.isLoading(),
-		() => {
-			const current_date = new Date();
-			const events_cursor = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(
-				{
-					end_date: type === 'upcoming' ? { $gte: current_date } : { $lte: current_date }
-				},
-				{
-					limit: comp_state.infinite_loader.limit,
-					sort: {
-						start_date: type === 'upcoming' ? 1 : -1
-					}
+	watch([() => COLLECTIONS.EVENT_DETAILS_COLLECTION.isLoading()], () => {
+		const current_date = new Date();
+		const events_cursor = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(
+			{
+				end_date: type === 'upcoming' ? { $gte: current_date } : { $lte: current_date }
+			},
+			{
+				limit: comp_state.infinite_loader.limit,
+				sort: {
+					start_date: type === 'upcoming' ? 1 : -1
 				}
-			);
-			comp_state.infinite_loader.events = events_cursor.fetch();
-			$inspect(comp_state.infinite_loader.events);
-			return () => events_cursor.cleanup();
-		}
-	);
+			}
+		);
+		comp_state.infinite_loader.events = events_cursor.fetch();
+		$inspect(comp_state.infinite_loader.events);
+		return () => events_cursor.cleanup();
+	});
 </script>
 
 <Timeline style="width: 100%;  padding: 0;">
