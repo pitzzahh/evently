@@ -17,7 +17,7 @@
 	import { time_options } from '@/constants';
 	import { toast } from 'svelte-sonner';
 	import { COLLECTIONS } from '@/db/index';
-	import type { EventSchedule } from '@/db/models/types';
+	import type { EventDetails, EventSchedule } from '@/db/models/types';
 	import {
 		createDate,
 		extractHoursAndMinutes,
@@ -31,6 +31,8 @@
 	import * as ImageCropper from '@/components/custom/image-cropper';
 
 	interface EventFormProps {
+		event_to_edit?: EventDetails;
+		event_schedules?: EventSchedule[];
 		event_form: SuperValidated<EventSchema>;
 	}
 
@@ -43,7 +45,7 @@
 		event_dates: Omit<EventSchedule, 'event_id' | 'updated' | 'created'>[];
 	}
 
-	let { event_form }: EventFormProps = $props();
+	let { event_form, event_schedules, event_to_edit }: EventFormProps = $props();
 
 	const form = superForm(event_form, {
 		SPA: true,
@@ -93,16 +95,28 @@
 	let comp_state = $state<ComponentState>({
 		start_value: undefined,
 		date_range: {
-			start: new CalendarDate(
-				current_date.getFullYear(),
-				current_date.getMonth() + 1,
-				current_date.getDate()
-			),
-			end: new CalendarDate(
-				current_date.getFullYear(),
-				current_date.getMonth() + 1,
-				current_date.getDate()
-			)
+			start: event_to_edit?.start_date
+				? new CalendarDate(
+						event_to_edit.start_date.getFullYear(),
+						event_to_edit.start_date.getMonth() + 1,
+						event_to_edit.start_date.getDate()
+					)
+				: new CalendarDate(
+						current_date.getFullYear(),
+						current_date.getMonth() + 1,
+						current_date.getDate()
+					),
+			end: event_to_edit?.end_date
+				? new CalendarDate(
+						event_to_edit.end_date.getFullYear(),
+						event_to_edit.end_date.getMonth() + 1,
+						event_to_edit.end_date.getDate()
+					)
+				: new CalendarDate(
+						current_date.getFullYear(),
+						current_date.getMonth() + 1,
+						current_date.getDate()
+					)
 		},
 		event_dates: []
 	});
@@ -235,6 +249,15 @@
 		handleGenerateEventDates();
 		$formData.start_date = comp_state.date_range.start.toDate(getLocalTimeZone());
 		$formData.end_date = comp_state.date_range.end.toDate(getLocalTimeZone());
+	});
+
+	$effect(() => {
+		if (event_to_edit) {
+			($formData.description = event_to_edit.description || ''),
+				($formData.title = event_to_edit.event_name || ''),
+				($formData.is_multi_day_event = event_to_edit.is_multi_day || false),
+				($formData.location = event_to_edit.location || '');
+		}
 	});
 </script>
 
