@@ -6,6 +6,16 @@ const config = {
 	preprocess: vitePreprocess(),
 	kit: {
 		adapter: adapter(),
+		csp: {
+			directives: {
+				'default-src': ['self'],
+				'script-src': ['self', 'unsafe-inline', 'unsafe-eval'],
+				'style-src': ['self', 'unsafe-inline'],
+				'base-uri': ['self'],
+				'form-action': ['self'],
+				'img-src': ['self', 'data:', 'blob:']
+			}
+		},
 		alias: {
 			"@/*": "./src/lib/*",
 			"@routes": "./src/routes",
