@@ -11,7 +11,7 @@
 		is_selection_disabled
 	}: {
 		is_selection_disabled?: boolean;
-		event_date:  Omit<EventSchedule, 'event_id' | 'updated' | 'created'>;
+		event_date: Omit<EventSchedule, 'event_id' | 'updated' | 'created'>;
 		updateDateEventPeriodStartEnd?: (params: {
 			id: string;
 			am_start?: string;
@@ -41,7 +41,7 @@
 	}
 </script>
 
-<div class="flex w-full gap-2">
+<div class="flex w-full gap-2 p-3 border rounded-xl">
 	<div
 		class="flex w-full items-center gap-4 rounded-lg border bg-gray-700/10 p-4 dark:bg-[#1C1E20]"
 	>
@@ -138,7 +138,7 @@
 	is_selection_disabled?: boolean;
 	onTimeSelect: (time: string) => void;
 })}
-	<div class="flex w-full max-w-[195px] items-center justify-between gap-4">
+	<div class="flex w-full items-center justify-between ">
 		<div class="flex items-center gap-2">
 			<p class="text-sm text-muted-foreground">{period_title}</p>
 		</div>
