@@ -5,7 +5,11 @@ import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 const config = {
 	preprocess: vitePreprocess(),
 	kit: {
-		adapter: adapter(),
+		adapter: adapter({
+			precompress: true,
+			strict: false,
+			fallback: 'index.html'
+		}),
 		csp: {
 			directives: {
 				'default-src': ['self'],
@@ -15,6 +19,9 @@ const config = {
 				'form-action': ['self'],
 				'img-src': ['self', 'data:', 'blob:']
 			}
+		},
+		output: {
+			bundleStrategy: 'single'
 		},
 		alias: {
 			"@/*": "./src/lib/*",
