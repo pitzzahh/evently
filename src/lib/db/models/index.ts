@@ -214,6 +214,10 @@ export class EventDetailsCollection extends Collection<EventDetails> {
     return COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.find({ event_id: event_id ?? this.id, time_in: { $gte: start_date }, time_out: { $lte: end_date }, user_id }).count();
   }
 
+  getSettingByID(id: string) {
+    return COLLECTIONS.SETTINGS_COLLECTION.findOne({ id });
+  }
+
 }
 
 export class ParticipantCollection extends Collection<Participant> {
