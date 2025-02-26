@@ -1,11 +1,19 @@
 <script lang="ts">
-	import { Button } from '@/components/ui/button';
+	import type { EventDetails, EventSchedule } from '@/db/models/types.js';
 	import { EventForm } from '@routes/events/(components)';
-	import { ChevronLeft } from '@/assets/icons';
-	import { browser } from '$app/environment';
-
 	let { data } = $props();
+
+	let comp_state: { event_to_edit: EventDetails | null; event_schedules: EventSchedule[] } = $state(
+		{
+			event_schedules: [],
+			event_to_edit: null
+		}
+	);
 </script>
 
 <h2 class="mb-4 text-4xl font-semibold">Edit Event</h2>
-<EventForm event_form={data.event_form} />
+<EventForm
+	event_form={data.event_form}
+	event_to_edit={data.event_to_edit}
+	event_schedules={data.event_schedules}
+/>
