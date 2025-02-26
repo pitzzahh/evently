@@ -129,7 +129,7 @@
 <Timeline style="width: 100%;  padding: 0;">
 	<InfiniteLoader triggerLoad={loadMore}>
 		{#each comp_state.infinite_loader.events as event, i}
-			<div transition:fly={{ y: 100, duration: 400, delay: i * 100, easing: quartInOut }}>
+			<div transition:fly={{ y: 20, duration: 200, delay: i * 100, easing: quartInOut }}>
 				<EventCard {...event} />
 			</div>
 		{/each}
