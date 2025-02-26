@@ -100,30 +100,6 @@
 		}
 	}
 
-	// watch([() => COLLECTIONS.EVENT_DETAILS_COLLECTION.isLoading()], () => {
-	// 	const events_cursor = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(
-	// 		{},
-	// 		{
-	// 			limit: comp_state.infinite_loader.limit,
-	// 			sort: {
-	// 				start_date: type === 'upcoming' ? 1 : -1
-	// 			}
-	// 		}
-	// 	);
-	// 	const current_date = new Date();
-	// 	const events = events_cursor.fetch();
-	// 	const a = events.filter((event) => {
-	// 		if (type === 'upcoming') {
-	// 			return event.start_date >= current_date;
-	// 		} else {
-	// 			return event.end_date < current_date;
-	// 		}
-	// 	});
-	// 	$inspect(a);
-	// 	comp_state.infinite_loader.events = events;
-	// 	return () => events_cursor.cleanup();
-	// });
-
 	onMount(() => {
 		const current_date = new Date();
 		const query: Selector<EventDetails> =
