@@ -5,18 +5,11 @@ import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 const config = {
 	preprocess: vitePreprocess(),
 	kit: {
-		adapter: adapter({
-			precompress: true,
-			strict: false,
-			fallback: 'index.html'
-		}),
-		output: {
-			bundleStrategy: 'single'
-		},
+		adapter: adapter(),
 		alias: {
 			"@/*": "./src/lib/*",
 			"@routes": "./src/routes",
-		},
+		}
 	}
 };
 
