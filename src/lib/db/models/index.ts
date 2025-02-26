@@ -118,6 +118,7 @@ export class EventDetailsCollection extends Collection<EventDetails> {
   end_date!: Date;
   created?: Date;
   updated?: Date;
+  settings!: Settings;
 
   constructor(data?: EventDetails) {
     super({
@@ -129,7 +130,12 @@ export class EventDetailsCollection extends Collection<EventDetails> {
         start_date: new Date(d.start_date),
         end_date: new Date(d.end_date),
         created: d.created ? new Date(d.created) : undefined,
-        updated: d.updated ? new Date(d.updated) : undefined
+        updated: d.updated ? new Date(d.updated) : undefined,
+        settings: {
+          ...d.settings,
+          created: d.settings.created ? new Date(d.settings.created) : undefined,
+          updated: d.settings.updated ? new Date(d.settings.updated) : undefined
+        }
       }),
       indices: [
         createIndex('id'),
@@ -176,6 +182,43 @@ export class EventDetailsCollection extends Collection<EventDetails> {
   getNumberOfParticipants(event_id?: string) {
     return COLLECTIONS.PARTICIPANT_COLLECTION.find({ event_id: event_id ?? this.id }).count();
   }
+
+  getNumberOfSchedules(event_id?: string) {
+    return COLLECTIONS.EVENT_SCHEDULE_COLLECTION.find({ event_id: event_id ?? this.id }).count();
+  }
+
+  getNumberOfAttendanceRecords(event_id?: string) {
+    return COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.find({ event_id: event_id ?? this.id }).count();
+  }
+
+  getNumberOfAttendanceRecordsByDate(date: Date, event_id?: string) {
+    return COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.find({ event_id: event_id ?? this.id, time_in: { $gte: date }, time_out: { $lte: date } }).count();
+  }
+
+  getNumberOfAttendanceRecordsByDateRange(start_date: Date, end_date: Date, event_id?: string) {
+    return COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.find({ event_id: event_id ?? this.id, time_in: { $gte: start_date }, time_out: { $lte: end_date } }).count();
+  }
+
+  getNumberOfAttendanceRecordsByPeriod(period: string, event_id?: string) {
+    return COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.find({ event_id: event_id ?? this.id, period }).count();
+  }
+
+  getNumberOfAttendanceRecordsByDateAndPeriod(date: Date, period: string, event_id?: string) {
+    return COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.find({ event_id: event_id ?? this.id, time_in: { $gte: date }, time_out: { $lte: date }, period }).count();
+  }
+
+  getNumberOfAttendanceRecordsByDateRangeAndPeriod(start_date: Date, end_date: Date, period: string, event_id?: string) {
+    return COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.find({ event_id: event_id ?? this.id, time_in: { $gte: start_date }, time_out: { $lte: end_date }, period }).count();
+  }
+
+  getNumberOfAttendanceRecordsByDateAndUser(date: Date, user_id: string, event_id?: string) {
+    return COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.find({ event_id: event_id ?? this.id, time_in: { $gte: date }, time_out: { $lte: date }, user_id }).count();
+  }
+
+  getNumberOfAttendanceRecordsByDateRangeAndUser(start_date: Date, end_date: Date, user_id: string, event_id?: string) {
+    return COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.find({ event_id: event_id ?? this.id, time_in: { $gte: start_date }, time_out: { $lte: end_date }, user_id }).count();
+  }
+
 }
 
 export class ParticipantCollection extends Collection<Participant> {
