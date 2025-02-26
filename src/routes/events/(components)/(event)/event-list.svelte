@@ -13,6 +13,7 @@
 	import { onMount } from 'svelte';
 	import type { Selector } from '@signaldb/core';
 	import { watch } from 'runed';
+	import { toast } from 'svelte-sonner';
 
 	interface ComponentState {
 		infinite_loader: {
@@ -47,23 +48,20 @@
 				loaderState.complete();
 				return;
 			}
-			let query: Record<string, any> = {};
+			let query: Selector<EventDetails> = {};
 			const current_date = new Date();
 			if (type === 'upcoming') {
 				query = {
 					$or: [
-						{ start_date: { $gt: current_date.toISOString() } },
+						{ start_date: { $gt: current_date } },
 						{
-							$and: [
-								{ start_date: { $lte: current_date.toISOString() } },
-								{ end_date: { $gte: current_date.toISOString() } }
-							]
+							$and: [{ start_date: { $lte: current_date } }, { end_date: { $gte: current_date } }]
 						}
 					]
 				};
 			} else {
 				query = {
-					end_date: { $lt: current_date.toISOString() }
+					end_date: { $lt: current_date }
 				};
 			}
 			const events_cursor = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(query, {
@@ -101,23 +99,20 @@
 		() => COLLECTIONS.EVENT_DETAILS_COLLECTION.isLoading(),
 		() => {
 			const current_date = new Date();
-			let query: Record<string, any> = {};
+			let query: Selector<EventDetails> = {};
 
 			if (type === 'upcoming') {
 				query = {
 					$or: [
-						{ start_date: { $gt: current_date.toISOString() } },
+						{ start_date: { $gt: current_date } },
 						{
-							$and: [
-								{ start_date: { $lte: current_date.toISOString() } },
-								{ end_date: { $gte: current_date.toISOString() } }
-							]
+							$and: [{ start_date: { $lte: current_date } }, { end_date: { $gte: current_date } }]
 						}
 					]
 				};
 			} else {
 				query = {
-					end_date: { $lt: current_date.toISOString() }
+					end_date: { $lt: current_date }
 				};
 			}
 			const events_cursor = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(query, {
@@ -128,7 +123,6 @@
 			});
 
 			comp_state.infinite_loader.events = events_cursor.fetch();
-			return () => events_cursor.cleanup();
 		}
 	);
 </script>
