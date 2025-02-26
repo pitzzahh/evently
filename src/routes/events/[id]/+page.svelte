@@ -35,26 +35,17 @@
 			() => COLLECTIONS.EVENT_DETAILS_COLLECTION.isLoading()
 		],
 		() => {
-			const participants_cursor = COLLECTIONS.PARTICIPANT_COLLECTION.find(
-				{
-					event_id: data.event_id
-				},
-				{ fieldTracking: true }
-			);
-			const event_schedule_cursor = COLLECTIONS.EVENT_SCHEDULE_COLLECTION.find(
-				{
-					event_id: data.event_id
-				},
-				{ fieldTracking: true }
-			);
+			const participants_cursor = COLLECTIONS.PARTICIPANT_COLLECTION.find({
+				event_id: data.event_id
+			});
+			const event_schedule_cursor = COLLECTIONS.EVENT_SCHEDULE_COLLECTION.find({
+				event_id: data.event_id
+			});
 			comp_state.participants = participants_cursor.fetch();
 			comp_state.event_schedules = event_schedule_cursor.fetch();
-			comp_state.event_details = COLLECTIONS.EVENT_DETAILS_COLLECTION.findOne(
-				{
-					id: data.event_id
-				},
-				{ fieldTracking: true }
-			);
+			comp_state.event_details = COLLECTIONS.EVENT_DETAILS_COLLECTION.findOne({
+				id: data.event_id
+			});
 
 			$inspect(
 				comp_state.event_details?.start_date && comp_state.event_details.start_date > new Date()
@@ -132,7 +123,7 @@
 					</div>
 					<ParticipantDialog
 						add_participants_form={data.add_participants_form}
-						event_details={comp_state.event_details!}
+						event_details={comp_state.event_details}
 					/>
 				</div>
 

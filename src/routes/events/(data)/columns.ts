@@ -39,10 +39,10 @@ export function participantTableColumns(): ColumnDef<Participant>[] {
         return String(row.getValue(id)).toLowerCase().includes(String(value ?? "").toLowerCase());
       }
     }, {
-      accessorKey: "middle_initial",
+      accessorKey: "middle_name",
       header: ({ column }) =>
         renderComponent(DataTableColumnHeader<Participant, unknown>, { column, title: "Middle Name" }),
-      cell: ({ row }) => row.original.middle_initial,
+      cell: ({ row }) => row.original.middle_name,
       filterFn: (row, id, value) => {
         return String(row.getValue(id)).toLowerCase().includes(String(value ?? "").toLowerCase());
       }
