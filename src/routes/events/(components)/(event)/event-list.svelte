@@ -48,9 +48,7 @@
 
 			const current_date = new Date();
 			const events_cursor = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(
-				{
-					end_date: type === 'upcoming' ? { $gte: current_date } : { $lte: current_date }
-				},
+				{},
 				{
 					skip: skip,
 					limit: comp_state.infinite_loader.limit
@@ -95,9 +93,7 @@
 	watch([() => COLLECTIONS.EVENT_DETAILS_COLLECTION.isLoading()], () => {
 		const current_date = new Date();
 		const events_cursor = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(
-			{
-				end_date: type === 'upcoming' ? { $gte: current_date } : { $lte: current_date }
-			},
+			{},
 			{
 				limit: comp_state.infinite_loader.limit,
 				sort: {
