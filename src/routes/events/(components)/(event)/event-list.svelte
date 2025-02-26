@@ -10,10 +10,8 @@
 	import * as Alert from '@/components/ui/alert/index.js';
 	import { CircleAlert } from '@/assets/icons';
 	import { Button } from '@/components/ui/button';
-	import { onMount } from 'svelte';
 	import type { Selector } from '@signaldb/core';
 	import { watch } from 'runed';
-	import { toast } from 'svelte-sonner';
 
 	interface ComponentState {
 		infinite_loader: {
@@ -48,36 +46,30 @@
 				loaderState.complete();
 				return;
 			}
-			let query: Selector<EventDetails> = {};
-			const current_date = new Date();
-			if (type === 'upcoming') {
-				query = {
-					$or: [
-						{ start_date: { $gt: current_date } },
-						{
-							$and: [{ start_date: { $lte: current_date } }, { end_date: { $gte: current_date } }]
-						}
-					]
-				};
-			} else {
-				query = {
-					end_date: { $lt: current_date }
-				};
-			}
-			const events_cursor = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(query, {
-				skip: skip,
-				limit: comp_state.infinite_loader.limit,
-				sort: {
-					start_date: type === 'upcoming' ? 1 : -1
+			const events_cursor = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(
+				{},
+				{
+					skip: skip,
+					limit: comp_state.infinite_loader.limit,
+					sort: {
+						start_date: type === 'upcoming' ? 1 : -1
+					}
 				}
-			});
+			);
 
 			if (!events_cursor.count) {
 				loaderState.error();
 				comp_state.infinite_loader.skip -= 1;
 				return;
 			}
-			const data = events_cursor.fetch();
+			const current_date = new Date();
+			const data = events_cursor.fetch().filter((e) => {
+				if (type === 'upcoming') {
+					return e.start_date > current_date || e.end_date > current_date;
+				} else {
+					return e.end_date < current_date;
+				}
+			});
 
 			if (data.length) {
 				comp_state.infinite_loader.events.push(...data);
@@ -96,33 +88,32 @@
 	}
 
 	watch(
-		() => COLLECTIONS.EVENT_DETAILS_COLLECTION.isLoading(),
+		[
+			() => COLLECTIONS.EVENT_DETAILS_COLLECTION.isLoading(),
+			() => COLLECTIONS.EVENT_DETAILS_COLLECTION.isReady()
+		],
 		() => {
-			const current_date = new Date();
-			let query: Selector<EventDetails> = {};
+			const events_cursor = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(
+				{},
+				{
+					limit: comp_state.infinite_loader.limit,
+					sort: {
+						start_date: type === 'upcoming' ? -1 : 1
+					}
+				}
+			);
 
-			if (type === 'upcoming') {
-				query = {
-					$or: [
-						{ start_date: { $gt: current_date } },
-						{
-							$and: [{ start_date: { $lte: current_date } }, { end_date: { $gte: current_date } }]
-						}
-					]
-				};
-			} else {
-				query = {
-					end_date: { $lt: current_date }
-				};
-			}
-			const events_cursor = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(query, {
-				limit: comp_state.infinite_loader.limit,
-				sort: {
-					start_date: type === 'upcoming' ? 1 : -1
+			const current_date = new Date();
+			comp_state.infinite_loader.events = events_cursor.fetch().filter((e) => {
+				if (type === 'upcoming') {
+					return e.start_date > current_date || e.end_date > current_date;
+				} else {
+					return e.end_date < current_date;
 				}
 			});
 
-			comp_state.infinite_loader.events = events_cursor.fetch();
+			$inspect(comp_state.infinite_loader.events);
+			return () => events_cursor.cleanup();
 		}
 	);
 </script>
