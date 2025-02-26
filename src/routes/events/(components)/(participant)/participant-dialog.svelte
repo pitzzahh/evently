@@ -26,7 +26,7 @@
 	});
 
 	watch(
-		[() => COLLECTIONS.PARTICIPANT_COLLECTION.isLoading(), event_details],
+		[() => COLLECTIONS.PARTICIPANT_COLLECTION.isLoading()],
 		() => {
 			const participants_cursor = COLLECTIONS.PARTICIPANT_COLLECTION.find(
 				{
@@ -59,10 +59,10 @@
 				<div class="grid gap-2">
 					<Dialog.Title>Participants</Dialog.Title>
 					<Dialog.Description
-						>These are the participants of {event_details.event_name}</Dialog.Description
+						>These are the participants of {event_details?.event_name ?? 'N/A'}</Dialog.Description
 					>
 				</div>
-				<AddParticipantsDialog {add_participants_form} event_id={event_details.id} />
+				<AddParticipantsDialog {add_participants_form} event_id={event_details?.id ?? 'N/A'} />
 			</div>
 		</Dialog.Header>
 		<div class="max-h-[500px] overflow-y-auto">
