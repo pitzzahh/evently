@@ -57,7 +57,7 @@
 				}
 			);
 
-			$inspect(events_cursor);
+			$inspect(events_cursor.fetch());
 
 			// Ideally, like most paginated endpoints, this should return the data
 			// you've requested for your page, as well as the total amount of data
@@ -100,7 +100,6 @@
 	}
 
 	watch([() => COLLECTIONS.EVENT_DETAILS_COLLECTION.isLoading()], () => {
-		const current_date = new Date();
 		const events_cursor = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(
 			{},
 			{
@@ -110,14 +109,28 @@
 				}
 			}
 		);
-		$inspect(events_cursor);
-		comp_state.infinite_loader.events = events_cursor.fetch().filter((event) => {
+		const current_date = new Date();
+		const events = events_cursor.fetch();
+		comp_state.infinite_loader.events = events.filter((event) => {
+			const event_start = new Date(event.start_date);
+			const event_end = new Date(event.end_date);
+			console.log({
+				event_start,
+				event_date: event_end,
+				current_date,
+				start_time: event_start.getTime(),
+				end_time: event_end.getTime(),
+				current_time: current_date.getTime(),
+				is_past: event_end.getTime() < current_date.getTime(),
+				is_upcoming: event_start.getTime() > current_date.getTime()
+			});
 			if (type === 'upcoming') {
-				return new Date(event.start_date) >= current_date;
+				return event_start.getTime() > current_date.getTime();
 			} else {
-				return new Date(event.end_date) < current_date;
+				return event_end.getTime() < current_date.getTime();
 			}
 		});
+		$inspect(comp_state.infinite_loader.events);
 		return () => events_cursor.cleanup();
 	});
 </script>
