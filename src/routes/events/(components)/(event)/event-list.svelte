@@ -44,59 +44,55 @@
 			// If there are less results on the first page (page.server loaded data)
 			// than the limit, don't keep trying to fetch more. We're done.
 			if (comp_state.infinite_loader.events.length < comp_state.infinite_loader.limit) {
-				loaderState.complete(); // <--- using loaderState
+				loaderState.complete();
 				return;
 			}
-
-			const events_cursor = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(
-				{},
-				{
-					skip: skip,
-					limit: comp_state.infinite_loader.limit,
-					sort: {
-						start_date: type === 'upcoming' ? 1 : -1
-					}
-				}
-			);
-
-			$inspect(events_cursor.fetch());
-
-			// Ideally, like most paginated endpoints, this should return the data
-			// you've requested for your page, as well as the total amount of data
-			// available to page through
-
-			if (!events_cursor.count) {
-				loaderState.error(); // <--- using loaderState
-
-				// On errors, set the pageNumber back so we can retry
-				// that page's data on the next 'loadMore' attempt
-				comp_state.infinite_loader.skip -= 1;
-				return;
-			}
+			let query: Record<string, any> = {};
 			const current_date = new Date();
-			const data = events_cursor.fetch().filter((event) => {
-				if (type === 'upcoming') {
-					return new Date(event.start_date) >= current_date;
-				} else {
-					return new Date(event.end_date) < current_date;
+			if (type === 'upcoming') {
+				query = {
+					$or: [
+						{ start_date: { $gt: current_date.toISOString() } },
+						{
+							$and: [
+								{ start_date: { $lte: current_date.toISOString() } },
+								{ end_date: { $gte: current_date.toISOString() } }
+							]
+						}
+					]
+				};
+			} else {
+				query = {
+					end_date: { $lt: current_date.toISOString() }
+				};
+			}
+			const events_cursor = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(query, {
+				skip: skip,
+				limit: comp_state.infinite_loader.limit,
+				sort: {
+					start_date: type === 'upcoming' ? 1 : -1
 				}
 			});
 
-			// If we've successfully received data, push it to the reactive state variable
+			if (!events_cursor.count) {
+				loaderState.error();
+				comp_state.infinite_loader.skip -= 1;
+				return;
+			}
+			const data = events_cursor.fetch();
+
 			if (data.length) {
 				comp_state.infinite_loader.events.push(...data);
 			}
 
-			// If there are more (or equal) number of items loaded as are totally available
-			// from the API, don't keep trying to fetch more. We're done.
 			if (comp_state.infinite_loader.events.length >= data.length) {
-				loaderState.complete(); // <--- using loaderState
+				loaderState.complete();
 			} else {
-				loaderState.loaded(); // <--- using loaderState
+				loaderState.loaded();
 			}
 		} catch (error) {
 			console.error(error);
-			loaderState.error(); // <--- using loaderState
+			loaderState.error();
 			comp_state.infinite_loader.skip -= 1;
 		}
 	}
@@ -105,23 +101,33 @@
 		() => COLLECTIONS.EVENT_DETAILS_COLLECTION.isLoading(),
 		() => {
 			const current_date = new Date();
-			const events_cursor = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(
-				{},
-				{
-					limit: comp_state.infinite_loader.limit,
-					sort: {
-						start_date: type === 'upcoming' ? 1 : -1
-					}
-				}
-			);
-			comp_state.infinite_loader.events = events_cursor.fetch().filter((event) => {
-				if (type === 'upcoming') {
-					return new Date(event.start_date).getTime() > current_date.getTime();
-				} else {
-					return new Date(event.end_date).getTime() < current_date.getTime();
+			let query: Record<string, any> = {};
+
+			if (type === 'upcoming') {
+				query = {
+					$or: [
+						{ start_date: { $gt: current_date.toISOString() } },
+						{
+							$and: [
+								{ start_date: { $lte: current_date.toISOString() } },
+								{ end_date: { $gte: current_date.toISOString() } }
+							]
+						}
+					]
+				};
+			} else {
+				query = {
+					end_date: { $lt: current_date.toISOString() }
+				};
+			}
+			const events_cursor = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(query, {
+				limit: comp_state.infinite_loader.limit,
+				sort: {
+					start_date: type === 'upcoming' ? 1 : -1
 				}
 			});
 
+			comp_state.infinite_loader.events = events_cursor.fetch();
 			return () => events_cursor.cleanup();
 		}
 	);

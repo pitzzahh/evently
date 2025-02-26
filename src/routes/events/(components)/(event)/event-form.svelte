@@ -74,6 +74,9 @@
 				end_date: comp_state.event_dates.at(-1)?.pm_end as Date 
 			});
 
+			console.log(comp_state.event_dates.at(0)?.am_start)
+			console.log(comp_state.event_dates.at(-1)?.pm_end)
+
 			COLLECTIONS.EVENT_SCHEDULE_COLLECTION.insertMany(
 				comp_state.event_dates.map((event) => ({
 					...event,
