@@ -3,7 +3,6 @@
 	import { Timeline } from 'svelte-vertical-timeline';
 	import { COLLECTIONS } from '@/db/index';
 	import type { EventDetails } from '@/db/models/types';
-	import { watch } from 'runed';
 	import { fly } from 'svelte/transition';
 	import { quartInOut } from 'svelte/easing';
 	import { InfiniteLoader, loaderState } from 'svelte-infinite';
@@ -11,6 +10,8 @@
 	import * as Alert from '@/components/ui/alert/index.js';
 	import { CircleAlert } from '@/assets/icons';
 	import { Button } from '@/components/ui/button';
+	import { onMount } from 'svelte';
+	import type { Selector } from '@signaldb/core';
 
 	interface ComponentState {
 		infinite_loader: {
@@ -37,7 +38,7 @@
 	async function loadMore() {
 		try {
 			comp_state.infinite_loader.skip += comp_state.infinite_loader.limit;
-			const skip = comp_state.infinite_loader.limit * (comp_state.infinite_loader.skip - 1);
+			const skip = comp_state.infinite_loader.limit * comp_state.infinite_loader.skip;
 
 			// If there are less results on the first page (page.server loaded data)
 			// than the limit, don't keep trying to fetch more. We're done.
@@ -46,18 +47,18 @@
 				return;
 			}
 
-			const current_date = new Date();
 			const events_cursor = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(
-				{
-					end_date: type === 'upcoming' ? { $gte: current_date } : { $lte: current_date }
-				},
+				{},
 				{
 					skip: skip,
-					limit: comp_state.infinite_loader.limit
+					limit: comp_state.infinite_loader.limit,
+					sort: {
+						start_date: type === 'upcoming' ? 1 : -1
+					}
 				}
 			);
 
-			console.log(events_cursor.count);
+			$inspect(events_cursor.fetch());
 
 			// Ideally, like most paginated endpoints, this should return the data
 			// you've requested for your page, as well as the total amount of data
@@ -71,7 +72,14 @@
 				comp_state.infinite_loader.skip -= 1;
 				return;
 			}
-			const data = events_cursor.fetch();
+			const current_date = new Date();
+			const data = events_cursor.fetch().filter((event) => {
+				if (type === 'upcoming') {
+					return new Date(event.start_date) >= current_date;
+				} else {
+					return new Date(event.end_date) < current_date;
+				}
+			});
 
 			// If we've successfully received data, push it to the reactive state variable
 			if (data.length) {
@@ -92,12 +100,15 @@
 		}
 	}
 
-	watch([() => COLLECTIONS.EVENT_DETAILS_COLLECTION.isLoading()], () => {
+	onMount(() => {
 		const current_date = new Date();
+		const query: Selector<EventDetails> =
+			type === 'upcoming'
+				? { start_date: { $gte: current_date } }
+				: { end_date: { $lt: current_date } };
+
 		const events_cursor = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(
-			{
-				end_date: type === 'upcoming' ? { $gte: current_date } : { $lte: current_date }
-			},
+			{},
 			{
 				limit: comp_state.infinite_loader.limit,
 				sort: {
@@ -105,9 +116,13 @@
 				}
 			}
 		);
-		comp_state.infinite_loader.events = events_cursor.fetch();
-		$inspect(comp_state.infinite_loader.events);
-		return () => events_cursor.cleanup();
+		comp_state.infinite_loader.events = events_cursor.fetch().filter((e) => {
+			if (type === 'upcoming') {
+				return new Date(e.start_date) >= current_date;
+			} else {
+				return new Date(e.end_date) < current_date;
+			}
+		});
 	});
 </script>
 
