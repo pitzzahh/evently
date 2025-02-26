@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { StatusPill } from '@/components/snippets';
+	import Badge from '@/components/ui/badge/badge.svelte';
 	import { Button } from '@/components/ui/button';
 	import { COLLECTIONS } from '@/db';
 	import type { EventDetails } from '@/db/models/types';
-	import { formatDate } from '@/utils/format';
+	import { formatDate, formatDateTime } from '@/utils/format';
 	import { ChevronRightIcon, MapPin, UsersRound } from 'lucide-svelte';
 	import { watch } from 'runed';
 	import {
@@ -62,12 +63,13 @@
 		<div
 			class="mb-10 ms-4 rounded-xl border bg-white p-4 transition duration-500 ease-in-out hover:border-black/50 dark:bg-[#1C1E20] dark:hover:border-white/50"
 		>
+			<div class="flex items-center gap-1">
+				<Badge variant="outline">{formatDateTime(new Date(start_date))}</Badge> - <Badge
+					variant="outline">{formatDateTime(new Date(end_date))}</Badge
+				>
+			</div>
 			<div class="relative flex w-full items-start justify-between">
 				<div class="grid place-content-start gap-1">
-					<p>
-						{difference_in_days}
-						{difference_in_days > 1 ? 'days' : 'day'} event
-					</p>
 					<h3 class="text-lg font-semibold text-gray-900 dark:text-white">{event_name}</h3>
 					<div class="flex items-center gap-1 text-muted-foreground">
 						<MapPin class="size-4" />
