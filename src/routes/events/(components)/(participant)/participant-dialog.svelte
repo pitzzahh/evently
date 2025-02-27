@@ -4,7 +4,7 @@
 	import { View } from '@/assets/icons';
 	import { ParticipantDataTable, AddParticipantsDialog } from '..';
 	import type { SuperValidated } from 'sveltekit-superforms';
-	import type { AddParticipantsSchema } from '@/schema/participant';
+	import type { AddParticipantsSchema, ParticipantSchema } from '@/schema/participant';
 	import type { EventDetails, Participant } from '@/db/models/types';
 	import { watch } from 'runed';
 	import { COLLECTIONS } from '@/db';
@@ -13,13 +13,14 @@
 	interface ParticipantDialogProps {
 		add_participants_form: SuperValidated<AddParticipantsSchema>;
 		event_details: EventDetails | undefined;
+		participant_form: SuperValidated<ParticipantSchema>;
 	}
 
 	interface ComponentState {
 		participants: Participant[];
 	}
 
-	let { add_participants_form, event_details }: ParticipantDialogProps = $props();
+	let { add_participants_form, event_details, participant_form }: ParticipantDialogProps = $props();
 
 	let comp_state = $state<ComponentState>({
 		participants: []
@@ -69,7 +70,7 @@
 			{#if COLLECTIONS.PARTICIPANT_COLLECTION.isPulling()}
 				<TableSkeleton />
 			{:else}
-				<ParticipantDataTable participants={comp_state.participants} />
+				<ParticipantDataTable {participant_form} participants={comp_state.participants} />
 			{/if}
 		</div>
 	</Dialog.Content>

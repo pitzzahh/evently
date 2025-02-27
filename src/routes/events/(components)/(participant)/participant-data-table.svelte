@@ -4,15 +4,18 @@
 	import { ParticipantDataTableToolbar } from '..';
 	import { generateOptions } from '@/utils/filter';
 	import type { Participant } from '@/db/models/types';
+	import type { ParticipantSchema } from '@/schema/participant';
+	import type { SuperValidated } from 'sveltekit-superforms';
 
 	export interface ParticipantDataTableProps {
 		participants: Participant[];
+		participant_form: SuperValidated<ParticipantSchema>;
 	}
 
-	let { participants }: ParticipantDataTableProps = $props();
+	let { participants, participant_form }: ParticipantDataTableProps = $props();
 </script>
 
-<DataTable data={participants} columns={participantTableColumns()}>
+<DataTable data={participants} columns={participantTableColumns(participant_form)}>
 	{#snippet data_table_toolbar({ table })}
 		<ParticipantDataTableToolbar
 			{table}
