@@ -4,7 +4,7 @@
 	import type { AddParticipantsSchema } from '@/schema/participant';
 	import { Plus } from '@/assets/icons';
 	import type { SuperValidated } from 'sveltekit-superforms';
-	import { ParticipantForm } from '..';
+	import ParticipantsForm from './participants-form.svelte';
 
 	interface AddParticipantsDialogProps {
 		add_participants_form: SuperValidated<AddParticipantsSchema>;
@@ -29,7 +29,7 @@
 			<Dialog.Description>Fill up the form to add participants</Dialog.Description>
 		</Dialog.Header>
 
-		<ParticipantForm
+		<ParticipantsForm
 			success_callback={() => (open_add_participants_dialog = false)}
 			{add_participants_form}
 			{event_id}
