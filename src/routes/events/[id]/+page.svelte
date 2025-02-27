@@ -122,6 +122,7 @@
 						</div>
 					</div>
 					<ParticipantDialog
+						participant_form={data.participant_form}
 						add_participants_form={data.add_participants_form}
 						event_details={comp_state.event_details}
 					/>
