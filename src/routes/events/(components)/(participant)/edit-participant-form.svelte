@@ -6,25 +6,47 @@
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { toast } from 'svelte-sonner';
 	import type { Participant } from '@/db/models/types';
+	import { COLLECTIONS } from '@/db';
 
 	interface ParticipantFormProps {
 		participant_to_edit?: Participant;
 		participant_form: SuperValidated<ParticipantSchema>;
+		success_callback: () => void;
 	}
 
-	let { participant_form, participant_to_edit }: ParticipantFormProps = $props();
+	let { participant_form, participant_to_edit, success_callback }: ParticipantFormProps = $props();
 	const form = superForm(participant_form, {
 		SPA: true,
 		validators: zodClient(participant_schema),
 		onUpdate: async ({ form }) => {
-			// toast the values
 			if (!form.valid) {
 				toast.error('Form is invalid');
 				return;
 			}
+
+			if (!participant_to_edit) {
+				return;
+			}
+
+			COLLECTIONS.PARTICIPANT_COLLECTION.updateOne(
+				{ id: participant_to_edit.id },
+				{ $set: form.data }
+			);
+
+			success_callback();
 		}
 	});
 	const { form: formData, enhance, capture, restore } = form;
+
+	$effect(() => {
+		if (participant_to_edit) {
+			$formData.email = participant_to_edit.email as string;
+			$formData.first_name = participant_to_edit.first_name;
+			$formData.middle_name = participant_to_edit.middle_name;
+			$formData.last_name = participant_to_edit.last_name;
+			$formData.event_id = participant_to_edit.event_id;
+		}
+	});
 
 	export const snapshot = { capture, restore };
 </script>
