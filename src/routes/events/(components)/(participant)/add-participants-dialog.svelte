@@ -26,7 +26,8 @@
 		{disabled}
 		class={buttonVariants({ class: 'rounded-lg border px-4 py-3 text-sm' })}
 	>
-		Add Participants <Plus class="size-4" />
+		<Plus class="size-4" />
+		Add Participants
 	</Dialog.Trigger>
 	<Dialog.Content class="max-w-[750px]">
 		<Dialog.Header>
