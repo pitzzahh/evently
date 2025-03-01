@@ -8,7 +8,7 @@
 	} from '@/schema/participant';
 	import { type SuperValidated, superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import { Button } from '@/components/ui/button';
 	import { PlusCircle, Trash } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
@@ -59,11 +59,10 @@
 			}
 		];
 		// Wait for DOM update then scroll
-		setTimeout(() => {
-			const forms = document.querySelectorAll('.rounded-lg.border');
-			const lastForm = forms[forms.length - 1];
+		tick().then(() => {
+			const lastForm = document.getElementById(($formData.participants.length - 1).toString());
 			lastForm?.scrollIntoView({ behavior: 'smooth' });
-		}, 0);
+		});
 	}
 
 	function removeParticipant(index: number) {
@@ -85,9 +84,13 @@
 </script>
 
 <form method="POST" use:enhance class="grid gap-4">
-	<div class="max-h-[450px] space-y-2 overflow-y-auto pb-1">
+	<div class="min max-h-[240px] space-y-2 overflow-y-auto">
 		{#each $formData.participants, index}
-			<div class="rounded-lg border p-4" transition:scale={{ duration: 200, easing: quartInOut }}>
+			<div
+				id={index.toString()}
+				class="p-4"
+				transition:scale={{ duration: 200, easing: quartInOut }}
+			>
 				<div class="mb-4 flex items-center justify-between">
 					<p class="font-medium">Participant {index + 1}</p>
 					{#if $formData.participants.length > 1}

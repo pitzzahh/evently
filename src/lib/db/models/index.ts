@@ -1,7 +1,7 @@
 import { svelteReactivityAdapter } from '@/db/adapter/index.svelte';
-import { Collection } from '@signaldb/core';
+import { createIndex, Collection } from '@signaldb/core';
 import createOPFSAdapter from '@signaldb/opfs';
-import type { AttendanceRecord, EventDetails, EventSchedule, Participant, QRCode } from './types';
+import type { AttendanceRecord, EventDetails, EventSchedule, Participant, Settings } from './types';
 import { COLLECTIONS } from '..';
 
 export class AttendanceRecordCollection extends Collection<AttendanceRecord> {
@@ -25,7 +25,14 @@ export class AttendanceRecordCollection extends Collection<AttendanceRecord> {
         time_out: d.time_out ? new Date(d.time_out) : undefined,
         created: d.created ? new Date(d.created) : undefined,
         updated: d.updated ? new Date(d.updated) : undefined
-      })
+      }),
+      indices: [
+        createIndex('user_id'),
+        createIndex('event_id'),
+        createIndex('time_in'),
+        createIndex('time_out'),
+        createIndex('period')
+      ]
     })
     if (!data) return
     this.id = data.id;
@@ -68,7 +75,15 @@ export class EventScheduleCollection extends Collection<EventSchedule> {
         pm_end: d.pm_end ? new Date(d.pm_end) : undefined,
         created: d.created ? new Date(d.created) : undefined,
         updated: d.updated ? new Date(d.updated) : undefined
-      })
+      }),
+      indices: [
+        createIndex('event_id'),
+        createIndex('event_date'),
+        createIndex('am_start'),
+        createIndex('am_end'),
+        createIndex('pm_start'),
+        createIndex('pm_end')
+      ]
     })
     if (!data) return
     this.id = data.id;
@@ -95,6 +110,7 @@ export class EventDetailsCollection extends Collection<EventDetails> {
   id!: string;
   event_name!: string;
   type!: 'meeting' | 'seminar' | 'workshop' | 'conference' | 'webinar' | 'other';
+  settings_id!: string;
   location!: string;
   description?: string;
   is_multi_day?: boolean;
@@ -114,8 +130,19 @@ export class EventDetailsCollection extends Collection<EventDetails> {
         start_date: new Date(d.start_date),
         end_date: new Date(d.end_date),
         created: d.created ? new Date(d.created) : undefined,
-        updated: d.updated ? new Date(d.updated) : undefined
-      })
+        updated: d.updated ? new Date(d.updated) : undefined,
+      }),
+      indices: [
+        createIndex('id'),
+        createIndex('event_name'),
+        createIndex('type'),
+        createIndex('location'),
+        createIndex('description'),
+        createIndex('is_multi_day'),
+        createIndex('difference_in_days'),
+        createIndex('start_date'),
+        createIndex('end_date')
+      ]
     })
     if (!data) return
     this.id = data.id;
@@ -150,6 +177,47 @@ export class EventDetailsCollection extends Collection<EventDetails> {
   getNumberOfParticipants(event_id?: string) {
     return COLLECTIONS.PARTICIPANT_COLLECTION.find({ event_id: event_id ?? this.id }).count();
   }
+
+  getNumberOfSchedules(event_id?: string) {
+    return COLLECTIONS.EVENT_SCHEDULE_COLLECTION.find({ event_id: event_id ?? this.id }).count();
+  }
+
+  getNumberOfAttendanceRecords(event_id?: string) {
+    return COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.find({ event_id: event_id ?? this.id }).count();
+  }
+
+  getNumberOfAttendanceRecordsByDate(date: Date, event_id?: string) {
+    return COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.find({ event_id: event_id ?? this.id, time_in: { $gte: date }, time_out: { $lte: date } }).count();
+  }
+
+  getNumberOfAttendanceRecordsByDateRange(start_date: Date, end_date: Date, event_id?: string) {
+    return COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.find({ event_id: event_id ?? this.id, time_in: { $gte: start_date }, time_out: { $lte: end_date } }).count();
+  }
+
+  getNumberOfAttendanceRecordsByPeriod(period: string, event_id?: string) {
+    return COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.find({ event_id: event_id ?? this.id, period }).count();
+  }
+
+  getNumberOfAttendanceRecordsByDateAndPeriod(date: Date, period: string, event_id?: string) {
+    return COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.find({ event_id: event_id ?? this.id, time_in: { $gte: date }, time_out: { $lte: date }, period }).count();
+  }
+
+  getNumberOfAttendanceRecordsByDateRangeAndPeriod(start_date: Date, end_date: Date, period: string, event_id?: string) {
+    return COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.find({ event_id: event_id ?? this.id, time_in: { $gte: start_date }, time_out: { $lte: end_date }, period }).count();
+  }
+
+  getNumberOfAttendanceRecordsByDateAndUser(date: Date, user_id: string, event_id?: string) {
+    return COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.find({ event_id: event_id ?? this.id, time_in: { $gte: date }, time_out: { $lte: date }, user_id }).count();
+  }
+
+  getNumberOfAttendanceRecordsByDateRangeAndUser(start_date: Date, end_date: Date, user_id: string, event_id?: string) {
+    return COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.find({ event_id: event_id ?? this.id, time_in: { $gte: start_date }, time_out: { $lte: end_date }, user_id }).count();
+  }
+
+  getSettingByID(id: string) {
+    return COLLECTIONS.SETTINGS_COLLECTION.findOne({ id });
+  }
+
 }
 
 export class ParticipantCollection extends Collection<Participant> {
@@ -171,7 +239,14 @@ export class ParticipantCollection extends Collection<Participant> {
         ...d,
         created: d.created ? new Date(d.created) : undefined,
         updated: d.updated ? new Date(d.updated) : undefined
-      })
+      }),
+      indices: [
+        createIndex('event_id'),
+        createIndex('email'),
+        createIndex('first_name'),
+        createIndex('last_name'),
+        createIndex('middle_name')
+      ]
     })
     if (!data) return;
     this.id = data.id;
@@ -193,17 +268,17 @@ export class ParticipantCollection extends Collection<Participant> {
   }
 }
 
-export class QRCodeCollection extends Collection<QRCode> {
+export class SettingsCollection extends Collection<Settings> {
   id!: string;
-  code!: string;
+  allow_add_participants_while_ongoing_event!: boolean;
   created?: Date;
   updated?: Date;
 
-  constructor(data?: QRCode) {
+  constructor(data?: Settings) {
     super({
-      name: 'qr_codes',
+      name: 'settings',
       reactivity: svelteReactivityAdapter(),
-      persistence: createOPFSAdapter('qr_codes.json'),
+      persistence: createOPFSAdapter('settings.json'),
       transform: (d) => ({
         ...d,
         created: d.created ? new Date(d.created) : undefined,
@@ -212,16 +287,9 @@ export class QRCodeCollection extends Collection<QRCode> {
     })
     if (!data) return;
     this.id = data.id;
-    this.code = data.code;
+    this.allow_add_participants_while_ongoing_event = data.allow_add_participants_while_ongoing_event;
     this.created = data.created ? new Date(data.created) : undefined;
     this.updated = data.updated ? new Date(data.updated) : undefined;
   }
 
-  getByID(id: string) {
-    return this.findOne({ id });
-  }
-
-  getByCode(code: string) {
-    return this.findOne({ code });
-  }
 }

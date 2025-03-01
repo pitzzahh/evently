@@ -14,13 +14,19 @@
 		add_participants_form: SuperValidated<AddParticipantsSchema>;
 		event_details: EventDetails | undefined;
 		participant_form: SuperValidated<ParticipantSchema>;
+		disable_add_participants?: boolean;
 	}
 
 	interface ComponentState {
 		participants: Participant[];
 	}
 
-	let { add_participants_form, event_details, participant_form }: ParticipantDialogProps = $props();
+	let {
+		add_participants_form,
+		event_details,
+		participant_form,
+		disable_add_participants = false
+	}: ParticipantDialogProps = $props();
 
 	let comp_state = $state<ComponentState>({
 		participants: []
@@ -63,7 +69,11 @@
 						>These are the participants of {event_details?.event_name ?? 'N/A'}</Dialog.Description
 					>
 				</div>
-				<AddParticipantsDialog {add_participants_form} event_id={event_details?.id ?? 'N/A'} />
+				<AddParticipantsDialog
+					disabled={disable_add_participants}
+					{add_participants_form}
+					event_id={event_details?.id ?? 'N/A'}
+				/>
 			</div>
 		</Dialog.Header>
 		<div class="max-h-[500px] overflow-y-auto">

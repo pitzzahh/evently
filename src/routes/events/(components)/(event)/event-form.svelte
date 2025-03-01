@@ -63,15 +63,20 @@
 					: 0;
 			const difference_in_days = Math.round(difference_in_time / (1000 * 3600 * 24)) + 1;
 
+			const added_settings_id = COLLECTIONS.SETTINGS_COLLECTION.insert({
+				allow_add_participants_while_ongoing_event: false
+			});
+
 			const added_event_details_id = COLLECTIONS.EVENT_DETAILS_COLLECTION.insert({
 				event_name: $formData.title,
 				type: 'other',
+				settings_id: added_settings_id,
 				location: $formData.location,
 				description: $formData.description,
 				is_multi_day: difference_in_days > 1,
 				difference_in_days,
 				start_date: comp_state.event_dates.at(0)?.am_start as Date,
-				end_date: comp_state.event_dates.at(-1)?.pm_end as Date 
+				end_date: comp_state.event_dates.at(-1)?.pm_end as Date
 			});
 
 			COLLECTIONS.EVENT_SCHEDULE_COLLECTION.insertMany(

@@ -5,7 +5,7 @@
 	import { EventTimePicker, ParticipantDialog } from '@routes/events/(components)';
 	import * as DropdownMenu from '@/components/ui/dropdown-menu/index.js';
 	import type { EventSchedule, EventDetails } from '@/db/models/types';
-	import { scale } from 'svelte/transition';
+	import { fly } from 'svelte/transition';
 	import { COLLECTIONS } from '@/db/index';
 	import type { Participant } from '@/db/models/types';
 	import { formatDateTime } from '@/utils/format';
@@ -25,8 +25,20 @@
 		event_details: undefined,
 		event_schedules: [],
 		participants: [],
-		see_more: false
+		see_more: true
 	});
+
+	const event_status = $derived(
+		comp_state.event_details?.start_date &&
+			comp_state.event_details?.end_date &&
+			new Date() >= new Date(comp_state.event_details.start_date) &&
+			new Date() <= new Date(comp_state.event_details.end_date)
+			? 'ongoing'
+			: comp_state.event_details?.end_date &&
+				  new Date() > new Date(comp_state.event_details.end_date)
+				? 'finished'
+				: 'upcoming'
+	);
 
 	watch(
 		[
@@ -59,22 +71,12 @@
 	);
 </script>
 
-<div in:scale class="grid gap-6">
+<div in:fly={{ y: 20 }} class="grid gap-6">
 	<div class="flex items-center justify-between">
 		<h2 class="text-5xl font-semibold">{comp_state.event_details?.event_name ?? 'N/A'}</h2>
 
 		<div class="flex items-center gap-2">
-			{@render StatusPill(
-				comp_state.event_details?.start_date &&
-					comp_state.event_details?.end_date &&
-					new Date() >= new Date(comp_state.event_details.start_date) &&
-					new Date() <= new Date(comp_state.event_details.end_date)
-					? 'ongoing'
-					: comp_state.event_details?.end_date &&
-						  new Date() > new Date(comp_state.event_details.end_date)
-						? 'finished'
-						: 'upcoming'
-			)}
+			{@render StatusPill(event_status)}
 
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger>
@@ -125,6 +127,7 @@
 						participant_form={data.participant_form}
 						add_participants_form={data.add_participants_form}
 						event_details={comp_state.event_details}
+						disable_add_participants={event_status === 'finished' || event_status === 'ongoing'}
 					/>
 				</div>
 
@@ -173,8 +176,14 @@
 						<p>95</p>
 					</div>
 					<div class="flex justify-between">
-						<p class="text-muted-foreground">Attended</p>
-						<p>5</p>
+						<p class="text-muted-foreground">
+							{#if event_status === 'upcoming' || event_status === 'ongoing'}
+								Attending
+							{:else if event_status === 'finished'}
+								Attended
+							{/if}
+						</p>
+						<p>{comp_state.participants.length}</p>
 					</div>
 				</div>
 			</div>

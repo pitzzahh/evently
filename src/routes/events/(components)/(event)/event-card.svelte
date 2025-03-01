@@ -35,6 +35,14 @@
 		number_of_participants: 0
 	});
 
+	const event_status = $derived(
+		start_date && end_date && new Date() >= new Date(start_date) && new Date() <= new Date(end_date)
+			? 'ongoing'
+			: end_date && new Date() > new Date(end_date)
+				? 'finished'
+				: 'upcoming'
+	);
+
 	watch(
 		() => COLLECTIONS.PARTICIPANT_COLLECTION.isLoading(),
 		() => {
@@ -85,17 +93,7 @@
 					</Button>
 				</div>
 				<div class="absolute -right-6 -top-14">
-					{@render StatusPill(
-						start_date &&
-							end_date &&
-							new Date() >= new Date(start_date) &&
-							new Date() <= new Date(end_date)
-							? 'ongoing'
-							: end_date && new Date() > new Date(end_date)
-								? 'finished'
-								: 'upcoming',
-						'sm'
-					)}
+					{@render StatusPill(event_status, 'sm')}
 				</div>
 				<div class="flex flex-col items-center gap-1">
 					<p class="text-4xl font-semibold">{comp_state.number_of_participants}</p>

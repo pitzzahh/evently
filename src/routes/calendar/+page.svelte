@@ -20,14 +20,11 @@
 		);
 		comp_state.event_details = event_details_cursor.fetch().map((e) => ({
 			...e,
-			type: 'seminar',
-			start_date: new Date(e.start_date),
-			end_date: new Date(e.end_date)
+			type: 'seminar'
 		}));
+
 		$inspect(comp_state.event_details);
-		return () => {
-			event_details_cursor.cleanup();
-		};
+		return () => event_details_cursor.cleanup();
 	});
 </script>
 
