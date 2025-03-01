@@ -6,8 +6,9 @@ export const entries = () => {
 	return [{ id: 'some-id' }, { id: 'other-id' }];
 };
 
-export const load = async () => {
-    return {
-        event_form: await superValidate(zod(eventSchema))
-    };
+export const load = async ({ params }) => {
+	return {
+		event_id: params.id,
+		event_form: await superValidate(zod(eventSchema))
+	};
 };
