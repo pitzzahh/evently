@@ -18,17 +18,13 @@
 	import { toast } from 'svelte-sonner';
 	import { COLLECTIONS } from '@/db/index';
 	import type { EventDetails, EventSchedule } from '@/db/models/types';
-	import {
-		createDate,
-		extractHoursAndMinutes,
-		formatDateToTimeOption,
-		monthFormatter
-	} from '@/utils/format';
+	import { createDate, formatDateToTimeOption, monthFormatter } from '@/utils/format';
 	import { hasRequiredData } from '@/utils/validation';
 	import { Label } from '@/components/ui/label';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import * as ImageCropper from '@/components/custom/image-cropper';
+	import { watch } from 'runed';
 
 	interface EventFormProps {
 		event_to_edit?: EventDetails;
@@ -67,27 +63,48 @@
 				allow_add_participants_while_ongoing_event: false
 			});
 
-			const added_event_details_id = COLLECTIONS.EVENT_DETAILS_COLLECTION.insert({
-				event_name: $formData.title,
-				type: 'other',
-				settings_id: added_settings_id,
-				location: $formData.location,
-				description: $formData.description,
-				is_multi_day: difference_in_days > 1,
-				difference_in_days,
-				start_date: comp_state.event_dates.at(0)?.am_start as Date,
-				end_date: comp_state.event_dates.at(-1)?.pm_end as Date
-			});
+			let event_details_id = event_to_edit?.id || '';
 
-			COLLECTIONS.EVENT_SCHEDULE_COLLECTION.insertMany(
-				comp_state.event_dates.map((event) => ({
-					...event,
-					event_id: added_event_details_id
-				}))
-			);
+			if (event_to_edit) {
+				// TODO: DAPAT MAG UPDATE MAN SU EVENT SCHEDULE COLLECTION PARA SYNC SA DATE RANGE IN CASE NA MAIRO
+				COLLECTIONS.EVENT_DETAILS_COLLECTION.updateOne(
+					{ id: event_details_id },
+					{
+						$set: {
+							event_name: $formData.title,
+							type: 'other',
+							location: $formData.location,
+							description: $formData.description,
+							is_multi_day: difference_in_days > 1,
+							difference_in_days,
+							start_date: comp_state.event_dates.at(0)?.am_start as Date,
+							end_date: comp_state.event_dates.at(-1)?.pm_end as Date
+						}
+					}
+				);
+			} else {
+				event_details_id = COLLECTIONS.EVENT_DETAILS_COLLECTION.insert({
+					event_name: $formData.title,
+					type: 'other',
+					settings_id: added_settings_id,
+					location: $formData.location,
+					description: $formData.description,
+					is_multi_day: difference_in_days > 1,
+					difference_in_days,
+					start_date: comp_state.event_dates.at(0)?.am_start as Date,
+					end_date: comp_state.event_dates.at(-1)?.pm_end as Date
+				});
 
-			goto(`/events/${added_event_details_id}`);
-			console.log('added_event_details', added_event_details_id);
+				COLLECTIONS.EVENT_SCHEDULE_COLLECTION.insertMany(
+					comp_state.event_dates.map((event) => ({
+						...event,
+						event_id: event_details_id
+					}))
+				);
+			}
+
+			goto(`/events/${event_details_id}`);
+			console.log('added_event_details', event_details_id);
 			toast.success(`Event is added and has ${difference_in_days} days`);
 		}
 	});
@@ -96,7 +113,6 @@
 	export const snapshot = { capture, restore };
 
 	const current_date = new Date();
-
 	let comp_state = $state<ComponentState>({
 		start_value: undefined,
 		date_range: {
@@ -124,10 +140,6 @@
 					)
 		},
 		event_dates: []
-	});
-
-	onMount(() => {
-		handleGenerateEventDates();
 	});
 
 	function getDatesInRange(start: Date, end: Date): Date[] {
@@ -256,12 +268,26 @@
 		$formData.end_date = comp_state.date_range.end.toDate(getLocalTimeZone());
 	});
 
-	$effect(() => {
+	watch([() => event_to_edit], () => {
 		if (event_to_edit) {
 			($formData.description = event_to_edit.description || ''),
 				($formData.title = event_to_edit.event_name || ''),
 				($formData.is_multi_day_event = event_to_edit.is_multi_day || false),
 				($formData.location = event_to_edit.location || '');
+
+			comp_state.date_range = {
+				start: new CalendarDate(
+					event_to_edit.start_date.getFullYear(),
+					event_to_edit.start_date.getMonth() + 1,
+					event_to_edit.start_date.getDate()
+				),
+				end: new CalendarDate(
+					event_to_edit.end_date.getFullYear(),
+					event_to_edit.end_date.getMonth() + 1,
+					event_to_edit.end_date.getDate()
+				)
+			};
+			handleGenerateEventDates();
 		}
 	});
 </script>
@@ -404,6 +430,6 @@
 
 	<Form.Button
 		disabled={!hasRequiredData($formData, ['title', 'location', 'start_date', 'end_date'])}
-		class="mt-3">Add</Form.Button
+		class="mt-3">{event_to_edit ? 'Save Changes' : 'Submit'}</Form.Button
 	>
 </form>
