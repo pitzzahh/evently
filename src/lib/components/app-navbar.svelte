@@ -77,7 +77,7 @@
 				{/if}
 			</Button>
 			<NavbarTime />
-			<Button href="/events/create">Create Event <Plus class="size-4" /></Button>
+			<Button href="/events/create"><Plus class="size-4" /> Create Event</Button>
 			{#if dev}
 				<Button
 					size="sm"
