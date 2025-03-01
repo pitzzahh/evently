@@ -42,8 +42,7 @@ export function participantTableColumns(
 					title: 'First Name'
 				});
 			},
-			cell: ({ row }) =>
-				renderComponent(DataTableBadge, { variant: 'outline', value: row.original.first_name }),
+			cell: ({ row }) => row.original.first_name,
 			filterFn: (row, id, value) => {
 				return String(row.getValue(id))
 					.toLowerCase()
@@ -57,7 +56,15 @@ export function participantTableColumns(
 					column,
 					title: 'Middle Name'
 				}),
-			cell: ({ row }) => row.original.middle_name,
+			cell: ({ row }) => {
+				return (
+					row.original.middle_name ||
+					renderComponent(DataTableBadge, {
+						variant: 'outline',
+						value: 'None'
+					})
+				);
+			},
 			filterFn: (row, id, value) => {
 				return String(row.getValue(id))
 					.toLowerCase()
