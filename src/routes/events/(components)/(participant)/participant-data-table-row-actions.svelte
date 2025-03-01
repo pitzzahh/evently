@@ -124,7 +124,13 @@
 			<Dialog.Header>
 				<Dialog.Title>Edit Participant's Information</Dialog.Title>
 			</Dialog.Header>
-			<EditParticipantForm {participant_form} />
+			<EditParticipantForm
+				{participant_form}
+				participant_to_edit={row.original}
+				success_callback={() => {
+					handleOnOpenChange(false);
+				}}
+			/>
 		</Dialog.Content>
 	{/if}
 
