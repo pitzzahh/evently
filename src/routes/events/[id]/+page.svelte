@@ -1,8 +1,17 @@
 <script lang="ts">
 	import { Button } from '@/components/ui/button';
-	import { Calendar, ChartBar, MapPin, Settings, UsersRound, Edit, Trash } from 'lucide-svelte';
+	import {
+		Calendar,
+		ChartBar,
+		MapPin,
+		Settings,
+		UsersRound,
+		Edit,
+		Trash,
+		View
+	} from 'lucide-svelte';
 	import { cn } from '@/utils/styles';
-	import { EventTimePicker, ParticipantDialog } from '@routes/events/(components)';
+	import { EventTimePicker } from '@routes/events/(components)';
 	import * as DropdownMenu from '@/components/ui/dropdown-menu/index.js';
 	import type { EventSchedule, EventDetails } from '@/db/models/types';
 	import { fly } from 'svelte/transition';
@@ -11,6 +20,7 @@
 	import { formatDateTime } from '@/utils/format';
 	import { watch } from 'runed';
 	import { StatusPill } from '@/components/snippets';
+	import { goto } from '$app/navigation';
 
 	let { data } = $props();
 
@@ -84,7 +94,13 @@
 				</DropdownMenu.Trigger>
 				<DropdownMenu.Content side="bottom" align="end" sideOffset={10}>
 					<DropdownMenu.Group>
-						<DropdownMenu.Item><Edit class="size-4" /> Edit event</DropdownMenu.Item>
+						<DropdownMenu.Item
+							onclick={() => {
+								if (comp_state.event_details?.id) {
+									goto(`/events/edit/${comp_state.event_details?.id}`);
+								}
+							}}><Edit class="size-4" /> Edit event</DropdownMenu.Item
+						>
 						<DropdownMenu.Item class="!text-red-600 hover:!bg-red-600/20"
 							><Trash class="size-4" />Delete event</DropdownMenu.Item
 						>
@@ -123,12 +139,15 @@
 							</div>
 						</div>
 					</div>
-					<ParticipantDialog
-						participant_form={data.participant_form}
-						add_participants_form={data.add_participants_form}
-						event_details={comp_state.event_details}
-						disable_add_participants={event_status === 'finished' || event_status === 'ongoing'}
-					/>
+
+					<Button
+						size="lg"
+						href={`/events/participants/${comp_state.event_details?.id}`}
+						class="rounded-lg border px-4 py-3 text-sm"
+					>
+						<View class="size-5" />
+						View Participants
+					</Button>
 				</div>
 
 				<div class="flex items-center justify-between gap-4">
