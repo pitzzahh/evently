@@ -11,6 +11,7 @@
 	import type { ParticipantSchema } from '@/schema/participant';
 	import QR from '@svelte-put/qr/img/QR.svelte';
 	import ImgQR from '@svelte-put/qr/img/QR.svelte';
+	import { COLLECTIONS } from '@/db';
 
 	let {
 		row,
@@ -59,6 +60,14 @@
 			window.removeEventListener('keydown', handleKeydown);
 		};
 	});
+
+	function handleDeleteParticipant() {
+		COLLECTIONS.PARTICIPANT_COLLECTION.removeOne({
+			id: row.original.id
+		});
+
+		comp_state.remove_open = false;
+	}
 </script>
 
 <Dialog.Dialog
@@ -144,7 +153,9 @@
 				</Dialog.Description>
 			</Dialog.Header>
 			<Dialog.Footer>
-				<Button class="bg-red-600 hover:!bg-red-600/80">Delete</Button>
+				<Button class="bg-red-600 hover:!bg-red-600/80" onclick={handleDeleteParticipant}
+					>Delete</Button
+				>
 				<Button variant="outline" onclick={() => (comp_state.remove_open = false)}>Cancel</Button>
 			</Dialog.Footer>
 		</Dialog.Content>
