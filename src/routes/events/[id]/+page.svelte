@@ -1,76 +1,183 @@
 <script lang="ts">
 	import { Button } from '@/components/ui/button';
-	import { Calendar, ChartBar, ChevronLeft, MapPin, Settings, UsersRound } from 'lucide-svelte';
+	import {
+		Calendar,
+		ChartBar,
+		MapPin,
+		Settings,
+		UsersRound,
+		Edit,
+		Trash,
+		View
+	} from 'lucide-svelte';
+	import { cn } from '@/utils/styles';
+	import { EventTimePicker } from '@routes/events/(components)';
+	import * as DropdownMenu from '@/components/ui/dropdown-menu/index.js';
+	import type { EventSchedule, EventDetails } from '@/db/models/types';
+	import { fly } from 'svelte/transition';
+	import { COLLECTIONS } from '@/db/index';
+	import type { Participant } from '@/db/models/types';
+	import { formatDateTime } from '@/utils/format';
+	import { watch } from 'runed';
+	import { StatusPill } from '@/components/snippets';
+	import { goto } from '$app/navigation';
 
-	import type { PageData } from './$types';
-	import { cn } from '@/utils';
-	import AttendeesDataTable from '../(components)/attendees-data-table.svelte';
-	import { browser } from '$app/environment';
+	let { data } = $props();
 
-	let { data }: { data: PageData } = $props();
-	let see_more = $state(true);
-
-	function toggleSeeMore() {
-		see_more = !see_more;
+	interface ComponentState {
+		event_details: EventDetails | undefined;
+		event_schedules: EventSchedule[];
+		participants: Participant[];
+		see_more: boolean;
 	}
+
+	let comp_state = $state<ComponentState>({
+		event_details: undefined,
+		event_schedules: [],
+		participants: [],
+		see_more: true
+	});
+
+	const event_status = $derived(
+		comp_state.event_details?.start_date &&
+			comp_state.event_details?.end_date &&
+			new Date() >= new Date(comp_state.event_details.start_date) &&
+			new Date() <= new Date(comp_state.event_details.end_date)
+			? 'ongoing'
+			: comp_state.event_details?.end_date &&
+				  new Date() > new Date(comp_state.event_details.end_date)
+				? 'finished'
+				: 'upcoming'
+	);
+
+	watch(
+		[
+			() => COLLECTIONS.PARTICIPANT_COLLECTION.isLoading(),
+			() => COLLECTIONS.EVENT_SCHEDULE_COLLECTION.isLoading(),
+			() => COLLECTIONS.EVENT_DETAILS_COLLECTION.isLoading()
+		],
+		() => {
+			const participants_cursor = COLLECTIONS.PARTICIPANT_COLLECTION.find({
+				event_id: data.event_id
+			});
+			const event_schedule_cursor = COLLECTIONS.EVENT_SCHEDULE_COLLECTION.find({
+				event_id: data.event_id
+			});
+			comp_state.participants = participants_cursor.fetch();
+			comp_state.event_schedules = event_schedule_cursor.fetch();
+			comp_state.event_details = COLLECTIONS.EVENT_DETAILS_COLLECTION.findOne({
+				id: data.event_id
+			});
+
+			$inspect(
+				comp_state.event_details?.start_date && comp_state.event_details.start_date > new Date()
+			);
+
+			return () => {
+				participants_cursor.cleanup();
+				event_schedule_cursor.cleanup();
+			};
+		}
+	);
 </script>
 
-<div class="grid gap-6">
+<div in:fly={{ y: 20 }} class="grid gap-6">
 	<div class="flex items-center justify-between">
-		<div class="flex flex-col gap-4">
-			<Button
-				variant="outline"
-				size="icon"
-				onclick={async () => {
-					if (browser) window.history.back();
-				}}
-			>
-				<ChevronLeft class="size-4" />
-			</Button>
-			<h2 class="text-5xl font-semibold">Teacher's Seminar</h2>
-		</div>
+		<h2 class="text-5xl font-semibold">{comp_state.event_details?.event_name ?? 'N/A'}</h2>
 
 		<div class="flex items-center gap-2">
-			{@render StatusPill('finished')}
-			<button class="rounded-md border p-3"><Settings class="size-5" /></button>
+			{@render StatusPill(event_status)}
+
+			<DropdownMenu.Root>
+				<DropdownMenu.Trigger>
+					<button class="rounded-md border p-3"><Settings class="size-5" /></button>
+				</DropdownMenu.Trigger>
+				<DropdownMenu.Content side="bottom" align="end" sideOffset={10}>
+					<DropdownMenu.Group>
+						<DropdownMenu.Item
+							onclick={() => {
+								if (comp_state.event_details?.id) {
+									goto(`/events/edit/${comp_state.event_details?.id}`);
+								}
+							}}><Edit class="size-4" /> Edit event</DropdownMenu.Item
+						>
+						<DropdownMenu.Item class="!text-red-600 hover:!bg-red-600/20"
+							><Trash class="size-4" />Delete event</DropdownMenu.Item
+						>
+					</DropdownMenu.Group>
+				</DropdownMenu.Content>
+			</DropdownMenu.Root>
 		</div>
 	</div>
 
+	<!-- EVENT DETAILS -->
 	<div class="grid gap-6 border-b-2 border-dashed pb-6">
 		<div class="flex items-end justify-between">
-			<div class="grid gap-4">
-				<div class="flex gap-5">
-					<div class="flex items-center gap-3">
-						<div class="rounded-md border p-3">
-							<Calendar class="size-5 text-muted-foreground" />
+			<div class="grid w-full gap-4">
+				<div class="flex w-full justify-between gap-4">
+					<div class="flex gap-5">
+						<div class="flex items-center gap-3">
+							<div class="rounded-md border p-3">
+								<Calendar class="size-5 text-muted-foreground" />
+							</div>
+							<div>
+								<p class="text-base font-medium">
+									{formatDateTime(comp_state.event_details?.start_date)}
+								</p>
+								<p class="text-muted-foreground">11:30 PM - 12:30 AM</p>
+							</div>
 						</div>
-						<div>
-							<p class="text-base font-medium">Wednesday, November 20, 2024</p>
-							<p class="text-muted-foreground">11:30 PM - 12:30 AM</p>
+						<div class="flex items-center gap-3">
+							<div class="rounded-md border p-3">
+								<UsersRound class="size-5 text-muted-foreground" />
+							</div>
+							<div>
+								<p class="text-base font-medium">{comp_state.participants.length}</p>
+								<p class=" text-muted-foreground">
+									Participant{comp_state.participants.length > 1 ? 's' : ''}
+								</p>
+							</div>
 						</div>
 					</div>
-					<div class="flex items-center gap-3">
-						<div class="rounded-md border p-3">
-							<UsersRound class="size-5 text-muted-foreground" />
-						</div>
-						<div>
-							<p class="text-base font-medium">100</p>
-							<p class=" text-muted-foreground">Attendees</p>
-						</div>
-					</div>
+
+					<Button
+						size="lg"
+						href={`/events/participants/${comp_state.event_details?.id}`}
+						class="rounded-lg border px-4 py-3 text-sm"
+					>
+						<View class="size-5" />
+						View Participants
+					</Button>
 				</div>
 
-				<div class="flex items-center gap-3">
-					<div class="rounded-md border p-3"><MapPin class="size-5 text-muted-foreground" /></div>
-					<p class="text-base font-medium">Legazpi City</p>
+				<div class="flex items-center justify-between gap-4">
+					<div class="flex items-center gap-3">
+						<div class="rounded-md border p-3"><MapPin class="size-5 text-muted-foreground" /></div>
+						<p class="text-base font-medium">{comp_state.event_details?.location ?? 'N/A'}</p>
+					</div>
+
+					<Button variant="ghost" onclick={() => (comp_state.see_more = !comp_state.see_more)}>
+						{comp_state.see_more ? 'See Less' : 'See More'}
+					</Button>
 				</div>
 			</div>
-			<Button variant="ghost" onclick={toggleSeeMore}>{see_more ? 'See Less' : 'See More'}</Button>
 		</div>
-
-		<!-- EVENT STATS -->
-		{#if see_more}
-			<div class="grid gap-3 rounded-lg border bg-white p-4 dark:bg-[#1C1E20]">
+		<div
+			class={cn(
+				'grid gap-3 overflow-hidden rounded-lg border bg-white p-4 transition-all duration-300 dark:bg-[#1C1E20]',
+				{
+					'm-0 h-0 p-0 opacity-0': !comp_state.see_more,
+					'h-auto opacity-100': comp_state.see_more
+				}
+			)}
+		>
+			<!-- EVENT STATS -->
+			<div
+				class={cn('transition-scale grid gap-3 rounded-lg border p-4 duration-300', {
+					'origin-top scale-y-0 opacity-0': !comp_state.see_more,
+					'scale-y-100 opacity-100': comp_state.see_more
+				})}
+			>
 				<div class="flex items-center justify-between">
 					<h3 class="text-lg font-semibold">Event Stats</h3>
 					<div class="rounded-md border border-blue-500 bg-blue-500/20 p-2">
@@ -88,28 +195,22 @@
 						<p>95</p>
 					</div>
 					<div class="flex justify-between">
-						<p class="text-muted-foreground">Attended</p>
-						<p>5</p>
+						<p class="text-muted-foreground">
+							{#if event_status === 'upcoming' || event_status === 'ongoing'}
+								Attending
+							{:else if event_status === 'finished'}
+								Attended
+							{/if}
+						</p>
+						<p>{comp_state.participants.length}</p>
 					</div>
 				</div>
 			</div>
-		{/if}
+		</div>
 	</div>
-
-	<!-- TODO: ADD ATTENDEES TABLE HERE -->
-	<div class="grid gap-4">
-		<h4 class="text-lg font-medium">Attendees</h4>
-		<AttendeesDataTable />
+	<div class="flex max-h-[400px] flex-col gap-2 overflow-y-auto pr-1">
+		{#each comp_state.event_schedules as event_date, index}
+			<EventTimePicker {event_date} day={index + 1} is_selection_disabled={true} />
+		{/each}
 	</div>
 </div>
-
-{#snippet StatusPill(status: 'upcoming' | 'finished' | 'ongoing')}
-	<p
-		class={cn('rounded-lg border px-4 py-3 text-sm', {
-			'border-blue-500 bg-blue-500/20': status === 'upcoming',
-			'border-green-600 bg-green-600/30': status === 'ongoing'
-		})}
-	>
-		{status.charAt(0)?.toUpperCase().concat(status.slice(1))}
-	</p>
-{/snippet}
