@@ -71,9 +71,15 @@
 		<div
 			class="mb-10 ms-4 rounded-xl border bg-white p-4 transition duration-500 ease-in-out hover:border-black/50 dark:bg-[#1C1E20] dark:hover:border-white/50"
 		>
-			<div class="flex items-center gap-1">
-				<Badge variant="outline">{formatDateTime(new Date(start_date))}</Badge> - <Badge
-					variant="outline">{formatDateTime(new Date(end_date))}</Badge
+			<div class="mb-1 flex items-center gap-1">
+				<Badge
+					variant="outline"
+					class="border border-gray-500 px-2 py-1 text-center text-xs font-medium dark:bg-gray-500/30 bg-gray-500/10"
+					>{formatDateTime(new Date(start_date))}</Badge
+				> - <Badge
+					variant="outline"
+					class="border border-gray-500 px-2 py-1 text-center text-xs font-medium dark:bg-gray-500/30 bg-gray-500/10"
+					>{formatDateTime(new Date(end_date))}</Badge
 				>
 			</div>
 			<div class="relative flex w-full items-start justify-between">
@@ -86,7 +92,7 @@
 
 					<Button
 						href="/events/{id}"
-						class="mt-3 inline-flex items-center rounded-lg border px-4 py-2 text-sm font-medium dark:border-white/20"
+						class="mt-3 inline-flex w-[150px] items-center rounded-lg border px-4 py-2 text-sm font-medium dark:border-white/20"
 					>
 						See Details
 						<ChevronRightIcon />
