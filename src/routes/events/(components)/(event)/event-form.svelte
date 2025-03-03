@@ -82,6 +82,10 @@
 						}
 					}
 				);
+
+				COLLECTIONS.EVENT_SCHEDULE_COLLECTION.removeMany({
+					event_id: event_details_id
+				});
 			} else {
 				event_details_id = COLLECTIONS.EVENT_DETAILS_COLLECTION.insert({
 					event_name: $formData.title,
@@ -94,14 +98,14 @@
 					start_date: comp_state.event_dates.at(0)?.am_start as Date,
 					end_date: comp_state.event_dates.at(-1)?.pm_end as Date
 				});
-
-				COLLECTIONS.EVENT_SCHEDULE_COLLECTION.insertMany(
-					comp_state.event_dates.map((event) => ({
-						...event,
-						event_id: event_details_id
-					}))
-				);
 			}
+
+			COLLECTIONS.EVENT_SCHEDULE_COLLECTION.insertMany(
+				comp_state.event_dates.map((event) => ({
+					...event,
+					event_id: event_details_id
+				}))
+			);
 
 			goto(`/events/${event_details_id}`);
 			console.log('added_event_details', event_details_id);
@@ -113,6 +117,7 @@
 	export const snapshot = { capture, restore };
 
 	const current_date = new Date();
+	
 	let comp_state = $state<ComponentState>({
 		start_value: undefined,
 		date_range: {
@@ -139,7 +144,7 @@
 						current_date.getDate()
 					)
 		},
-		event_dates: []
+		event_dates: event_schedules as any
 	});
 
 	function getDatesInRange(start: Date, end: Date): Date[] {
@@ -165,7 +170,7 @@
 			const end_date = new Date(
 				comp_state.date_range.end?.toString() || comp_state.date_range.start.toString()
 			);
-			comp_state.event_dates = getDatesInRange(start_date, end_date).map((date) => {
+			comp_state.event_dates = getDatesInRange(start_date, end_date).map((date, index) => {
 				const am_start = new Date(date);
 				am_start.setHours(8, 0, 0, 0);
 				const am_end = new Date(date);
@@ -174,6 +179,20 @@
 				pm_start.setHours(13, 0, 0, 0);
 				const pm_end = new Date(date);
 				pm_end.setHours(16, 0, 0, 0);
+
+				const existing_event_sched = event_schedules?.at(index);
+
+				if (existing_event_sched) {
+					return {
+						id: nanoid(),
+						event_date: existing_event_sched.event_date,
+						event_id: '',
+						am_start: existing_event_sched.am_start,
+						am_end: existing_event_sched.am_end,
+						pm_start: existing_event_sched.pm_start,
+						pm_end: existing_event_sched.pm_end
+					};
+				}
 
 				return {
 					id: nanoid(),
@@ -287,7 +306,9 @@
 					event_to_edit.end_date.getDate()
 				)
 			};
-			handleGenerateEventDates();
+
+			comp_state.event_dates = event_schedules as any;
+			// handleGenerateEventDates();
 		}
 	});
 </script>
@@ -377,11 +398,6 @@
 				</Popover.Root>
 			</div>
 		</div>
-		<!-- <img
-			src="https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=800&dpr=2&q=80"
-			alt="Gray by Drew Beamer"
-			class="flex w-80 shrink-0 items-center justify-center rounded-md bg-muted object-cover text-center text-sm text-muted-foreground"
-		/> -->
 		<ImageCropper.Root>
 			<ImageCropper.UploadTrigger>
 				<ImageCropper.Preview class="h-64 w-64 rounded-md" />
