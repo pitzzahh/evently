@@ -44,5 +44,9 @@
 
 <div in:fly={{ y: 20 }}>
 	<h2 class="mb-4 text-4xl font-semibold">Edit Event</h2>
-	<EventForm event_form={data.event_form} event_to_edit={comp_state.event_details_to_edit} />
+	<EventForm
+		event_form={data.event_form}
+		event_to_edit={comp_state.event_details_to_edit}
+		event_schedules={comp_state.event_schedules}
+	/>
 </div>
