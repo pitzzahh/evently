@@ -67,7 +67,7 @@
 	</div>
 	<div class="grid w-[200px] place-items-center gap-1 self-center">
 		<p
-			class="rounded-md border border-gray-500 bg-background bg-gray-500/30 px-2 py-1 text-center text-xs font-medium"
+			class="rounded-md border border-gray-500 bg-gray-500/10 px-2 py-1 text-center text-xs font-medium dark:bg-gray-500/30"
 		>
 			Day {day}
 		</p>
