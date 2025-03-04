@@ -132,7 +132,7 @@
 			<div transition:fly={{ y: 20, duration: 200, delay: i * 100, easing: quartInOut }}>
 				<EventCard {...event} />
 			</div>
-		{/each}
+		{/each} 
 
 		{#snippet noData()}
 			<Badge variant="secondary">Nore More Data</Badge>
