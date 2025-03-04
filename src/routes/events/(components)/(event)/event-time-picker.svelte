@@ -21,7 +21,7 @@
 		}) => void;
 		day: number;
 	} = $props();
-	let formatted_date = formatDate(event_date.event_date);
+	let formatted_date = $derived(formatDate(event_date.event_date));
 
 	function getFilteredEndTimes(startTime: string) {
 		const startIndex = time_options.indexOf(startTime);
