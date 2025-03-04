@@ -30,7 +30,7 @@
 
 			COLLECTIONS.PARTICIPANT_COLLECTION.updateOne(
 				{ id: participant_to_edit.id },
-				{ $set: form.data }
+				{ $set: { ...form.data, updated: new Date() } }
 			);
 
 			success_callback();
