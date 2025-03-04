@@ -22,6 +22,9 @@
 	import { StatusPill } from '@/components/snippets';
 	import { goto } from '$app/navigation';
 	import { checkEventStatus } from '../utils/index.js';
+	import * as Dialog from '@/components/ui/dialog';
+	import { error } from '@sveltejs/kit';
+	import { onMount } from 'svelte';
 
 	let { data } = $props();
 
@@ -30,13 +33,15 @@
 		event_schedules: EventSchedule[];
 		participants: Participant[];
 		see_more: boolean;
+		confimation_open: boolean;
 	}
 
 	let comp_state = $state<ComponentState>({
 		event_details: undefined,
 		event_schedules: [],
 		participants: [],
-		see_more: true
+		see_more: true,
+		confimation_open: false
 	});
 
 	const event_status = $derived(
@@ -45,9 +50,9 @@
 
 	watch(
 		[
-			() => COLLECTIONS.PARTICIPANT_COLLECTION.isLoading(),
-			() => COLLECTIONS.EVENT_SCHEDULE_COLLECTION.isLoading(),
-			() => COLLECTIONS.EVENT_DETAILS_COLLECTION.isLoading()
+			() => COLLECTIONS.PARTICIPANT_COLLECTION.isPushing(),
+			() => COLLECTIONS.EVENT_SCHEDULE_COLLECTION.isPushing(),
+			() => COLLECTIONS.EVENT_DETAILS_COLLECTION.isPushing()
 		],
 		() => {
 			const participants_cursor = COLLECTIONS.PARTICIPANT_COLLECTION.find({
@@ -56,11 +61,13 @@
 			const event_schedule_cursor = COLLECTIONS.EVENT_SCHEDULE_COLLECTION.find({
 				event_id: data.event_id
 			});
-			comp_state.participants = participants_cursor.fetch();
-			comp_state.event_schedules = event_schedule_cursor.fetch();
+
 			comp_state.event_details = COLLECTIONS.EVENT_DETAILS_COLLECTION.findOne({
 				id: data.event_id
 			});
+
+			comp_state.participants = participants_cursor.fetch();
+			comp_state.event_schedules = event_schedule_cursor.fetch();
 
 			$inspect(
 				comp_state.event_details?.start_date && comp_state.event_details.start_date > new Date()
@@ -72,6 +79,36 @@
 			};
 		}
 	);
+
+	onMount(() => {
+		if (!comp_state.event_details) {
+			const error_content = {
+				status: 404,
+				message: 'Event not found'
+			};
+			goto(`/events/${data.event_id}?error_content=${JSON.stringify(error_content)}`);
+		}
+	});
+
+	function handleDeleteEvent() {
+		if (comp_state.event_details) {
+			const id = comp_state.event_details.id;
+
+			goto('/');
+
+			COLLECTIONS.EVENT_DETAILS_COLLECTION.removeOne({
+				id
+			});
+			COLLECTIONS.PARTICIPANT_COLLECTION.removeMany({
+				event_id: id
+			});
+			COLLECTIONS.EVENT_SCHEDULE_COLLECTION.removeMany({
+				event_id: id
+			});
+
+			comp_state.confimation_open = false;
+		}
+	}
 </script>
 
 <div in:fly={{ y: 20 }} class="grid gap-6">
@@ -81,25 +118,49 @@
 		<div class="flex items-center gap-2">
 			{@render StatusPill(event_status)}
 
-			<DropdownMenu.Root>
-				<DropdownMenu.Trigger>
-					<button class="rounded-md border p-3"><Settings class="size-5" /></button>
-				</DropdownMenu.Trigger>
-				<DropdownMenu.Content side="bottom" align="end" sideOffset={10}>
-					<DropdownMenu.Group>
-						<DropdownMenu.Item
-							onclick={() => {
-								if (comp_state.event_details?.id) {
-									goto(`/events/edit/${comp_state.event_details?.id}`);
-								}
-							}}><Edit class="size-4" /> Edit event</DropdownMenu.Item
+			<Dialog.Root
+				open={comp_state.confimation_open}
+				onOpenChange={(value) => (comp_state.confimation_open = value)}
+			>
+				<DropdownMenu.Root>
+					<DropdownMenu.Trigger>
+						<button class="rounded-md border p-3"><Settings class="size-5" /></button>
+					</DropdownMenu.Trigger>
+					<DropdownMenu.Content side="bottom" align="end" sideOffset={10}>
+						<DropdownMenu.Group>
+							<DropdownMenu.Item
+								onclick={() => {
+									if (comp_state.event_details?.id) {
+										goto(`/events/edit/${comp_state.event_details?.id}`);
+									}
+								}}><Edit class="size-4" /> Edit event</DropdownMenu.Item
+							>
+							<DropdownMenu.Item
+								onclick={() => (comp_state.confimation_open = true)}
+								class="!text-red-600 hover:!bg-red-600/20"
+								><Trash class="size-4" />Delete event</DropdownMenu.Item
+							>
+						</DropdownMenu.Group>
+					</DropdownMenu.Content>
+				</DropdownMenu.Root>
+
+				<Dialog.Content>
+					<Dialog.Header>
+						<Dialog.Title>Remove Event</Dialog.Title>
+						<Dialog.Description>
+							This action cannot be undone. Are you sure you want to permanently delete this event?
+						</Dialog.Description>
+					</Dialog.Header>
+					<Dialog.Footer>
+						<Button class="bg-red-600 hover:!bg-red-600/80" onclick={handleDeleteEvent}
+							>Delete</Button
 						>
-						<DropdownMenu.Item class="!text-red-600 hover:!bg-red-600/20"
-							><Trash class="size-4" />Delete event</DropdownMenu.Item
+						<Button variant="outline" onclick={() => (comp_state.confimation_open = false)}
+							>Cancel</Button
 						>
-					</DropdownMenu.Group>
-				</DropdownMenu.Content>
-			</DropdownMenu.Root>
+					</Dialog.Footer>
+				</Dialog.Content>
+			</Dialog.Root>
 		</div>
 	</div>
 
