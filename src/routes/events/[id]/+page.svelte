@@ -21,6 +21,7 @@
 	import { watch } from 'runed';
 	import { StatusPill } from '@/components/snippets';
 	import { goto } from '$app/navigation';
+	import { checkEventStatus } from '../utils/index.js';
 
 	let { data } = $props();
 
@@ -39,15 +40,7 @@
 	});
 
 	const event_status = $derived(
-		comp_state.event_details?.start_date &&
-			comp_state.event_details?.end_date &&
-			new Date() >= new Date(comp_state.event_details.start_date) &&
-			new Date() <= new Date(comp_state.event_details.end_date)
-			? 'ongoing'
-			: comp_state.event_details?.end_date &&
-				  new Date() > new Date(comp_state.event_details.end_date)
-				? 'finished'
-				: 'upcoming'
+		checkEventStatus(comp_state.event_details?.start_date, comp_state.event_details?.end_date)
 	);
 
 	watch(
