@@ -81,7 +81,8 @@
 							is_multi_day: difference_in_days > 1,
 							difference_in_days,
 							start_date: comp_state.event_dates.at(0)?.am_start as Date,
-							end_date: comp_state.event_dates.at(-1)?.pm_end as Date
+							end_date: comp_state.event_dates.at(-1)?.pm_end as Date,
+							updated: new Date()
 						}
 					}
 				);
