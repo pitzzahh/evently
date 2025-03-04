@@ -3,7 +3,7 @@
 	import { Input } from '@/components/ui/input';
 	import Textarea from '@/components/ui/textarea/textarea.svelte';
 	import { eventSchema, type EventSchema } from '@/schema/event';
-	import { MapPin, Ticket } from 'lucide-svelte';
+	import { Info, MapPin, Ticket } from 'lucide-svelte';
 	import { type SuperValidated, superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { nanoid } from 'nanoid';
@@ -25,6 +25,7 @@
 	import { onMount } from 'svelte';
 	import * as ImageCropper from '@/components/custom/image-cropper';
 	import { watch } from 'runed';
+	import { checkEventStatus } from '@routes/events/utils';
 
 	interface EventFormProps {
 		event_to_edit?: EventDetails;
@@ -42,6 +43,9 @@
 	}
 
 	let { event_form, event_schedules, event_to_edit }: EventFormProps = $props();
+	const event_status = $derived(
+		checkEventStatus(event_to_edit?.start_date, event_to_edit?.end_date)
+	);
 
 	const form = superForm(event_form, {
 		SPA: true,
@@ -66,7 +70,6 @@
 			let event_details_id = event_to_edit?.id || '';
 
 			if (event_to_edit) {
-				// TODO: DAPAT MAG UPDATE MAN SU EVENT SCHEDULE COLLECTION PARA SYNC SA DATE RANGE IN CASE NA MAIRO
 				COLLECTIONS.EVENT_DETAILS_COLLECTION.updateOne(
 					{ id: event_details_id },
 					{
@@ -83,9 +86,18 @@
 					}
 				);
 
-				COLLECTIONS.EVENT_SCHEDULE_COLLECTION.removeMany({
-					event_id: event_details_id
-				});
+				if (event_status === 'upcoming') {
+					COLLECTIONS.EVENT_SCHEDULE_COLLECTION.removeMany({
+						event_id: event_details_id
+					});
+
+					COLLECTIONS.EVENT_SCHEDULE_COLLECTION.insertMany(
+						comp_state.event_dates.map((event) => ({
+							...event,
+							event_id: event_details_id
+						}))
+					);
+				}
 			} else {
 				event_details_id = COLLECTIONS.EVENT_DETAILS_COLLECTION.insert({
 					event_name: $formData.title,
@@ -98,14 +110,14 @@
 					start_date: comp_state.event_dates.at(0)?.am_start as Date,
 					end_date: comp_state.event_dates.at(-1)?.pm_end as Date
 				});
-			}
 
-			COLLECTIONS.EVENT_SCHEDULE_COLLECTION.insertMany(
-				comp_state.event_dates.map((event) => ({
-					...event,
-					event_id: event_details_id
-				}))
-			);
+				COLLECTIONS.EVENT_SCHEDULE_COLLECTION.insertMany(
+					comp_state.event_dates.map((event) => ({
+						...event,
+						event_id: event_details_id
+					}))
+				);
+			}
 
 			goto(`/events/${event_details_id}`);
 			console.log('added_event_details', event_details_id);
@@ -117,7 +129,7 @@
 	export const snapshot = { capture, restore };
 
 	const current_date = new Date();
-	
+
 	let comp_state = $state<ComponentState>({
 		start_value: undefined,
 		date_range: {
@@ -162,7 +174,6 @@
 	function handleGenerateEventDates() {
 		if (!comp_state.date_range?.end && !comp_state.date_range?.start) {
 			comp_state.event_dates = [];
-			console.log('true');
 		}
 
 		if (comp_state.date_range?.start) {
@@ -170,6 +181,8 @@
 			const end_date = new Date(
 				comp_state.date_range.end?.toString() || comp_state.date_range.start.toString()
 			);
+
+			console.log(getDatesInRange(start_date, end_date));
 			comp_state.event_dates = getDatesInRange(start_date, end_date).map((date, index) => {
 				const am_start = new Date(date);
 				am_start.setHours(8, 0, 0, 0);
@@ -182,10 +195,12 @@
 
 				const existing_event_sched = event_schedules?.at(index);
 
-				if (existing_event_sched) {
+				if (existing_event_sched?.event_date.toLocaleDateString() === date.toLocaleDateString()) {
+					console.log('existing', existing_event_sched?.event_date.toLocaleDateString());
+					console.log(date.toLocaleDateString());
 					return {
 						id: nanoid(),
-						event_date: existing_event_sched.event_date,
+						event_date: date,
 						event_id: '',
 						am_start: existing_event_sched.am_start,
 						am_end: existing_event_sched.am_end,
@@ -193,7 +208,6 @@
 						pm_end: existing_event_sched.pm_end
 					};
 				}
-
 				return {
 					id: nanoid(),
 					event_date: date,
@@ -353,49 +367,60 @@
 			</Form.Field>
 			<div class="mb-3 grid gap-2">
 				<p class="text-sm">Event Date</p>
-				<Popover.Root>
-					<Popover.Trigger
-						disabled={!hasRequiredData($formData, ['title', 'location'])}
-						class={cn(
-							buttonVariants({
-								variant: 'outline',
-								class: 'w-auto justify-start place-self-start text-left font-normal'
-							}),
-							!comp_state.date_range && 'text-muted-foreground'
-						)}
-					>
-						<CalendarIcon />
-						{#if comp_state.date_range && comp_state.date_range.start}
-							{#if comp_state.date_range.end}
-								{monthFormatter.format(comp_state.date_range.start.toDate(getLocalTimeZone()))} - {monthFormatter.format(
-									comp_state.date_range.end.toDate(getLocalTimeZone())
-								)}
+				<div>
+					<Popover.Root>
+						<Popover.Trigger
+							disabled={!hasRequiredData($formData, ['title', 'location']) ||
+								(event_to_edit && event_status === 'ongoing')}
+							class={cn(
+								buttonVariants({
+									variant: 'outline',
+									class: 'w-auto justify-start place-self-start text-left font-normal'
+								}),
+								!comp_state.date_range && 'text-muted-foreground'
+							)}
+						>
+							<CalendarIcon />
+							{#if comp_state.date_range && comp_state.date_range.start}
+								{#if comp_state.date_range.end}
+									{monthFormatter.format(comp_state.date_range.start.toDate(getLocalTimeZone()))} - {monthFormatter.format(
+										comp_state.date_range.end.toDate(getLocalTimeZone())
+									)}
+								{:else}
+									{monthFormatter.format(comp_state.date_range.start.toDate(getLocalTimeZone()))}
+								{/if}
+							{:else if comp_state.start_value}
+								{monthFormatter.format(comp_state.start_value.toDate(getLocalTimeZone()))}
 							{:else}
-								{monthFormatter.format(comp_state.date_range.start.toDate(getLocalTimeZone()))}
+								Pick a date
 							{/if}
-						{:else if comp_state.start_value}
-							{monthFormatter.format(comp_state.start_value.toDate(getLocalTimeZone()))}
-						{:else}
-							Pick a date
-						{/if}
-					</Popover.Trigger>
-					<Popover.Content class="w-auto p-0" align="start">
-						<RangeCalendar
-							bind:value={comp_state.date_range}
-							onStartValueChange={(v) => {
-								comp_state.start_value = v;
-							}}
-							onValueChange={(v) => {
-								const { start, end } = v;
-								if (!start || !end) return;
-								handleGenerateEventDates();
-								$formData.start_date = start?.toDate(getLocalTimeZone());
-								$formData.end_date = end?.toDate(getLocalTimeZone());
-							}}
-							numberOfMonths={2}
-						/>
-					</Popover.Content>
-				</Popover.Root>
+						</Popover.Trigger>
+						<Popover.Content class="w-auto p-0" align="start">
+							<RangeCalendar
+								bind:value={comp_state.date_range}
+								onStartValueChange={(v) => {
+									comp_state.start_value = v;
+								}}
+								onValueChange={(v) => {
+									const { start, end } = v;
+									if (!start || !end) return;
+									handleGenerateEventDates();
+									$formData.start_date = start?.toDate(getLocalTimeZone());
+									$formData.end_date = end?.toDate(getLocalTimeZone());
+								}}
+								numberOfMonths={2}
+							/>
+						</Popover.Content>
+					</Popover.Root>
+					{#if event_status === 'ongoing'}
+						<div class="mt-2 flex gap-2">
+							<Info class="size-4 text-yellow-500" />
+							<p class="text-xs text-yellow-500">
+								You cannot edit the date ranger picker as this event is already ongoing
+							</p>
+						</div>
+					{/if}
+				</div>
 			</div>
 		</div>
 		<ImageCropper.Root>
@@ -428,13 +453,25 @@
 		<Form.FieldErrors />
 	</Form.Field>
 
-	<div>
-		<Label>Time</Label>
+	<div class="mt-4">
+		<div class="mb-2 flex items-center justify-between">
+			<Label>Event Time Schedules</Label>
+			{#if event_status === 'ongoing'}
+				<div class="flex gap-2">
+					<Info class="size-4 text-yellow-500" />
+					<p class="text-xs text-yellow-500">
+						You cannot edit the event time schedules this event is already ongoing
+					</p>
+				</div>
+			{/if}
+		</div>
+
 		<div class="max-h-[400px] overflow-y-auto">
 			<div class="flex flex-col gap-4 pr-2">
 				{#each comp_state.event_dates as event_date, index}
 					<EventTimePicker
-						is_selection_disabled={!hasRequiredData($formData, ['title', 'location'])}
+						is_selection_disabled={!hasRequiredData($formData, ['title', 'location']) ||
+							(event_to_edit && event_status === 'ongoing')}
 						{event_date}
 						day={index + 1}
 						{updateDateEventPeriodStartEnd}
