@@ -74,11 +74,11 @@
 			<div class="mb-1 flex items-center gap-1">
 				<Badge
 					variant="outline"
-					class="border border-gray-500 px-2 py-1 text-center text-xs font-medium dark:bg-gray-500/30 bg-gray-500/10"
+					class="border border-gray-500 bg-gray-500/10 px-2 py-1 text-center text-xs font-medium dark:bg-gray-500/30"
 					>{formatDateTime(new Date(start_date))}</Badge
 				> - <Badge
 					variant="outline"
-					class="border border-gray-500 px-2 py-1 text-center text-xs font-medium dark:bg-gray-500/30 bg-gray-500/10"
+					class="border border-gray-500 bg-gray-500/10 px-2 py-1 text-center text-xs font-medium dark:bg-gray-500/30"
 					>{formatDateTime(new Date(end_date))}</Badge
 				>
 			</div>
