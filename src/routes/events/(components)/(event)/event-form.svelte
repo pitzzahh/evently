@@ -194,6 +194,7 @@
 				const pm_end = new Date(date);
 				pm_end.setHours(16, 0, 0, 0);
 
+				const day = index + 1;
 				const existing_event_sched = event_schedules?.at(index);
 
 				if (existing_event_sched?.event_date.toLocaleDateString() === date.toLocaleDateString()) {
@@ -203,6 +204,7 @@
 						id: nanoid(),
 						event_date: date,
 						event_id: '',
+						day,
 						am_start: existing_event_sched.am_start,
 						am_end: existing_event_sched.am_end,
 						pm_start: existing_event_sched.pm_start,
@@ -213,6 +215,7 @@
 					id: nanoid(),
 					event_date: date,
 					event_id: '',
+					day,
 					am_start,
 					am_end,
 					pm_start,
@@ -469,12 +472,12 @@
 
 		<div class="max-h-[400px] overflow-y-auto">
 			<div class="flex flex-col gap-4 pr-2">
-				{#each comp_state.event_dates as event_date, index}
+				{#each comp_state.event_dates as event_date}
 					<EventTimePicker
 						is_selection_disabled={!hasRequiredData($formData, ['title', 'location']) ||
 							(event_to_edit && event_status === 'ongoing')}
 						{event_date}
-						day={index + 1}
+						day={event_date.day}
 						{updateDateEventPeriodStartEnd}
 					/>
 				{/each}
