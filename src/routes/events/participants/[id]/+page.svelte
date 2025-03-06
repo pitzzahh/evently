@@ -47,6 +47,16 @@
 	let barcode = $state('');
 	let timeout = $state<number | null>(null);
 
+	const current_event_day = $derived(
+		comp_state.event_details
+			? getEventDayInfo(
+					comp_state.event_details.start_date,
+					comp_state.event_details.end_date,
+					new Date()
+				).currentDay
+			: null
+	);
+
 	watch(
 		[
 			() => COLLECTIONS.PARTICIPANT_COLLECTION.isLoading(),
@@ -80,7 +90,8 @@
 
 	function getPopulatedAttendanceRecords(eventId: string) {
 		const attendance_records = COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.find({
-			event_id: eventId
+			event_id: eventId,
+			day: current_event_day as number
 		}).fetch();
 
 		const participantIds = [...new Set(attendance_records.map((record) => record.participant_id))];
@@ -160,16 +171,11 @@
 			return;
 		}
 
-		const exact_matches = COLLECTIONS.EVENT_SCHEDULE_COLLECTION.find({
-			event_id: event.id
-		}).fetch();
-
-		console.log('exact matches', exact_matches);
-
 		// Check for existing attendance record today
 		const existingAttendance = COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.findOne({
 			participant_id: participant.id,
-			event_id: comp_state.event_details.id
+			event_id: comp_state.event_details.id,
+			day: current_event_day as number
 		});
 
 		if (existingAttendance) {
@@ -198,6 +204,7 @@
 				am_time_in: period === 'AM' ? now : undefined,
 				pm_time_in: period === 'PM' ? now : undefined,
 				participant_id: participant.id,
+				day: current_event_day as number,
 				latest_time_scanned: now,
 				created: new Date(),
 				updated: new Date()
@@ -257,18 +264,14 @@
 
 <div in:fly={{ y: 20 }} class="grid gap-6">
 	<div class="flex items-center justify-between">
-		<div class="grid gap-2 place-items-start">
+		<div class="grid place-items-start gap-6">
 			<h2 class="text-5xl font-semibold">
 				{comp_state.event_details?.event_name ?? 'N/A'}'s Participants
 			</h2>
 
 			{#if comp_state.event_details}
-				<Badge variant="outline" class="font-semibold text-md">
-					Day {getEventDayInfo(
-						comp_state.event_details.start_date,
-						comp_state.event_details.end_date,
-						new Date()
-					).currentDay}
+				<Badge variant="outline" class="text-md font-semibold">
+					Day {current_event_day}
 				</Badge>
 			{/if}
 		</div>
@@ -310,7 +313,7 @@
 
 		<Tabs.Content value="time-in-and-out" class="mt-4">
 			<div class="flex items-start gap-4">
-				<Card.Root class="w-[400px]">
+				<!-- <Card.Root class="w-[400px]">
 					<Card.Header>
 						<Card.Title class="text-xl">Scan Result</Card.Title>
 						<Card.Description>Participant information</Card.Description>
@@ -359,7 +362,7 @@
 							Scan a participant's QR code to see their information
 						</Card.Content>
 					{/if}
-				</Card.Root>
+				</Card.Root> -->
 
 				<div class="grid flex-1 gap-2">
 					{#if COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.isPulling()}
