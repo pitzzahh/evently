@@ -16,6 +16,7 @@ export type AttendanceRecord = Pick<
 	| 'am_time_in'
 	| 'am_time_out'
 	| 'latest_time_scanned'
+	| 'day'
 	| 'created'
 	| 'updated'
 >;
