@@ -11,6 +11,7 @@ import type { SuperValidated } from 'sveltekit-superforms';
 import type { ParticipantSchema } from '@/schema/participant';
 import { formatDateToTimeOption } from '@/utils/format';
 import TimeInOutCell from '../(components)/(participant)/time-in-out-cell.svelte';
+import ParticipantAttendanceDataTableRowActions from '../(components)/(participant)/participant-attendance-data-table-row-actions.svelte';
 
 export function participantTableColumns(
 	participant_form: SuperValidated<ParticipantSchema>
@@ -265,7 +266,7 @@ export function participantAttendanceColumns(): ColumnDef<ParticipantAttendance>
 					.toLowerCase()
 					.includes(String(value ?? '').toLowerCase());
 			}
-		}
+		},
 		// {
 		// 	accessorKey: 'created',
 		// 	header: ({ column }) =>
@@ -291,10 +292,18 @@ export function participantAttendanceColumns(): ColumnDef<ParticipantAttendance>
 		// 		);
 		// 	}
 		// },
-		// {
-		// 	id: 'actions',
-		// 	header: () => 'Actions',
-		// 	cell: ({ row }) => renderComponent(ParticipantDataTableRowActions, { participant_form, row })
-		// }
+		{
+			id: 'actions',
+			header: () => 'Actions',
+			cell: ({ row }) => {
+				const original = row.original;
+				return renderComponent(ParticipantAttendanceDataTableRowActions, {
+					am_time_in: original.am_time_in,
+					am_time_out: original.am_time_out,
+					pm_time_in: original.pm_time_in,
+					pm_time_out: original.pm_time_out
+				});
+			}
+		}
 	];
 }
