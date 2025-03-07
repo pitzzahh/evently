@@ -24,9 +24,14 @@
 		success_callback?: () => void;
 	}
 
+	interface DuplicateItem {
+		index: number;
+		type: 'full-name' | 'email';
+	}
+
 	let { add_participants_form, event_id, success_callback }: ParticipantFormProps = $props();
 	let has_attempted_submit = $state(false);
-	let duplicate_indexes = $state<number[]>([]);
+	let duplicate_indexes = $state<DuplicateItem[]>([]);
 
 	const form = superForm(add_participants_form, {
 		SPA: true,
@@ -42,7 +47,7 @@
 			console.log('Internal Duplicates', internal_duplicates);
 
 			if (internal_duplicates.length > 0) {
-				toast.error('There are duplicate participants in the form');
+				toast.error('There are duplicate participants name/email in the form');
 				cancel();
 				return;
 			}
@@ -60,8 +65,24 @@
 					toast.error(
 						`${generateFullName({ first_name, last_name, middle_name }, { include_last_name: true })} is already existing in the list of event's participants`
 					);
-			
-					duplicate_indexes = [...duplicate_indexes, index];
+
+					duplicate_indexes = [...duplicate_indexes, { index, type: 'full-name' }];
+					cancel();
+					return;
+				}
+
+				const existing_email_participant = COLLECTIONS.PARTICIPANT_COLLECTION.findOne({
+					event_id,
+					email: participant.email
+				});
+
+				if (existing_email_participant) {
+					const { first_name, middle_name, last_name } = existing_email_participant;
+					toast.error(
+						`${generateFullName({ first_name, last_name, middle_name }, { include_last_name: true })}'s email is already existing in the list of event's participants`
+					);
+
+					duplicate_indexes = [...duplicate_indexes, { index, type: 'email' }];
 					cancel();
 					return;
 				}
@@ -70,7 +91,7 @@
 			COLLECTIONS.PARTICIPANT_COLLECTION.insertMany(
 				$formData.participants.map((p) => ({
 					...p,
-					event_id: event_id
+					event_id
 				}))
 			);
 			success_callback?.();
@@ -83,28 +104,58 @@
 
 	export const snapshot = { capture, restore };
 
-	function findDuplicates(): number[] {
-		const duplicates: number[] = [];
-		const participant_map = new Map();
+	/**
+	 * Find duplicate participants based on full name or email
+	 */
+	function findDuplicates() {
+		const result: DuplicateItem[] = [];
+		const nameMap = new Map<string, number>();
+		const emailMap = new Map<string, number>();
 
 		$formData.participants.forEach((participant, index) => {
-			// key for comparison
-			const key = `${participant.first_name.toLowerCase()}_${participant.middle_name?.toLowerCase() || ''}_${participant.last_name.toLowerCase()}`;
+			// Check for name duplicates (only if name fields are filled)
+			if (participant.first_name && participant.last_name) {
+				const nameKey = `${participant.first_name.toLowerCase()}_${
+					participant.middle_name?.toLowerCase() || ''
+				}_${participant.last_name.toLowerCase()}`;
 
-			if (participant_map.has(key)) {
-				duplicates.push(index); //current participant
-				duplicates.push(participant_map.get(key)); //previous participant that  was used to match to its duplicate
-			} else {
-				if (participant.first_name && participant.last_name) {
-					participant_map.set(key, index);
+				if (nameMap.has(nameKey)) {
+					// Current participant is a duplicate
+					result.push({ index, type: 'full-name' });
+
+					// Also mark the original participant if not already marked
+					const originalIndex = nameMap.get(nameKey)!;
+					if (!result.some((d) => d.index === originalIndex && d.type === 'full-name')) {
+						result.push({ index: originalIndex, type: 'full-name' });
+					}
+				} else {
+					nameMap.set(nameKey, index);
+				}
+			}
+
+			// Check for email duplicates (if email is provided)
+			if (participant.email) {
+				const emailKey = participant.email.toLowerCase();
+
+				if (emailMap.has(emailKey)) {
+					// Current participant has duplicate email
+					result.push({ index, type: 'email' });
+
+					// Also mark the original participant if not already marked
+					const originalIndex = emailMap.get(emailKey)!;
+					if (!result.some((d) => d.index === originalIndex && d.type === 'email')) {
+						result.push({ index: originalIndex, type: 'email' });
+					}
+				} else {
+					emailMap.set(emailKey, index);
 				}
 			}
 		});
 
-		duplicate_indexes = [...new Set(duplicates)];
-		return duplicate_indexes;
+		// Update state with found duplicates
+		duplicate_indexes = result;
+		return result;
 	}
-
 	function addParticipant() {
 		$formData.participants = [
 			...$formData.participants,
@@ -137,30 +188,32 @@
 		addParticipant();
 	});
 
-	function checkIsDuplicate(index: number): boolean {
-		return duplicate_indexes.includes(index);
+	function getDuplicateItem(index: number) {
+		return duplicate_indexes.find((item) => item.index === index);
 	}
 </script>
 
 <form method="POST" use:enhance class="grid gap-4">
 	<div class="h-auto max-h-[340px] space-y-2 overflow-y-auto">
 		{#each $formData.participants, index}
-			{@const is_duplicate_item = has_attempted_submit && checkIsDuplicate(index)}
+			{@const duplicate_item = has_attempted_submit && getDuplicateItem(index)}
 
 			<div
 				id={index.toString()}
 				class={cn('rounded-lg border p-4', {
-					'border-red-600 ': is_duplicate_item
+					'border-red-600 ': !!duplicate_item
 				})}
 				transition:scale={{ duration: 200, easing: quartInOut }}
 			>
 				<div class="mb-4 flex items-center justify-between">
 					<div class="flex items-center gap-2">
 						<p class="font-medium">Participant {index + 1}</p>
-						{#if is_duplicate_item}
+						{#if !!duplicate_item}
 							<div class="flex items-center gap-1 text-xs text-red-600">
 								<AlertCircle class="h-4 w-4" />
-								<span>Duplicate participant</span>
+								<span
+									>Duplicate participant {(duplicate_item.type === 'email' && 'email') || ''}</span
+								>
 							</div>
 						{/if}
 					</div>
