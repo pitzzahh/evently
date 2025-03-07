@@ -4,6 +4,7 @@
 	import { watch } from 'runed';
 	import { fly } from 'svelte/transition';
 	import { COLLECTIONS } from '@/db';
+	import { checkEventStatus } from '@routes/events/utils/index.js';
 
 	let { data } = $props();
 
@@ -15,6 +16,7 @@
 		event_details_to_edit: undefined
 	});
 
+	
 	watch(
 		[
 			() => COLLECTIONS.EVENT_SCHEDULE_COLLECTION.isLoading(),
