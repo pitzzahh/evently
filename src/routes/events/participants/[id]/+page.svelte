@@ -128,7 +128,8 @@
 	}
 
 	/**
-	 * Process a completed barcode scan
+	 * Process a barcode scan and record participant attendance
+	 * @param participant_id The ID of the scanned participant
 	 */
 	function handleScanParticipant(participant_id: string) {
 		if (!comp_state.event_details) {
@@ -136,95 +137,169 @@
 			return;
 		}
 
-		const now = new Date();
-		const period = now.getHours() < 12 ? 'AM' : 'PM';
+		try {
+			const now = new Date();
+			const period = now.getHours() < 12 ? 'AM' : 'PM';
 
-		const event = COLLECTIONS.EVENT_DETAILS_COLLECTION.findOne({
-			id: comp_state.event_details.id
-		});
+			// Get fresh event data
+			const event = COLLECTIONS.EVENT_DETAILS_COLLECTION.findOne({
+				id: comp_state.event_details.id
+			});
 
-		if (!event) {
-			toast.error('Event not found');
-			return;
-		}
+			if (!event) {
+				toast.error('Event not found');
+				return;
+			}
 
-		// validate the event's start date schedule
-		if (now < event.start_date) {
-			toast.error('Unable to scan - The event has not started yet.');
-			return;
-		}
+			// Validate event timing
+			if (now < event.start_date) {
+				toast.error('Event has not started yet. Attendance cannot be recorded.');
+				return;
+			}
 
-		// validate the event's end date schedule
-		if (
-			now >=
-			new Date(
-				event.end_date.getFullYear(),
-				event.end_date.getMonth(),
-				event.end_date.getDate() + 1
-			)
-		) {
-			toast.error('Unable to scan - The event has concluded.');
-			return;
-		}
+			// Set end date to end of the day
+			const endOfEventDay = new Date(event.end_date);
+			endOfEventDay.setHours(23, 59, 59, 999);
 
-		const participant = COLLECTIONS.PARTICIPANT_COLLECTION.findOne({
-			id: participant_id
-		});
+			if (now > endOfEventDay) {
+				toast.error('Event has concluded. Attendance records are now finalized.');
+				return;
+			}
 
-		if (!participant) {
-			toast.error('Invalid QR Code - No matching participant found');
-			return;
-		}
+			// Find the participant
+			const participant = COLLECTIONS.PARTICIPANT_COLLECTION.findOne({
+				id: participant_id
+			});
 
-		// Check for existing attendance record today
-		const existingAttendance = COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.findOne({
-			participant_id: participant.id,
-			event_id: comp_state.event_details.id,
-			day: current_event_day as number
-		});
+			if (!participant) {
+				toast.error('Invalid QR Code - No matching participant found');
+				return;
+			}
 
-		if (existingAttendance) {
-			// If already has attendance for this period, update time_out
-			COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.updateOne(
-				{ id: existingAttendance.id },
-				{
-					$set: {
-						am_time_out: period === 'AM' ? now : undefined,
-						pm_time_out: period === 'PM' ? now : undefined,
-						latest_time_scanned: now,
-						updated: new Date()
+			// Check for existing attendance record for this day
+			const existingAttendance = COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.findOne({
+				participant_id: participant.id,
+				event_id: event.id,
+				day: current_event_day as number
+			});
+
+			// Prepare response message variables
+			let actionTaken = '';
+			let attendanceRecord;
+
+			if (existingAttendance) {
+				// Update existing attendance record based on period and current state
+				if (period === 'AM') {
+					if (!existingAttendance.am_time_in) {
+						// First AM scan - record time in
+						COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.updateOne(
+							{ id: existingAttendance.id },
+							{
+								$set: {
+									am_time_in: now,
+									latest_time_scanned: now
+								}
+							}
+						);
+						actionTaken = 'signed in for morning session';
+					} else if (!existingAttendance.am_time_out) {
+						// Second AM scan - record time out
+						COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.updateOne(
+							{ id: existingAttendance.id },
+							{
+								$set: {
+									am_time_out: now,
+									latest_time_scanned: now
+								}
+							}
+						);
+						actionTaken = 'signed out from morning session';
+					} else {
+						// AM already has both time in and out
+						toast.info(`${participant.first_name} already has complete morning attendance`);
+						comp_state.last_scanned_participant = participant;
+						comp_state.scanned_attendance = existingAttendance;
+						return;
+					}
+				} else {
+					// Period is PM
+					if (!existingAttendance.pm_time_in) {
+						// First PM scan - record time in
+						COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.updateOne(
+							{ id: existingAttendance.id },
+							{
+								$set: {
+									pm_time_in: now,
+									latest_time_scanned: now
+								}
+							}
+						);
+						actionTaken = 'signed in for PM session';
+					} else if (!existingAttendance.pm_time_out) {
+						// Second PM scan - record time out
+						COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.updateOne(
+							{ id: existingAttendance.id },
+							{
+								$set: {
+									pm_time_out: now,
+									latest_time_scanned: now
+								}
+							}
+						);
+						actionTaken = 'signed out from PM session';
+					} else {
+						// PM already has both time in and out
+						toast.info(`${participant.first_name} already has complete PM attendance`);
+						comp_state.last_scanned_participant = participant;
+						comp_state.scanned_attendance = existingAttendance;
+						return;
 					}
 				}
-			);
 
-			const updatedAttendance = COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.findOne({
-				id: existingAttendance.id
-			});
+				// Get the updated attendance record
+				attendanceRecord = COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.findOne({
+					id: existingAttendance.id
+				});
+			} else {
+				// Create new attendance record
+				const attendanceId = COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.insert({
+					event_id: event.id,
+					participant_id: participant.id,
+					day: current_event_day as number,
+					am_time_in: period === 'AM' ? now : undefined,
+					pm_time_in: period === 'PM' ? now : undefined,
+					latest_time_scanned: now,
+					created: new Date(),
+					updated: new Date()
+				});
 
-			comp_state.scanned_attendance = updatedAttendance;
-			toast.success(`${participant.first_name} ${participant.last_name} signed out successfully`);
-		} else {
-			const attendance_id = COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.insert({
-				event_id: comp_state.event_details.id,
-				am_time_in: period === 'AM' ? now : undefined,
-				pm_time_in: period === 'PM' ? now : undefined,
-				participant_id: participant.id,
-				day: current_event_day as number,
-				latest_time_scanned: now,
-				created: new Date(),
-				updated: new Date()
-			});
+				attendanceRecord = COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.findOne({
+					id: attendanceId
+				});
 
-			const attendance = COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.findOne({
-				id: attendance_id
-			});
+				actionTaken =
+					period === 'AM' ? 'signed in for morning session' : 'signed in for afternoon session';
+			}
 
-			comp_state.scanned_attendance = { ...attendance };
-			toast.success(`${participant.first_name} ${participant.last_name} signed in successfully`);
+			// Update component state with scan results
+			comp_state.last_scanned_participant = participant;
+			comp_state.scanned_attendance = attendanceRecord;
+
+			// Display success message
+			const fullName = `${participant.first_name} ${participant.last_name}`;
+			toast.success(`${fullName} ${actionTaken}`);
+
+			// Refresh the attendance records display
+			if (current_event_day) {
+				comp_state.participants_attendance = getPopulatedAttendanceRecords(
+					event.id,
+					current_event_day
+				) as ParticipantAttendance[];
+			}
+		} catch (error) {
+			console.error('Error processing attendance scan:', error);
+			toast.error('An error occurred while processing the scan');
 		}
-
-		// Update UI with the scanned participant
-		comp_state.last_scanned_participant = participant;
 	}
 
 	function handleKeydown(event: KeyboardEvent) {
@@ -290,7 +365,7 @@
 			<Button variant="outline"><Download class="size-4" /> Export QR Codes</Button>
 		</div>
 	</div>
-
+	
 	<Tabs.Root value="participants">
 		<Tabs.List class="grid h-auto w-full max-w-[600px] grid-cols-2">
 			<Tabs.Trigger value="participants" class="h-auto text-base">
