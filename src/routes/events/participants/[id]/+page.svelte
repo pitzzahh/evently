@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Button } from '@/components/ui/button';
-	import { Check, Clock, Download, UsersRound } from 'lucide-svelte';
+	import { Check, Clock, Download, UsersRound, X } from 'lucide-svelte';
 	import {
 		AddParticipantsDialog,
 		ParticipantDataTable,
@@ -21,6 +21,7 @@
 	import ParticipantAttendanceDataTable from '@routes/events/(components)/(participant)/participant-attendance-data-table.svelte';
 	import ParticipantAttendanceDataTableToolbar from '@routes/events/(components)/(participant)/participant-attendance-data-table-toolbar.svelte';
 	import { getEventDayInfo } from '@routes/events/utils/index.js';
+	import { cubicIn, cubicOut } from 'svelte/easing';
 
 	let { data } = $props();
 
@@ -72,14 +73,18 @@
 				event_id: data.event_id
 			});
 
-			comp_state.participants_attendance = getPopulatedAttendanceRecords(
-				data.event_id
-			) as ParticipantAttendance[];
 			comp_state.participants = participants_cursor.fetch();
 			comp_state.event_schedules = event_schedule_cursor.fetch();
 			comp_state.event_details = COLLECTIONS.EVENT_DETAILS_COLLECTION.findOne({
 				id: data.event_id
 			});
+
+			if (current_event_day) {
+				comp_state.participants_attendance = getPopulatedAttendanceRecords(
+					data.event_id,
+					current_event_day
+				) as ParticipantAttendance[];
+			}
 
 			return () => {
 				participants_cursor.cleanup();
@@ -88,10 +93,10 @@
 		}
 	);
 
-	function getPopulatedAttendanceRecords(eventId: string) {
+	function getPopulatedAttendanceRecords(eventId: string, current_event_day: number) {
 		const attendance_records = COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.find({
 			event_id: eventId,
-			day: current_event_day as number
+			day: current_event_day
 		}).fetch();
 
 		const participantIds = [...new Set(attendance_records.map((record) => record.participant_id))];
@@ -313,57 +318,6 @@
 
 		<Tabs.Content value="time-in-and-out" class="mt-4">
 			<div class="flex items-start gap-4">
-				<!-- <Card.Root class="w-[400px]">
-					<Card.Header>
-						<Card.Title class="text-xl">Scan Result</Card.Title>
-						<Card.Description>Participant information</Card.Description>
-					</Card.Header>
-
-					{#if comp_state.last_scanned_participant}
-						<Card.Content class="flex w-full justify-between">
-							<div>
-								<h5 class="font-semibold">
-									{comp_state.last_scanned_participant.first_name}
-									{comp_state.last_scanned_participant.middle_name
-										? comp_state.last_scanned_participant.middle_name + ' '
-										: ''}
-									{comp_state.last_scanned_participant.last_name}
-								</h5>
-								<p class="text-muted-foreground">{comp_state.last_scanned_participant.email}</p>
-							</div>
-
-							<div class="flex size-8 items-center justify-center rounded-full bg-green-200">
-								<Check class="size-4 text-green-600" />
-							</div>
-						</Card.Content>
-						<Card.Footer class="flex justify-between">
-							{#if comp_state.scanned_attendance}
-								<Badge variant="outline">
-									Date: {new Date().toLocaleDateString()}
-								</Badge>
-								<Badge>
-									{(comp_state.scanned_attendance.am_time_in &&
-										!comp_state.scanned_attendance.am_time_out) ||
-									(comp_state.scanned_attendance.pm_time_in &&
-										!comp_state.scanned_attendance.pm_time_out)
-										? 'Time in: '
-										: 'Time out: '}
-									{comp_state.scanned_attendance.latest_time_scanned.toLocaleTimeString([], {
-										hour: '2-digit',
-										minute: '2-digit'
-									})}
-								</Badge>
-							{:else}
-								<Badge>No attendance record</Badge>
-							{/if}
-						</Card.Footer>
-					{:else}
-						<Card.Content class="py-8 text-center text-muted-foreground">
-							Scan a participant's QR code to see their information
-						</Card.Content>
-					{/if}
-				</Card.Root> -->
-
 				<div class="grid flex-1 gap-2">
 					{#if COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.isPulling()}
 						<TableSkeleton />
@@ -377,3 +331,64 @@
 		</Tabs.Content>
 	</Tabs.Root>
 </div>
+
+{#if comp_state.last_scanned_participant}
+	<div
+		in:fly={{ y: -20, easing: cubicIn }}
+		out:fly={{ y: -20, easing: cubicOut }}
+		class="fixed right-8 top-10 z-20"
+	>
+		<Card.Root class="relative w-[400px]">
+			<button
+				class="absolute right-4 top-4"
+				onclick={() => (comp_state.last_scanned_participant = null)}
+			>
+				<X class="size-4" />
+			</button>
+			<Card.Header>
+				<Card.Title class="text-xl">Scan Result</Card.Title>
+				<Card.Description>Participant information</Card.Description>
+			</Card.Header>
+
+			<Card.Content class="flex w-full justify-between">
+				<div>
+					<h5 class="font-semibold">
+						{comp_state.last_scanned_participant.first_name}
+						{comp_state.last_scanned_participant.middle_name
+							? comp_state.last_scanned_participant.middle_name + ' '
+							: ''}
+						{comp_state.last_scanned_participant.last_name}
+					</h5>
+					<p class="text-muted-foreground">{comp_state.last_scanned_participant.email}</p>
+				</div>
+
+				<div class="flex size-8 items-center justify-center rounded-full bg-green-200">
+					<Check class="size-4 text-green-600" />
+				</div>
+			</Card.Content>
+			<Card.Footer class="flex justify-between">
+				<Badge variant="outline">
+					Date: {new Date().toLocaleDateString()}
+				</Badge>
+				<Badge>
+					{(comp_state.scanned_attendance.am_time_in &&
+						!comp_state.scanned_attendance.am_time_out) ||
+					(comp_state.scanned_attendance.pm_time_in && !comp_state.scanned_attendance.pm_time_out)
+						? 'Time in: '
+						: 'Time out: '}
+					{comp_state.scanned_attendance.latest_time_scanned.toLocaleTimeString([], {
+						hour: '2-digit',
+						minute: '2-digit'
+					})}
+				</Badge>
+				<!-- {:else}
+				<Badge>No attendance record</Badge>
+			{/if} -->
+			</Card.Footer>
+			<!-- {:else} -->
+			<!-- <Card.Content class="py-8 text-center text-muted-foreground">
+			Scan a participant's QR code to see their information
+		</Card.Content> -->
+		</Card.Root>
+	</div>
+{/if}
