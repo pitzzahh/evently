@@ -33,33 +33,6 @@
 		}
 	}
 
-	let barcode = $state('');
-	let timeout = $state(0);
-
-	function handleKeydown(event: KeyboardEvent) {
-		if (event.key === 'Enter') {
-			event.preventDefault();
-			event.stopPropagation();
-			barcode = '';
-			return;
-		}
-
-		if (timeout) clearTimeout(timeout);
-
-		barcode = event.key;
-
-		timeout = setTimeout(() => {
-			barcode = '';
-		}, 500);
-	}
-
-	$effect(() => {
-		window.addEventListener('keydown', handleKeydown);
-
-		return () => {
-			window.removeEventListener('keydown', handleKeydown);
-		};
-	});
 
 	function handleDeleteParticipant() {
 		COLLECTIONS.PARTICIPANT_COLLECTION.removeOne({
@@ -123,7 +96,6 @@
 						<img {src} alt="qr" class="size-[200px]" />
 					{/snippet}
 				</QR>
-				<p>{barcode}</p>
 			</Dialog.Header>
 		</Dialog.Content>
 	{/if}
