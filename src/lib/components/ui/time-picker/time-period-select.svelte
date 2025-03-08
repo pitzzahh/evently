@@ -36,12 +36,7 @@
 	function handlePeriod() {
 		const tempTime = time.copy();
 		const hours = display12HourValue(time.hour);
-		const _time = setDateByType(
-			tempTime,
-			hours.toString(),
-			'12hours',
-			period === 'AM' ? 'PM' : 'AM'
-		);
+		const _time = setDateByType(tempTime, hours.toString(), '12hours', period);
 
 		time = _time;
 		setTime?.(_time);
@@ -56,6 +51,7 @@
 		period = value;
 		setPeriod?.(value);
 
+		console.log('PERIOD', value);
 		/**
 		 * trigger an update whenever the user switches between AM and PM;
 		 * otherwise user must manually change the hour each time
