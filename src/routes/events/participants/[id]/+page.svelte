@@ -80,10 +80,10 @@
 			});
 
 			if (current_event_day) {
-				comp_state.participants_attendance = getPopulatedAttendanceRecords(
+				comp_state.participants_attendance  = getPopulatedAttendanceRecords(
 					data.event_id,
 					current_event_day
-				) as ParticipantAttendance[];
+				) as ParticipantAttendance[];	
 			}
 
 			return () => {
@@ -365,7 +365,7 @@
 			<Button variant="outline"><Download class="size-4" /> Export QR Codes</Button>
 		</div>
 	</div>
-	
+
 	<Tabs.Root value="participants">
 		<Tabs.List class="grid h-auto w-full max-w-[600px] grid-cols-2">
 			<Tabs.Trigger value="participants" class="h-auto text-base">
@@ -456,14 +456,7 @@
 						minute: '2-digit'
 					})}
 				</Badge>
-				<!-- {:else}
-				<Badge>No attendance record</Badge>
-			{/if} -->
 			</Card.Footer>
-			<!-- {:else} -->
-			<!-- <Card.Content class="py-8 text-center text-muted-foreground">
-			Scan a participant's QR code to see their information
-		</Card.Content> -->
 		</Card.Root>
 	</div>
 {/if}
