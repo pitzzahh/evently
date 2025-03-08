@@ -1,0 +1,106 @@
+name: "publish"
+
+on:
+  push:
+    tags:
+      - "*.*.*"
+
+env:
+  APP_NAME: "Evently"
+
+jobs:
+  release:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: "macos-latest" # for Arm based macs (M1 and above).
+            args: "--target aarch64-apple-darwin"
+          - platform: "macos-latest" # for Intel based macs.
+            args: "--target x86_64-apple-darwin"
+          - platform: "ubuntu-22.04"
+            args: ""
+          - platform: "windows-latest"
+            args: ""
+
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: install dependencies (ubuntu only)
+        if: matrix.platform == 'ubuntu-22.04' # This must match the platform value defined above.
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      # build the changelog based on the commit messages between the versioned tags
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install npm as global
+        run: bun install -g npm
+
+      - name: install Rust stable
+        uses: dtolnay/rust-toolchain@stable # Set this to dtolnay/rust-toolchain@nightly
+        with:
+          # Those targets are only used on macos runners so it's in an `if` to slightly speed up windows and linux builds.
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+
+      - name: Install frontend
+        run: bun install
+
+      - name: Create env
+        uses: SpicyPizza/create-envfile@v2.0
+
+      - name: Read created env file (Linux/Mac)
+        if: matrix.platform != 'windows-latest'
+        run: cat $GITHUB_WORKSPACE/.env
+
+      - name: Read created env file (Windows)
+        if: matrix.platform == 'windows-latest'
+        run: type $env:GITHUB_WORKSPACE\.env
+
+      - name: CI Upload Windows
+        if: ${{ github.ref_type == 'branch' && matrix.platform == 'windows-latest' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: "Windows Installers"
+          path: |
+            src-tauri/target/release/bundle/msi/*.msi
+            src-tauri/target/release/bundle/nsis/*.exe
+      - name: Get Changelog Entry
+        id: changelog_reader
+        uses: mindsers/changelog-reader-action@v2
+        with:
+          validation_level: warn
+          version: ${{ github.ref_name }}
+          path: ./changelog.md
+      - name: Build Tauri app
+        uses: tauri-apps/tauri-action@v0
+        if: ${{ github.ref_type == 'tag' }}
+        env:
+          CI: true
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: "${{ env.APP_NAME }} v__VERSION__"
+          releaseBody: ${{ steps.changelog_reader.outputs.changes }}
+          releaseDraft: true
+          prerelease: false
+          args: ${{ matrix.args }}
