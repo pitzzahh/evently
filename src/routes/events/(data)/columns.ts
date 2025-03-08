@@ -238,20 +238,6 @@ export function participantAttendanceColumns(): ColumnDef<ParticipantAttendance>
 				});
 			}
 		},
-		// {
-		// 	accessorKey: 'email',
-		// 	header: ({ column }) =>
-		// 		renderComponent(DataTableColumnHeader<ParticipantAttendance, unknown>, {
-		// 			column,
-		// 			title: 'Email'
-		// 		}),
-		// 	cell: ({ row }) => row.original.email,
-		// 	filterFn: (row, id, value) => {
-		// 		return String(row.getValue(id))
-		// 			.toLowerCase()
-		// 			.includes(String(value ?? '').toLowerCase());
-		// 	}
-		// },
 		{
 			accessorKey: 'latest_time_scanned',
 			header: ({ column }) =>
@@ -267,31 +253,6 @@ export function participantAttendanceColumns(): ColumnDef<ParticipantAttendance>
 					.includes(String(value ?? '').toLowerCase());
 			}
 		},
-		// {
-		// 	accessorKey: 'created',
-		// 	header: ({ column }) =>
-		// 		renderComponent(DataTableColumnHeader<Participant, unknown>, {
-		// 			column,
-		// 			title: 'Created At'
-		// 		}),
-		// 	cell: ({ row }) =>
-		// 		renderComponent(DataTableBadge, {
-		// 			variant: 'outline',
-		// 			value: formatDateTime(row.original.created)
-		// 		}),
-		// 	filterFn: (row, id, value) => {
-		// 		const date = new Date(row.getValue(id));
-		// 		const searchValue = value.toLowerCase();
-		// 		const dateStr = date.toLocaleDateString();
-		// 		const timeStr = date.toLocaleTimeString();
-		// 		const fullStr = date.toString().toLowerCase();
-		// 		return (
-		// 			dateStr.includes(searchValue) ||
-		// 			timeStr.includes(searchValue) ||
-		// 			fullStr.includes(searchValue)
-		// 		);
-		// 	}
-		// },
 		{
 			id: 'actions',
 			header: () => 'Actions',
@@ -301,7 +262,9 @@ export function participantAttendanceColumns(): ColumnDef<ParticipantAttendance>
 					am_time_in: original.am_time_in,
 					am_time_out: original.am_time_out,
 					pm_time_in: original.pm_time_in,
-					pm_time_out: original.pm_time_out
+					pm_time_out: original.pm_time_out,
+					current_event_date: original.created as Date, 
+					attendance_id: original.id
 				});
 			}
 		}
