@@ -33,6 +33,8 @@
 		last_scanned_participant: Participant | null;
 		scanned_attendance: any | null;
 		participants_attendance: ParticipantAttendance[];
+		barcode: string;
+		timeout: number | null;
 	}
 
 	let comp_state = $state<ComponentState>({
@@ -42,11 +44,10 @@
 		see_more: true,
 		last_scanned_participant: null,
 		scanned_attendance: null,
-		participants_attendance: []
+		participants_attendance: [],
+		barcode: '',
+		timeout: null
 	});
-
-	let barcode = $state('');
-	let timeout = $state<number | null>(null);
 
 	const current_event_day = $derived(
 		comp_state.event_details
@@ -80,10 +81,10 @@
 			});
 
 			if (current_event_day) {
-				comp_state.participants_attendance  = getPopulatedAttendanceRecords(
+				comp_state.participants_attendance = getPopulatedAttendanceRecords(
 					data.event_id,
 					current_event_day
-				) as ParticipantAttendance[];	
+				) as ParticipantAttendance[];
 			}
 
 			return () => {
@@ -158,10 +159,10 @@
 			}
 
 			// Set end date to end of the day
-			const endOfEventDay = new Date(event.end_date);
-			endOfEventDay.setHours(23, 59, 59, 999);
+			const end_of_eventDay = new Date(event.end_date);
+			end_of_eventDay.setHours(23, 59, 59, 999);
 
-			if (now > endOfEventDay) {
+			if (now > end_of_eventDay) {
 				toast.error('Event has concluded. Attendance records are now finalized.');
 				return;
 			}
@@ -177,23 +178,23 @@
 			}
 
 			// Check for existing attendance record for this day
-			const existingAttendance = COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.findOne({
+			const existing_attendance = COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.findOne({
 				participant_id: participant.id,
 				event_id: event.id,
 				day: current_event_day as number
 			});
 
 			// Prepare response message variables
-			let actionTaken = '';
-			let attendanceRecord;
+			let action_taken = '';
+			let attendance_record;
 
-			if (existingAttendance) {
+			if (existing_attendance) {
 				// Update existing attendance record based on period and current state
 				if (period === 'AM') {
-					if (!existingAttendance.am_time_in) {
+					if (!existing_attendance.am_time_in) {
 						// First AM scan - record time in
 						COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.updateOne(
-							{ id: existingAttendance.id },
+							{ id: existing_attendance.id },
 							{
 								$set: {
 									am_time_in: now,
@@ -201,11 +202,11 @@
 								}
 							}
 						);
-						actionTaken = 'signed in for morning session';
-					} else if (!existingAttendance.am_time_out) {
+						action_taken = 'signed in for morning session';
+					} else if (!existing_attendance.am_time_out) {
 						// Second AM scan - record time out
 						COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.updateOne(
-							{ id: existingAttendance.id },
+							{ id: existing_attendance.id },
 							{
 								$set: {
 									am_time_out: now,
@@ -213,20 +214,20 @@
 								}
 							}
 						);
-						actionTaken = 'signed out from morning session';
+						action_taken = 'signed out from morning session';
 					} else {
 						// AM already has both time in and out
 						toast.info(`${participant.first_name} already has complete morning attendance`);
 						comp_state.last_scanned_participant = participant;
-						comp_state.scanned_attendance = existingAttendance;
+						comp_state.scanned_attendance = existing_attendance;
 						return;
 					}
 				} else {
 					// Period is PM
-					if (!existingAttendance.pm_time_in) {
+					if (!existing_attendance.pm_time_in) {
 						// First PM scan - record time in
 						COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.updateOne(
-							{ id: existingAttendance.id },
+							{ id: existing_attendance.id },
 							{
 								$set: {
 									pm_time_in: now,
@@ -234,11 +235,11 @@
 								}
 							}
 						);
-						actionTaken = 'signed in for PM session';
-					} else if (!existingAttendance.pm_time_out) {
+						action_taken = 'signed in for PM session';
+					} else if (!existing_attendance.pm_time_out) {
 						// Second PM scan - record time out
 						COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.updateOne(
-							{ id: existingAttendance.id },
+							{ id: existing_attendance.id },
 							{
 								$set: {
 									pm_time_out: now,
@@ -246,19 +247,19 @@
 								}
 							}
 						);
-						actionTaken = 'signed out from PM session';
+						action_taken = 'signed out from PM session';
 					} else {
 						// PM already has both time in and out
 						toast.info(`${participant.first_name} already has complete PM attendance`);
 						comp_state.last_scanned_participant = participant;
-						comp_state.scanned_attendance = existingAttendance;
+						comp_state.scanned_attendance = existing_attendance;
 						return;
 					}
 				}
 
 				// Get the updated attendance record
-				attendanceRecord = COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.findOne({
-					id: existingAttendance.id
+				attendance_record = COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.findOne({
+					id: existing_attendance.id
 				});
 			} else {
 				// Create new attendance record
@@ -273,21 +274,21 @@
 					updated: new Date()
 				});
 
-				attendanceRecord = COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.findOne({
+				attendance_record = COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.findOne({
 					id: attendanceId
 				});
 
-				actionTaken =
+				action_taken =
 					period === 'AM' ? 'signed in for morning session' : 'signed in for afternoon session';
 			}
 
 			// Update component state with scan results
 			comp_state.last_scanned_participant = participant;
-			comp_state.scanned_attendance = attendanceRecord;
+			comp_state.scanned_attendance = attendance_record;
 
 			// Display success message
 			const fullName = `${participant.first_name} ${participant.last_name}`;
-			toast.success(`${fullName} ${actionTaken}`);
+			toast.success(`${fullName} ${action_taken}`);
 
 			// Refresh the attendance records display
 			if (current_event_day) {
@@ -307,28 +308,28 @@
 			event.preventDefault();
 			event.stopPropagation();
 
-			if (barcode && barcode.length > 5) {
-				console.log('Complete barcode scanned:', barcode);
-				handleScanParticipant(barcode);
+			if (comp_state.barcode && comp_state.barcode.length > 5) {
+				console.log('Complete barcode scanned:', comp_state.barcode);
+				handleScanParticipant(comp_state.barcode);
 			}
 
-			barcode = '';
+			comp_state.barcode = '';
 			return;
 		}
 
-		if (timeout) {
-			clearTimeout(timeout);
-			timeout = null;
+		if (comp_state.timeout) {
+			clearTimeout(comp_state.timeout);
+			comp_state.timeout = null;
 		}
 
-		barcode += event.key;
+		comp_state.barcode += event.key;
 
 		// reset if no input received for a while
-		timeout = setTimeout(() => {
-			if (barcode.length < 5) {
-				barcode = '';
+		comp_state.timeout = setTimeout(() => {
+			if (comp_state.barcode.length < 5) {
+				comp_state.barcode = '';
 			}
-			timeout = null;
+			comp_state.timeout = null;
 		}, 500) as unknown as number;
 	}
 
@@ -336,7 +337,7 @@
 		window.addEventListener('keydown', handleKeydown);
 
 		return () => {
-			if (timeout) clearTimeout(timeout);
+			if (comp_state.timeout) clearTimeout(comp_state.timeout);
 			window.removeEventListener('keydown', handleKeydown);
 		};
 	});
