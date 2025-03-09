@@ -12,6 +12,7 @@
 	import QR from '@svelte-put/qr/img/QR.svelte';
 	import ImgQR from '@svelte-put/qr/img/QR.svelte';
 	import { COLLECTIONS } from '@/db';
+	import ParticipantInfo from './participant-info.svelte';
 
 	let {
 		row,
@@ -32,7 +33,6 @@
 			comp_state.view_open = value;
 		}
 	}
-
 
 	function handleDeleteParticipant() {
 		COLLECTIONS.PARTICIPANT_COLLECTION.removeOne({
@@ -80,23 +80,11 @@
 	</DropdownMenu.Root>
 
 	{#if comp_state.view_open}
-		<Dialog.Content class="max-w-[650px]">
+		<Dialog.Content class="max-w-[850px]">
 			<Dialog.Header>
 				<Dialog.Title>Participant's Information</Dialog.Title>
-				<QR
-					data={row.original.id}
-					logoRatio={107 / 128}
-					shape="circle"
-					backgroundFill="white"
-					margin={4}
-					width="600"
-					height="600"
-				>
-					{#snippet img({ src })}
-						<img {src} alt="qr" class="size-[200px]" />
-					{/snippet}
-				</QR>
 			</Dialog.Header>
+			<ParticipantInfo participant={row.original} />
 		</Dialog.Content>
 	{/if}
 
