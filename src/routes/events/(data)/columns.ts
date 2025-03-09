@@ -98,31 +98,6 @@ export function participantTableColumns(
 					.includes(String(value ?? '').toLowerCase());
 			}
 		},
-		// {
-		// 	accessorKey: 'created',
-		// 	header: ({ column }) =>
-		// 		renderComponent(DataTableColumnHeader<Participant, unknown>, {
-		// 			column,
-		// 			title: 'Created At'
-		// 		}),
-		// 	cell: ({ row }) =>
-		// 		renderComponent(DataTableBadge, {
-		// 			variant: 'outline',
-		// 			value: formatDateTime(row.original.created)
-		// 		}),
-		// 	filterFn: (row, id, value) => {
-		// 		const date = new Date(row.getValue(id));
-		// 		const searchValue = value.toLowerCase();
-		// 		const dateStr = date.toLocaleDateString();
-		// 		const timeStr = date.toLocaleTimeString();
-		// 		const fullStr = date.toString().toLowerCase();
-		// 		return (
-		// 			dateStr.includes(searchValue) ||
-		// 			timeStr.includes(searchValue) ||
-		// 			fullStr.includes(searchValue)
-		// 		);
-		// 	}
-		// },
 		{
 			id: 'actions',
 			header: () => 'Actions',
@@ -133,25 +108,6 @@ export function participantTableColumns(
 
 export function participantAttendanceColumns(): ColumnDef<ParticipantAttendance>[] {
 	return [
-		// {
-		// 	id: 'select',
-		// 	header: ({ table }) =>
-		// 		renderComponent(DataTableCheckbox, {
-		// 			checked: table.getIsAllPageRowsSelected(),
-		// 			onCheckedChange: (value) => table.toggleAllPageRowsSelected(!!value),
-		// 			'aria-label': 'Select all',
-		// 			class: 'translate-y-[2px]'
-		// 		}),
-		// 	cell: ({ row }) =>
-		// 		renderComponent(DataTableCheckbox, {
-		// 			checked: row.getIsSelected(),
-		// 			onCheckedChange: (value) => row.toggleSelected(!!value),
-		// 			'aria-label': 'Select row',
-		// 			class: 'translate-y-[2px]'
-		// 		}),
-		// 	enableSorting: false,
-		// 	enableHiding: false
-		// },
 		{
 			accessorKey: 'first_name',
 			header: ({ column }) => {
@@ -263,7 +219,7 @@ export function participantAttendanceColumns(): ColumnDef<ParticipantAttendance>
 					am_time_out: original.am_time_out,
 					pm_time_in: original.pm_time_in,
 					pm_time_out: original.pm_time_out,
-					current_event_date: original.created as Date, 
+					current_event_date: original.created as Date,
 					attendance_id: original.id
 				});
 			}
