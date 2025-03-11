@@ -6,6 +6,7 @@ import type {
 } from 'pdfmake/interfaces';
 import type { DocumentMetaDetails } from "@/types/exports";
 import { createQrPngDataUrl } from '@svelte-put/qr';
+import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 
 export async function generateQRCodesPDF(props: DocumentMetaDetails) {
   const { info, event_details, participants } = props;
@@ -112,7 +113,28 @@ export async function generateQRCodesPDF(props: DocumentMetaDetails) {
         };
       }
     };
-    pdfMake.createPdf(file).download(`${event_details.event_name}_QR_Codes.pdf`);
+    const generated_pdf = pdfMake.createPdf(file);
+    // generated_pdf.download(`${event_details.event_name}_QR_Codes.pdf`);
+    generated_pdf.getDataUrl((dataUrl) => {
+      const webview = new WebviewWindow(`${event_details.event_name}_QR_Codes`, {
+        url: dataUrl
+      });
+
+      webview.once('tauri://created', function () {
+        toast.success("QR codes generated successfully");
+      });
+      webview.once('tauri://error', function (e) {
+        // an error happened creating the webview
+        console.error(e)
+        toast.error("Failed to generate QR codes", {
+          description: e.event
+        });
+      });
+      console.log({
+        dataUrl,
+        webview
+      });
+    });
     toast.success("QR codes generated successfully");
   } catch (error) {
     toast.error("Failed to generate QR codes");
