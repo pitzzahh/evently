@@ -11,7 +11,6 @@
 
 <svelte:window
 	onkeydown={async (e) => {
-		console.log('Key down:', e.key);
 		if (e.key === 'F11') {
 			await getCurrentWindow().setFullscreen(
 				await getCurrentWindow()
