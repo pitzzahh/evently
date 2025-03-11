@@ -10,6 +10,7 @@
 	import { Button } from '@/components/ui/button/index.js';
 	import { dev } from '$app/environment';
 	import { COLLECTIONS } from '@/db';
+	import { goto } from '$app/navigation';
 
 	const isActive = (pathname: string) => page.url.pathname === pathname;
 	const routes = [
@@ -87,6 +88,7 @@
 						COLLECTIONS.EVENT_DETAILS_COLLECTION.removeMany({});
 						COLLECTIONS.PARTICIPANT_COLLECTION.removeMany({});
 						COLLECTIONS.SETTINGS_COLLECTION.removeMany({});
+						goto('/');
 					}}>RESET</Button
 				>
 			{/if}
