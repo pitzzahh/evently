@@ -38,6 +38,7 @@
 
 	const uploadFile = async (file: File) => {
 		// don't upload duplicate files
+		console.log(file);
 		if (selected_file && selected_file.name === file.name) return;
 
 		const urlPromise = new Promise<string>((resolve) => {
@@ -73,8 +74,10 @@
 			toast.error('No files selected!');
 			return;
 		}
+		const file_url = await selected_file.url;
+		console.log('file_url', file_url);
+		const participants = await readParticipants(file_url, event_id);
 
-		const participants = await readParticipants(await selected_file.url, event_id);
 		console.log('participants', participants);
 	}
 
