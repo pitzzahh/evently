@@ -1,7 +1,7 @@
-import type { EventDetails, Participant } from "@/db/models/types";
+import type { Participant } from "@/db/models/types";
 import ExcelJS from 'exceljs';
 
-export async function readParticipants(filePath: string, event_details: EventDetails): Promise<Omit<Participant, 'id'>[]> {
+export async function readParticipants(filePath: string, event_id: string): Promise<Omit<Participant, 'id'>[]> {
   const workbook = new ExcelJS.Workbook();
   await workbook.xlsx.readFile(filePath);
   const worksheet = workbook.getWorksheet('participants');
@@ -9,6 +9,8 @@ export async function readParticipants(filePath: string, event_details: EventDet
   if (!worksheet) {
     throw new Error('Worksheet "participants" not found in the Excel file');
   }
+
+  console.log('Worksheet found:', worksheet.name);
 
   const participants = worksheet.getSheetValues()
     .slice(2) // Skip header row
@@ -26,7 +28,7 @@ export async function readParticipants(filePath: string, event_details: EventDet
         middle_name: middle_name as string,
         last_name: last_name as string,
         email: email as string,
-        event_id: event_details.id,
+        event_id,
         created: new Date(),
         updated: new Date()
       };

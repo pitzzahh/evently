@@ -16,7 +16,8 @@
 		"core:webview:allow-get-all-webviews",
 		"core:window:allow-start-dragging",
 		"core:window:allow-set-fullscreen",
-		"updater:default"
+		"updater:default",
+		"dialog:default"
 	],
 	"platforms": [
 		"macOS",

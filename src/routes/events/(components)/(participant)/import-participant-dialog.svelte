@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Button, buttonVariants } from '@/components/ui/button';
 	import * as Dialog from '@/components/ui/dialog';
-	import { Check, Clock, Download, Import, UsersRound, X } from '@/assets/icons';
+	import { Import, X } from '@/assets/icons';
 	import {
 		displaySize,
 		FileDropZone,
@@ -11,8 +11,22 @@
 	import { onDestroy } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	import { SvelteDate } from 'svelte/reactivity';
-	import { sleep } from '@/utils';
+	import { cn, sleep } from '@/utils';
 	import { Progress } from '@/components/ui/progress';
+	import * as AlertDialog from '@/components/ui/alert-dialog';
+	import { readParticipants } from '@/utils/exports/excel';
+
+	interface ImportParticipantsDialogProps {
+		event_id: string;
+		disabled?: boolean;
+		open_add_participants_dialog?: boolean;
+	}
+
+	let {
+		event_id,
+		disabled = false,
+		open_add_participants_dialog = $bindable(false)
+	}: ImportParticipantsDialogProps = $props();
 
 	const onUpload: FileDropZoneProps['onUpload'] = async (files) => {
 		await Promise.allSettled(files.map((file) => uploadFile(file)));
@@ -24,20 +38,21 @@
 
 	const uploadFile = async (file: File) => {
 		// don't upload duplicate files
-		if (files.find((f) => f.name === file.name)) return;
+		console.log(file);
+		if (selected_file && selected_file.name === file.name) return;
 
 		const urlPromise = new Promise<string>((resolve) => {
 			// add some fake loading time
 			sleep(1000).then(() => resolve(URL.createObjectURL(file)));
 		});
 
-		files.push({
+		selected_file = {
 			name: file.name,
 			type: file.type,
 			size: file.size,
 			uploadedAt: Date.now(),
 			url: urlPromise
-		});
+		};
 
 		// we await since we don't want the onUpload to be complete until the files are actually uploaded
 		await urlPromise;
@@ -51,15 +66,25 @@
 		url: Promise<string>;
 	};
 
-	let files = $state<UploadedFile[]>([]);
+	let selected_file = $state<UploadedFile | null>(null);
 	let date = new SvelteDate();
 
-	onDestroy(async () => {
-		for (const file of files) {
-			URL.revokeObjectURL(await file.url);
+	async function handleImportParticipants() {
+		if (!selected_file) {
+			toast.error('No files selected!');
+			return;
 		}
-	});
+		const file_url = await selected_file.url;
+		console.log('file_url', file_url);
+		const participants = await readParticipants(file_url, event_id);
 
+		console.log('participants', participants);
+	}
+
+	onDestroy(async () => {
+		if (!selected_file) return;
+		URL.revokeObjectURL(await selected_file.url);
+	});
 	$effect(() => {
 		const interval = setInterval(() => {
 			date.setTime(Date.now());
@@ -71,11 +96,11 @@
 	});
 </script>
 
-<Dialog.Root>
+<Dialog.Root bind:open={open_add_participants_dialog}>
 	<Dialog.Trigger class={buttonVariants({ variant: 'ghost' })}
 		><Import class="size-4" />Import Excel Participants</Dialog.Trigger
 	>
-	<Dialog.Content>
+	<Dialog.Content class="max-w-[750px]">
 		<Dialog.Header>
 			<Dialog.Title>Importing guide</Dialog.Title>
 			<Dialog.Description>
@@ -109,33 +134,33 @@
 				<FileDropZone
 					{onUpload}
 					{onFileRejected}
-					maxFileSize={2 * MEGABYTE}
-					accept="image/*"
-					maxFiles={4}
-					fileCount={files.length}
+					maxFileSize={10 * MEGABYTE}
+					accept="application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 				/>
-				<div class="flex flex-col gap-2">
-					{#each files as file, i (file.name)}
+				{#if selected_file}
+					<div class="flex flex-col gap-2">
 						<div class="flex place-items-center justify-between gap-2">
-							<div class="flex place-items-center gap-2">
-								{#await file.url then src}
+							<div class="flex place-items-center gap-2 whitespace-nowrap">
+								{#await selected_file.url then src}
 									<div class="relative size-9 overflow-clip">
 										<img
 											{src}
-											alt={file.name}
+											alt={selected_file.name}
 											class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 overflow-clip"
 										/>
 									</div>
 								{/await}
 								<div class="flex flex-col">
-									<span>{file.name}</span>
-									<span class="text-xs text-muted-foreground">{displaySize(file.size)}</span>
+									<span>{selected_file.name}</span>
+									<span class="text-xs text-muted-foreground"
+										>{displaySize(selected_file.size)}</span
+									>
 								</div>
 							</div>
-							{#await file.url}
+							{#await selected_file.url}
 								<Progress
 									class="h-2 w-full flex-grow"
-									value={((date.getTime() - file.uploadedAt) / 1000) * 100}
+									value={((date.getTime() - selected_file.uploadedAt) / 1000) * 100}
 									max={100}
 								/>
 							{:then url}
@@ -144,16 +169,42 @@
 									size="icon"
 									onclick={() => {
 										URL.revokeObjectURL(url);
-										files = [...files.slice(0, i), ...files.slice(i + 1)];
+										selected_file = null;
 									}}
 								>
 									<X />
 								</Button>
 							{/await}
 						</div>
-					{/each}
-				</div>
-			</div>
-		</Dialog.Header>
+					</div>
+				{/if}
+			</div></Dialog.Header
+		>
+		<Dialog.Footer>
+			<AlertDialog.Root>
+				<AlertDialog.Trigger
+					disabled={!selected_file}
+					class={cn(buttonVariants({ variant: 'outline', className: 'w-full' }), {
+						'cursor-not-allowed': !selected_file
+					})}
+				>
+					Import Participants
+				</AlertDialog.Trigger>
+				<AlertDialog.Content>
+					<AlertDialog.Header>
+						<AlertDialog.Title>Are you absolutely sure?</AlertDialog.Title>
+						<AlertDialog.Description>
+							Are you sure you want to import the participants from this file? This action cannot be
+							undone. Please ensure that the file is formatted correctly and contains the necessary
+							data.
+						</AlertDialog.Description>
+					</AlertDialog.Header>
+					<AlertDialog.Footer>
+						<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
+						<AlertDialog.Action onclick={handleImportParticipants}>Import</AlertDialog.Action>
+					</AlertDialog.Footer>
+				</AlertDialog.Content>
+			</AlertDialog.Root>
+		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>

@@ -2,7 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use std::env;
-use std::path::{PathBuf};
+use std::path::PathBuf;
 
 #[tauri::command]
 fn get_env_var(key: String) -> String {
@@ -23,6 +23,7 @@ fn main() {
         .unwrap()
         .load();
     tauri::Builder::default()
+        .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_shell::init())
         .plugin(
             tauri_plugin_log::Builder::new()
@@ -44,10 +45,7 @@ fn main() {
                 .build(),
         )
         .plugin(tauri_plugin_updater::Builder::new().build())
-        .invoke_handler(tauri::generate_handler![
-            get_env_var,
-            get_exe_path
-        ])
+        .invoke_handler(tauri::generate_handler![get_env_var, get_exe_path])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
