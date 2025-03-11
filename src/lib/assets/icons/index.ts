@@ -25,3 +25,11 @@ export { default as Clock } from 'lucide-svelte/icons/clock';
 export { default as Plus } from 'lucide-svelte/icons/plus';
 export { default as Mail } from 'lucide-svelte/icons/mail';
 export { default as Phone } from 'lucide-svelte/icons/phone';
+
+export { default as Calendar } from 'lucide-svelte/icons/calendar';
+export { default as ChartBar } from 'lucide-svelte/icons/chart-bar';
+export { default as MapPin } from 'lucide-svelte/icons/map-pin';
+export { default as Settings } from 'lucide-svelte/icons/settings';
+export { default as UsersRound } from 'lucide-svelte/icons/users-round';
+export { default as Edit } from 'lucide-svelte/icons/edit';
+export { default as Trash } from 'lucide-svelte/icons/trash';
