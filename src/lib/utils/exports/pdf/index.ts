@@ -131,9 +131,7 @@ export async function generateQRCodesPDF(props: DocumentMetaDetails) {
         };
       }
     };
-    const generated_pdf = pdfMake.createPdf(file);
-    // generated_pdf.download(`${event_details.event_name}_QR_Codes.pdf`);
-    generated_pdf.getDataUrl(async (dataUrl) => {
+    pdfMake.createPdf(file).getDataUrl(async (dataUrl) => {
       const label = `${event_details.event_name}_QR_Codes`;
       const existingWebview = await WebviewWindow.getByLabel(label);
       if (existingWebview) {
@@ -141,22 +139,18 @@ export async function generateQRCodesPDF(props: DocumentMetaDetails) {
       }
 
       const webview = new WebviewWindow(label, {
-        url: dataUrl
+        url: dataUrl,
+        title: `${event_details.event_name} QR Codes`,
       });
 
       webview.once('tauri://created', function () {
         toast.success("QR codes generated successfully");
       });
       webview.once('tauri://error', function (e) {
-        // an error happened creating the webview
         console.error(e);
         toast.error("Failed to generate QR codes", {
           description: e.event
         });
-      });
-      console.log({
-        dataUrl,
-        webview
       });
     });
     toast.success("QR codes generated successfully");
