@@ -15,6 +15,7 @@
 	import { Progress } from '@/components/ui/progress';
 	import * as AlertDialog from '@/components/ui/alert-dialog';
 	import { readParticipants } from '@/utils/exports/excel';
+	import { COLLECTIONS } from '@/db';
 
 	interface ImportParticipantsDialogProps {
 		event_id: string;
@@ -72,6 +73,8 @@
 		console.log('selected_file', selected_file);
 		const file_url = await selected_file.path;
 		const participants = await readParticipants(file_url, event_id);
+
+		COLLECTIONS.PARTICIPANT_COLLECTION.insertMany(participants);
 
 		console.log('participants', participants);
 	}
