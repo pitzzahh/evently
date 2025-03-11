@@ -12,9 +12,11 @@ import type { ParticipantSchema } from '@/schema/participant';
 import { formatDateToTimeOption } from '@/utils/format';
 import TimeInOutCell from '../(components)/(participant)/time-in-out-cell.svelte';
 import ParticipantAttendanceDataTableRowActions from '../(components)/(participant)/participant-attendance-data-table-row-actions.svelte';
+import { cn } from '@/utils';
 
 export function participantTableColumns(
-	participant_form: SuperValidated<ParticipantSchema>
+	participant_form: SuperValidated<ParticipantSchema>,
+	event_status: 'upcoming' | 'ongoing' | 'finished'
 ): ColumnDef<Participant>[] {
 	return [
 		{
@@ -81,6 +83,50 @@ export function participantTableColumns(
 					title: 'Last Name'
 				}),
 			cell: ({ row }) => row.original.last_name,
+			filterFn: (row, id, value) => {
+				return String(row.getValue(id))
+					.toLowerCase()
+					.includes(String(value ?? '').toLowerCase());
+			}
+		},
+
+		{
+			accessorKey: 'attendance_status',
+			header: ({ column }) =>
+				renderComponent(DataTableColumnHeader<Participant, unknown>, {
+					column,
+					title: 'Overall Attendance Status'
+				}),
+			cell: ({ row }) => {
+				const attendance_status = row.original.attendance_status;
+
+				if (event_status === 'ongoing')
+					return renderComponent(DataTableBadge, {
+						variant: 'outline',
+						value: 'Event is currently ongoing'
+					});
+				if (event_status === 'upcoming') {
+					return renderComponent(DataTableBadge, {
+						variant: 'outline',
+						value: `Event hasn't started yet`
+					});
+				}
+
+				if (attendance_status)
+					return renderComponent(DataTableBadge, {
+						variant: 'outline',
+						className: cn('text-white bg-green-600 hover:bg-green-600/90', {
+							'bg-yellow-600 hover:bg-yellow-600/90': attendance_status === 'incomplete',
+							'bg-red-600 hover:bg-red-600/90': attendance_status === 'absent'
+						}),
+						value:
+							attendance_status === 'absent'
+								? 'Absent'
+								: attendance_status === 'complete'
+									? 'Complete Attendance'
+									: 'Incomplete Attendance'
+					});
+			},
 			filterFn: (row, id, value) => {
 				return String(row.getValue(id))
 					.toLowerCase()

@@ -1,13 +1,15 @@
 <script lang="ts">
 	import { Badge } from '@/components/ui/badge';
 	import type { BadgeVariant } from '@/components/ui/badge';
+	import { cn } from '@/utils';
 
 	interface Props {
 		value: boolean | string | number | null;
 		variant?: BadgeVariant;
+		className?: string
 	}
 
-	let { value, variant = 'default' }: Props = $props();
+	let { value, className, variant = 'default' }: Props = $props();
 </script>
 
-<Badge {variant} class="text-ellipsis whitespace-nowrap">{value}</Badge>
+<Badge {variant} class={cn("text-ellipsis whitespace-nowrap", className)}>{value}</Badge>

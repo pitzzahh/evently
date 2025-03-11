@@ -55,7 +55,7 @@ export type EventDetails = Pick<
 export type Participant = Pick<
 	ParticipantCollection,
 	'id' | 'first_name' | 'middle_name' | 'last_name' | 'email' | 'event_id' | 'created' | 'updated'
->;
+> & { attendance_status?: 'complete' | 'incomplete' | 'absent' };
 export type Settings = Pick<
 	SettingsCollection,
 	'id' | 'allow_add_participants_while_ongoing_event' | 'created' | 'updated'
