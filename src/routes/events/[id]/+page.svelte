@@ -23,7 +23,6 @@
 	import { goto } from '$app/navigation';
 	import { checkEventStatus, getEventDayInfo } from '../utils/index.js';
 	import * as Dialog from '@/components/ui/dialog';
-	import { error } from '@sveltejs/kit';
 	import { onMount } from 'svelte';
 
 	let { data } = $props();
