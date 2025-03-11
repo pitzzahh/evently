@@ -68,14 +68,20 @@
 			() => COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.isLoading()
 		],
 		() => {
-			const participants_cursor = COLLECTIONS.PARTICIPANT_COLLECTION.find({
-				event_id: data.event_id
-			});
+			const participants_cursor = COLLECTIONS.PARTICIPANT_COLLECTION.find(
+				{
+					event_id: data.event_id
+				},
+				{
+					sort: {
+						created: -1
+					}
+				}
+			);
 			const event_schedule_cursor = COLLECTIONS.EVENT_SCHEDULE_COLLECTION.find({
 				event_id: data.event_id
 			});
 
-			comp_state.participants = participants_cursor.fetch();
 			comp_state.event_schedules = event_schedule_cursor.fetch();
 			comp_state.event_details = COLLECTIONS.EVENT_DETAILS_COLLECTION.findOne({
 				id: data.event_id
@@ -91,6 +97,34 @@
 			comp_state.all_participants_attendance = getPopulatedAttendanceRecords(
 				data.event_id
 			) as ParticipantAttendance[];
+
+			comp_state.participants = participants_cursor.fetch().map((participant) => {
+				const event_days = comp_state.event_details?.difference_in_days;
+				const total_days_attended = comp_state.all_participants_attendance.reduce(
+					(acc, participant_attendance) => {
+						if (
+							participant_attendance.participant_id === participant.id &&
+							participant_attendance.am_time_in &&
+							participant_attendance.pm_time_in
+						) {
+							return (acc += 1);
+						}
+						return (acc += 0);
+					},
+					0
+				);
+				const attendance_status =
+					event_days === total_days_attended
+						? 'complete'
+						: event_days && event_days < total_days_attended
+							? 'incomplete'
+							: 'absent';
+				console.log(attendance_status);
+				return {
+					...participant,
+					attendance_status
+				};
+			});
 
 			return () => {
 				participants_cursor.cleanup();

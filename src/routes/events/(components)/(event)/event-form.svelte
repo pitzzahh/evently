@@ -109,13 +109,15 @@
 					is_multi_day: difference_in_days > 1,
 					difference_in_days,
 					start_date: comp_state.event_dates.at(0)?.am_start as Date,
-					end_date: comp_state.event_dates.at(-1)?.pm_end as Date
+					end_date: comp_state.event_dates.at(-1)?.pm_end as Date,
+					updated: new Date()
 				});
 
 				COLLECTIONS.EVENT_SCHEDULE_COLLECTION.insertMany(
 					comp_state.event_dates.map((event) => ({
 						...event,
-						event_id: event_details_id
+						event_id: event_details_id,
+						updated: new Date()
 					}))
 				);
 			}
