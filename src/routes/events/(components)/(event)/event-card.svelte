@@ -27,8 +27,7 @@
 		difference_in_days,
 		is_multi_day,
 		end_date,
-		start_date,
-		updated
+		start_date
 	}: EventDetails = $props();
 
 	let comp_state = $state<ComponentState>({
@@ -98,7 +97,7 @@
 						<ChevronRightIcon />
 					</Button>
 				</div>
-				<div class="absolute -right-6 -top-14">
+				<div class="absolute -right-6 -top-14 rounded-lg bg-white dark:bg-[#1C1E20]">
 					{@render StatusPill(event_status, 'sm')}
 				</div>
 				<div class="flex flex-col items-center gap-1">
