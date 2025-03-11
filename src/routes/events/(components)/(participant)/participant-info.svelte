@@ -79,10 +79,17 @@
 					{@const participant_attendance = comp_state.participant_attendance.find(
 						(p) => event_schedule.day === p.day
 					)}
+					{@const has_completed_attendance =
+						participant_attendance?.am_time_in && participant_attendance.pm_time_in}
 					<div class="grid gap-4 rounded-lg border p-4">
-						<div class="flex gap-2">
-							<Badge>Day {event_schedule.day}</Badge>
-							<Badge variant="outline">{formatDate(event_schedule.event_date)}</Badge>
+						<div class="flex items-center justify-between">
+							<div class="flex gap-2">
+								<Badge>Day {event_schedule.day}</Badge>
+								<Badge variant="outline">{formatDate(event_schedule.event_date)}</Badge>
+							</div>
+							{#if has_completed_attendance}
+								<Badge class="bg-green-600 hover:bg-green-600/90">Attendance Complete</Badge>
+							{/if}
 						</div>
 
 						<div class="grid gap-4">
