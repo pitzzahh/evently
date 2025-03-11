@@ -8,6 +8,7 @@
 	import { Badge } from '@/components/ui/badge';
 	import { formatDate, formatDateToTimeOption } from '@/utils/format';
 	import { cn } from '@/utils';
+	import { checkEventStatus } from '@routes/events/utils';
 
 	interface Props {
 		participant: Participant;
@@ -79,16 +80,35 @@
 					{@const participant_attendance = comp_state.participant_attendance.find(
 						(p) => event_schedule.day === p.day
 					)}
-					{@const has_completed_attendance =
-						participant_attendance?.am_time_in && participant_attendance.pm_time_in}
+					{@const event_day_status = checkEventStatus(
+						event_schedule.am_start,
+						event_schedule.pm_end
+					)}
+					{@const attendance_status =
+						participant_attendance?.am_time_in && participant_attendance.pm_time_in
+							? 'complete'
+							: participant_attendance?.am_time_in || participant_attendance?.pm_time_in
+								? 'incomplete'
+								: 'absent'}
+
 					<div class="grid gap-4 rounded-lg border p-4">
 						<div class="flex items-center justify-between">
 							<div class="flex gap-2">
 								<Badge>Day {event_schedule.day}</Badge>
 								<Badge variant="outline">{formatDate(event_schedule.event_date)}</Badge>
 							</div>
-							{#if has_completed_attendance}
-								<Badge class="bg-green-600 hover:bg-green-600/90">Attendance Complete</Badge>
+							{#if event_day_status === 'finished'}
+								<Badge
+									class={cn('bg-green-600 hover:bg-green-600/90', {
+										'bg-yellow-600 hover:bg-yellow-600/90': attendance_status === 'incomplete',
+										'bg-red-600 hover:bg-red-600/90': attendance_status === 'absent'
+									})}
+									>{attendance_status === 'absent'
+										? 'Absent'
+										: attendance_status === 'complete'
+											? 'Attendance Complete'
+											: 'Incomplete Attendance'}
+								</Badge>
 							{/if}
 						</div>
 
