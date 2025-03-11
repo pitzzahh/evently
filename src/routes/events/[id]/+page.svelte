@@ -9,7 +9,7 @@
 		Edit,
 		Trash,
 		View
-	} from 'lucide-svelte';
+	} from '@/assets/icons';
 	import { cn } from '@/utils/styles';
 	import { EventTimePicker } from '@routes/events/(components)';
 	import * as DropdownMenu from '@/components/ui/dropdown-menu/index.js';
@@ -23,7 +23,6 @@
 	import { goto } from '$app/navigation';
 	import { checkEventStatus, getEventDayInfo } from '../utils/index.js';
 	import * as Dialog from '@/components/ui/dialog';
-	import { error } from '@sveltejs/kit';
 	import { onMount } from 'svelte';
 
 	let { data } = $props();

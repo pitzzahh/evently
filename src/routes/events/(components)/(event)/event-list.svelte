@@ -117,8 +117,10 @@
 				}
 			});
 			clearTimeout(comp_state.timeout);
-			comp_state.timeout = setTimeout(() => (comp_state.refetch = !comp_state.refetch), 1000);
-			$inspect(comp_state.infinite_loader.events);
+			comp_state.timeout = setTimeout(
+				() => (comp_state.refetch = !comp_state.refetch),
+				1000
+			) as unknown as number;
 			return () => {
 				events_cursor.cleanup();
 				clearTimeout(comp_state.timeout);

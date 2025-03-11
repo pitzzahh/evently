@@ -120,7 +120,7 @@
 				);
 			}
 
-			goto(`/events/${event_details_id}`);
+			await goto(`/events/${event_details_id}`);
 			console.log('added_event_details', event_details_id);
 			toast.success(`Event is added and has ${difference_in_days} days`);
 		}

@@ -17,6 +17,7 @@
 	import { checkEventStatus, getEventDayInfo } from '@routes/events/utils/index.js';
 	import { cubicIn, cubicOut } from 'svelte/easing';
 	import { StatusPill } from '@/components/snippets/events.svelte';
+	import { generateQRCodesPDF } from '@/utils/exports/pdf/index.js';
 
 	let { data } = $props();
 
@@ -367,7 +368,26 @@
 					add_participants_form={data.add_participants_form}
 					event_id={comp_state.event_details?.id ?? 'N/A'}
 				/>
-				<Button variant="outline"><Download class="size-4" /> Export QR Codes</Button>
+				<Button
+					variant="outline"
+					onclick={() => {
+						if (!comp_state.event_details) {
+							return toast.warning('Event details not available', {
+								description: "Couldn't find event details required to generate QR codes"
+							});
+						}
+						generateQRCodesPDF({
+							info: {
+								creator: 'Evently',
+								title: `${comp_state.event_details.event_name} QR Codes`,
+								subject: 'QR Codes for participants',
+								producer: 'Evently'
+							},
+							event_details: comp_state.event_details,
+							participants: comp_state.participants
+						});
+					}}><Download class="size-4" /> Export QR Codes</Button
+				>
 			</div>
 			{@render StatusPill(event_status)}
 		</div>
