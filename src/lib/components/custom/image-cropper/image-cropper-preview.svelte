@@ -14,6 +14,12 @@
 	let { child, class: className }: ImageCropperPreviewProps = $props();
 
 	const previewState = useImageCropperPreview();
+
+	const uploadIconSize = $derived(() => {
+		const classStr = typeof className === 'string' ? className : '';
+		const match = classStr.match(/size-(\d+)/);
+		return classStr.includes('size-') && match ? match[1] : 4;
+	});
 </script>
 
 {#if child}
@@ -22,9 +28,8 @@
 	<Avatar.Root
 		class={cn('size-20 ring-2 ring-accent ring-offset-2 ring-offset-background', className)}
 	>
-		<Avatar.Image src={previewState.rootState.src} />
-		<Avatar.Fallback>
-			<Upload class="size-4" />
+		<Avatar.Fallback class={className}>
+			<Upload class={`size-${uploadIconSize}`} />
 			<span class="sr-only">Upload image</span>
 		</Avatar.Fallback>
 	</Avatar.Root>
