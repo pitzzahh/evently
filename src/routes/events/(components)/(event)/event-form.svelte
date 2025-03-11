@@ -326,7 +326,6 @@
 			};
 
 			comp_state.event_dates = event_schedules as any;
-			// handleGenerateEventDates();
 		}
 	});
 </script>
@@ -375,7 +374,7 @@
 					<Popover.Root>
 						<Popover.Trigger
 							disabled={!hasRequiredData($formData, ['title', 'location']) ||
-								(event_to_edit && event_status === 'ongoing')}
+								(event_to_edit && event_status !== 'upcoming')}
 							class={cn(
 								buttonVariants({
 									variant: 'outline',
@@ -416,11 +415,11 @@
 							/>
 						</Popover.Content>
 					</Popover.Root>
-					{#if event_status === 'ongoing'}
+					{#if event_status !== 'upcoming'}
 						<div class="mt-2 flex gap-2">
 							<Info class="size-4 text-yellow-500" />
 							<p class="text-xs text-yellow-500">
-								You cannot edit the date ranger picker as this event is already ongoing
+								You cannot edit the date ranger picker as this event is already {event_status}
 							</p>
 						</div>
 					{/if}
@@ -460,11 +459,11 @@
 	<div class="mt-4">
 		<div class="mb-2 flex items-center justify-between">
 			<Label>Event Time Schedules</Label>
-			{#if event_status === 'ongoing'}
+			{#if event_status !== 'upcoming'}
 				<div class="flex gap-2">
 					<Info class="size-4 text-yellow-500" />
 					<p class="text-xs text-yellow-500">
-						You cannot edit the event time schedules this event is already ongoing
+						You cannot edit the event time schedules this event is already {event_status}
 					</p>
 				</div>
 			{/if}
@@ -475,7 +474,7 @@
 				{#each comp_state.event_dates as event_date}
 					<EventTimePicker
 						is_selection_disabled={!hasRequiredData($formData, ['title', 'location']) ||
-							(event_to_edit && event_status === 'ongoing')}
+							(event_to_edit && event_status !== 'upcoming')}
 						{event_date}
 						day={event_date.day}
 						{updateDateEventPeriodStartEnd}
