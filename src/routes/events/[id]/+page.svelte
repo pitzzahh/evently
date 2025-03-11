@@ -21,7 +21,7 @@
 	import { watch } from 'runed';
 	import { StatusPill } from '@/components/snippets';
 	import { goto } from '$app/navigation';
-	import { checkEventStatus } from '../utils/index.js';
+	import { checkEventStatus, getEventDayInfo } from '../utils/index.js';
 	import * as Dialog from '@/components/ui/dialog';
 	import { error } from '@sveltejs/kit';
 	import { onMount } from 'svelte';
@@ -46,6 +46,15 @@
 
 	const event_status = $derived(
 		checkEventStatus(comp_state.event_details?.start_date, comp_state.event_details?.end_date)
+	);
+	const current_event_day = $derived(
+		comp_state.event_details
+			? getEventDayInfo(
+					comp_state.event_details.start_date,
+					comp_state.event_details.end_date,
+					new Date()
+				).currentDay
+			: null
 	);
 
 	watch(
@@ -264,7 +273,12 @@
 	</div>
 	<div class="flex max-h-[400px] flex-col gap-2 overflow-y-auto pr-1">
 		{#each comp_state.event_schedules as event_date, index}
-			<EventTimePicker {event_date} day={index + 1} is_selection_disabled={true} />
+			<EventTimePicker
+				{current_event_day}
+				{event_date}
+				day={index + 1}
+				is_selection_disabled={true}
+			/>
 		{/each}
 	</div>
 </div>
