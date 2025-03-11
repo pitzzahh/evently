@@ -8,7 +8,8 @@
 		UsersRound,
 		Edit,
 		Trash,
-		View
+		View,
+		Clock
 	} from '@/assets/icons';
 	import { cn } from '@/utils/styles';
 	import { EventTimePicker } from '@routes/events/(components)';
@@ -203,6 +204,19 @@
 								</p>
 							</div>
 						</div>
+
+						<div class="flex items-center gap-3">
+							<div class="rounded-md border p-3">
+								<Clock class="size-5 text-muted-foreground" />
+							</div>
+							<p class="text-base font-medium">
+								{comp_state.event_details?.difference_in_days}
+								{comp_state.event_details?.difference_in_days &&
+								comp_state.event_details?.difference_in_days > 1
+									? 'days'
+									: 'day'} event
+							</p>
+						</div>
 					</div>
 
 					<Button
@@ -217,7 +231,9 @@
 
 				<div class="flex items-center justify-between gap-4">
 					<div class="flex items-center gap-3">
-						<div class="rounded-md border p-3"><MapPin class="size-5 text-muted-foreground" /></div>
+						<div class="rounded-md border p-3">
+							<MapPin class="size-5 text-muted-foreground" />
+						</div>
 						<p class="text-base font-medium">{comp_state.event_details?.location ?? 'N/A'}</p>
 					</div>
 
