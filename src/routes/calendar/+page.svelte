@@ -1,9 +1,11 @@
 <script lang="ts">
-	import { EventCalendar } from '@routes/calendar/(components)';
+	import { EventCalendar } from '@/components/custom/event-calendar';
 	import { scale } from 'svelte/transition';
 	import type { EventDetails } from '@/db/models/types';
 	import { watch } from 'runed';
 	import { COLLECTIONS } from '@/db';
+	import moment from 'moment';
+	import { momentLocalizer } from 'react-big-calendar';
 
 	interface ComponentState {
 		event_details: EventDetails[];
@@ -30,5 +32,5 @@
 
 <h2 class="mb-4 text-4xl font-semibold">Calendar of Events</h2>
 <div in:scale class="min-h-dvh bg-background p-4">
-	<EventCalendar type="single" events={comp_state.event_details} />
+	<EventCalendar localizer={momentLocalizer(moment)} />
 </div>
