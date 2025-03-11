@@ -80,7 +80,7 @@
 	</DropdownMenu.Root>
 
 	{#if comp_state.view_open}
-		<Dialog.Content class="max-w-[850px]">
+		<Dialog.Content class="max-w-[950px]">
 			<Dialog.Header>
 				<Dialog.Title>Participant's Information</Dialog.Title>
 			</Dialog.Header>
