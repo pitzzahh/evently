@@ -1,11 +1,7 @@
 <script lang="ts">
 	import { Button } from '@/components/ui/button';
 	import { Check, Clock, Download, UsersRound, X } from 'lucide-svelte';
-	import {
-		AddParticipantsDialog,
-		ParticipantDataTable,
-		EventTimePicker
-	} from '@routes/events/(components)';
+	import { AddParticipantsDialog, ParticipantDataTable } from '@routes/events/(components)';
 	import type { EventSchedule, EventDetails, ParticipantAttendance } from '@/db/models/types';
 	import { fly } from 'svelte/transition';
 	import { COLLECTIONS } from '@/db/index';
@@ -17,13 +13,10 @@
 	import { Badge } from '@/components/ui/badge';
 	import { toast } from 'svelte-sonner';
 	import { onMount } from 'svelte';
-	import { generateFullName } from '@/utils/text/index.js';
 	import ParticipantAttendanceDataTable from '@routes/events/(components)/(participant)/participant-attendance-data-table.svelte';
-	import ParticipantAttendanceDataTableToolbar from '@routes/events/(components)/(participant)/participant-attendance-data-table-toolbar.svelte';
 	import { checkEventStatus, getEventDayInfo } from '@routes/events/utils/index.js';
 	import { cubicIn, cubicOut } from 'svelte/easing';
 	import { StatusPill } from '@/components/snippets/events.svelte';
-	import { generateQRCodesPDF } from '@/utils/exports/pdf/index.js';
 
 	let { data } = $props();
 
@@ -34,7 +27,8 @@
 		see_more: boolean;
 		last_scanned_participant: Participant | null;
 		scanned_attendance: any | null;
-		participants_attendance: ParticipantAttendance[];
+		current_day_participants_attendance: ParticipantAttendance[];
+		all_participants_attendance: ParticipantAttendance[];
 		barcode: string;
 		timeout: number | null;
 	}
@@ -46,7 +40,8 @@
 		see_more: true,
 		last_scanned_participant: null,
 		scanned_attendance: null,
-		participants_attendance: [],
+		current_day_participants_attendance: [],
+		all_participants_attendance: [],
 		barcode: '',
 		timeout: null
 	});
@@ -85,11 +80,15 @@
 			});
 
 			if (current_event_day) {
-				comp_state.participants_attendance = getPopulatedAttendanceRecords(
+				comp_state.current_day_participants_attendance = getPopulatedAttendanceRecords(
 					data.event_id,
 					current_event_day
 				) as ParticipantAttendance[];
 			}
+
+			comp_state.all_participants_attendance = getPopulatedAttendanceRecords(
+				data.event_id
+			) as ParticipantAttendance[];
 
 			return () => {
 				participants_cursor.cleanup();
@@ -98,10 +97,10 @@
 		}
 	);
 
-	function getPopulatedAttendanceRecords(eventId: string, current_event_day: number) {
+	function getPopulatedAttendanceRecords(eventId: string, current_event_day?: number) {
 		const attendance_records = COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.find({
 			event_id: eventId,
-			day: current_event_day
+			...(current_event_day && { day: current_event_day })
 		}).fetch();
 
 		const participantIds = [...new Set(attendance_records.map((record) => record.participant_id))];
@@ -296,7 +295,7 @@
 
 			// Refresh the attendance records display
 			if (current_event_day) {
-				comp_state.participants_attendance = getPopulatedAttendanceRecords(
+				comp_state.current_day_participants_attendance = getPopulatedAttendanceRecords(
 					event.id,
 					current_event_day
 				) as ParticipantAttendance[];
@@ -354,7 +353,7 @@
 				{comp_state.event_details?.event_name ?? 'N/A'}'s Participants
 			</h2>
 
-			{#if comp_state.event_details && event_status !== 'finished'}
+			{#if comp_state.event_details && event_status === 'ongoing'}
 				<Badge variant="outline" class="text-md font-semibold">
 					Day {current_event_day}
 				</Badge>
@@ -368,39 +367,25 @@
 					add_participants_form={data.add_participants_form}
 					event_id={comp_state.event_details?.id ?? 'N/A'}
 				/>
-				<Button
-					variant="outline"
-					onclick={() => {
-						if (!comp_state.event_details) {
-							return toast.warning('Event details not available', {
-								description: 'Cannot generate QR codes without event details.'
-							});
-						}
-						generateQRCodesPDF({
-							info: {
-								producer: 'Evently',
-								title: comp_state.event_details.event_name,
-								subject: 'Event QR Codes'
-							},
-							event_details: comp_state.event_details,
-							participants: comp_state.participants
-						});
-					}}><Download class="size-4" /> Export QR Codes</Button
-				>
+				<Button variant="outline"><Download class="size-4" /> Export QR Codes</Button>
 			</div>
 			{@render StatusPill(event_status)}
 		</div>
 	</div>
 
 	<Tabs.Root value="participants">
-		<Tabs.List class="grid h-auto w-full max-w-[600px] grid-cols-2">
+		<Tabs.List class="grid h-auto w-full max-w-[800px] grid-cols-3">
 			<Tabs.Trigger value="participants" class="h-auto text-base">
 				<UsersRound class="mr-2 size-4" />
 				All participants</Tabs.Trigger
 			>
 			<Tabs.Trigger value="time-in-and-out" class="h-auto text-base">
 				<Clock class="mr-2 size-4" />
-				Time in and out
+				All time in and out
+			</Tabs.Trigger>
+			<Tabs.Trigger value="all-time-in-and-out" class="h-auto text-base">
+				<Clock class="mr-2 size-4" />
+				Today's time in and out
 			</Tabs.Trigger>
 		</Tabs.List>
 
@@ -424,7 +409,21 @@
 						<TableSkeleton />
 					{:else}
 						<ParticipantAttendanceDataTable
-							participants_attendance={comp_state.participants_attendance}
+							participants_attendance={comp_state.current_day_participants_attendance}
+						/>
+					{/if}
+				</div>
+			</div>
+		</Tabs.Content>
+
+		<Tabs.Content value="all-time-in-and-out" class="mt-4">
+			<div class="flex items-start gap-4">
+				<div class="grid flex-1 gap-2">
+					{#if COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.isPulling()}
+						<TableSkeleton />
+					{:else}
+						<ParticipantAttendanceDataTable
+							participants_attendance={comp_state.all_participants_attendance}
 						/>
 					{/if}
 				</div>
