@@ -9,6 +9,7 @@
 		"core:default",
 		"log:default",
 		"process:default",
+		"core:window:allow-is-fullscreen",
 		"core:window:allow-create",
 		"core:window:allow-close",
 		"core:webview:allow-create-webview-window",
