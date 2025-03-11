@@ -103,7 +103,7 @@
 				{
 					limit: comp_state.infinite_loader.limit,
 					sort: {
-						start_date: type === 'upcoming' ? -1 : 1
+						start_date: type === 'upcoming' ? 1 : -1 // Changed sorting order
 					}
 				}
 			);
