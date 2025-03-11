@@ -9,7 +9,7 @@
 		Edit,
 		Trash,
 		View
-	} from 'lucide-svelte';
+	} from '@/assets/icons';
 	import { cn } from '@/utils/styles';
 	import { EventTimePicker } from '@routes/events/(components)';
 	import * as DropdownMenu from '@/components/ui/dropdown-menu/index.js';
