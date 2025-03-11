@@ -3,12 +3,16 @@
 	import { TimeComboBox } from '..';
 	import { time_options } from '@/constants';
 	import { formatDate, formatDateToTimeOption } from '@/utils/format';
+	import { StatusPill } from '@/components/snippets';
+	import { size } from '@tauri-apps/plugin-fs';
+	import { checkEventStatus } from '@routes/events/utils';
 
 	let {
 		event_date,
 		day,
 		updateDateEventPeriodStartEnd,
-		is_selection_disabled
+		is_selection_disabled,
+		current_event_day
 	}: {
 		is_selection_disabled?: boolean;
 		event_date: Omit<EventSchedule, 'event_id' | 'updated' | 'created'>;
@@ -20,6 +24,7 @@
 			pm_end?: string;
 		}) => void;
 		day: number;
+		current_event_day?: number | null;
 	} = $props();
 	let formatted_date = $derived(formatDate(event_date.event_date));
 
@@ -65,15 +70,19 @@
 			})}
 		</div>
 	</div>
-	<div class="grid w-[200px] place-items-center gap-1 self-center">
+	<div class="grid w-[300px] place-items-center gap-1 self-center">
 		<p
 			class="rounded-md border border-gray-500 bg-gray-500/10 px-2 py-1 text-center text-xs font-medium dark:bg-gray-500/30"
 		>
 			Day {day}
 		</p>
-		<p class="text-center text-sm font-medium">
+		<p class="text-center text-xs font-medium">
 			{formatted_date}
 		</p>
+
+		{#if current_event_day !== undefined}
+			{@render StatusPill(checkEventStatus(event_date.am_start, event_date.pm_end), 'sm')}
+		{/if}
 	</div>
 	<div
 		class="flex w-full items-center gap-4 rounded-lg border bg-gray-700/10 p-4 dark:bg-[#1C1E20]"
