@@ -16,11 +16,10 @@ export async function generateQRCodesPDF(props: DocumentMetaDetails) {
     return;
   }
 
-  // Calculate optimal number of columns (max 4)
   const calculateOptimalColumns = (totalItems: number): number => {
     if (totalItems <= 4) return totalItems;
     if (totalItems <= 8) return Math.min(4, Math.ceil(totalItems / 2));
-    return 4; // Default to max columns for larger counts
+    return 4;
   };
 
   const columnsPerRow = calculateOptimalColumns(participants.length);
@@ -40,17 +39,16 @@ export async function generateQRCodesPDF(props: DocumentMetaDetails) {
               backgroundFill: '#fff',
             }),
             fit: [100, 100],
-            alignment: 'center' // Center the image
+            alignment: 'center'
           },
           {
             text: `${participant.first_name} ${participant.last_name}`,
-            alignment: 'center',
-            fontSize: 10,
-            bold: true
+            style: 'participantText',
+            alignment: 'center'
           }
         ],
         margin: [10, 10, 10, 20],
-        alignment: 'center' // Center the entire stack
+        alignment: 'center'
       };
     });
 
@@ -60,17 +58,14 @@ export async function generateQRCodesPDF(props: DocumentMetaDetails) {
       currentRow.push(cell);
 
       if (currentRow.length === columnsPerRow || index === participants.length - 1) {
-        // Fill remaining cells in the last row if needed
         while (currentRow.length < columnsPerRow) {
           currentRow.push({});
         }
-
         rows.push(currentRow);
         currentRow = [];
       }
     });
 
-    // Create dynamic column widths array
     const columnWidths = Array(columnsPerRow).fill('*');
 
     const file: TDocumentDefinitions = {
@@ -91,7 +86,7 @@ export async function generateQRCodesPDF(props: DocumentMetaDetails) {
           margin: [0, 0, 0, 20]
         },
         {
-          text: 'Participant QR Codes',
+          text: 'Participants QR Codes',
           style: 'subheader',
           alignment: 'center',
           margin: [0, 0, 0, 10]
@@ -102,11 +97,18 @@ export async function generateQRCodesPDF(props: DocumentMetaDetails) {
             body: rows
           },
           layout: {
-            defaultBorder: false,
-            paddingLeft: function () { return 5; },
-            paddingRight: function () { return 5; },
-            paddingTop: function () { return 5; },
-            paddingBottom: function () { return 5; }
+            hLineWidth(i, node) {
+              return (i === 0 || i === node.table.body.length) ? 0 : 1;
+            },
+            vLineWidth(i, node) {
+              return (i === 0 || (node.table.widths && i === node.table.widths.length)) ? 0 : 1;
+            },
+            hLineColor() { return '#ccc'; },
+            vLineColor() { return '#ccc'; },
+            paddingLeft() { return 10; },
+            paddingRight() { return 10; },
+            paddingTop() { return 10; },
+            paddingBottom() { return 10; }
           }
         }
       ],
@@ -114,12 +116,20 @@ export async function generateQRCodesPDF(props: DocumentMetaDetails) {
         header: {
           fontSize: 20,
           bold: true,
-          margin: [0, 0, 0, 10]
+          margin: [0, 0, 0, 10],
+          color: '#333',
+          decoration: 'underline'
         },
         subheader: {
           fontSize: 14,
           bold: true,
-          margin: [0, 10, 0, 5]
+          margin: [0, 10, 0, 5],
+          color: '#555'
+        },
+        participantText: {
+          fontSize: 12,
+          bold: true,
+          color: '#007ACC'
         }
       },
       footer: function (currentPage, pageCount) {
@@ -131,9 +141,7 @@ export async function generateQRCodesPDF(props: DocumentMetaDetails) {
         };
       }
     };
-    const generated_pdf = pdfMake.createPdf(file);
-    // generated_pdf.download(`${event_details.event_name}_QR_Codes.pdf`);
-    generated_pdf.getDataUrl(async (dataUrl) => {
+    pdfMake.createPdf(file).getDataUrl(async (dataUrl) => {
       const label = `${event_details.event_name}_QR_Codes`;
       const existingWebview = await WebviewWindow.getByLabel(label);
       if (existingWebview) {
@@ -141,22 +149,18 @@ export async function generateQRCodesPDF(props: DocumentMetaDetails) {
       }
 
       const webview = new WebviewWindow(label, {
-        url: dataUrl
+        url: dataUrl,
+        title: `${event_details.event_name} QR Codes`,
       });
 
       webview.once('tauri://created', function () {
         toast.success("QR codes generated successfully");
       });
       webview.once('tauri://error', function (e) {
-        // an error happened creating the webview
         console.error(e);
         toast.error("Failed to generate QR codes", {
           description: e.event
         });
-      });
-      console.log({
-        dataUrl,
-        webview
       });
     });
     toast.success("QR codes generated successfully");
