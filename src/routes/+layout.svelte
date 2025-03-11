@@ -5,8 +5,24 @@
 	import { dev } from '$app/environment';
 	import { Toaster } from 'svelte-sonner';
 	import AppNavbar from '@/components/app-navbar.svelte';
+	import { getCurrentWindow } from '@tauri-apps/api/window';
 	let { children } = $props();
 </script>
+
+<svelte:window
+	onkeydown={async (e) => {
+		if (e.key === 'F11') {
+			await getCurrentWindow().setFullscreen(
+				await getCurrentWindow()
+					.isFullscreen()
+					.then((isFullscreen) => !isFullscreen)
+			);
+		}
+		if (e.key === 'Escape') {
+			await getCurrentWindow().setFullscreen(false);
+		}
+	}}
+/>
 
 <ModeWatcher />
 <Toaster richColors position="top-center" />

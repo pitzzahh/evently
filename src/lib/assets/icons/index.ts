@@ -33,3 +33,5 @@ export { default as Settings } from 'lucide-svelte/icons/settings';
 export { default as UsersRound } from 'lucide-svelte/icons/users-round';
 export { default as Edit } from 'lucide-svelte/icons/edit';
 export { default as Trash } from 'lucide-svelte/icons/trash';
+export { default as Import } from 'lucide-svelte/icons/import';
+export { default as Download } from 'lucide-svelte/icons/download';

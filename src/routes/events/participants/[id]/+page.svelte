@@ -1,23 +1,24 @@
 <script lang="ts">
-	import { Button } from '@/components/ui/button';
-	import { Check, Clock, Download, UsersRound, X } from 'lucide-svelte';
+	import { Button, buttonVariants } from '@/components/ui/button';
+	import { Check, Clock, Download, Import, UsersRound, X } from 'lucide-svelte';
 	import { AddParticipantsDialog, ParticipantDataTable } from '@routes/events/(components)';
 	import type { EventSchedule, EventDetails, ParticipantAttendance } from '@/db/models/types';
 	import { fly } from 'svelte/transition';
 	import { COLLECTIONS } from '@/db/index';
 	import type { Participant } from '@/db/models/types';
 	import { watch } from 'runed';
-	import { TableSkeleton } from '@/components/custom/skeleton/index.js';
-	import * as Tabs from '$lib/components/ui/tabs/index.js';
-	import * as Card from '$lib/components/ui/card/index.js';
+	import { TableSkeleton } from '@/components/custom/skeleton';
+	import * as Tabs from '$lib/components/ui/tabs';
+	import * as Card from '$lib/components/ui/card';
 	import { Badge } from '@/components/ui/badge';
 	import { toast } from 'svelte-sonner';
 	import { onMount } from 'svelte';
 	import ParticipantAttendanceDataTable from '@routes/events/(components)/(participant)/participant-attendance-data-table.svelte';
-	import { checkEventStatus, getEventDayInfo } from '@routes/events/utils/index.js';
+	import { checkEventStatus, getEventDayInfo } from '@routes/events/utils';
 	import { cubicIn, cubicOut } from 'svelte/easing';
 	import { StatusPill } from '@/components/snippets/events.svelte';
-	import { generateQRCodesPDF } from '@/utils/exports/pdf/index.js';
+	import { generateQRCodesPDF } from '@/utils/exports/pdf';
+	import { ImportParticipantDialog } from '@routes/events/(components)/(participant)/index.js';
 
 	let { data } = $props();
 
@@ -397,6 +398,7 @@
 
 		<div class="flex flex-col items-end gap-2">
 			<div class="flex items-center gap-2">
+				<ImportParticipantDialog />
 				<AddParticipantsDialog
 					disabled={false}
 					add_participants_form={data.add_participants_form}
