@@ -91,7 +91,8 @@
 			COLLECTIONS.PARTICIPANT_COLLECTION.insertMany(
 				$formData.participants.map((p) => ({
 					...p,
-					event_id
+					event_id,
+					created: new Date()
 				}))
 			);
 			success_callback?.();
