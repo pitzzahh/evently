@@ -2,12 +2,12 @@
 	import { Time } from '@internationalized/date';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { buttonVariants } from '$lib/components/ui/button';
-	import TimePicker_12h from '@/components/ui/time-picker/time-picker-12h.svelte';
-	import { Clock, Ellipsis, X } from 'lucide-svelte';
+	import { Ellipsis } from 'lucide-svelte';
 	import Button from '@/components/ui/button/button.svelte';
 	import { COLLECTIONS } from '@/db';
 	import { toast } from 'svelte-sonner';
 	import PeriodTimePicker from './period-time-picker.svelte';
+	import { watch } from 'runed';
 
 	let {
 		am_time_out,
@@ -33,22 +33,37 @@
 		override_open: boolean;
 	} = $state({
 		am_out: {
-			time: am_time_out ? new Time(am_time_out.getHours(), am_time_out.getMinutes()) : undefined,
+			time: undefined,
 			period: 'AM'
 		},
 		am_in: {
-			time: am_time_in ? new Time(am_time_in.getHours(), am_time_in.getMinutes()) : undefined,
+			time: undefined,
 			period: 'AM'
 		},
 		pm_out: {
-			time: pm_time_out ? new Time(pm_time_out.getHours(), pm_time_out.getMinutes()) : undefined,
+			time: undefined,
 			period: 'PM'
 		},
 		pm_in: {
-			time: pm_time_in ? new Time(pm_time_in.getHours(), pm_time_in.getMinutes()) : undefined,
+			time: undefined,
 			period: 'PM'
 		},
 		override_open: false
+	});
+
+	watch([() => am_time_out, () => am_time_in, () => pm_time_in, () => pm_time_out], () => {
+		comp_state.am_out.time = am_time_out
+			? new Time(am_time_out.getHours(), am_time_out.getMinutes())
+			: undefined;
+		comp_state.am_in.time = am_time_in
+			? new Time(am_time_in.getHours(), am_time_in.getMinutes())
+			: undefined;
+		comp_state.pm_in.time = pm_time_in
+			? new Time(pm_time_in.getHours(), pm_time_in.getMinutes())
+			: undefined;
+		comp_state.pm_out.time = pm_time_out
+			? new Time(pm_time_out.getHours(), pm_time_out.getMinutes())
+			: undefined;
 	});
 
 	function validateTimes(): boolean {
