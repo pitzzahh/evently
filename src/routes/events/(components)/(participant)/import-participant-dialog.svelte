@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Button, buttonVariants } from '@/components/ui/button';
 	import * as Dialog from '@/components/ui/dialog';
-	import { Check, Clock, Download, Import, UsersRound, X } from '@/assets/icons';
+	import { Import, X } from '@/assets/icons';
 	import {
 		displaySize,
 		FileDropZone,
@@ -75,7 +75,7 @@
 	<Dialog.Trigger class={buttonVariants({ variant: 'ghost' })}
 		><Import class="size-4" />Import Excel Participants</Dialog.Trigger
 	>
-	<Dialog.Content>
+	<Dialog.Content class="max-w-[750px]">
 		<Dialog.Header>
 			<Dialog.Title>Importing guide</Dialog.Title>
 			<Dialog.Description>
@@ -109,15 +109,14 @@
 				<FileDropZone
 					{onUpload}
 					{onFileRejected}
-					maxFileSize={2 * MEGABYTE}
-					accept="image/*"
-					maxFiles={4}
+					maxFileSize={10 * MEGABYTE}
+					accept="application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 					fileCount={files.length}
 				/>
 				<div class="flex flex-col gap-2">
 					{#each files as file, i (file.name)}
 						<div class="flex place-items-center justify-between gap-2">
-							<div class="flex place-items-center gap-2">
+							<div class="flex place-items-center gap-2 whitespace-nowrap">
 								{#await file.url then src}
 									<div class="relative size-9 overflow-clip">
 										<img
