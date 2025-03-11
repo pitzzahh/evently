@@ -10,6 +10,8 @@ export async function readParticipants(filePath: string, event_id: string): Prom
     throw new Error('Worksheet "participants" not found in the Excel file');
   }
 
+  console.log('Worksheet found:', worksheet.name);
+
   const participants = worksheet.getSheetValues()
     .slice(2) // Skip header row
     .filter(row => Array.isArray(row) && row.length > 1) // Filter out empty rows
