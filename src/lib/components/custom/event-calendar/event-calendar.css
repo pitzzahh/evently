@@ -176,10 +176,26 @@ button.rbc-input::-moz-focus-inner {
 	padding: 5px;
 	border-radius: var(--radius);
 	cursor: pointer;
+	transition: all 0.2s ease;
 }
 .rbc-slot-selecting .rbc-event {
-	cursor: inherit;
+	cursor: hsl(var(--primary-foreground));
 	pointer-events: none;
+}
+.rbc-event.rbc-selected {
+	background-color: hsl(var(--primary));
+	box-shadow:
+		0 0 0 2px hsl(var(--card)),
+		0 0 0 4px hsl(var(--primary));
+	z-index: 10;
+	outline: none;
+}
+.rbc-event:hover {
+	background-color: hsl(var(--primary-focus, var(--primary)));
+	transform: translateY(-1px);
+}
+.rbc-event.rbc-selected:hover {
+	background-color: hsl(var(--primary));
 }
 .rbc-event.rbc-selected {
 	background-color: hsla(var(--primary), 0.9);
@@ -497,8 +513,8 @@ button.rbc-input::-moz-focus-inner {
 .rbc-slot-selection {
 	z-index: 10;
 	position: absolute;
-	background-color: rgba(0, 0, 0, 0.5);
-	color: white;
+	background-color: hsl(var(--primary));
+	color: inherit;
 	font-size: 75%;
 	width: 100%;
 	padding: 3px;
