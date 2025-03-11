@@ -1,17 +1,13 @@
 <script lang="ts">
 	import { COLLECTIONS } from '@/db';
-	import type {
-		AttendanceRecord,
-		EventSchedule,
-		Participant,
-		ParticipantAttendance
-	} from '@/db/models/types';
+	import type { AttendanceRecord, EventSchedule, Participant } from '@/db/models/types';
 	import { generateFullName } from '@/utils/text';
 	import SvgQR from '@svelte-put/qr/svg/QR.svelte';
 	import { watch } from 'runed';
 	import { page } from '$app/state';
 	import { Badge } from '@/components/ui/badge';
 	import { formatDate, formatDateToTimeOption } from '@/utils/format';
+	import { cn } from '@/utils';
 
 	interface Props {
 		participant: Participant;
@@ -46,7 +42,16 @@
 </script>
 
 <div class="flex items-center gap-4">
-	<SvgQR data={participant.id} logoRatio={107 / 128} shape="circle" width="300" height="300" />
+	<div class="bg-white p-2">
+		<SvgQR
+			data={participant.id}
+			logoRatio={107 / 128}
+			shape="circle"
+			width="250"
+			height="250"
+			color="black"
+		/>
+	</div>
 
 	<div class="grid w-full gap-4">
 		<div>
@@ -68,7 +73,7 @@
 
 		<div class="w-full border-t-2 border-dashed"></div>
 
-		<div class="h-[300px] overflow-auto">
+		<div class="h-[400px] overflow-auto">
 			<div class="grid w-full gap-2">
 				{#each comp_state.event_schedules as event_schedule}
 					{@const participant_attendance = comp_state.participant_attendance.find(
@@ -81,99 +86,21 @@
 						</div>
 
 						<div class="grid gap-4">
-							<div class="grid gap-2">
-								<p class="font-semibold">AM Time</p>
-								<div class="flex items-center justify-between gap-4">
-									<div class="grid w-full gap-1 rounded-lg border-2 border-dashed p-4">
-										<p class="text-sm font-medium">In</p>
+							{@render time_period_panel({
+								event_period_start: event_schedule?.am_start,
+								event_period_end: event_schedule?.am_end,
+								time_in: participant_attendance?.am_time_in,
+								time_out: participant_attendance?.am_time_out,
+								period: 'AM'
+							})}
 
-										<div class="flex gap-2">
-											<p class="text-sm text-muted-foreground">Scheduled Time</p>
-											<Badge variant="outline"
-												>{formatDateToTimeOption(event_schedule?.am_start)}</Badge
-											>
-										</div>
-
-										<div class="flex gap-2">
-											<p class="text-sm text-muted-foreground">Time In</p>
-
-											<Badge variant="outline">
-												{participant_attendance?.am_time_in
-													? formatDateToTimeOption(participant_attendance?.am_time_in)
-													: 'No time in'}
-											</Badge>
-										</div>
-									</div>
-
-									<div class="grid w-full gap-1 rounded-lg border-2 border-dashed p-4">
-										<p class="text-sm font-medium">Out</p>
-
-										<div class="flex gap-2">
-											<p class="text-sm text-muted-foreground">Scheduled Time</p>
-											<Badge variant="outline"
-												>{formatDateToTimeOption(event_schedule?.am_end)}</Badge
-											>
-										</div>
-
-										<div class="flex gap-2">
-											<p class="text-sm text-muted-foreground">Time Out</p>
-
-											<Badge variant="outline">
-												{participant_attendance?.am_time_out
-													? formatDateToTimeOption(participant_attendance?.am_time_out)
-													: 'No time out'}
-											</Badge>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							<div class="grid gap-2">
-								<p class="font-semibold">PM Time</p>
-								<div class="flex items-center justify-between gap-4">
-									<div class="grid w-full gap-1 rounded-lg border-2 border-dashed p-4">
-										<p class="text-sm font-medium">In</p>
-
-										<div class="flex gap-2">
-											<p class="text-sm text-muted-foreground">Scheduled Time</p>
-											<Badge variant="outline"
-												>{formatDateToTimeOption(event_schedule?.pm_start)}</Badge
-											>
-										</div>
-
-										<div class="flex gap-2">
-											<p class="text-sm text-muted-foreground">Time In</p>
-
-											<Badge variant="outline">
-												{participant_attendance?.pm_time_in
-													? formatDateToTimeOption(participant_attendance?.pm_time_in)
-													: 'No time in'}
-											</Badge>
-										</div>
-									</div>
-
-									<div class="grid w-full gap-1 rounded-lg border-2 border-dashed p-4">
-										<p class="text-sm font-medium">Out</p>
-
-										<div class="flex gap-2">
-											<p class="text-sm text-muted-foreground">Scheduled Time</p>
-											<Badge variant="outline"
-												>{formatDateToTimeOption(event_schedule?.pm_end)}</Badge
-											>
-										</div>
-
-										<div class="flex gap-2">
-											<p class="text-sm text-muted-foreground">Time Out</p>
-
-											<Badge variant="outline">
-												{participant_attendance?.pm_time_out
-													? formatDateToTimeOption(participant_attendance?.pm_time_out)
-													: 'No time out'}
-											</Badge>
-										</div>
-									</div>
-								</div>
-							</div>
+							{@render time_period_panel({
+								event_period_start: event_schedule?.pm_start,
+								event_period_end: event_schedule?.pm_end,
+								time_in: participant_attendance?.pm_time_in,
+								time_out: participant_attendance?.pm_time_out,
+								period: 'PM'
+							})}
 						</div>
 					</div>
 				{/each}
@@ -181,3 +108,66 @@
 		</div>
 	</div>
 </div>
+
+{#snippet time_period_panel({
+	event_period_start,
+	event_period_end,
+	time_in,
+	time_out,
+	period
+}: {
+	event_period_start?: Date;
+	event_period_end?: Date;
+	time_in?: Date;
+	time_out?: Date;
+	period: 'AM' | 'PM';
+})}
+	<div class="grid gap-2">
+		<p class="font-semibold">{period} Time</p>
+		<div class="flex items-center justify-between gap-4">
+			<div class="grid w-full gap-1 rounded-lg border-2 border-dashed p-4">
+				<p class="text-sm font-medium">In</p>
+
+				<div class="flex gap-2">
+					<p class="text-sm text-muted-foreground">Scheduled Time</p>
+					<Badge variant="outline">{formatDateToTimeOption(event_period_start)}</Badge>
+				</div>
+
+				<div class="flex gap-2">
+					<p class="text-sm text-muted-foreground">Time In</p>
+
+					<Badge
+						variant="outline"
+						class={cn({
+							'text-red-500': !time_in
+						})}
+					>
+						{time_in ? formatDateToTimeOption(time_in) : 'No time in'}
+					</Badge>
+				</div>
+			</div>
+
+			<div class="grid w-full gap-1 rounded-lg border-2 border-dashed p-4">
+				<p class="text-sm font-medium">Out</p>
+
+				<div class="flex gap-2">
+					<p class="text-sm text-muted-foreground">Scheduled Time</p>
+					<Badge variant="outline">{formatDateToTimeOption(event_period_end)}</Badge>
+				</div>
+
+				<div class="flex gap-2">
+					<p class="text-sm text-muted-foreground">Time Out</p>
+
+					<Badge
+						variant="outline"
+						class={cn({
+							'text-red-500': !time_out
+						})}
+					>
+						{time_out ? formatDateToTimeOption(time_out) : 'No time out'}
+					</Badge>
+				</div>
+			</div>
+		</div>
+	</div>
+{/snippet}

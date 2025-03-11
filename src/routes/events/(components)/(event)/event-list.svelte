@@ -4,13 +4,14 @@
 	import { COLLECTIONS } from '@/db/index';
 	import type { EventDetails } from '@/db/models/types';
 	import { fly } from 'svelte/transition';
-	import { quartInOut } from 'svelte/easing';
+	import { quartIn, quartInOut } from 'svelte/easing';
 	import { InfiniteLoader, loaderState } from 'svelte-infinite';
 	import { Badge } from '@/components/ui/badge';
 	import * as Alert from '@/components/ui/alert/index.js';
-	import { CircleAlert } from '@/assets/icons';
+	import { CircleAlert, Plus } from '@/assets/icons';
 	import { Button } from '@/components/ui/button';
 	import { watch } from 'runed';
+	import { Calendar } from 'lucide-svelte';
 
 	interface ComponentState {
 		refetch: boolean;
@@ -126,20 +127,39 @@
 	);
 </script>
 
-<Timeline style="width: 100%;  padding: 0;">
+<Timeline style="width: 100%; padding: 0;">
 	<InfiniteLoader triggerLoad={loadMore}>
 		{#each comp_state.infinite_loader.events as event, i}
 			<div transition:fly={{ y: 20, duration: 200, delay: i * 100, easing: quartInOut }}>
 				<EventCard {...event} />
 			</div>
-		{/each} 
+		{/each}
+
+		{#if comp_state.infinite_loader.events.length === 0}
+			<div class="grid h-[65vh] place-content-center">
+				<div class="grid place-items-center gap-4">
+					<Calendar class="size-[7rem] text-muted-foreground/80" />
+					<div class="grid place-items-center gap-2">
+						<h2 class="text-2xl font-medium text-muted-foreground">
+							No {type === 'upcoming' ? 'Upcoming' : 'Past'} Events
+						</h2>
+						<p class="text-muted-foreground">There's no {type} events, why not add one?</p>
+						<Button href="/events/create" variant="outline"
+							><Plus class="size-4" /> Create One</Button
+						>
+					</div>
+				</div>
+			</div>
+		{/if}
 
 		{#snippet noData()}
-			<Badge variant="secondary">Nore More Data</Badge>
+			{#if comp_state.infinite_loader.events.length > 0}
+				<Badge class="text-sm" variant="outline">No more data</Badge>
+			{/if}
 		{/snippet}
 
 		{#snippet loading()}
-			<Badge class="text-sm">Loading...</Badge>
+			<Badge class="text-sm" variant="outline">Loading Events</Badge>
 		{/snippet}
 		{#snippet error(load)}
 			<Alert.Root variant="destructive">

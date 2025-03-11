@@ -1,18 +1,13 @@
 <script lang="ts">
-	import {
-		DateFormatter,
-		type DateValue,
-		getLocalTimeZone,
-		Time,
-		now
-	} from '@internationalized/date';
+	import { Time } from '@internationalized/date';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { buttonVariants } from '$lib/components/ui/button';
 	import TimePicker_12h from '@/components/ui/time-picker/time-picker-12h.svelte';
-	import { Ellipsis } from 'lucide-svelte';
+	import { Clock, Ellipsis, X } from 'lucide-svelte';
 	import Button from '@/components/ui/button/button.svelte';
 	import { COLLECTIONS } from '@/db';
 	import { toast } from 'svelte-sonner';
+	import PeriodTimePicker from './period-time-picker.svelte';
 
 	let {
 		am_time_out,
@@ -31,31 +26,29 @@
 	} = $props();
 
 	let comp_state: {
-		am_out: { time: Time; period: 'AM' | 'PM' };
-		am_in: { time: Time; period: 'AM' | 'PM' };
-		pm_out: { time: Time; period: 'AM' | 'PM' };
-		pm_in: { time: Time; period: 'AM' | 'PM' };
+		am_out: { time?: Time; period: 'AM' | 'PM' };
+		am_in: { time?: Time; period: 'AM' | 'PM' };
+		pm_out: { time?: Time; period: 'AM' | 'PM' };
+		pm_in: { time?: Time; period: 'AM' | 'PM' };
+		override_open: boolean;
 	} = $state({
 		am_out: {
-			time: am_time_out
-				? new Time(am_time_out.getHours(), am_time_out.getMinutes())
-				: new Time(0, 0),
+			time: am_time_out ? new Time(am_time_out.getHours(), am_time_out.getMinutes()) : undefined,
 			period: 'AM'
 		},
 		am_in: {
-			time: am_time_in ? new Time(am_time_in.getHours(), am_time_in.getMinutes()) : new Time(0, 0),
+			time: am_time_in ? new Time(am_time_in.getHours(), am_time_in.getMinutes()) : undefined,
 			period: 'AM'
 		},
 		pm_out: {
-			time: pm_time_out
-				? new Time(pm_time_out.getHours(), pm_time_out.getMinutes())
-				: new Time(0, 0),
+			time: pm_time_out ? new Time(pm_time_out.getHours(), pm_time_out.getMinutes()) : undefined,
 			period: 'PM'
 		},
 		pm_in: {
-			time: pm_time_in ? new Time(pm_time_in.getHours(), pm_time_in.getMinutes()) : new Time(0, 0),
+			time: pm_time_in ? new Time(pm_time_in.getHours(), pm_time_in.getMinutes()) : undefined,
 			period: 'PM'
-		}
+		},
+		override_open: false
 	});
 
 	function validateTimes(): boolean {
@@ -86,38 +79,54 @@
 	function handleSaveChanges() {
 		if (!validateTimes()) return;
 
-		const am_time_in = new Date(current_event_date);
-		am_time_in.setHours(comp_state.am_in.time.hour);
-		am_time_in.setMinutes(comp_state.am_in.time.minute);
+		const updates: Record<string, Date | undefined> = {
+			updated: new Date()
+		};
 
-		const am_time_out = new Date(current_event_date);
-		am_time_out.setHours(comp_state.am_out.time.hour);
-		am_time_out.setMinutes(comp_state.am_out.time.minute);
+		const createTimeDate = (time?: Time) => {
+			if (!time) return undefined;
 
-		const pm_time_in = new Date(current_event_date);
-		pm_time_in.setHours(comp_state.pm_in.time.hour);
-		pm_time_in.setMinutes(comp_state.pm_in.time.minute);
+			const newDate = new Date(current_event_date);
+			newDate.setHours(time.hour);
+			newDate.setMinutes(time.minute);
+			newDate.setSeconds(0);
+			newDate.setMilliseconds(0);
+			return newDate;
+		};
 
-		const pm_time_out = new Date(current_event_date);
-		pm_time_out.setHours(comp_state.pm_out.time.hour);
-		pm_time_out.setMinutes(comp_state.pm_out.time.minute);
+		updates.am_time_in = createTimeDate(comp_state.am_in.time);
+		updates.am_time_out = createTimeDate(comp_state.am_out.time);
+		updates.pm_time_in = createTimeDate(comp_state.pm_in.time);
+		updates.pm_time_out = createTimeDate(comp_state.pm_out.time);
 
-		COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.updateOne(
-			{ id: attendance_id },
-			{
-				$set: {
-					am_time_in,
-					am_time_out,
-					pm_time_in,
-					pm_time_out
-				}
+		Object.keys(updates).forEach((key) => {
+			if (updates[key] === undefined) {
+				delete updates[key];
 			}
-		);
+		});
+
+		COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.updateOne({ id: attendance_id }, { $set: updates });
+
+		toast.success('Attendance record/s overridden successfully');
+		comp_state.override_open = false;
+	}
+
+	function handleSetDefaultTimeValue(setTime: (time: Time) => void, hours: number) {
+		const default_time = new Date();
+		default_time.setHours(hours);
+		default_time.setMinutes(0);
+		default_time.setSeconds(0);
+
+		const time = new Time(default_time.getHours(), default_time.getMinutes());
+		setTime(time);
 	}
 </script>
 
-<Dialog.Root>
-	<Dialog.Trigger class={buttonVariants({ variant: 'outline' })}>
+<Dialog.Root
+	open={comp_state.override_open}
+	onOpenChange={(value) => (comp_state.override_open = value)}
+>
+	<Dialog.Trigger class={buttonVariants({ variant: 'ghost', size: 'icon' })}>
 		<Ellipsis class="size-4" />
 	</Dialog.Trigger>
 	<Dialog.Content class="sm:max-w-[500px]">
@@ -126,45 +135,37 @@
 			<Dialog.Description>Make changes to the time of this participant</Dialog.Description>
 		</Dialog.Header>
 		<div class="grid gap-4">
-			<div class="grid gap-2">
-				<p class="font-semibold">AM Time</p>
-				<div class="flex items-center justify-between gap-4">
-					<div class="rounded-lg border-2 border-dashed p-4">
-						<p class="text-sm font-medium">In</p>
-						<TimePicker_12h
-							bind:time={comp_state.am_in.time}
-							bind:period={comp_state.am_in.period}
-						/>
-					</div>
-					<div class="rounded-lg border-2 border-dashed p-4">
-						<p class="text-sm font-medium">Out</p>
-						<TimePicker_12h
-							bind:time={comp_state.am_out.time}
-							bind:period={comp_state.am_out.period}
-						/>
-					</div>
-				</div>
-			</div>
+			<PeriodTimePicker
+				period="AM"
+				handleSetDefaultTime={(type) =>
+					type === 'in'
+						? handleSetDefaultTimeValue((time) => (comp_state.am_in.time = time), 8)
+						: handleSetDefaultTimeValue((time) => (comp_state.am_out.time = time), 12)}
+				bind:time_in={comp_state.am_in.time}
+				bind:time_in_period={comp_state.am_in.period}
+				bind:time_out={comp_state.am_out.time}
+				bind:time_out_period={comp_state.am_out.period}
+				handleRemoveTime={(type) =>
+					type === 'in'
+						? (comp_state.am_in.time = undefined)
+						: (comp_state.am_out.time = undefined)}
+			/>
 
-			<div class="grid gap-2">
-				<p class="font-semibold">PM Time</p>
-				<div class="flex items-center justify-between gap-4">
-					<div class="rounded-lg border-2 border-dashed p-4">
-						<p class="text-sm font-medium">In</p>
-						<TimePicker_12h
-							bind:time={comp_state.pm_in.time}
-							bind:period={comp_state.pm_in.period}
-						/>
-					</div>
-					<div class="rounded-lg border-2 border-dashed p-4">
-						<p class="text-sm font-medium">Out</p>
-						<TimePicker_12h
-							bind:time={comp_state.pm_out.time}
-							bind:period={comp_state.pm_out.period}
-						/>
-					</div>
-				</div>
-			</div>
+			<PeriodTimePicker
+				period="PM"
+				handleSetDefaultTime={(type) =>
+					type === 'in'
+						? handleSetDefaultTimeValue((time) => (comp_state.pm_in.time = time), 8)
+						: handleSetDefaultTimeValue((time) => (comp_state.pm_out.time = time), 12)}
+				bind:time_in={comp_state.pm_in.time}
+				bind:time_in_period={comp_state.pm_in.period}
+				bind:time_out={comp_state.pm_out.time}
+				bind:time_out_period={comp_state.pm_out.period}
+				handleRemoveTime={(type) =>
+					type === 'in'
+						? (comp_state.pm_in.time = undefined)
+						: (comp_state.pm_out.time = undefined)}
+			/>
 		</div>
 		<Dialog.Footer>
 			<Button onclick={handleSaveChanges}>Save changes</Button>

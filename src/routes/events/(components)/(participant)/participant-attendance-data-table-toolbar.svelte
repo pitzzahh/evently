@@ -12,7 +12,6 @@
 	import QR from '@svelte-put/qr/img/QR.svelte';
 	import ImgQR from '@svelte-put/qr/img/QR.svelte';
 	import { COLLECTIONS } from '@/db';
-	import ParticipantInfo from './participant-info.svelte';
 
 	let {
 		row,
@@ -33,6 +32,34 @@
 			comp_state.view_open = value;
 		}
 	}
+
+	let barcode = $state('');
+	let timeout = $state(0);
+
+	function handleKeydown(event: KeyboardEvent) {
+		if (event.key === 'Enter') {
+			event.preventDefault();
+			event.stopPropagation();
+			barcode = '';
+			return;
+		}
+
+		if (timeout) clearTimeout(timeout);
+
+		barcode = event.key;
+
+		timeout = setTimeout(() => {
+			barcode = '';
+		}, 500);
+	}
+
+	$effect(() => {
+		window.addEventListener('keydown', handleKeydown);
+
+		return () => {
+			window.removeEventListener('keydown', handleKeydown);
+		};
+	});
 
 	function handleDeleteParticipant() {
 		COLLECTIONS.PARTICIPANT_COLLECTION.removeOne({
@@ -79,12 +106,25 @@
 		</DropdownMenu.Content>
 	</DropdownMenu.Root>
 
-	{#if comp_state.view_open}
-		<Dialog.Content class="max-w-[950px]">
+	<!-- {#if comp_state.view_open}
+		<Dialog.Content class="max-w-[650px]">
 			<Dialog.Header>
 				<Dialog.Title>Participant's Information</Dialog.Title>
+				<QR
+					data={row.original.id}
+					logoRatio={107 / 128}
+					shape="circle"
+					backgroundFill="white"
+					margin={4}
+					width="600"
+					height="600"
+				>
+					{#snippet img({ src })}
+						<img {src} alt="qr" class="size-[200px]" />
+					{/snippet}
+				</QR>
+				<p>{barcode}</p>
 			</Dialog.Header>
-			<ParticipantInfo participant={row.original} />
 		</Dialog.Content>
 	{/if}
 
@@ -119,5 +159,5 @@
 				<Button variant="outline" onclick={() => (comp_state.remove_open = false)}>Cancel</Button>
 			</Dialog.Footer>
 		</Dialog.Content>
-	{/if}
+	{/if} -->
 </Dialog.Dialog>

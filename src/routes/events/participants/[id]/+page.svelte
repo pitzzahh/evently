@@ -20,8 +20,9 @@
 	import { generateFullName } from '@/utils/text/index.js';
 	import ParticipantAttendanceDataTable from '@routes/events/(components)/(participant)/participant-attendance-data-table.svelte';
 	import ParticipantAttendanceDataTableToolbar from '@routes/events/(components)/(participant)/participant-attendance-data-table-toolbar.svelte';
-	import { getEventDayInfo } from '@routes/events/utils/index.js';
+	import { checkEventStatus, getEventDayInfo } from '@routes/events/utils/index.js';
 	import { cubicIn, cubicOut } from 'svelte/easing';
+	import { StatusPill } from '@/components/snippets/events.svelte';
 
 	let { data } = $props();
 
@@ -48,7 +49,9 @@
 		barcode: '',
 		timeout: null
 	});
-
+	const event_status = $derived(
+		checkEventStatus(comp_state.event_details?.start_date, comp_state.event_details?.end_date)
+	);
 	const current_event_day = $derived(
 		comp_state.event_details
 			? getEventDayInfo(
@@ -350,20 +353,23 @@
 				{comp_state.event_details?.event_name ?? 'N/A'}'s Participants
 			</h2>
 
-			{#if comp_state.event_details}
+			{#if comp_state.event_details && event_status !== 'finished'}
 				<Badge variant="outline" class="text-md font-semibold">
 					Day {current_event_day}
 				</Badge>
 			{/if}
 		</div>
 
-		<div class="flex items-center gap-2">
-			<AddParticipantsDialog
-				disabled={false}
-				add_participants_form={data.add_participants_form}
-				event_id={comp_state.event_details?.id ?? 'N/A'}
-			/>
-			<Button variant="outline"><Download class="size-4" /> Export QR Codes</Button>
+		<div class="flex flex-col items-end gap-2">
+			<div class="flex items-center gap-2">
+				<AddParticipantsDialog
+					disabled={false}
+					add_participants_form={data.add_participants_form}
+					event_id={comp_state.event_details?.id ?? 'N/A'}
+				/>
+				<Button variant="outline"><Download class="size-4" /> Export QR Codes</Button>
+			</div>
+			{@render StatusPill(event_status)}
 		</div>
 	</div>
 
