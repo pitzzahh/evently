@@ -20,18 +20,16 @@ export async function generateQRCodesPDF(props: DocumentMetaDetails) {
 
   try {
     const qrCodePromises = participants.map(async (participant) => {
-      const qr_code = await createQrPngDataUrl({
-        data: participant.id,
-        width: 500,
-        height: 500,
-        shape: 'circle',
-        backgroundFill: '#fff',
-      });
-      console.log("QR Code Data URL:", qr_code);
       return {
         stack: [
           {
-            image: qr_code,
+            image: await createQrPngDataUrl({
+              data: participant.id,
+              width: 500,
+              height: 500,
+              shape: 'circle',
+              backgroundFill: '#fff',
+            }),
             fit: [100, 100]
           },
           {
@@ -114,8 +112,6 @@ export async function generateQRCodesPDF(props: DocumentMetaDetails) {
         };
       }
     };
-
-
     pdfMake.createPdf(file).download(`${event_details.event_name}_QR_Codes.pdf`);
     toast.success("QR codes generated successfully");
   } catch (error) {
