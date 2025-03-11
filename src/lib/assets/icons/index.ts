@@ -35,3 +35,4 @@ export { default as Edit } from 'lucide-svelte/icons/edit';
 export { default as Trash } from 'lucide-svelte/icons/trash';
 export { default as Import } from 'lucide-svelte/icons/import';
 export { default as Download } from 'lucide-svelte/icons/download';
+export { default as Sheet } from 'lucide-svelte/icons/sheet';

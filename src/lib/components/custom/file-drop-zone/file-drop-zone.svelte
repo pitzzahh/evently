@@ -12,7 +12,7 @@
 		 *
 		 * @param files
 		 */
-		onUpload: (files: File[]) => Promise<void>;
+		onUpload: (files: string[]) => Promise<void>;
 		/** The maximum amount files allowed to be uploaded */
 		maxFiles?: number;
 		fileCount?: number;
@@ -20,7 +20,7 @@
 		maxFileSize?: number;
 		children?: Snippet<[]>;
 		/** Called when a file does not meet the upload criteria (size, or type) */
-		onFileRejected?: (opts: { reason: FileRejectedReason; file: File }) => void;
+		onFileRejected?: (opts: { reason: FileRejectedReason; file: string }) => void;
 
 		// just for extra documentation
 		/** Takes a comma separated list of one or more file types.
@@ -76,7 +76,9 @@
 	const drop = async (e: DragEvent & { currentTarget: EventTarget & HTMLLabelElement }) => {
 		if (disabled || !canUploadFiles) return;
 		e.preventDefault();
-		const droppedFiles = Array.from(e.dataTransfer?.files ?? []);
+		const droppedFiles = Array.from(e.dataTransfer?.files ?? []).map(
+			(file) => file.webkitRelativePath
+		);
 		await upload(droppedFiles);
 	};
 
@@ -85,44 +87,23 @@
 		const selectedFiles = await open({
 			multiple: maxFiles === undefined || maxFiles - (fileCount ?? 0) > 1,
 			directory: false,
+			filters: accept
+				? [
+						{
+							name: 'Excel Files',
+							extensions: ['xlsx']
+						}
+					]
+				: undefined
 		});
 		if (!selectedFiles) return;
-		const files = Array.isArray(selectedFiles) ? selectedFiles : [selectedFiles];
-		await upload(files.map((filePath) => new File([filePath], filePath.split('/').pop() ?? '')));
+		const filePaths = Array.isArray(selectedFiles) ? selectedFiles : [selectedFiles];
+		await upload(filePaths);
 	};
 
-	const shouldAcceptFile = (file: File, fileNumber: number): FileRejectedReason | undefined => {
-		if (maxFileSize !== undefined && file.size > maxFileSize) return 'Maximum file size exceeded';
-		if (maxFiles !== undefined && fileNumber > maxFiles) return 'Maximum files uploaded';
-		if (!accept) return undefined;
-		return checkFileType(file);
-	};
-
-	const checkFileType = (file: File): FileRejectedReason | undefined => {
-		const acceptedTypes = accept ? accept.split(',').map((a) => a.trim().toLowerCase()) : [];
-		const fileType = file.type.toLowerCase();
-		const fileName = file.name.toLowerCase();
-		const isAcceptable = acceptedTypes.some((pattern) => {
-			if (fileType.startsWith('.')) return fileName.endsWith(pattern);
-			if (pattern.endsWith('/*')) return fileType.startsWith(pattern.slice(0, -1));
-			return fileType === pattern;
-		});
-		return isAcceptable ? undefined : 'File type not allowed';
-	};
-
-	const upload = async (uploadFiles: File[]) => {
+	const upload = async (uploadFiles: string[]) => {
 		uploading = true;
-		const validFiles: File[] = [];
-		for (let i = 0; i < uploadFiles.length; i++) {
-			const file = uploadFiles[i];
-			const rejectedReason = shouldAcceptFile(file, (fileCount ?? 0) + i + 1);
-			if (rejectedReason) {
-				onFileRejected?.({ file, reason: rejectedReason });
-				continue;
-			}
-			validFiles.push(file);
-		}
-		await onUpload(validFiles);
+		await onUpload(uploadFiles);
 		uploading = false;
 	};
 
@@ -179,7 +160,7 @@
 		{accept}
 		multiple={false}
 		type="button"
-		onclick={change} 
+		onclick={change}
 		class="hidden"
 	/>
 </label>

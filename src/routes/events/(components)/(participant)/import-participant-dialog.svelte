@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Button, buttonVariants } from '@/components/ui/button';
 	import * as Dialog from '@/components/ui/dialog';
-	import { Import, X } from '@/assets/icons';
+	import { Import, X, Sheet } from '@/assets/icons';
 	import {
 		displaySize,
 		FileDropZone,
@@ -28,30 +28,27 @@
 		open_add_participants_dialog = $bindable(false)
 	}: ImportParticipantsDialogProps = $props();
 
-	const onUpload: FileDropZoneProps['onUpload'] = async (files) => {
-		await Promise.allSettled(files.map((file) => uploadFile(file)));
+	const onUpload: FileDropZoneProps['onUpload'] = async (filePaths) => {
+		await Promise.allSettled(filePaths.map((filePath) => uploadFile(filePath)));
 	};
 
 	const onFileRejected: FileDropZoneProps['onFileRejected'] = async ({ reason, file }) => {
-		toast.error(`${file.name} failed to upload!`, { description: reason });
+		toast.error(`${file} failed to upload!`, { description: reason });
 	};
 
-	const uploadFile = async (file: File) => {
+	const uploadFile = async (filePath: string) => {
 		// don't upload duplicate files
-		console.log(file);
-		if (selected_file && selected_file.name === file.name) return;
+		if (selected_file && selected_file.path === filePath) return;
 
 		const urlPromise = new Promise<string>((resolve) => {
 			// add some fake loading time
-			sleep(1000).then(() => resolve(URL.createObjectURL(file)));
+			sleep(1000).then(() => resolve(filePath));
 		});
 
 		selected_file = {
-			name: file.name,
-			type: file.type,
-			size: file.size,
-			uploadedAt: Date.now(),
-			url: urlPromise
+			path: filePath,
+			name: filePath.split('/').pop() ?? '',
+			uploadedAt: Date.now()
 		};
 
 		// we await since we don't want the onUpload to be complete until the files are actually uploaded
@@ -59,11 +56,9 @@
 	};
 
 	type UploadedFile = {
+		path: string;
 		name: string;
-		type: string;
-		size: number;
 		uploadedAt: number;
-		url: Promise<string>;
 	};
 
 	let selected_file = $state<UploadedFile | null>(null);
@@ -74,17 +69,13 @@
 			toast.error('No files selected!');
 			return;
 		}
-		const file_url = await selected_file.url;
-		console.log('file_url', file_url);
+		console.log('selected_file', selected_file);
+		const file_url = await selected_file.path;
 		const participants = await readParticipants(file_url, event_id);
 
 		console.log('participants', participants);
 	}
 
-	onDestroy(async () => {
-		if (!selected_file) return;
-		URL.revokeObjectURL(await selected_file.url);
-	});
 	$effect(() => {
 		const interval = setInterval(() => {
 			date.setTime(Date.now());
@@ -141,34 +132,31 @@
 					<div class="flex flex-col gap-2">
 						<div class="flex place-items-center justify-between gap-2">
 							<div class="flex place-items-center gap-2 whitespace-nowrap">
-								{#await selected_file.url then src}
+								{#await selected_file.path then src}
 									<div class="relative size-9 overflow-clip">
-										<img
-											{src}
-											alt={selected_file.name}
+										<Sheet
 											class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 overflow-clip"
 										/>
 									</div>
 								{/await}
 								<div class="flex flex-col">
 									<span>{selected_file.name}</span>
-									<span class="text-xs text-muted-foreground"
+									<!-- <span class="text-xs text-muted-foreground"
 										>{displaySize(selected_file.size)}</span
-									>
+									> -->
 								</div>
 							</div>
-							{#await selected_file.url}
+							{#await selected_file.path}
 								<Progress
 									class="h-2 w-full flex-grow"
 									value={((date.getTime() - selected_file.uploadedAt) / 1000) * 100}
 									max={100}
 								/>
-							{:then url}
+							{:then path}
 								<Button
 									variant="outline"
 									size="icon"
 									onclick={() => {
-										URL.revokeObjectURL(url);
 										selected_file = null;
 									}}
 								>
