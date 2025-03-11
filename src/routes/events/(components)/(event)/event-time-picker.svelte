@@ -4,7 +4,6 @@
 	import { time_options } from '@/constants';
 	import { formatDate, formatDateToTimeOption } from '@/utils/format';
 	import { StatusPill } from '@/components/snippets';
-	import { size } from '@tauri-apps/plugin-fs';
 	import { checkEventStatus } from '@routes/events/utils';
 
 	let {

@@ -38,7 +38,10 @@
 		COLLECTIONS.PARTICIPANT_COLLECTION.removeOne({
 			id: row.original.id
 		});
-
+		COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.removeMany({
+			participant_id: row.original.id,
+			event_id: row.original.event_id
+		});
 		comp_state.remove_open = false;
 	}
 </script>

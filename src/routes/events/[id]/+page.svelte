@@ -111,6 +111,9 @@
 			COLLECTIONS.PARTICIPANT_COLLECTION.removeMany({
 				event_id: id
 			});
+			COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.removeMany({
+				event_id: id
+			});
 			COLLECTIONS.EVENT_SCHEDULE_COLLECTION.removeMany({
 				event_id: id
 			});
