@@ -99,12 +99,6 @@
 		updates.pm_time_in = createTimeDate(comp_state.pm_in.time);
 		updates.pm_time_out = createTimeDate(comp_state.pm_out.time);
 
-		Object.keys(updates).forEach((key) => {
-			if (updates[key] === undefined) {
-				delete updates[key];
-			}
-		});
-
 		COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.updateOne({ id: attendance_id }, { $set: updates });
 
 		toast.success('Attendance record/s overridden successfully');
@@ -150,13 +144,12 @@
 						? (comp_state.am_in.time = undefined)
 						: (comp_state.am_out.time = undefined)}
 			/>
-
 			<PeriodTimePicker
 				period="PM"
 				handleSetDefaultTime={(type) =>
 					type === 'in'
-						? handleSetDefaultTimeValue((time) => (comp_state.pm_in.time = time), 8)
-						: handleSetDefaultTimeValue((time) => (comp_state.pm_out.time = time), 12)}
+						? handleSetDefaultTimeValue((time) => (comp_state.pm_in.time = time), 13)
+						: handleSetDefaultTimeValue((time) => (comp_state.pm_out.time = time), 16)}
 				bind:time_in={comp_state.pm_in.time}
 				bind:time_in_period={comp_state.pm_in.period}
 				bind:time_out={comp_state.pm_out.time}
