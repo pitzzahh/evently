@@ -432,7 +432,7 @@
 				<ImageCropper.Preview class="h-64 w-64 rounded-md" />
 			</ImageCropper.UploadTrigger>
 			<ImageCropper.Dialog>
-				<ImageCropper.Cropper cropShape="round" />
+				<ImageCropper.Cropper cropShape="rect" />
 				<ImageCropper.Controls>
 					<ImageCropper.Cancel />
 					<ImageCropper.Crop />
