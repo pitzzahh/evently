@@ -16,11 +16,10 @@ export async function generateQRCodesPDF(props: DocumentMetaDetails) {
     return;
   }
 
-  // Calculate optimal number of columns (max 4)
   const calculateOptimalColumns = (totalItems: number): number => {
     if (totalItems <= 4) return totalItems;
     if (totalItems <= 8) return Math.min(4, Math.ceil(totalItems / 2));
-    return 4; // Default to max columns for larger counts
+    return 4;
   };
 
   const columnsPerRow = calculateOptimalColumns(participants.length);
@@ -40,7 +39,7 @@ export async function generateQRCodesPDF(props: DocumentMetaDetails) {
               backgroundFill: '#fff',
             }),
             fit: [100, 100],
-            alignment: 'center' // Center the image
+            alignment: 'center'
           },
           {
             text: `${participant.first_name} ${participant.last_name}`,
@@ -49,7 +48,7 @@ export async function generateQRCodesPDF(props: DocumentMetaDetails) {
           }
         ],
         margin: [10, 10, 10, 20],
-        alignment: 'center' // Center the entire stack
+        alignment: 'center'
       };
     });
 
@@ -59,17 +58,14 @@ export async function generateQRCodesPDF(props: DocumentMetaDetails) {
       currentRow.push(cell);
 
       if (currentRow.length === columnsPerRow || index === participants.length - 1) {
-        // Fill remaining cells in the last row if needed
         while (currentRow.length < columnsPerRow) {
           currentRow.push({});
         }
-
         rows.push(currentRow);
         currentRow = [];
       }
     });
 
-    // Create dynamic column widths array
     const columnWidths = Array(columnsPerRow).fill('*');
 
     const file: TDocumentDefinitions = {
