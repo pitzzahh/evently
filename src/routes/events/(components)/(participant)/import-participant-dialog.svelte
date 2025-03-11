@@ -13,6 +13,7 @@
 	import { SvelteDate } from 'svelte/reactivity';
 	import { sleep } from '@/utils';
 	import { Progress } from '@/components/ui/progress';
+	import * as AlertDialog from '@/components/ui/alert-dialog';
 
 	const onUpload: FileDropZoneProps['onUpload'] = async (files) => {
 		await Promise.allSettled(files.map((file) => uploadFile(file)));
@@ -115,7 +116,7 @@
 					{onUpload}
 					{onFileRejected}
 					maxFileSize={10 * MEGABYTE}
-					accept="application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+					accept="application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 				/>
 				{#if selected_file}
 					<div class="flex flex-col gap-2">
@@ -161,7 +162,25 @@
 			</div></Dialog.Header
 		>
 		<Dialog.Footer>
-			<Button class="w-full" onclick={handleImportParticipants}>Save changes</Button>
+			<AlertDialog.Root>
+				<AlertDialog.Trigger class={buttonVariants({ variant: 'outline', className: 'w-full' })}>
+					Import Participants
+				</AlertDialog.Trigger>
+				<AlertDialog.Content>
+					<AlertDialog.Header>
+						<AlertDialog.Title>Are you absolutely sure?</AlertDialog.Title>
+						<AlertDialog.Description>
+							Are you sure you want to import the participants from this file? This action cannot be
+							undone. Please ensure that the file is formatted correctly and contains the necessary
+							data.
+						</AlertDialog.Description>
+					</AlertDialog.Header>
+					<AlertDialog.Footer>
+						<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
+						<AlertDialog.Action onclick={handleImportParticipants}>Import</AlertDialog.Action>
+					</AlertDialog.Footer>
+				</AlertDialog.Content>
+			</AlertDialog.Root>
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>
