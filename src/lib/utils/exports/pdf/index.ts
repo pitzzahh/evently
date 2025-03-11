@@ -44,9 +44,8 @@ export async function generateQRCodesPDF(props: DocumentMetaDetails) {
           },
           {
             text: `${participant.first_name} ${participant.last_name}`,
-            alignment: 'center',
-            fontSize: 10,
-            bold: true
+            style: 'participantText',
+            alignment: 'center'
           }
         ],
         margin: [10, 10, 10, 20],
@@ -102,11 +101,18 @@ export async function generateQRCodesPDF(props: DocumentMetaDetails) {
             body: rows
           },
           layout: {
-            defaultBorder: false,
-            paddingLeft: function () { return 5; },
-            paddingRight: function () { return 5; },
-            paddingTop: function () { return 5; },
-            paddingBottom: function () { return 5; }
+            hLineWidth(i, node) {
+              return (i === 0 || i === node.table.body.length) ? 0 : 1;
+            },
+            vLineWidth(i, node) {
+              return (i === 0 || (node.table.widths && i === node.table.widths.length)) ? 0 : 1;
+            },
+            hLineColor() { return '#ccc'; },
+            vLineColor() { return '#ccc'; },
+            paddingLeft() { return 10; },
+            paddingRight() { return 10; },
+            paddingTop() { return 10; },
+            paddingBottom() { return 10; }
           }
         }
       ],
@@ -114,12 +120,20 @@ export async function generateQRCodesPDF(props: DocumentMetaDetails) {
         header: {
           fontSize: 20,
           bold: true,
-          margin: [0, 0, 0, 10]
+          margin: [0, 0, 0, 10],
+          color: '#333',
+          decoration: 'underline'
         },
         subheader: {
           fontSize: 14,
           bold: true,
-          margin: [0, 10, 0, 5]
+          margin: [0, 10, 0, 5],
+          color: '#555'
+        },
+        participantText: {
+          fontSize: 12,
+          bold: true,
+          color: '#007ACC'
         }
       },
       footer: function (currentPage, pageCount) {
