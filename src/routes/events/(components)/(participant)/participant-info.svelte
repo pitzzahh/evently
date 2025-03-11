@@ -106,7 +106,7 @@
 									>{attendance_status === 'absent'
 										? 'Absent'
 										: attendance_status === 'complete'
-											? 'Attendance Complete'
+											? 'Complete Attendance'
 											: 'Incomplete Attendance'}
 								</Badge>
 							{/if}
