@@ -91,7 +91,7 @@ export async function generateQRCodesPDF(props: DocumentMetaDetails) {
           margin: [0, 0, 0, 20]
         },
         {
-          text: 'Participant QR Codes',
+          text: 'Participants QR Codes',
           style: 'subheader',
           alignment: 'center',
           margin: [0, 0, 0, 10]
