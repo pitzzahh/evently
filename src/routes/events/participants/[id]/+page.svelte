@@ -18,7 +18,7 @@
 	import { cubicIn, cubicOut } from 'svelte/easing';
 	import { StatusPill } from '@/components/snippets/events.svelte';
 	import { generateQRCodesPDF } from '@/utils/exports/pdf';
-	import * as Dialog from '@/components/ui/dialog';
+	import { ImportParticipantDialog } from '@routes/events/(components)/(participant)/index.js';
 
 	let { data } = $props();
 
@@ -364,20 +364,7 @@
 
 		<div class="flex flex-col items-end gap-2">
 			<div class="flex items-center gap-2">
-				<Dialog.Root>
-					<Dialog.Trigger class={buttonVariants({ variant: 'ghost' })}
-						><Import class="size-4" />Import Excel Participants</Dialog.Trigger
-					>
-					<Dialog.Content>
-						<Dialog.Header>
-							<Dialog.Title>Are you sure absolutely sure?</Dialog.Title>
-							<Dialog.Description>
-								This action cannot be undone. This will permanently delete your account and remove
-								your data from our servers.
-							</Dialog.Description>
-						</Dialog.Header>
-					</Dialog.Content>
-				</Dialog.Root>
+				<ImportParticipantDialog />
 				<AddParticipantsDialog
 					disabled={false}
 					add_participants_form={data.add_participants_form}
