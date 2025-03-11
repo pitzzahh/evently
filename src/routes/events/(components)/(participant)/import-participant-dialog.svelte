@@ -11,9 +11,22 @@
 	import { onDestroy } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	import { SvelteDate } from 'svelte/reactivity';
-	import { sleep } from '@/utils';
+	import { cn, sleep } from '@/utils';
 	import { Progress } from '@/components/ui/progress';
 	import * as AlertDialog from '@/components/ui/alert-dialog';
+	import { readParticipants } from '@/utils/exports/excel';
+
+	interface ImportParticipantsDialogProps {
+		event_id: string;
+		disabled?: boolean;
+		open_add_participants_dialog?: boolean;
+	}
+
+	let {
+		event_id,
+		disabled = false,
+		open_add_participants_dialog = $bindable(false)
+	}: ImportParticipantsDialogProps = $props();
 
 	const onUpload: FileDropZoneProps['onUpload'] = async (files) => {
 		await Promise.allSettled(files.map((file) => uploadFile(file)));
@@ -55,11 +68,14 @@
 	let selected_file = $state<UploadedFile | null>(null);
 	let date = new SvelteDate();
 
-	function handleImportParticipants() {
+	async function handleImportParticipants() {
 		if (!selected_file) {
 			toast.error('No files selected!');
 			return;
 		}
+
+		const participants = await readParticipants(await selected_file.url, event_id);
+		console.log('participants', participants);
 	}
 
 	onDestroy(async () => {
@@ -77,7 +93,7 @@
 	});
 </script>
 
-<Dialog.Root>
+<Dialog.Root bind:open={open_add_participants_dialog}>
 	<Dialog.Trigger class={buttonVariants({ variant: 'ghost' })}
 		><Import class="size-4" />Import Excel Participants</Dialog.Trigger
 	>
@@ -163,7 +179,12 @@
 		>
 		<Dialog.Footer>
 			<AlertDialog.Root>
-				<AlertDialog.Trigger class={buttonVariants({ variant: 'outline', className: 'w-full' })}>
+				<AlertDialog.Trigger
+					disabled={!selected_file}
+					class={cn(buttonVariants({ variant: 'outline', className: 'w-full' }), {
+						'cursor-not-allowed': !selected_file
+					})}
+				>
 					Import Participants
 				</AlertDialog.Trigger>
 				<AlertDialog.Content>
