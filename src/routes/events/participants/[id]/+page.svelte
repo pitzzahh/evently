@@ -113,16 +113,17 @@
 					},
 					0
 				);
+
 				const attendance_status =
 					event_days === total_days_attended
 						? 'complete'
 						: event_days && event_days < total_days_attended
 							? 'incomplete'
 							: 'absent';
-				console.log(attendance_status);
+
 				return {
 					...participant,
-					attendance_status
+					attendance_status: event_status === 'finished' ? attendance_status : undefined
 				};
 			});
 
@@ -453,6 +454,7 @@
 					<ParticipantDataTable
 						participant_form={data.participant_form}
 						participants={comp_state.participants}
+						{event_status}
 					/>
 				{/if}
 			</div>
