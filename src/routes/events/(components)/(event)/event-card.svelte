@@ -55,7 +55,13 @@
 	<TimelineOppositeContent slot="opposite-content" style="flex: 0; margin: 0;">
 		<div class="sticky top-[5rem] mb-[3rem] flex w-[200px] flex-col items-start gap-2">
 			<p class="text-lg font-semibold leading-none">{formatDate(start_date)}</p>
-			<p class="text-lg font-semibold leading-none text-muted-foreground/80">Tuesday</p>
+			<p class="text-lg font-semibold leading-none text-muted-foreground/80">
+				{new Date(start_date).toLocaleDateString('en-US', { weekday: 'long' })}
+			</p>
+			<p class="text-sm font-medium leading-none text-muted-foreground">
+				{difference_in_days}
+				{difference_in_days > 1 ? 'days' : 'day'} event
+			</p>
 		</div>
 	</TimelineOppositeContent>
 	<TimelineSeparator>
