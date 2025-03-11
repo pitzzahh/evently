@@ -50,7 +50,7 @@
 	import { Upload } from 'lucide-svelte';
 	import { displaySize } from '.';
 	import { useId } from 'bits-ui';
-
+	import { open } from '@tauri-apps/plugin-dialog';
 	let {
 		id = useId(),
 		children,
@@ -73,89 +73,56 @@
 
 	let uploading = $state(false);
 
-	const drop = async (
-		e: DragEvent & {
-			currentTarget: EventTarget & HTMLLabelElement;
-		}
-	) => {
+	const drop = async (e: DragEvent & { currentTarget: EventTarget & HTMLLabelElement }) => {
 		if (disabled || !canUploadFiles) return;
-
 		e.preventDefault();
-
 		const droppedFiles = Array.from(e.dataTransfer?.files ?? []);
-
 		await upload(droppedFiles);
 	};
 
-	const change = async (
-		e: Event & {
-			currentTarget: EventTarget & HTMLInputElement;
-		}
-	) => {
+	const change = async () => {
 		if (disabled) return;
-
-		const selectedFiles = e.currentTarget.files;
-
+		const selectedFiles = await open({
+			multiple: maxFiles === undefined || maxFiles - (fileCount ?? 0) > 1,
+			directory: false,
+		});
 		if (!selectedFiles) return;
-
-		await upload(Array.from(selectedFiles));
-
-		// this if a file fails and we upload the same file again we still get feedback
-		(e.target as HTMLInputElement).value = '';
+		const files = Array.isArray(selectedFiles) ? selectedFiles : [selectedFiles];
+		await upload(files.map((filePath) => new File([filePath], filePath.split('/').pop() ?? '')));
 	};
 
 	const shouldAcceptFile = (file: File, fileNumber: number): FileRejectedReason | undefined => {
 		if (maxFileSize !== undefined && file.size > maxFileSize) return 'Maximum file size exceeded';
-
 		if (maxFiles !== undefined && fileNumber > maxFiles) return 'Maximum files uploaded';
-
 		if (!accept) return undefined;
+		return checkFileType(file);
+	};
 
-		const acceptedTypes = accept.split(',').map((a) => a.trim().toLowerCase());
+	const checkFileType = (file: File): FileRejectedReason | undefined => {
+		const acceptedTypes = accept ? accept.split(',').map((a) => a.trim().toLowerCase()) : [];
 		const fileType = file.type.toLowerCase();
 		const fileName = file.name.toLowerCase();
-
 		const isAcceptable = acceptedTypes.some((pattern) => {
-			// check extension like .mp4
-			if (fileType.startsWith('.')) {
-				return fileName.endsWith(pattern);
-			}
-
-			// if pattern has wild card like video/*
-			if (pattern.endsWith('/*')) {
-				const baseType = pattern.slice(0, pattern.indexOf('/*'));
-				return fileType.startsWith(baseType + '/');
-			}
-
-			// otherwise it must be a specific type like video/mp4
+			if (fileType.startsWith('.')) return fileName.endsWith(pattern);
+			if (pattern.endsWith('/*')) return fileType.startsWith(pattern.slice(0, -1));
 			return fileType === pattern;
 		});
-
-		if (!isAcceptable) return 'File type not allowed';
-
-		return undefined;
+		return isAcceptable ? undefined : 'File type not allowed';
 	};
 
 	const upload = async (uploadFiles: File[]) => {
 		uploading = true;
-
 		const validFiles: File[] = [];
-
 		for (let i = 0; i < uploadFiles.length; i++) {
 			const file = uploadFiles[i];
-
 			const rejectedReason = shouldAcceptFile(file, (fileCount ?? 0) + i + 1);
-
 			if (rejectedReason) {
 				onFileRejected?.({ file, reason: rejectedReason });
 				continue;
 			}
-
 			validFiles.push(file);
 		}
-
 		await onUpload(validFiles);
-
 		uploading = false;
 	};
 
@@ -210,9 +177,9 @@
 		disabled={!canUploadFiles}
 		{id}
 		{accept}
-		multiple={maxFiles === undefined || maxFiles - (fileCount ?? 0) > 1}
-		type="file"
-		onchange={change}
+		multiple={false}
+		type="button"
+		onclick={change} 
 		class="hidden"
 	/>
 </label>
