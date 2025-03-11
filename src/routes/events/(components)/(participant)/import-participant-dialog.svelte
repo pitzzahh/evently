@@ -24,20 +24,20 @@
 
 	const uploadFile = async (file: File) => {
 		// don't upload duplicate files
-		if (files.find((f) => f.name === file.name)) return;
+		if (selected_file && selected_file.name === file.name) return;
 
 		const urlPromise = new Promise<string>((resolve) => {
 			// add some fake loading time
 			sleep(1000).then(() => resolve(URL.createObjectURL(file)));
 		});
 
-		files.push({
+		selected_file = {
 			name: file.name,
 			type: file.type,
 			size: file.size,
 			uploadedAt: Date.now(),
 			url: urlPromise
-		});
+		};
 
 		// we await since we don't want the onUpload to be complete until the files are actually uploaded
 		await urlPromise;
@@ -51,15 +51,20 @@
 		url: Promise<string>;
 	};
 
-	let files = $state<UploadedFile[]>([]);
+	let selected_file = $state<UploadedFile | null>(null);
 	let date = new SvelteDate();
 
-	onDestroy(async () => {
-		for (const file of files) {
-			URL.revokeObjectURL(await file.url);
+	function handleImportParticipants() {
+		if (!selected_file) {
+			toast.error('No files selected!');
+			return;
 		}
-	});
+	}
 
+	onDestroy(async () => {
+		if (!selected_file) return;
+		URL.revokeObjectURL(await selected_file.url);
+	});
 	$effect(() => {
 		const interval = setInterval(() => {
 			date.setTime(Date.now());
@@ -111,30 +116,31 @@
 					{onFileRejected}
 					maxFileSize={10 * MEGABYTE}
 					accept="application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-					fileCount={files.length}
 				/>
-				<div class="flex flex-col gap-2">
-					{#each files as file, i (file.name)}
+				{#if selected_file}
+					<div class="flex flex-col gap-2">
 						<div class="flex place-items-center justify-between gap-2">
 							<div class="flex place-items-center gap-2 whitespace-nowrap">
-								{#await file.url then src}
+								{#await selected_file.url then src}
 									<div class="relative size-9 overflow-clip">
 										<img
 											{src}
-											alt={file.name}
+											alt={selected_file.name}
 											class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 overflow-clip"
 										/>
 									</div>
 								{/await}
 								<div class="flex flex-col">
-									<span>{file.name}</span>
-									<span class="text-xs text-muted-foreground">{displaySize(file.size)}</span>
+									<span>{selected_file.name}</span>
+									<span class="text-xs text-muted-foreground"
+										>{displaySize(selected_file.size)}</span
+									>
 								</div>
 							</div>
-							{#await file.url}
+							{#await selected_file.url}
 								<Progress
 									class="h-2 w-full flex-grow"
-									value={((date.getTime() - file.uploadedAt) / 1000) * 100}
+									value={((date.getTime() - selected_file.uploadedAt) / 1000) * 100}
 									max={100}
 								/>
 							{:then url}
@@ -143,16 +149,19 @@
 									size="icon"
 									onclick={() => {
 										URL.revokeObjectURL(url);
-										files = [...files.slice(0, i), ...files.slice(i + 1)];
+										selected_file = null;
 									}}
 								>
 									<X />
 								</Button>
 							{/await}
 						</div>
-					{/each}
-				</div>
-			</div>
-		</Dialog.Header>
+					</div>
+				{/if}
+			</div></Dialog.Header
+		>
+		<Dialog.Footer>
+			<Button class="w-full" onclick={handleImportParticipants}>Save changes</Button>
+		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>
