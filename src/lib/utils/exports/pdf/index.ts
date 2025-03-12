@@ -1,7 +1,7 @@
-import pdfMake, { type TCreatedPdf } from "pdfmake/build/pdfmake";
+import pdfMake from "pdfmake/build/pdfmake";
 import "pdfmake/build/vfs_fonts";
 import { createQrSvgString } from '@svelte-put/qr';
-import type { TDocumentDefinitions } from 'pdfmake/interfaces';
+import type { CustomTableLayout, TDocumentDefinitions, TFontDictionary } from 'pdfmake/interfaces';
 import type { DocumentMetaDetails } from "@/types/exports";
 import { formatDateToTimeOption } from "@/utils/format";
 import { COLLECTIONS } from "@/db";
@@ -62,7 +62,7 @@ export async function generateQRCodesPDF(props: DocumentMetaDetails): Promise<He
 
     const columnWidths = Array(columnsPerRow).fill('*');
 
-    const file: TDocumentDefinitions = {
+    const document_definition: TDocumentDefinitions = {
       info: info,
       pageSize: 'LEGAL',
       pageMargins: [20, 40, 20, 40],
@@ -135,15 +135,7 @@ export async function generateQRCodesPDF(props: DocumentMetaDetails): Promise<He
         };
       }
     };
-    return {
-      status: 200,
-      message: "PDF generated successfully",
-      data: await new Promise<string | null>((resolve) => {
-        pdfMake.createPdf(file).getDataUrl((dataUrl) => {
-          resolve(dataUrl);
-        });
-      })
-    };
+    return await generatePDFFile(document_definition);
   } catch (error) {
     console.error("PDF generation error:", error);
     return { status: 500, message: "Failed to generate QR codes" };
@@ -201,7 +193,7 @@ export async function generateDailyAttendanceReportPDF(props: DocumentMetaDetail
       ])
     ];
 
-    const file: TDocumentDefinitions = {
+    const document_definition: TDocumentDefinitions = {
       info: info,
       pageSize: 'A4',
       pageMargins: [20, 40, 20, 40],
@@ -286,17 +278,49 @@ export async function generateDailyAttendanceReportPDF(props: DocumentMetaDetail
         };
       }
     };
-    return {
-      status: 200,
-      message: "PDF generated successfully",
-      data: await new Promise<string | null>((resolve) => {
-        pdfMake.createPdf(file).getDataUrl((dataUrl) => {
-          resolve(dataUrl);
-        });
-      })
-    };
+    return await generatePDFFile(document_definition);
   } catch (error) {
     console.error("PDF generation error:", error);
     return { status: 500, message: "Failed to generate attendance report", data: null };
   }
+}
+
+async function generatePDFFile(documentDefinitions: TDocumentDefinitions, tableLayouts?: {
+  [name: string]: CustomTableLayout;
+}, fonts?: TFontDictionary, vfs?: {
+  [file: string]: string;
+}): Promise<HelperResponse<string | null>> {
+  const { valid, data } = await new Promise<{
+    valid: boolean;
+    data: string | null;
+  }>((resolve, reject) => {
+    try {
+      pdfMake.createPdf(documentDefinitions, tableLayouts, fonts, vfs).getDataUrl((dataUrl) => {
+        if (dataUrl) {
+          resolve({
+            valid: true,
+            data: dataUrl
+          });
+        } else {
+          reject({
+            valid: false,
+            data: "Failed to generate PDF data URL"
+          });
+        }
+      });
+    } catch (error) {
+      resolve({
+        valid: false,
+        data: (error as Error).message ?? "Failed to generate PDF data URL"
+      });
+    }
+  });
+  if (!valid) {
+    return { status: 500, message: data ?? "Failed to generate QR codes" };
+  }
+  return {
+    status: 200,
+    message: "PDF generated successfully",
+    data
+  };
 }
