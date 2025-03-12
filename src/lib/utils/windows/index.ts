@@ -47,7 +47,10 @@ export async function newWebViewWindow(label: WebviewLabel, options?: Omit<Webvi
   if (existingWindow) {
     existingWindow.close();
   }
-  const webview_window = new WebviewWindow(sanitizedLabel, options);
+  const webview_window = new WebviewWindow(sanitizedLabel, {
+    ...options,
+    title: label,
+  });
   webview_window.once('tauri://created', () => {
     console.log('Webview window created:', sanitizedLabel);
   });
