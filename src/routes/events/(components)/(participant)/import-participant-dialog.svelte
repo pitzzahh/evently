@@ -13,7 +13,7 @@
 	import { cn, sleep } from '@/utils';
 	import { Progress } from '@/components/ui/progress';
 	import * as AlertDialog from '@/components/ui/alert-dialog';
-	import { readParticipants } from '@/utils/exports/excel';
+	import { readParticipants } from '@/utils/imports/excel';
 	import { COLLECTIONS } from '@/db';
 	import { onDestroy } from 'svelte';
 
