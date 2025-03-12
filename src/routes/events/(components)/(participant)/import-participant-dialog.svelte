@@ -42,7 +42,6 @@
 	let files = $state<UploadedFile[]>([]);
 
 	const onUpload: FileDropZoneProps['onUpload'] = async (files) => {
-		console.log('files', files);
 		await Promise.allSettled(files.map((file) => uploadFile(file)));
 	};
 
