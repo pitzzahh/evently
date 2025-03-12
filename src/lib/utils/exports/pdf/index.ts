@@ -7,11 +7,11 @@ import { formatDateToTimeOption } from "@/utils/format";
 import { COLLECTIONS } from "@/db";
 import type { HelperResponse } from "@/types/generic";
 
-export function generateQRCodesPDF(props: DocumentMetaDetails) {
+export async function generateQRCodesPDF(props: DocumentMetaDetails): Promise<HelperResponse<string | null>> {
   const { info, event_details, participants } = props;
 
   if (!participants || participants.length === 0) {
-    return { success: false, message: "No participants found to generate QR codes" };
+    return { status: 400, message: "No participants found to generate QR codes" };
   }
   try {
     const calculateOptimalColumns = (totalItems: number): number => {
@@ -135,11 +135,18 @@ export function generateQRCodesPDF(props: DocumentMetaDetails) {
         };
       }
     };
-    pdfMake.createPdf(file).download(`${event_details.event_name}_QR_Codes`);
-    return { success: true };
+    return {
+      status: 200,
+      message: "PDF generated successfully",
+      data: await new Promise<string | null>((resolve) => {
+        pdfMake.createPdf(file).getDataUrl((dataUrl) => {
+          resolve(dataUrl);
+        });
+      })
+    };
   } catch (error) {
     console.error("PDF generation error:", error);
-    return { success: false, message: "Failed to generate QR codes" };
+    return { status: 500, message: "Failed to generate QR codes" };
   }
 }
 
