@@ -25,10 +25,17 @@
 		columns: ColumnDef<TData, TValue>[];
 		data: TData[];
 		data_table_toolbar?: Snippet<[{ table: Table<TData> }]>;
+		floating_bar?: Snippet<[{ table: Table<TData> }]>;
 		fetching?: boolean;
 	}
 
-	let { columns, data, data_table_toolbar, fetching = $bindable(false) }: DataTableProps = $props();
+	let {
+		columns,
+		data,
+		data_table_toolbar,
+		fetching = $bindable(false),
+		floating_bar
+	}: DataTableProps = $props();
 
 	let rowSelection = $state<RowSelectionState>({});
 	let columnVisibility = $state<VisibilityState>({});
@@ -117,6 +124,11 @@
 		class="h-8 w-[150px] min-w-[300px] lg:w-min"
 	/>
 {/if}
+
+{#if floating_bar && table.getFilteredSelectedRowModel ().rows.length > 0}
+	{@render floating_bar({ table })}
+{/if}
+
 <div class="rounded-md border">
 	<DataTable.Root>
 		<DataTable.Header>
