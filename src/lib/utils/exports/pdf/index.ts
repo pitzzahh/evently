@@ -57,8 +57,24 @@ export async function generateQRCodesPDF(props: DocumentMetaDetails): Promise<He
       }
       acc[acc.length - 1].push(cell);
 
+      // Ensure each row has the correct number of columns
+      if (acc[acc.length - 1].length === columnsPerRow) {
+        acc.push([]);
+      }
+
       return acc;
     }, []);
+    // Remove the last empty row if it exists
+    if (rows[rows.length - 1].length === 0) {
+      rows.pop();
+    }
+
+    // Ensure all rows have the correct number of columns
+    rows.forEach(row => {
+      while (row.length < columnsPerRow) {
+        row.push({ text: '', border: [false, false, false, false] });
+      }
+    });
 
     const columnWidths = Array(columnsPerRow).fill('*');
 
