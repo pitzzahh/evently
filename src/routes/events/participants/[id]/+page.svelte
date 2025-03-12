@@ -399,7 +399,7 @@
 
 		<div class="flex flex-col items-end gap-2">
 			<div class="flex items-center gap-2">
-				<ImportParticipantDialog />
+				<ImportParticipantDialog event_id={comp_state.event_details?.id ?? 'N/A'} />
 				<AddParticipantsDialog
 					disabled={false}
 					add_participants_form={data.add_participants_form}
