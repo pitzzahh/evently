@@ -290,37 +290,43 @@ async function generatePDFFile(documentDefinitions: TDocumentDefinitions, tableL
 }, fonts?: TFontDictionary, vfs?: {
   [file: string]: string;
 }): Promise<HelperResponse<string | null>> {
-  const { valid, data } = await new Promise<{
-    valid: boolean;
-    data: string | null;
-  }>((resolve, reject) => {
-    try {
-      pdfMake.createPdf(documentDefinitions, tableLayouts, fonts, vfs).getDataUrl((dataUrl) => {
-        if (dataUrl) {
-          resolve({
-            valid: true,
-            data: dataUrl
-          });
-        } else {
-          reject({
-            valid: false,
-            data: "Failed to generate PDF data URL"
-          });
-        }
-      });
-    } catch (error) {
-      resolve({
-        valid: false,
-        data: (error as Error).message ?? "Failed to generate PDF data URL"
-      });
+  try {
+
+
+    const { valid, data } = await new Promise<{
+      valid: boolean;
+      data: string | null;
+    }>((resolve, reject) => {
+      try {
+        pdfMake.createPdf(documentDefinitions, tableLayouts, fonts, vfs).getDataUrl((dataUrl) => {
+          if (dataUrl) {
+            resolve({
+              valid: true,
+              data: dataUrl
+            });
+          } else {
+            reject({
+              valid: false,
+              data: "Failed to generate PDF data URL"
+            });
+          }
+        });
+      } catch (error) {
+        reject({
+          valid: false,
+          data: (error as Error).message ?? "Failed to generate PDF data URL"
+        });
+      }
+    });
+    if (!valid) {
+      return { status: 500, message: data ?? "Failed to generate QR codes" };
     }
-  });
-  if (!valid) {
-    return { status: 500, message: data ?? "Failed to generate QR codes" };
+    return {
+      status: 200,
+      message: "PDF generated successfully",
+      data
+    };
+  } catch (error) {
+    return { status: 500, message: (error as Error).message ?? "Failed to generate PDF" };
   }
-  return {
-    status: 200,
-    message: "PDF generated successfully",
-    data
-  };
 }
