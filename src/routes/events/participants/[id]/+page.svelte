@@ -24,6 +24,7 @@
 	import { QRCode, SquareCheckBig } from '@/assets/icons';
 	import type { DocumentMetaDetails } from '@/types/exports/index.js';
 	import type { HelperResponse } from '@/types/generic/index.js';
+	import type { TCreatedPdf } from 'pdfmake/build/pdfmake.js';
 
 	interface ComponentState {
 		event_details: EventDetails | undefined;
@@ -324,9 +325,26 @@
 		comp_state.workers.daily_attendance_report_worker = new DailyAttendanceWorker.default();
 		console.log('QRCodeWorker loaded:', comp_state.workers.daily_attendance_report_worker);
 		comp_state.workers.daily_attendance_report_worker.onmessage = (
-			message: MessageEvent<HelperResponse<boolean>>
+			message: MessageEvent<HelperResponse<string | null>>
 		) => {
 			console.log('Daily attendance report worker message:', message);
+			if (message.data.status !== 200 || message.data.data === null) {
+				return toast.error('Failed to generate daily attendance report', {
+					description: message.data.message
+				});
+			}
+			if (message.data.data) {
+				const a = document.createElement('a');
+				a.href = message.data.data;
+				a.download = `${comp_state.event_details?.event_name} Daily Attendance Report.pdf`;
+				document.body.appendChild(a);
+				a.click();
+				document.body.removeChild(a);
+			} else {
+				toast.error('Failed to generate daily attendance report', {
+					description: 'No data received from the worker'
+				});
+			}
 			toast.success('Daily attendance report generated successfully', {
 				description: 'The daily attendance report has been generated and is ready for download'
 			});
