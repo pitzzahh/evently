@@ -35,10 +35,7 @@
 		where_to_search: 'first_name'
 	});
 	const is_filtered = $derived(table.getState().columnFilters.length > 0);
-	const first_name_col = $derived(table.getColumn('first_name'));
-	const middle_name_col = $derived(table.getColumn('middle_name'));
-	const last_name_col = $derived(table.getColumn('last_name'));
-	const email_col = $derived(table.getColumn('email'));
+	const over_attendance_status_col = $derived(table.getColumn('attendance_status'));
 
 	onDestroy(() => {
 		clearTimeout(comp_state.timeout);
@@ -64,21 +61,25 @@
 				class="h-8 w-[150px] min-w-[300px] lg:w-min"
 			/>
 			<DataTableSearchFilter {table} bind:where_to_search={comp_state.where_to_search} />
-			{#if first_name_col}
-				<DataTableFacetedFilter column={first_name_col} title="First Name" options={first_names} />
-			{/if}
-			{#if middle_name_col}
+			{#if over_attendance_status_col}
 				<DataTableFacetedFilter
-					column={middle_name_col}
-					title="Middle Name"
-					options={middle_names}
+					column={over_attendance_status_col}
+					title="Overall Attendance Status"
+					options={[
+						{
+							label: 'Complete',
+							value: 'complete'
+						},
+						{
+							label: 'Incomplete',
+							value: 'icomplete'
+						},
+						{
+							label: 'Absent',
+							value: 'asbent'
+						}
+					]}
 				/>
-			{/if}
-			{#if last_name_col}
-				<DataTableFacetedFilter column={last_name_col} title="Last Name" options={last_names} />
-			{/if}
-			{#if email_col}
-				<DataTableFacetedFilter column={email_col} title="Email" options={emails} />
 			{/if}
 
 			{#if is_filtered}
