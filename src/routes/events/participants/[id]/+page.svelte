@@ -492,6 +492,7 @@
 						<TableSkeleton />
 					{:else}
 						<ParticipantAttendanceDataTable
+							event_days={comp_state.event_details?.difference_in_days}
 							participants_attendance={comp_state.all_participants_attendance}
 						/>
 					{/if}
