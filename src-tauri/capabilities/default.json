@@ -22,8 +22,7 @@
 		"fs:allow-home-read",
 		"fs:scope-home-index",
 		"fs:allow-home-read-recursive",
-		"fs:scope-home-recursive",
-		"fs:read-files"
+		"fs:scope-home-recursive"
 	],
 	"platforms": [
 		"macOS",
