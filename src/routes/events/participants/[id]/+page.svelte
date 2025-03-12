@@ -446,32 +446,30 @@
 
 							<DropdownMenu.Item
 								onclick={() => {
-									new Promise(() => {
-										if (!comp_state.event_details) {
-											return toast.warning('Event details not available', {
-												description: "Couldn't find event details required to generate QR codes"
-											});
-										}
-										const result = generateDailyAttendanceReportPDF({
-											info: {
-												creator: 'Evently',
-												title: `${comp_state.event_details.event_name} Daily Attendance Report`,
-												subject: 'Daily Attendance Report',
-												producer: 'Evently'
-											},
-											event_details: comp_state.event_details,
-											participants: comp_state.participants
+									if (!comp_state.event_details) {
+										return toast.warning('Event details not available', {
+											description: "Couldn't find event details required to generate QR codes"
 										});
+									}
+									const result = generateDailyAttendanceReportPDF({
+										info: {
+											creator: 'Evently',
+											title: `${comp_state.event_details.event_name} Daily Attendance Report`,
+											subject: 'Daily Attendance Report',
+											producer: 'Evently'
+										},
+										event_details: comp_state.event_details,
+										participants: comp_state.participants
+									});
 
-										if (!result.success) {
-											return toast.error('Failed to generate daily attendance report', {
-												description: result.message
-											});
-										}
-										toast.success('Daily attendance report generated successfully', {
-											description:
-												'The Daily attendance report have been generated and are ready for download'
+									if (!result.success) {
+										return toast.error('Failed to generate daily attendance report', {
+											description: result.message
 										});
+									}
+									toast.success('Daily attendance report generated successfully', {
+										description:
+											'The Daily attendance report have been generated and are ready for download'
 									});
 								}}><SquareCheckBig />Daily Attendance Report</DropdownMenu.Item
 							>
