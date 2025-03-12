@@ -18,25 +18,21 @@ export function generateQRCodesPDF(props: DocumentMetaDetails) {
     };
 
     const columnsPerRow = calculateOptimalColumns(participants.length);
-    const rows: any[] = [];
-    let currentRow: any[] = [];
 
     const new_participants = participants
       .sort((a, b) => a.first_name.localeCompare(b.first_name))
-      .map((participant) => {
-        return {
-          ...participant,
-          qr: createQrSvgString({
-            data: participant.id,
-            width: 500,
-            height: 500,
-            shape: 'circle',
-          })
-        };
-      });
+      .map((participant) => ({
+        ...participant,
+        qr: createQrSvgString({
+          data: participant.id,
+          width: 500,
+          height: 500,
+          shape: 'circle',
+        })
+      }));
 
-    new_participants.map((participant) => {
-      return {
+    const rows: any[][] = new_participants.reduce((acc: any[][], participant, index) => {
+      const cell = {
         stack: [
           {
             svg: participant.qr,
@@ -52,17 +48,14 @@ export function generateQRCodesPDF(props: DocumentMetaDetails) {
         margin: [10, 10, 10, 20],
         alignment: 'center'
       };
-    }).forEach((cell, index) => {
-      currentRow.push(cell);
 
-      if (currentRow.length === columnsPerRow || index === participants.length - 1) {
-        while (currentRow.length < columnsPerRow) {
-          currentRow.push({});
-        }
-        rows.push(currentRow);
-        currentRow = [];
+      if (index % columnsPerRow === 0) {
+        acc.push([]);
       }
-    });
+      acc[acc.length - 1].push(cell);
+
+      return acc;
+    }, []);
 
     const columnWidths = Array(columnsPerRow).fill('*');
 

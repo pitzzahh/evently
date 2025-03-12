@@ -415,20 +415,31 @@
 							<DropdownMenu.Separator />
 							<DropdownMenu.Item
 								onclick={() => {
-									if (!comp_state.event_details) {
-										return toast.warning('Event details not available', {
-											description: "Couldn't find event details required to generate QR codes"
+									new Promise(() => {
+										if (!comp_state.event_details) {
+											return toast.warning('Event details not available', {
+												description: "Couldn't find event details required to generate QR codes"
+											});
+										}
+										const result = generateQRCodesPDF({
+											info: {
+												creator: 'Evently',
+												title: `${comp_state.event_details.event_name} QR Codes`,
+												subject: 'QR Codes for participants',
+												producer: 'Evently'
+											},
+											event_details: comp_state.event_details,
+											participants: comp_state.participants
 										});
-									}
-									generateQRCodesPDF({
-										info: {
-											creator: 'Evently',
-											title: `${comp_state.event_details.event_name} QR Codes`,
-											subject: 'QR Codes for participants',
-											producer: 'Evently'
-										},
-										event_details: comp_state.event_details,
-										participants: comp_state.participants
+
+										if (!result.success) {
+											return toast.error('Failed to generate QR codes', {
+												description: result.message
+											});
+										}
+										toast.success('QR codes generated successfully', {
+											description: 'The QR codes have been generated and are ready for download'
+										});
 									});
 								}}><QRCode />Participants QR codes</DropdownMenu.Item
 							>
