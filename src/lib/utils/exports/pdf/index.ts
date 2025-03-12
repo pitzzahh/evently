@@ -26,18 +26,25 @@ export async function generateQRCodesPDF(props: DocumentMetaDetails) {
   const rows: any[] = [];
   let currentRow: any[] = [];
 
+  const new_part = await Promise.all(participants.map(async (participant) => {
+    return {
+      ...participant,
+      qr: await createQrPngDataUrl({
+        data: participant.id,
+        width: 500,
+        height: 500,
+        shape: 'circle',
+        backgroundFill: '#fff',
+      })
+    };
+  }));
+
   try {
-    const qrCodePromises = participants.map(async (participant) => {
+    const qrCodePromises = new_part.map(async (participant) => {
       return {
         stack: [
           {
-            image: await createQrPngDataUrl({
-              data: participant.id,
-              width: 500,
-              height: 500,
-              shape: 'circle',
-              backgroundFill: '#fff',
-            }),
+            image: participant.qr,
             fit: [100, 100],
             alignment: 'center'
           },
