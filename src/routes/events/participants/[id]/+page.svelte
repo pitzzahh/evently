@@ -21,6 +21,7 @@
 	import { ImportParticipantDialog } from '@routes/events/(components)/(participant)';
 	import { cn } from '@/utils';
 	import * as DropdownMenu from '@/components/ui/dropdown-menu';
+	import { QRCode } from '@/assets/icons/index.js';
 
 	let { data } = $props();
 
@@ -408,7 +409,9 @@
 					>
 					<DropdownMenu.Content>
 						<DropdownMenu.Group>
-							<DropdownMenu.GroupHeading>Export Options</DropdownMenu.GroupHeading>
+							<DropdownMenu.GroupHeading class="text-center"
+								>Export Options</DropdownMenu.GroupHeading
+							>
 							<DropdownMenu.Separator />
 							<DropdownMenu.Item
 								onclick={() => {
@@ -427,7 +430,7 @@
 										event_details: comp_state.event_details,
 										participants: comp_state.participants
 									});
-								}}>Participants QR codes</DropdownMenu.Item
+								}}><QRCode />Participants QR codes</DropdownMenu.Item
 							>
 						</DropdownMenu.Group>
 					</DropdownMenu.Content>
