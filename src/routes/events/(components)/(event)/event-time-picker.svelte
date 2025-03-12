@@ -39,7 +39,7 @@
 
 <div class="flex w-full gap-2 rounded-xl border p-3">
 	<div
-		class="flex w-full items-center gap-4 rounded-lg border bg-gray-700/10 p-4 dark:bg-[#1C1E20]"
+		class="flex w-full items-center gap-4 rounded-lg border bg-[#26303a08] p-4 dark:bg-[#151e28]"
 	>
 		{@render start_end_pattern()}
 
@@ -84,7 +84,7 @@
 		{/if}
 	</div>
 	<div
-		class="flex w-full items-center gap-4 rounded-lg border bg-gray-700/10 p-4 dark:bg-[#1C1E20]"
+		class="flex w-full items-center gap-4 rounded-lg border bg-[#26303a08] p-4 dark:bg-[#151e28]"
 	>
 		{@render start_end_pattern()}
 
