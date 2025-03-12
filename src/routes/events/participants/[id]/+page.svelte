@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Button, buttonVariants } from '@/components/ui/button';
-	import { Check, Clock, Download, Import, UsersRound, X } from 'lucide-svelte';
+	import { Check, Clock, FileOutput, UsersRound, X } from 'lucide-svelte';
 	import { AddParticipantsDialog, ParticipantDataTable } from '@routes/events/(components)';
 	import type { EventSchedule, EventDetails, ParticipantAttendance } from '@/db/models/types';
 	import { fly } from 'svelte/transition';
@@ -8,8 +8,8 @@
 	import type { Participant } from '@/db/models/types';
 	import { watch } from 'runed';
 	import { TableSkeleton } from '@/components/custom/skeleton';
-	import * as Tabs from '$lib/components/ui/tabs';
-	import * as Card from '$lib/components/ui/card';
+	import * as Tabs from '@/components/ui/tabs';
+	import * as Card from '@/components/ui/card';
 	import { Badge } from '@/components/ui/badge';
 	import { toast } from 'svelte-sonner';
 	import { onMount } from 'svelte';
@@ -18,8 +18,9 @@
 	import { cubicIn, cubicOut } from 'svelte/easing';
 	import { StatusPill } from '@/components/snippets/events.svelte';
 	import { generateQRCodesPDF } from '@/utils/exports/pdf';
-	import { ImportParticipantDialog } from '@routes/events/(components)/(participant)/index.js';
+	import { ImportParticipantDialog } from '@routes/events/(components)/(participant)';
 	import { cn } from '@/utils';
+	import * as DropdownMenu from '@/components/ui/dropdown-menu';
 
 	let { data } = $props();
 
@@ -406,26 +407,36 @@
 					add_participants_form={data.add_participants_form}
 					event_id={comp_state.event_details?.id ?? 'N/A'}
 				/>
-				<Button
-					variant="outline"
-					onclick={() => {
-						if (!comp_state.event_details) {
-							return toast.warning('Event details not available', {
-								description: "Couldn't find event details required to generate QR codes"
-							});
-						}
-						generateQRCodesPDF({
-							info: {
-								creator: 'Evently',
-								title: `${comp_state.event_details.event_name} QR Codes`,
-								subject: 'QR Codes for participants',
-								producer: 'Evently'
-							},
-							event_details: comp_state.event_details,
-							participants: comp_state.participants
-						});
-					}}><Download class="size-4" /> Export QR Codes</Button
-				>
+				<DropdownMenu.Root>
+					<DropdownMenu.Trigger class={buttonVariants({ variant: 'outline' })}
+						><FileOutput class="size-4" />Export</DropdownMenu.Trigger
+					>
+					<DropdownMenu.Content>
+						<DropdownMenu.Group>
+							<DropdownMenu.GroupHeading>Export Options</DropdownMenu.GroupHeading>
+							<DropdownMenu.Separator />
+							<DropdownMenu.Item
+								onclick={() => {
+									if (!comp_state.event_details) {
+										return toast.warning('Event details not available', {
+											description: "Couldn't find event details required to generate QR codes"
+										});
+									}
+									generateQRCodesPDF({
+										info: {
+											creator: 'Evently',
+											title: `${comp_state.event_details.event_name} QR Codes`,
+											subject: 'QR Codes for participants',
+											producer: 'Evently'
+										},
+										event_details: comp_state.event_details,
+										participants: comp_state.participants
+									});
+								}}>Participants QR codes</DropdownMenu.Item
+							>
+						</DropdownMenu.Group>
+					</DropdownMenu.Content>
+				</DropdownMenu.Root>
 			</div>
 			{@render StatusPill(event_status)}
 		</div>
