@@ -342,14 +342,14 @@
 					url: message.data.data
 				});
 				document.body.removeChild(a);
+				toast.success('Daily attendance report generated successfully', {
+					description: 'The daily attendance report has been generated and is ready for download'
+				});
 			} else {
 				toast.error('Failed to generate daily attendance report', {
 					description: 'No data received from the worker'
 				});
 			}
-			toast.success('Daily attendance report generated successfully', {
-				description: 'The daily attendance report has been generated and is ready for download'
-			});
 		};
 	}
 
@@ -376,18 +376,15 @@
 				a.download = `${comp_state.event_details?.event_name} QR Codes.pdf`;
 				document.body.appendChild(a);
 				a.click();
-				newWebViewWindow(file_name, {
-					url: message.data.data
-				});
 				document.body.removeChild(a);
+				toast.success('QR codes generated successfully', {
+					description: 'The QR codes have been generated and are ready for download'
+				});
 			} else {
 				toast.error('Failed to generate QR codes', {
 					description: 'No data received from the worker'
 				});
 			}
-			toast.success('QR codes generated successfully', {
-				description: 'The QR codes have been generated and are ready for download'
-			});
 		};
 	}
 
