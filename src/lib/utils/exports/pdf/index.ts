@@ -1,18 +1,14 @@
 import pdfMake from "pdfmake/build/pdfmake";
 import "pdfmake/build/vfs_fonts";
-import { toast } from "svelte-sonner";
-import type {
-  TDocumentDefinitions
-} from 'pdfmake/interfaces';
-import type { DocumentMetaDetails } from "@/types/exports";
 import { createQrSvgString } from '@svelte-put/qr';
+import type { TDocumentDefinitions } from 'pdfmake/interfaces';
+import type { DocumentMetaDetails } from "@/types/exports";
 
 export function generateQRCodesPDF(props: DocumentMetaDetails) {
   const { info, event_details, participants } = props;
 
   if (!participants || participants.length === 0) {
-    toast.error("No participants found to generate QR codes");
-    return;
+    return { success: false, message: "No participants found to generate QR codes" };
   }
   try {
     const calculateOptimalColumns = (totalItems: number): number => {
@@ -144,9 +140,9 @@ export function generateQRCodesPDF(props: DocumentMetaDetails) {
       }
     };
     pdfMake.createPdf(file).download(`${event_details.event_name}_QR_Codes`);
-    toast.success("QR codes generated successfully");
+    return { success: true };
   } catch (error) {
-    toast.error("Failed to generate QR codes");
     console.error("PDF generation error:", error);
+    return { success: false, message: "Failed to generate QR codes" };
   }
 }
