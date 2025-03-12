@@ -17,14 +17,11 @@
 	import { checkEventStatus, getEventDayInfo } from '@routes/events/utils';
 	import { cubicIn, cubicOut } from 'svelte/easing';
 	import { StatusPill } from '@/components/snippets/events.svelte';
-	import { generateDailyAttendanceReportPDF, generateQRCodesPDF } from '@/utils/exports/pdf';
 	import { ImportParticipantDialog } from '@routes/events/(components)/(participant)';
 	import { cn } from '@/utils';
 	import * as DropdownMenu from '@/components/ui/dropdown-menu';
 	import { QRCode, SquareCheckBig } from '@/assets/icons';
-	import type { DocumentMetaDetails } from '@/types/exports/index.js';
 	import type { HelperResponse } from '@/types/generic/index.js';
-	import type { TCreatedPdf } from 'pdfmake/build/pdfmake.js';
 
 	interface ComponentState {
 		event_details: EventDetails | undefined;
@@ -355,7 +352,7 @@
 		if (comp_state.workers.qr_code_worker) {
 			comp_state.workers.qr_code_worker.terminate();
 		}
-		const QRCodeWorker = await import('$lib/workers/generate-qr-code.worker?worker');
+		const QRCodeWorker = await import('$lib/workers/generate-qr-codes.worker?worker');
 		comp_state.workers.qr_code_worker = new QRCodeWorker.default();
 		console.log('QRCodeWorker loaded:', comp_state.workers.qr_code_worker);
 		comp_state.workers.qr_code_worker.onmessage = (
