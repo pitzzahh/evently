@@ -74,7 +74,7 @@
 	</TimelineSeparator>
 	<TimelineContent style="margin: 0;">
 		<div
-			class="mb-10 ms-4 rounded-xl border bg-white p-4 transition duration-500 ease-in-out hover:border-black/50 dark:bg-[#1C1E20] dark:hover:border-white/50"
+			class="mb-10 ms-4 rounded-xl border bg-white p-4 transition duration-500 ease-in-out hover:border-black/50 dark:bg-[#151e28] dark:hover:border-white/50"
 		>
 			<div class="mb-1 flex items-center gap-1">
 				<Badge

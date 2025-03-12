@@ -256,7 +256,7 @@
 		</div>
 		<div
 			class={cn(
-				'grid gap-3 overflow-hidden rounded-lg border bg-white p-4 transition-all duration-300 dark:bg-[#1C1E20]',
+				'grid gap-3 overflow-hidden rounded-lg border bg-white p-4 transition-all duration-300 dark:bg-[#151e28]',
 				{
 					'm-0 h-0 p-0 opacity-0': !comp_state.see_more,
 					'h-auto opacity-100': comp_state.see_more

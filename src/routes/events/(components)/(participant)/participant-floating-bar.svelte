@@ -48,6 +48,7 @@
 			});
 		});
 		comp_state.dialog_open = false;
+		table.toggleAllRowsSelected(false);
 	}
 </script>
 
