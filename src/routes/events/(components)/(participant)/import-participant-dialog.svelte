@@ -13,7 +13,7 @@
 	import { cn, sleep } from '@/utils';
 	import { Progress } from '@/components/ui/progress';
 	import * as AlertDialog from '@/components/ui/alert-dialog';
-	import { readParticipants } from '@/utils/exports/excel';
+	import { readParticipants } from '@/utils/imports/excel';
 	import { COLLECTIONS } from '@/db';
 	import { onDestroy } from 'svelte';
 
@@ -42,6 +42,7 @@
 	let files = $state<UploadedFile[]>([]);
 
 	const onUpload: FileDropZoneProps['onUpload'] = async (files) => {
+		console.log('files', files);
 		await Promise.allSettled(files.map((file) => uploadFile(file)));
 	};
 
@@ -79,11 +80,10 @@
 		const [selected_file] = files;
 		console.log('selected_file', selected_file);
 		const { file } = selected_file;
-		const participants = await readParticipants(file, event_id);
-
-		COLLECTIONS.PARTICIPANT_COLLECTION.insertMany(participants);
-
-		console.log('participants', participants);
+		COLLECTIONS.PARTICIPANT_COLLECTION.insertMany(await readParticipants(file, event_id));
+		open_add_participants_dialog = false;
+		files = [];
+		toast.success('Participants imported successfully!');
 	}
 
 	$effect(() => {
@@ -153,11 +153,15 @@
 							<div class="flex place-items-center gap-2">
 								{#await file.url then src}
 									<div class="relative size-9 overflow-clip">
-										<img
-											{src}
-											alt={file.name}
-											class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 overflow-clip"
-										/>
+										{#if file.type.startsWith('image/')}
+											<img
+												{src}
+												alt={file.name}
+												class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 overflow-clip"
+											/>
+										{:else if file.type.startsWith('video/')}
+											video
+										{/if}
 									</div>
 								{/await}
 								<div class="flex flex-col">

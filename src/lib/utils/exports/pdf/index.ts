@@ -1,43 +1,45 @@
 import pdfMake from "pdfmake/build/pdfmake";
 import "pdfmake/build/vfs_fonts";
-import { toast } from "svelte-sonner";
-import type {
-  TDocumentDefinitions
-} from 'pdfmake/interfaces';
+import { createQrSvgString } from '@svelte-put/qr';
+import type { TDocumentDefinitions } from 'pdfmake/interfaces';
 import type { DocumentMetaDetails } from "@/types/exports";
-import { createQrPngDataUrl } from '@svelte-put/qr';
-import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 
-export async function generateQRCodesPDF(props: DocumentMetaDetails) {
+export function generateQRCodesPDF(props: DocumentMetaDetails) {
   const { info, event_details, participants } = props;
 
   if (!participants || participants.length === 0) {
-    toast.error("No participants found to generate QR codes");
-    return;
+    return { success: false, message: "No participants found to generate QR codes" };
   }
-
-  const calculateOptimalColumns = (totalItems: number): number => {
-    if (totalItems <= 4) return totalItems;
-    if (totalItems <= 8) return Math.min(4, Math.ceil(totalItems / 2));
-    return 4;
-  };
-
-  const columnsPerRow = calculateOptimalColumns(participants.length);
-  const rows: any[] = [];
-  let currentRow: any[] = [];
-
   try {
-    const qrCodePromises = participants.map(async (participant) => {
+    const calculateOptimalColumns = (totalItems: number): number => {
+      if (totalItems <= 4) return totalItems;
+      if (totalItems <= 8) return Math.min(4, Math.ceil(totalItems / 2));
+      return 4;
+    };
+
+    const columnsPerRow = calculateOptimalColumns(participants.length);
+    const rows: any[] = [];
+    let currentRow: any[] = [];
+
+    const new_participants = participants
+      .sort((a, b) => a.first_name.localeCompare(b.first_name))
+      .map((participant) => {
+        return {
+          ...participant,
+          qr: createQrSvgString({
+            data: participant.id,
+            width: 500,
+            height: 500,
+            shape: 'circle',
+          })
+        };
+      });
+
+    new_participants.map((participant) => {
       return {
         stack: [
           {
-            image: await createQrPngDataUrl({
-              data: participant.id,
-              width: 500,
-              height: 500,
-              shape: 'circle',
-              backgroundFill: '#fff',
-            }),
+            svg: participant.qr,
             fit: [100, 100],
             alignment: 'center'
           },
@@ -50,11 +52,7 @@ export async function generateQRCodesPDF(props: DocumentMetaDetails) {
         margin: [10, 10, 10, 20],
         alignment: 'center'
       };
-    });
-
-    const cells = await Promise.all(qrCodePromises);
-
-    cells.forEach((cell, index) => {
+    }).forEach((cell, index) => {
       currentRow.push(cell);
 
       if (currentRow.length === columnsPerRow || index === participants.length - 1) {
@@ -141,31 +139,10 @@ export async function generateQRCodesPDF(props: DocumentMetaDetails) {
         };
       }
     };
-    pdfMake.createPdf(file).getDataUrl(async (dataUrl) => {
-      const label = `${event_details.event_name}_QR_Codes`;
-      const existingWebview = await WebviewWindow.getByLabel(label);
-      if (existingWebview) {
-        existingWebview.close();
-      }
-
-      const webview = new WebviewWindow(label, {
-        url: dataUrl,
-        title: `${event_details.event_name} QR Codes`,
-      });
-
-      webview.once('tauri://created', function () {
-        toast.success("QR codes generated successfully");
-      });
-      webview.once('tauri://error', function (e) {
-        console.error(e);
-        toast.error("Failed to generate QR codes", {
-          description: e.event
-        });
-      });
-    });
-    toast.success("QR codes generated successfully");
+    pdfMake.createPdf(file).download(`${event_details.event_name}_QR_Codes`);
+    return { success: true };
   } catch (error) {
-    toast.error("Failed to generate QR codes");
     console.error("PDF generation error:", error);
+    return { success: false, message: "Failed to generate QR codes" };
   }
 }
