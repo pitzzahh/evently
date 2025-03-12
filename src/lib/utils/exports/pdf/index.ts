@@ -149,7 +149,8 @@ export async function generateQRCodesPDF(props: DocumentMetaDetails) {
       }
     };
     pdfMake.createPdf(file).getDataUrl(async (dataUrl) => {
-      const label = `${event_details.event_name}_QR_Codes`;
+      const sanitizeLabel = (label: string) => label.replace(/[^a-zA-Z0-9\-\/:_]/g, '_');
+      const label = sanitizeLabel(`${event_details.event_name}_QR_Codes`);
       const existingWebview = await WebviewWindow.getByLabel(label);
       if (existingWebview) {
         existingWebview.close();
