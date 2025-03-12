@@ -1,9 +1,10 @@
 import type { Participant } from "@/db/models/types";
 import ExcelJS from 'exceljs';
 
-export async function readParticipants(filePath: string, event_id: string): Promise<Omit<Participant, 'id'>[]> {
+export async function readParticipants(file: File, event_id: string): Promise<Omit<Participant, 'id'>[]> {
+  const arrayBuffer = await file.arrayBuffer();
   const workbook = new ExcelJS.Workbook();
-  await workbook.xlsx.readFile(filePath);
+  await workbook.xlsx.load(arrayBuffer);
   const worksheet = workbook.getWorksheet(0);
 
   if (!worksheet) {
