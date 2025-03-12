@@ -34,7 +34,7 @@
 	} = $state({
 		am_out: {
 			time: undefined,
-			period: 'AM'
+			period: 'PM'
 		},
 		am_in: {
 			time: undefined,
@@ -64,6 +64,11 @@
 		comp_state.pm_out.time = pm_time_out
 			? new Time(pm_time_out.getHours(), pm_time_out.getMinutes())
 			: undefined;
+
+		comp_state.am_out.period = am_time_out && am_time_out.getHours() >= 12 ? 'PM' : 'AM';
+		comp_state.am_in.period = am_time_in && am_time_in.getHours() >= 12 ? 'PM' : 'AM';
+		comp_state.pm_in.period = pm_time_in && pm_time_in.getHours() >= 12 ? 'PM' : 'AM';
+		comp_state.pm_out.period = pm_time_out && pm_time_out.getHours() >= 12 ? 'PM' : 'AM';
 	});
 
 	function validateTimes(): boolean {

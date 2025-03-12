@@ -67,15 +67,13 @@
 	});
 
 	function calculateNewValue(key: string) {
-		/*
-		 * If picker is '12hours' and the first digit is 0, then the second digit is automatically set to 1.
-		 * The second entered digit will break the condition and the value will be set to 10-12.
-		 */
-		if (picker === '12hours') {
-			if (flag && calculatedValue.slice(1, 2) === '1' && intKey === '0') return '0' + key;
+		// If this is the first digit (flag is false), replace the current value
+		if (!flag) {
+			return '0' + key;
 		}
 
-		return !flag ? '0' + key : calculatedValue.slice(1, 2) + key;
+		// For the second digit, combine with the first one
+		return calculatedValue.slice(1, 2) + key;
 	}
 
 	function handleKeyDown(e: KeyboardEvent) {
@@ -93,21 +91,50 @@
 			if (flag) flag = false;
 
 			const tempTime = time.copy();
-
 			time = setDateByType(tempTime, newValue, picker, period);
 			setTime?.(time);
 		}
+
 		if (e.key >= '0' && e.key <= '9') {
 			if (picker === '12hours') intKey = e.key;
 
 			const newValue = calculateNewValue(e.key);
-			if (flag) onRightFocus?.();
-			flag = !flag;
+
+			// Only move focus to the next field if:
+			// 1. Flag is true (second digit entered)
+			// 2. AND the resulting value is valid for this input type
+			const moveFocus = flag && isValidTimeValue(newValue, picker);
 
 			const tempTime = time.copy();
 			time = setDateByType(tempTime, newValue, picker, period);
 			setTime?.(time);
+
+			// Update flag before potentially moving focus
+			flag = !flag;
+
+			// Only move focus after processing the new value
+			if (moveFocus) {
+				setTimeout(() => onRightFocus?.(), 0);
+			}
 		}
+	}
+
+	// New helper function to validate time values
+	function isValidTimeValue(value: string, picker: TimePickerType): boolean {
+		const num = parseInt(value, 10);
+
+		if (picker === 'hours' || picker === '12hours') {
+			// For 24-hour format
+			if (picker === 'hours') {
+				return num >= 0 && num <= 23;
+			}
+			// For 12-hour format
+			return num >= 1 && num <= 12;
+		} else if (picker === 'minutes' || picker === 'seconds') {
+			return num >= 0 && num <= 59;
+		}
+
+		return true;
 	}
 </script>
 
