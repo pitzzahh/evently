@@ -1,10 +1,11 @@
-import pdfMake from "pdfmake/build/pdfmake";
+import pdfMake, { type TCreatedPdf } from "pdfmake/build/pdfmake";
 import "pdfmake/build/vfs_fonts";
 import { createQrSvgString } from '@svelte-put/qr';
 import type { TDocumentDefinitions } from 'pdfmake/interfaces';
 import type { DocumentMetaDetails } from "@/types/exports";
 import { formatDateToTimeOption } from "@/utils/format";
 import { COLLECTIONS } from "@/db";
+import type { HelperResponse } from "@/types/generic";
 
 export function generateQRCodesPDF(props: DocumentMetaDetails) {
   const { info, event_details, participants } = props;
@@ -142,11 +143,11 @@ export function generateQRCodesPDF(props: DocumentMetaDetails) {
   }
 }
 
-export function generateDailyAttendanceReportPDF(props: DocumentMetaDetails) {
+export function generateDailyAttendanceReportPDF(props: DocumentMetaDetails): HelperResponse<TCreatedPdf | null> {
   const { info, event_details, participants } = props;
 
   if (!participants || participants.length === 0) {
-    return { success: false, message: "No participants found to generate attendance report" };
+    return { status: 404, message: "No participants found to generate attendance report", data: null };
   }
   try {
     const attendanceRecords = COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.find({
@@ -278,10 +279,14 @@ export function generateDailyAttendanceReportPDF(props: DocumentMetaDetails) {
         };
       }
     };
-    pdfMake.createPdf(file).download(`${event_details.event_name}_Daily_Attendance_Report`);
-    return { success: true };
+    // pdfMake.createPdf(file).download(`${event_details.event_name}_Daily_Attendance_Report`);
+    return {
+      status: 200,
+      message: "PDF generated successfully",
+      data: pdfMake.createPdf(file)
+    }
   } catch (error) {
     console.error("PDF generation error:", error);
-    return { success: false, message: "Failed to generate attendance report" };
+    return { status: 500, message: "Failed to generate attendance report", data: null };
   }
 }
