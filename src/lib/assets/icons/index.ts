@@ -38,3 +38,4 @@ export { default as Download } from 'lucide-svelte/icons/download';
 export { default as Sheet } from 'lucide-svelte/icons/sheet';
 export { default as FileOutput } from 'lucide-svelte/icons/file-output';
 export { default as QRCode } from 'lucide-svelte/icons/qr-code';
+export { default as SquareCheckBig } from 'lucide-svelte/icons/square-check-big';

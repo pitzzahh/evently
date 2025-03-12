@@ -3,6 +3,6 @@ import type { TDocumentInformation } from "pdfmake/interfaces";
 
 export type DocumentMetaDetails = {
   info: TDocumentInformation;
-  event_details: EventDetails
+  event_details: EventDetails;
   participants: Participant[];
 };
