@@ -153,7 +153,7 @@ export async function generateQRCodesPDF(props: DocumentMetaDetails): Promise<He
     };
     return await generatePDFFile(document_definition);
   } catch (error) {
-    console.error("PDF generation error:", error);
+    console.error(JSON.stringify(error, null, 2));
     return { status: 500, message: "Failed to generate QR codes" };
   }
 }
@@ -296,7 +296,7 @@ export async function generateDailyAttendanceReportPDF(props: DocumentMetaDetail
     };
     return await generatePDFFile(document_definition);
   } catch (error) {
-    console.error("PDF generation error:", error);
+    console.error(JSON.stringify(error, null, 2));
     return { status: 500, message: "Failed to generate attendance report", data: null };
   }
 }
@@ -307,8 +307,6 @@ async function generatePDFFile(documentDefinitions: TDocumentDefinitions, tableL
   [file: string]: string;
 }): Promise<HelperResponse<string | null>> {
   try {
-
-
     const { valid, data } = await new Promise<{
       valid: boolean;
       data: string | null;
@@ -343,6 +341,7 @@ async function generatePDFFile(documentDefinitions: TDocumentDefinitions, tableL
       data
     };
   } catch (error) {
+    console.error(JSON.stringify(error, null, 2));
     return { status: 500, message: (error as Error).message ?? "Failed to generate PDF" };
   }
 }
