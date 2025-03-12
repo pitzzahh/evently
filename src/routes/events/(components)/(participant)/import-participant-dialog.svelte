@@ -84,7 +84,7 @@
 
 		COLLECTIONS.PARTICIPANT_COLLECTION.insertMany(participants);
 
-		console.log('participants', participants);
+		console.log('participants', COLLECTIONS.PARTICIPANT_COLLECTION.find({ event_id }).fetch());
 	}
 
 	$effect(() => {
