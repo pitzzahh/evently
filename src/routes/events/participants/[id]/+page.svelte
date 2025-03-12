@@ -19,6 +19,7 @@
 	import { StatusPill } from '@/components/snippets/events.svelte';
 	import { generateQRCodesPDF } from '@/utils/exports/pdf';
 	import { ImportParticipantDialog } from '@routes/events/(components)/(participant)/index.js';
+	import { cn } from '@/utils';
 
 	let { data } = $props();
 
@@ -431,19 +432,25 @@
 	</div>
 
 	<Tabs.Root value="participants">
-		<Tabs.List class="grid h-auto w-full max-w-[800px] grid-cols-3">
+		<Tabs.List
+			class={cn('grid h-auto w-full max-w-[600px] grid-cols-2', {
+				'max-w-[800px]  grid-cols-3': event_status === 'ongoing'
+			})}
+		>
 			<Tabs.Trigger value="participants" class="h-auto text-base">
 				<UsersRound class="mr-2 size-4" />
 				All participants</Tabs.Trigger
 			>
-			<Tabs.Trigger value="time-in-and-out" class="h-auto text-base">
+			<Tabs.Trigger value="all-time-in-and-out" class="h-auto text-base">
 				<Clock class="mr-2 size-4" />
 				All time in and out
 			</Tabs.Trigger>
-			<Tabs.Trigger value="all-time-in-and-out" class="h-auto text-base">
-				<Clock class="mr-2 size-4" />
-				Today's time in and out
-			</Tabs.Trigger>
+			{#if event_status === 'ongoing'}
+				<Tabs.Trigger value="time-in-and-out" class="h-auto text-base">
+					<Clock class="mr-2 size-4" />
+					Today's time in and out
+				</Tabs.Trigger>
+			{/if}
 		</Tabs.List>
 
 		<Tabs.Content value="participants" class="mt-4">
@@ -451,28 +458,32 @@
 				{#if COLLECTIONS.PARTICIPANT_COLLECTION.isPulling()}
 					<TableSkeleton />
 				{:else}
-					<ParticipantDataTable
-						participant_form={data.participant_form}
-						participants={comp_state.participants}
-						{event_status}
-					/>
+					{#key event_status}
+						<ParticipantDataTable
+							participant_form={data.participant_form}
+							participants={comp_state.participants}
+							{event_status}
+						/>
+					{/key}
 				{/if}
 			</div>
 		</Tabs.Content>
 
-		<Tabs.Content value="time-in-and-out" class="mt-4">
-			<div class="flex items-start gap-4">
-				<div class="grid flex-1 gap-2">
-					{#if COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.isPulling()}
-						<TableSkeleton />
-					{:else}
-						<ParticipantAttendanceDataTable
-							participants_attendance={comp_state.current_day_participants_attendance}
-						/>
-					{/if}
+		{#if event_status === 'ongoing'}
+			<Tabs.Content value="time-in-and-out" class="mt-4">
+				<div class="flex items-start gap-4">
+					<div class="grid flex-1 gap-2">
+						{#if COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.isPulling()}
+							<TableSkeleton />
+						{:else}
+							<ParticipantAttendanceDataTable
+								participants_attendance={comp_state.current_day_participants_attendance}
+							/>
+						{/if}
+					</div>
 				</div>
-			</div>
-		</Tabs.Content>
+			</Tabs.Content>
+		{/if}
 
 		<Tabs.Content value="all-time-in-and-out" class="mt-4">
 			<div class="flex items-start gap-4">
