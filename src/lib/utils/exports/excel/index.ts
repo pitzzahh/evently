@@ -4,7 +4,7 @@ import ExcelJS from 'exceljs';
 export async function readParticipants(filePath: string, event_id: string): Promise<Omit<Participant, 'id'>[]> {
   const workbook = new ExcelJS.Workbook();
   await workbook.xlsx.readFile(filePath);
-  const worksheet = workbook.getWorksheet('participants');
+  const worksheet = workbook.getWorksheet(0);
 
   if (!worksheet) {
     throw new Error('Worksheet "participants" not found in the Excel file');
