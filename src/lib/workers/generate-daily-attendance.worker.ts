@@ -6,15 +6,12 @@ export type ModifiedDocumentMetaDetails = Omit<DocumentMetaDetails, 'event_detai
   participants: string;
 };
 
-onmessage = (message: MessageEvent<ModifiedDocumentMetaDetails>) => {
-  console.log(JSON.stringify(message, null, 2));
-  const data = {
+onmessage = async (message: MessageEvent<ModifiedDocumentMetaDetails>) => {
+  postMessage(await generateDailyAttendanceReportPDF({
     ...message.data,
     event_details: JSON.parse(message.data.event_details) as DocumentMetaDetails['event_details'],
     participants: JSON.parse(message.data.participants) as DocumentMetaDetails['participants'],
-  } as DocumentMetaDetails;
-  console.log(data);
-  postMessage(generateDailyAttendanceReportPDF(data));
+  }));
 };
 
 export { };
