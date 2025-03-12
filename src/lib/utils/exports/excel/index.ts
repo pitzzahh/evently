@@ -1,13 +1,14 @@
 import type { Participant } from "@/db/models/types";
 import ExcelJS from 'exceljs';
 
-export async function readParticipants(filePath: string, event_id: string): Promise<Omit<Participant, 'id'>[]> {
+export async function readParticipants(file: File, event_id: string): Promise<Omit<Participant, 'id'>[]> {
+  const arrayBuffer = await file.arrayBuffer();
   const workbook = new ExcelJS.Workbook();
-  await workbook.xlsx.readFile(filePath);
-  const worksheet = workbook.getWorksheet(0);
+  await workbook.xlsx.load(arrayBuffer);
+  const worksheet = workbook.worksheets[0];
 
   if (!worksheet) {
-    throw new Error('Worksheet "participants" not found in the Excel file');
+    throw new Error('First worksheet not found in the Excel file');
   }
 
   console.log('Worksheet found:', worksheet.name);
