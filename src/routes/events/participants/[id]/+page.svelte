@@ -313,57 +313,82 @@
 		}, 500) as unknown as number;
 	}
 
-	async function load_worker(workerPath: string, fileName: string) {
-		const WorkerModule = await import(workerPath);
-		const worker = new WorkerModule.default();
-		console.log(`${fileName} Worker loaded:`, worker);
-		worker.onmessage = (message: MessageEvent<HelperResponse<string | null>>) => {
-			console.log(`${fileName} worker message:`, message);
-			if (message.data.status !== 200 || message.data.data === null) {
-				return toast.error(`Failed to generate ${fileName.toLowerCase()}`, {
-					description: message.data.message
-				});
-			}
-			if (message.data.data) {
-				const a = document.createElement('a');
-				a.href = message.data.data;
-				a.download = `${fileName}.pdf`;
-				document.body.appendChild(a);
-				a.click();
-				newWebViewWindow(fileName, {
-					url: message.data.data
-				});
-				document.body.removeChild(a);
-			} else {
-				toast.error(`Failed to generate ${fileName.toLowerCase()}`, {
-					description: 'No data received from the worker'
-				});
-			}
-			toast.success(`${fileName} generated successfully`, {
-				description: `The ${fileName.toLowerCase()} has been generated and is ready for download`
-			});
-		};
-		return worker;
-	}
-
 	async function load_daily_attendance_report_worker() {
 		if (comp_state.workers.daily_attendance_report_worker) {
 			comp_state.workers.daily_attendance_report_worker.terminate();
 		}
-		comp_state.workers.daily_attendance_report_worker = await load_worker(
-			'$lib/workers/generate-daily-attendance.worker?worker',
-			`${comp_state.event_details?.event_name} Daily Attendance Report`
+		const DailyAttendanceWorker = await import(
+			'$lib/workers/generate-daily-attendance.worker?worker'
 		);
+		comp_state.workers.daily_attendance_report_worker = new DailyAttendanceWorker.default();
+		console.log('QRCodeWorker loaded:', comp_state.workers.daily_attendance_report_worker);
+		comp_state.workers.daily_attendance_report_worker.onmessage = (
+			message: MessageEvent<HelperResponse<string | null>>
+		) => {
+			console.log('Daily attendance report worker message:', message);
+			if (message.data.status !== 200 || message.data.data === null) {
+				return toast.error('Failed to generate daily attendance report', {
+					description: message.data.message
+				});
+			}
+			if (message.data.data) {
+				const file_name = `${comp_state.event_details?.event_name} Daily Attendance Report`;
+				const a = document.createElement('a');
+				a.href = message.data.data;
+				a.download = `${file_name}.pdf`;
+				document.body.appendChild(a);
+				a.click();
+				newWebViewWindow(file_name, {
+					url: message.data.data
+				});
+				document.body.removeChild(a);
+			} else {
+				toast.error('Failed to generate daily attendance report', {
+					description: 'No data received from the worker'
+				});
+			}
+			toast.success('Daily attendance report generated successfully', {
+				description: 'The daily attendance report has been generated and is ready for download'
+			});
+		};
 	}
 
 	async function load_qr_code_worker() {
 		if (comp_state.workers.qr_code_worker) {
 			comp_state.workers.qr_code_worker.terminate();
 		}
-		comp_state.workers.qr_code_worker = await load_worker(
-			'$lib/workers/generate-qr-codes.worker?worker',
-			`${comp_state.event_details?.event_name} QR Codes`
-		);
+		const QRCodeWorker = await import('$lib/workers/generate-qr-codes.worker?worker');
+		comp_state.workers.qr_code_worker = new QRCodeWorker.default();
+		console.log('QRCodeWorker loaded:', comp_state.workers.qr_code_worker);
+		comp_state.workers.qr_code_worker.onmessage = (
+			message: MessageEvent<HelperResponse<string | null>>
+		) => {
+			console.log('QRCode worker message:', message);
+			if (message.data.status !== 200 || message.data.data === null) {
+				return toast.error('Failed to generate QR codes', {
+					description: message.data.message
+				});
+			}
+			if (message.data.data) {
+				const file_name = `${comp_state.event_details?.event_name} QR Codes`;
+				const a = document.createElement('a');
+				a.href = message.data.data;
+				a.download = `${comp_state.event_details?.event_name} QR Codes.pdf`;
+				document.body.appendChild(a);
+				a.click();
+				newWebViewWindow(file_name, {
+					url: message.data.data
+				});
+				document.body.removeChild(a);
+			} else {
+				toast.error('Failed to generate QR codes', {
+					description: 'No data received from the worker'
+				});
+			}
+			toast.success('QR codes generated successfully', {
+				description: 'The QR codes have been generated and are ready for download'
+			});
+		};
 	}
 
 	watch(
@@ -480,26 +505,29 @@
 							<DropdownMenu.Separator />
 							<DropdownMenu.Item
 								onclick={() => {
-									if (!comp_state.event_details) {
-										return toast.warning('Event details not available', {
-											description: "Couldn't find event details required to generate QR codes"
-										});
-									}
+									new Promise(() => {
+										if (!comp_state.event_details) {
+											return toast.warning('Event details not available', {
+												description: "Couldn't find event details required to generate QR codes"
+											});
+										}
 
-									if (!comp_state.workers.qr_code_worker) {
-										return toast.error('QR code worker not available', {
-											description: 'Please refresh the page and try again'
+										if (!comp_state.workers.qr_code_worker) {
+											return toast.error('QR code worker not available', {
+												description: 'Please refresh the page and try again'
+											});
+										}
+
+										comp_state.workers.qr_code_worker.postMessage({
+											info: {
+												creator: 'Evently',
+												title: `${comp_state.event_details.event_name} QR Codes`,
+												subject: 'QR Codes',
+												producer: 'Evently'
+											},
+											event_details: JSON.stringify(comp_state.event_details),
+											participants: JSON.stringify(comp_state.participants)
 										});
-									}
-									comp_state.workers.qr_code_worker.postMessage({
-										info: {
-											creator: 'Evently',
-											title: `${comp_state.event_details.event_name} QR Codes`,
-											subject: 'QR Codes',
-											producer: 'Evently'
-										},
-										event_details: JSON.stringify(comp_state.event_details),
-										participants: JSON.stringify(comp_state.participants)
 									});
 									toast.info('Generating QR codes', {
 										description: 'Please wait while we generate the QR codes'
