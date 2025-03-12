@@ -3,14 +3,21 @@
 	import { ModeWatcher } from 'mode-watcher';
 	import { RenderScan } from 'svelte-render-scan';
 	import { dev } from '$app/environment';
-	import { Toaster } from 'svelte-sonner';
+	import { toast, Toaster } from 'svelte-sonner';
 	import AppNavbar from '@/components/app-navbar.svelte';
 	import { getCurrentWindow } from '@tauri-apps/api/window';
 	let { children } = $props();
 </script>
 
 <svelte:window
+	oncontextmenu={(e) => e.preventDefault()}
 	onkeydown={async (e) => {
+		if (e.key === 'F5') {
+			toast.info('F5 is disabled', {
+				description: 'This is a system message, F5 is disabled in this application.'
+			});
+			e.preventDefault();
+		}
 		if (e.key === 'F11') {
 			await getCurrentWindow().setFullscreen(
 				await getCurrentWindow()
