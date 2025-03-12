@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Button, buttonVariants } from '@/components/ui/button';
+	import { buttonVariants } from '@/components/ui/button';
 	import { Check, Clock, FileOutput, UsersRound, X } from 'lucide-svelte';
 	import { AddParticipantsDialog, ParticipantDataTable } from '@routes/events/(components)';
 	import type { EventSchedule, EventDetails, ParticipantAttendance } from '@/db/models/types';
@@ -402,11 +402,6 @@
 		<div class="flex flex-col items-end gap-2">
 			<div class="flex items-center gap-2">
 				<ImportParticipantDialog event_id={comp_state.event_details?.id ?? 'N/A'} />
-				<AddParticipantsDialog
-					disabled={false}
-					add_participants_form={data.add_participants_form}
-					event_id={comp_state.event_details?.id ?? 'N/A'}
-				/>
 				<DropdownMenu.Root>
 					<DropdownMenu.Trigger class={buttonVariants({ variant: 'outline' })}
 						><FileOutput class="size-4" />Export</DropdownMenu.Trigger
@@ -437,6 +432,11 @@
 						</DropdownMenu.Group>
 					</DropdownMenu.Content>
 				</DropdownMenu.Root>
+				<AddParticipantsDialog
+					disabled={false}
+					add_participants_form={data.add_participants_form}
+					event_id={comp_state.event_details?.id ?? 'N/A'}
+				/>
 			</div>
 			{@render StatusPill(event_status)}
 		</div>
