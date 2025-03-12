@@ -17,11 +17,11 @@
 	import { checkEventStatus, getEventDayInfo } from '@routes/events/utils';
 	import { cubicIn, cubicOut } from 'svelte/easing';
 	import { StatusPill } from '@/components/snippets/events.svelte';
-	import { generateQRCodesPDF } from '@/utils/exports/pdf';
+	import { generateDailyAttendanceReportPDF, generateQRCodesPDF } from '@/utils/exports/pdf';
 	import { ImportParticipantDialog } from '@routes/events/(components)/(participant)';
 	import { cn } from '@/utils';
 	import * as DropdownMenu from '@/components/ui/dropdown-menu';
-	import { QRCode } from '@/assets/icons/index.js';
+	import { QRCode, SquareCheckBig } from '@/assets/icons';
 
 	let { data } = $props();
 
@@ -442,6 +442,38 @@
 										});
 									});
 								}}><QRCode />Participants QR codes</DropdownMenu.Item
+							>
+
+							<DropdownMenu.Item
+								onclick={() => {
+									new Promise(() => {
+										if (!comp_state.event_details) {
+											return toast.warning('Event details not available', {
+												description: "Couldn't find event details required to generate QR codes"
+											});
+										}
+										const result = generateDailyAttendanceReportPDF({
+											info: {
+												creator: 'Evently',
+												title: `${comp_state.event_details.event_name} Daily Attendance Report`,
+												subject: 'Daily Attendance Report',
+												producer: 'Evently'
+											},
+											event_details: comp_state.event_details,
+											participants: comp_state.participants
+										});
+
+										if (!result.success) {
+											return toast.error('Failed to generate daily attendance report', {
+												description: result.message
+											});
+										}
+										toast.success('Daily attendance report generated successfully', {
+											description:
+												'The Daily attendance report have been generated and are ready for download'
+										});
+									});
+								}}><SquareCheckBig />Daily Attendance Report</DropdownMenu.Item
 							>
 						</DropdownMenu.Group>
 					</DropdownMenu.Content>
