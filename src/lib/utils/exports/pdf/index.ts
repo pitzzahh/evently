@@ -143,11 +143,11 @@ export function generateQRCodesPDF(props: DocumentMetaDetails) {
   }
 }
 
-export function generateDailyAttendanceReportPDF(props: DocumentMetaDetails): HelperResponse<TCreatedPdf | null> {
+export function generateDailyAttendanceReportPDF(props: DocumentMetaDetails): HelperResponse<boolean> {
   const { info, event_details, participants } = props;
 
   if (!participants || participants.length === 0) {
-    return { status: 404, message: "No participants found to generate attendance report", data: null };
+    return { status: 404, message: "No participants found to generate attendance report", data: false };
   }
   try {
     const attendanceRecords = COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.find({
@@ -279,14 +279,14 @@ export function generateDailyAttendanceReportPDF(props: DocumentMetaDetails): He
         };
       }
     };
-    // pdfMake.createPdf(file).download(`${event_details.event_name}_Daily_Attendance_Report`);
+    pdfMake.createPdf(file).download(`${event_details.event_name}_Daily_Attendance_Report`);
     return {
       status: 200,
       message: "PDF generated successfully",
-      data: pdfMake.createPdf(file)
+      data: true
     }
   } catch (error) {
     console.error("PDF generation error:", error);
-    return { status: 500, message: "Failed to generate attendance report", data: null };
+    return { status: 500, message: "Failed to generate attendance report", data: false };
   }
 }
