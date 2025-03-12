@@ -321,7 +321,6 @@
 			'$lib/workers/generate-daily-attendance.worker?worker'
 		);
 		comp_state.workers.daily_attendance_report_worker = new DailyAttendanceWorker.default();
-		console.log('QRCodeWorker loaded:', comp_state.workers.daily_attendance_report_worker);
 		comp_state.workers.daily_attendance_report_worker.onmessage = (
 			message: MessageEvent<HelperResponse<string | null>>
 		) => {
@@ -363,7 +362,6 @@
 		comp_state.workers.qr_code_worker.onmessage = (
 			message: MessageEvent<HelperResponse<string | null>>
 		) => {
-			console.log('QRCode worker message:', message);
 			if (message.data.status !== 200 || message.data.data === null) {
 				return toast.error('Failed to generate QR codes', {
 					description: message.data.message
@@ -373,7 +371,7 @@
 				const file_name = `${comp_state.event_details?.event_name} QR Codes`;
 				const a = document.createElement('a');
 				a.href = message.data.data;
-				a.download = `${comp_state.event_details?.event_name} QR Codes.pdf`;
+				a.download = `${file_name}.pdf`;
 				document.body.appendChild(a);
 				a.click();
 				document.body.removeChild(a);
