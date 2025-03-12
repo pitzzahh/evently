@@ -123,7 +123,7 @@
 			}
 
 			await goto(`/events/${event_details_id}`);
-			console.log('added_event_details', event_details_id);
+			console.log('added_event_details', JSON.stringify(event_details_id));
 			toast.success(`Event is added and has ${difference_in_days} days`);
 		}
 	});
@@ -185,7 +185,7 @@
 				comp_state.date_range.end?.toString() || comp_state.date_range.start.toString()
 			);
 
-			console.log(getDatesInRange(start_date, end_date));
+			console.log(JSON.stringify(getDatesInRange(start_date, end_date), null, 2));
 			comp_state.event_dates = getDatesInRange(start_date, end_date).map((date, index) => {
 				const am_start = new Date(date);
 				am_start.setHours(8, 0, 0, 0);
@@ -200,8 +200,6 @@
 				const existing_event_sched = event_schedules?.at(index);
 
 				if (existing_event_sched?.event_date.toLocaleDateString() === date.toLocaleDateString()) {
-					console.log('existing', existing_event_sched?.event_date.toLocaleDateString());
-					console.log(date.toLocaleDateString());
 					return {
 						id: nanoid(),
 						event_date: date,
@@ -240,7 +238,7 @@
 		pm_start?: string;
 		pm_end?: string;
 	}) {
-		console.log({ id, am_start, am_end, pm_start, pm_end });
+		console.log(JSON.stringify({ id, am_start, am_end, pm_start, pm_end }, null, 2));
 		comp_state.event_dates = comp_state.event_dates.map((event) => {
 			// $state.snapshot(event);
 			if (event.id !== id) return event;

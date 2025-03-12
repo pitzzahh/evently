@@ -52,10 +52,10 @@ export async function newWebViewWindow(label: WebviewLabel, options?: Omit<Webvi
     title: label,
   });
   webview_window.once('tauri://created', () => {
-    console.log('Webview window created:', sanitizedLabel);
+    console.log('Webview window created:', JSON.stringify(sanitizedLabel, null, 2));
   });
   webview_window.once('tauri://error', (event) => {
-    console.error('Error creating webview window:', sanitizedLabel, event);
+    console.error('Error creating webview window:', sanitizedLabel, JSON.stringify(event, null, 2));
   });
   return webview_window;
 }

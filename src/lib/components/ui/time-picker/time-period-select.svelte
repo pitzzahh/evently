@@ -51,7 +51,6 @@
 		period = value;
 		setPeriod?.(value);
 
-		console.log('PERIOD', value);
 		/**
 		 * trigger an update whenever the user switches between AM and PM;
 		 * otherwise user must manually change the hour each time

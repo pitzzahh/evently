@@ -289,7 +289,6 @@
 			event.stopPropagation();
 
 			if (comp_state.barcode && comp_state.barcode.length > 5) {
-				console.log('Complete barcode scanned:', comp_state.barcode);
 				handleScanParticipant(comp_state.barcode);
 			}
 
@@ -324,7 +323,6 @@
 		comp_state.workers.daily_attendance_report_worker.onmessage = (
 			message: MessageEvent<HelperResponse<string | null>>
 		) => {
-			console.log('Daily attendance report worker message:', message);
 			if (message.data.status !== 200 || message.data.data === null) {
 				return toast.error('Failed to generate daily attendance report', {
 					description: message.data.message
@@ -358,7 +356,6 @@
 		}
 		const QRCodeWorker = await import('$lib/workers/generate-qr-codes.worker?worker');
 		comp_state.workers.qr_code_worker = new QRCodeWorker.default();
-		console.log('QRCodeWorker loaded:', comp_state.workers.qr_code_worker);
 		comp_state.workers.qr_code_worker.onmessage = (
 			message: MessageEvent<HelperResponse<string | null>>
 		) => {

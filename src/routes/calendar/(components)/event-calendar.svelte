@@ -24,7 +24,7 @@
 
 	// Get events for a specific date
 	function getDateEvents(date: DateValue) {
-		console.log(events);
+		console.log(JSON.stringify(events, null, 2));
 		return events.filter((event) => {
 			// Check if the date falls within the event's duration (inclusive)
 			const currentDateTime = date.toDate(getLocalTimeZone()).getTime();

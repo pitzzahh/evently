@@ -11,7 +11,7 @@ export async function readParticipants(file: File, event_id: string): Promise<Om
     throw new Error('First worksheet not found in the Excel file');
   }
 
-  console.log('Worksheet found:', worksheet.name);
+  console.log('Worksheet found:', JSON.stringify(worksheet.name));
 
   const participants = worksheet.getSheetValues()
     .slice(2) // Skip header row

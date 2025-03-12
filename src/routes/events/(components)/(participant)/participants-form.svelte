@@ -44,7 +44,7 @@
 
 			has_attempted_submit = true;
 			const internal_duplicates = findDuplicates();
-			console.log('Internal Duplicates', internal_duplicates);
+			console.log('Internal Duplicates', JSON.stringify(internal_duplicates, null, 2));
 
 			if (internal_duplicates.length > 0) {
 				toast.error('There are duplicate participants name/email in the form');

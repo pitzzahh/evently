@@ -42,7 +42,7 @@
 	let files = $state<UploadedFile[]>([]);
 
 	const onUpload: FileDropZoneProps['onUpload'] = async (files) => {
-		console.log('files', files);
+		console.log('files', JSON.stringify(files, null, 2));
 		await Promise.allSettled(files.map((file) => uploadFile(file)));
 	};
 
@@ -78,8 +78,7 @@
 			return;
 		}
 		const [selected_file] = files;
-		console.log('selected_file', selected_file);
-		const { file } = selected_file;
+		const { file } = JSON.parse(JSON.stringify(selected_file, null, 2));
 		COLLECTIONS.PARTICIPANT_COLLECTION.insertMany(await readParticipants(file, event_id));
 		open_add_participants_dialog = false;
 		files = [];
