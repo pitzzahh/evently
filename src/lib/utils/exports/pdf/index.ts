@@ -26,21 +26,23 @@ export async function generateQRCodesPDF(props: DocumentMetaDetails) {
   const rows: any[] = [];
   let currentRow: any[] = [];
 
-  const new_part = await Promise.all(participants.map(async (participant) => {
-    return {
-      ...participant,
-      qr: await createQrPngDataUrl({
-        data: participant.id,
-        width: 500,
-        height: 500,
-        shape: 'circle',
-        backgroundFill: '#fff',
-      })
-    };
-  }));
+  const new_participants = await Promise.all(participants
+    .sort((a, b) => a.first_name.localeCompare(b.first_name))
+    .map(async (participant) => {
+      return {
+        ...participant,
+        qr: await createQrPngDataUrl({
+          data: participant.id,
+          width: 500,
+          height: 500,
+          shape: 'circle',
+          backgroundFill: '#fff',
+        })
+      };
+    }));
 
   try {
-    const qrCodePromises = new_part.map(async (participant) => {
+    const qrCodePromises = new_participants.map(async (participant) => {
       return {
         stack: [
           {
@@ -148,31 +150,7 @@ export async function generateQRCodesPDF(props: DocumentMetaDetails) {
         };
       }
     };
-    pdfMake.createPdf(file).getDataUrl(async (dataUrl) => {
-      const sanitizeLabel = (label: string) => label.replace(/[^a-zA-Z0-9\-\/:_]/g, '_');
-      const label = sanitizeLabel(`${event_details.event_name}_QR_Codes`);
-      console.log('Label:', label);
-      const existingWebview = await WebviewWindow.getByLabel(label);
-      if (existingWebview) {
-        existingWebview.close();
-        existingWebview.window.close();
-      }
-
-      const webview = new WebviewWindow(label, {
-        url: dataUrl,
-        title: `${event_details.event_name} QR Codes`,
-      });
-
-      webview.once('tauri://created', function () {
-        toast.success("QR codes generated successfully");
-      });
-      webview.once('tauri://error', function (e) {
-        console.error(e);
-        toast.error("Failed to generate QR codes", {
-          description: e.event
-        });
-      });
-    });
+    pdfMake.createPdf(file).download(`${event_details.event_name}_QR_Codes`);
     toast.success("QR codes generated successfully");
   } catch (error) {
     toast.error("Failed to generate QR codes");
