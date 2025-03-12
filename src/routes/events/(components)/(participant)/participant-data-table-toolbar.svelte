@@ -24,7 +24,7 @@
 	type ComponentState = {
 		search: string;
 		where_to_search: keyof Participant;
-		timeout?: number;
+		timeout?: ReturnType<typeof setTimeout>;
 	};
 
 	let { table, first_names, middle_names, last_names, emails }: ParticipantDataTableToolbarProps =
@@ -32,7 +32,8 @@
 
 	let comp_state = $state<ComponentState>({
 		search: '',
-		where_to_search: 'first_name'
+		where_to_search: 'first_name',
+		timeout: undefined
 	});
 	const is_filtered = $derived(table.getState().columnFilters.length > 0);
 	const over_attendance_status_col = $derived(table.getColumn('attendance_status'));
