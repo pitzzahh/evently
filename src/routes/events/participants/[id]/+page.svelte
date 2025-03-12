@@ -22,8 +22,7 @@
 	import { cn } from '@/utils';
 	import * as DropdownMenu from '@/components/ui/dropdown-menu';
 	import { QRCode, SquareCheckBig } from '@/assets/icons';
-
-	let { data } = $props();
+	import type { DocumentMetaDetails } from '@/types/exports/index.js';
 
 	interface ComponentState {
 		event_details: EventDetails | undefined;
@@ -41,6 +40,8 @@
 			daily_attendance_report_worker: Worker | null;
 		};
 	}
+
+	let { data } = $props();
 
 	let comp_state = $state<ComponentState>({
 		event_details: undefined,
@@ -312,6 +313,13 @@
 		}, 500) as unknown as number;
 	}
 
+	function onDailyAttendanceReportWorkerMessage(message: MessageEvent<DocumentMetaDetails>) {
+		console.log('Daily attendance report worker message:', message);
+		toast.success('Daily attendance report generated successfully', {
+			description: 'The daily attendance report has been generated and is ready for download'
+		});
+	}
+
 	async function load_daily_attendance_report_worker() {
 		if (comp_state.workers.daily_attendance_report_worker) {
 			comp_state.workers.daily_attendance_report_worker.terminate();
@@ -320,14 +328,13 @@
 			'$lib/workers/generate-daily-attendance.worker?worker'
 		);
 		comp_state.workers.daily_attendance_report_worker = new DailyAttendanceWorker.default();
-
-		comp_state.workers.daily_attendance_report_worker.onmessage = (message) => {
-			toast.success('Daily attendance report generated successfully', {
-				description: 'The daily attendance report has been generated and is ready for download'
-			});
-		};
 		console.log('QRCodeWorker loaded:', comp_state.workers.daily_attendance_report_worker);
-	}
+		comp_state.workers.daily_attendance_report_worker.onmessage = (
+			message: MessageEvent<DocumentMetaDetails>
+		) => {
+			onDailyAttendanceReportWorkerMessage(message);
+		};
+	}	
 
 	watch(
 		[
@@ -479,19 +486,12 @@
 										});
 									}
 
-									if (!comp_state.workers.qr_code_worker) {
+									if (!comp_state.workers.daily_attendance_report_worker) {
 										return toast.error('QR code worker not available', {
 											description: 'Please refresh the page and try again'
 										});
 									}
-
-									toast.info('Generating daily attendance report', {
-										description: 'Please wait while we generate the report'
-									});
-
-									comp_state.workers.qr_code_worker.postMessage({});
-
-									const result = generateDailyAttendanceReportPDF({
+									const message: DocumentMetaDetails = {
 										info: {
 											creator: 'Evently',
 											title: `${comp_state.event_details.event_name} Daily Attendance Report`,
@@ -500,13 +500,11 @@
 										},
 										event_details: comp_state.event_details,
 										participants: comp_state.participants
+									};
+									comp_state.workers.daily_attendance_report_worker.postMessage(message);
+									toast.info('Generating daily attendance report', {
+										description: 'Please wait while we generate the report'
 									});
-
-									if (!result.success) {
-										return toast.error('Failed to generate daily attendance report', {
-											description: result.message
-										});
-									}
 								}}><SquareCheckBig />Daily Attendance Report</DropdownMenu.Item
 							>
 						</DropdownMenu.Group>
