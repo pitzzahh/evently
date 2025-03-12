@@ -5,10 +5,10 @@ export async function readParticipants(file: File, event_id: string): Promise<Om
   const arrayBuffer = await file.arrayBuffer();
   const workbook = new ExcelJS.Workbook();
   await workbook.xlsx.load(arrayBuffer);
-  const worksheet = workbook.getWorksheet(0);
+  const worksheet = workbook.worksheets[0];
 
   if (!worksheet) {
-    throw new Error('Worksheet "participants" not found in the Excel file');
+    throw new Error('First worksheet not found in the Excel file');
   }
 
   console.log('Worksheet found:', worksheet.name);
