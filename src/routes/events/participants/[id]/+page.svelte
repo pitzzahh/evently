@@ -42,11 +42,6 @@
 		};
 	}
 
-	type ModifiedDocumentMetaDetails = Omit<DocumentMetaDetails, 'event_details' | 'participants'> & {
-		event_details: string;
-		participants: string;
-	};
-
 	let { data } = $props();
 
 	let comp_state = $state<ComponentState>({

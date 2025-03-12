@@ -1,7 +1,7 @@
 import type { DocumentMetaDetails } from "@/types/exports";
 import { generateDailyAttendanceReportPDF } from "@/utils/exports/pdf";
 
-type ModifiedDocumentMetaDetails = Omit<DocumentMetaDetails, 'event_details' | 'participants'> & {
+export type ModifiedDocumentMetaDetails = Omit<DocumentMetaDetails, 'event_details' | 'participants'> & {
   event_details: string;
   participants: string;
 };
