@@ -351,6 +351,40 @@
 		};
 	}
 
+	async function load_qr_code_worker() {
+		if (comp_state.workers.qr_code_worker) {
+			comp_state.workers.qr_code_worker.terminate();
+		}
+		const QRCodeWorker = await import('$lib/workers/generate-qr-code.worker?worker');
+		comp_state.workers.qr_code_worker = new QRCodeWorker.default();
+		console.log('QRCodeWorker loaded:', comp_state.workers.qr_code_worker);
+		comp_state.workers.qr_code_worker.onmessage = (
+			message: MessageEvent<HelperResponse<string | null>>
+		) => {
+			console.log('QRCode worker message:', message);
+			if (message.data.status !== 200 || message.data.data === null) {
+				return toast.error('Failed to generate QR codes', {
+					description: message.data.message
+				});
+			}
+			if (message.data.data) {
+				const a = document.createElement('a');
+				a.href = message.data.data;
+				a.download = `${comp_state.event_details?.event_name} QR Codes.pdf`;
+				document.body.appendChild(a);
+				a.click();
+				document.body.removeChild(a);
+			} else {
+				toast.error('Failed to generate QR codes', {
+					description: 'No data received from the worker'
+				});
+			}
+			toast.success('QR codes generated successfully', {
+				description: 'The QR codes have been generated and are ready for download'
+			});
+		};
+	}
+
 	watch(
 		[
 			() => COLLECTIONS.PARTICIPANT_COLLECTION.isLoading(),
@@ -428,6 +462,7 @@
 	onMount(() => {
 		window.addEventListener('keydown', handleKeydown);
 		load_daily_attendance_report_worker();
+		load_qr_code_worker();
 		return () => {
 			if (comp_state.timeout) clearTimeout(comp_state.timeout);
 			window.removeEventListener('keydown', handleKeydown);
@@ -470,25 +505,26 @@
 												description: "Couldn't find event details required to generate QR codes"
 											});
 										}
-										const result = generateQRCodesPDF({
+
+										if (!comp_state.workers.qr_code_worker) {
+											return toast.error('QR code worker not available', {
+												description: 'Please refresh the page and try again'
+											});
+										}
+
+										comp_state.workers.qr_code_worker.postMessage({
 											info: {
 												creator: 'Evently',
 												title: `${comp_state.event_details.event_name} QR Codes`,
-												subject: 'QR Codes for participants',
+												subject: 'QR Codes',
 												producer: 'Evently'
 											},
-											event_details: comp_state.event_details,
-											participants: comp_state.participants
+											event_details: JSON.stringify(comp_state.event_details),
+											participants: JSON.stringify(comp_state.participants)
 										});
-
-										if (!result.success) {
-											return toast.error('Failed to generate QR codes', {
-												description: result.message
-											});
-										}
-										toast.success('QR codes generated successfully', {
-											description: 'The QR codes have been generated and are ready for download'
-										});
+									});
+									toast.info('Generating QR codes', {
+										description: 'Please wait while we generate the QR codes'
 									});
 								}}><QRCode />Participants QR codes</DropdownMenu.Item
 							>
