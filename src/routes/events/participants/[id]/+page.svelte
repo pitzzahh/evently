@@ -22,6 +22,7 @@
 	import * as DropdownMenu from '@/components/ui/dropdown-menu';
 	import { QRCode, SquareCheckBig } from '@/assets/icons';
 	import type { HelperResponse } from '@/types/generic/index.js';
+	import { newWebViewWindow } from '@/utils/windows/index.js';
 
 	interface ComponentState {
 		event_details: EventDetails | undefined;
@@ -331,11 +332,15 @@
 				});
 			}
 			if (message.data.data) {
+				const file_name = `${comp_state.event_details?.event_name} Daily Attendance Report`;
 				const a = document.createElement('a');
 				a.href = message.data.data;
-				a.download = `${comp_state.event_details?.event_name} Daily Attendance Report.pdf`;
+				a.download = `${file_name}.pdf`;
 				document.body.appendChild(a);
 				a.click();
+				newWebViewWindow(file_name, {
+					url: message.data.data
+				});
 				document.body.removeChild(a);
 			} else {
 				toast.error('Failed to generate daily attendance report', {
@@ -365,11 +370,15 @@
 				});
 			}
 			if (message.data.data) {
+				const file_name = `${comp_state.event_details?.event_name} QR Codes`;
 				const a = document.createElement('a');
 				a.href = message.data.data;
-				a.download = `${comp_state.event_details?.event_name} QR Codes.pdf`;
+				a.download = `${file_name}.pdf`;
 				document.body.appendChild(a);
 				a.click();
+				newWebViewWindow(file_name, {
+					url: message.data.data
+				});
 				document.body.removeChild(a);
 			} else {
 				toast.error('Failed to generate QR codes', {
