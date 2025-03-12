@@ -18,7 +18,7 @@
 	import { fly } from 'svelte/transition';
 	import { COLLECTIONS } from '@/db/index';
 	import type { Participant } from '@/db/models/types';
-	import { formatDateTime } from '@/utils/format';
+	import { formatDateTime, formatDateToTimeOption } from '@/utils/format';
 	import { watch } from 'runed';
 	import { StatusPill } from '@/components/snippets';
 	import { goto } from '$app/navigation';
@@ -190,7 +190,11 @@
 								<p class="text-base font-medium">
 									{formatDateTime(comp_state.event_details?.start_date)}
 								</p>
-								<p class="text-muted-foreground">11:30 PM - 12:30 AM</p>
+								<p class="text-muted-foreground">
+									{formatDateToTimeOption(comp_state.event_schedules.at(0)?.am_start)} - {formatDateToTimeOption(
+										comp_state.event_schedules.at(0)?.pm_end
+									)}
+								</p>
 							</div>
 						</div>
 						<div class="flex items-center gap-3">
@@ -209,13 +213,17 @@
 							<div class="rounded-md border p-3">
 								<Clock class="size-5 text-muted-foreground" />
 							</div>
-							<p class="text-base font-medium">
-								{comp_state.event_details?.difference_in_days}
-								{comp_state.event_details?.difference_in_days &&
-								comp_state.event_details?.difference_in_days > 1
-									? 'days'
-									: 'day'} event
-							</p>
+
+							<div>
+								<p class="text-base font-medium">
+									{comp_state.event_details?.difference_in_days}
+									{comp_state.event_details?.difference_in_days &&
+									comp_state.event_details?.difference_in_days > 1
+										? 'days'
+										: 'day'} event
+								</p>
+								<p class=" text-muted-foreground">Duration</p>
+							</div>
 						</div>
 					</div>
 
@@ -234,7 +242,10 @@
 						<div class="rounded-md border p-3">
 							<MapPin class="size-5 text-muted-foreground" />
 						</div>
-						<p class="text-base font-medium">{comp_state.event_details?.location ?? 'N/A'}</p>
+						<div>
+							<p class="text-base font-medium">{comp_state.event_details?.location ?? 'N/A'}</p>
+							<p class=" text-muted-foreground">Location</p>
+						</div>
 					</div>
 
 					<Button variant="ghost" onclick={() => (comp_state.see_more = !comp_state.see_more)}>
