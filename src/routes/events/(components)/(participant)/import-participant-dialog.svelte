@@ -147,49 +147,47 @@
 					fileCount={files.length}
 					accept="application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 				/>
-				{#if no_file}
-					<div class="flex flex-col gap-2">
-						{#each files as file, i (file.name)}
-							<div class="flex place-items-center justify-between gap-2">
-								<div class="flex place-items-center gap-2">
-									{#await file.url then src}
-										<div class="relative size-9 overflow-clip">
-											<img
-												{src}
-												alt={file.name}
-												class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 overflow-clip"
-											/>
-										</div>
-									{/await}
-									<div class="flex flex-col">
-										<span>{file.name}</span>
-										<span class="text-xs text-muted-foreground">{displaySize(file.size)}</span>
+				<div class="flex flex-col gap-2">
+					{#each files as file, i (file.name)}
+						<div class="flex place-items-center justify-between gap-2">
+							<div class="flex place-items-center gap-2">
+								{#await file.url then src}
+									<div class="relative size-9 overflow-clip">
+										<img
+											{src}
+											alt={file.name}
+											class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 overflow-clip"
+										/>
 									</div>
-								</div>
-								{#await file.url}
-									<Progress
-										class="h-2 w-full flex-grow"
-										value={((date.getTime() - file.uploadedAt) / 1000) * 100}
-										max={100}
-									/>
-								{:then url}
-									<Button
-										variant="outline"
-										size="icon"
-										onclick={() => {
-											URL.revokeObjectURL(url);
-											files = [...files.slice(0, i), ...files.slice(i + 1)];
-										}}
-									>
-										<X />
-									</Button>
 								{/await}
+								<div class="flex flex-col">
+									<span>{file.name}</span>
+									<span class="text-xs text-muted-foreground">{displaySize(file.size)}</span>
+								</div>
 							</div>
-						{/each}
-					</div>
-				{/if}
-			</div></Dialog.Header
-		>
+							{#await file.url}
+								<Progress
+									class="h-2 w-full flex-grow"
+									value={((date.getTime() - file.uploadedAt) / 1000) * 100}
+									max={100}
+								/>
+							{:then url}
+								<Button
+									variant="outline"
+									size="icon"
+									onclick={() => {
+										URL.revokeObjectURL(url);
+										files = [...files.slice(0, i), ...files.slice(i + 1)];
+									}}
+								>
+									<X />
+								</Button>
+							{/await}
+						</div>
+					{/each}
+				</div>
+			</div>
+		</Dialog.Header>
 		<Dialog.Footer>
 			<AlertDialog.Root>
 				<AlertDialog.Trigger
