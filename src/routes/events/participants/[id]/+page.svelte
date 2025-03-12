@@ -480,29 +480,26 @@
 							<DropdownMenu.Separator />
 							<DropdownMenu.Item
 								onclick={() => {
-									new Promise(() => {
-										if (!comp_state.event_details) {
-											return toast.warning('Event details not available', {
-												description: "Couldn't find event details required to generate QR codes"
-											});
-										}
-
-										if (!comp_state.workers.qr_code_worker) {
-											return toast.error('QR code worker not available', {
-												description: 'Please refresh the page and try again'
-											});
-										}
-
-										comp_state.workers.qr_code_worker.postMessage({
-											info: {
-												creator: 'Evently',
-												title: `${comp_state.event_details.event_name} QR Codes`,
-												subject: 'QR Codes',
-												producer: 'Evently'
-											},
-											event_details: JSON.stringify(comp_state.event_details),
-											participants: JSON.stringify(comp_state.participants)
+									if (!comp_state.event_details) {
+										return toast.warning('Event details not available', {
+											description: "Couldn't find event details required to generate QR codes"
 										});
+									}
+
+									if (!comp_state.workers.qr_code_worker) {
+										return toast.error('QR code worker not available', {
+											description: 'Please refresh the page and try again'
+										});
+									}
+									comp_state.workers.qr_code_worker.postMessage({
+										info: {
+											creator: 'Evently',
+											title: `${comp_state.event_details.event_name} QR Codes`,
+											subject: 'QR Codes',
+											producer: 'Evently'
+										},
+										event_details: JSON.stringify(comp_state.event_details),
+										participants: JSON.stringify(comp_state.participants)
 									});
 									toast.info('Generating QR codes', {
 										description: 'Please wait while we generate the QR codes'
