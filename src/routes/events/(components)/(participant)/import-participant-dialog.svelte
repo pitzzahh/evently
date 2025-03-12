@@ -42,6 +42,7 @@
 	let files = $state<UploadedFile[]>([]);
 
 	const onUpload: FileDropZoneProps['onUpload'] = async (files) => {
+		console.log('files', files);
 		await Promise.allSettled(files.map((file) => uploadFile(file)));
 	};
 
@@ -153,11 +154,15 @@
 							<div class="flex place-items-center gap-2">
 								{#await file.url then src}
 									<div class="relative size-9 overflow-clip">
-										<img
-											{src}
-											alt={file.name}
-											class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 overflow-clip"
-										/>
+										{#if file.type.startsWith('image/')}
+											<img
+												{src}
+												alt={file.name}
+												class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 overflow-clip"
+											/>
+										{:else if file.type.startsWith('video/')}
+											video
+										{/if}
 									</div>
 								{/await}
 								<div class="flex flex-col">
