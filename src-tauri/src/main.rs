@@ -28,10 +28,7 @@ fn main() {
         .plugin(
             tauri_plugin_log::Builder::new()
                 .target(tauri_plugin_log::Target::new(
-                    tauri_plugin_log::TargetKind::Folder {
-                        path: dirs::home_dir().unwrap(),
-                        file_name: Some("evently-app".to_string()),
-                    },
+                    tauri_plugin_log::TargetKind::Webview,
                 ))
                 .format(|out, message, record| {
                     out.finish(format_args!(
