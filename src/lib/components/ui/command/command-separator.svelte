@@ -9,7 +9,7 @@
 	}: CommandPrimitive.SeparatorProps = $props();
 </script>
 
-r<CommandPrimitive.Separator
+<CommandPrimitive.Separator
 	bind:ref
 	class={cn('-mx-1 h-px bg-border', className)}
 	{...restProps}

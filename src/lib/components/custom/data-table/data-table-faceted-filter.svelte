@@ -16,25 +16,10 @@
 		options: FilterOption<FilterType>[];
 	};
 
-	type ComponentState = {
-		root_element: HTMLElement | undefined;
-		loaded_data: number;
-		all_items: DataTableFacetedFilterProps<TData, TValue, FilterType>['options'];
-		processing: boolean;
-	};
-
 	let { column, title, options }: DataTableFacetedFilterProps<TData, TValue, FilterType> = $props();
 
-	const LOAD_LIMIT = 20;
 	const facets = $derived(column?.getFacetedUniqueValues());
 	const selectedValues = $derived(new SvelteSet(column?.getFilterValue() as FilterType[]));
-
-	let comp_state = $state<ComponentState>({
-		root_element: undefined,
-		loaded_data: LOAD_LIMIT,
-		all_items: options.slice(0, LOAD_LIMIT),
-		processing: false
-	});
 </script>
 
 <Popover.Root>
@@ -43,7 +28,7 @@
 			<Button {...props} variant="outline" size="sm" class="h-8 border-dashed">
 				<CirclePlus />
 				{title}
-				{#if comp_state.all_items.some((opt) => selectedValues.has(opt.value))}
+				{#if options.some((opt) => selectedValues.has(opt.value))}
 					<Separator orientation="vertical" class="mx-2 h-4" />
 					<Badge variant="secondary" class="rounded-sm px-1 font-normal lg:hidden">
 						{selectedValues.size}
@@ -100,7 +85,7 @@
 							<span>{option.label}</span>
 							{#if facets?.get(option.value)}
 								<span class="ml-auto flex size-4 items-center justify-center font-mono text-xs">
-									{facets.get(option.value)}
+									{Number(facets.get(option.value))}
 								</span>
 							{/if}
 						</Command.Item>
