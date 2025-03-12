@@ -70,10 +70,7 @@
 		}
 		console.log('selected_file', selected_file);
 		const file_url = selected_file.path;
-		const participants = await readParticipants(
-			'C:\\Users\\peter\\Downloads\\MOCK_DATA(2).xlsx',
-			event_id
-		);
+		const participants = await readParticipants(file_url, event_id);
 
 		COLLECTIONS.PARTICIPANT_COLLECTION.insertMany(participants);
 
