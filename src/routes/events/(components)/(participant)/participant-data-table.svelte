@@ -6,6 +6,7 @@
 	import type { Participant } from '@/db/models/types';
 	import type { ParticipantSchema } from '@/schema/participant';
 	import type { SuperValidated } from 'sveltekit-superforms';
+	import ParticipantFloatingBar from './participant-floating-bar.svelte';
 
 	export interface ParticipantDataTableProps {
 		participants: Participant[];
@@ -18,18 +19,10 @@
 
 <DataTable data={participants} columns={participantTableColumns(participant_form, event_status)}>
 	{#snippet data_table_toolbar({ table })}
-		<ParticipantDataTableToolbar
-			{table}
-			first_names={generateOptions<Participant>(participants, 'first_name')}
-			middle_names={generateOptions<Participant>(
-				participants.filter((p) => p.middle_name),
-				'middle_name'
-			)}
-			emails={generateOptions<Participant>(
-				participants.filter((p) => p.email),
-				'email'
-			)}
-			last_names={generateOptions<Participant>(participants, 'last_name')}
-		/>
+		<ParticipantDataTableToolbar {table} />
+	{/snippet}
+
+	{#snippet floating_bar({ table })}
+		<ParticipantFloatingBar {table} />
 	{/snippet}
 </DataTable>

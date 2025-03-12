@@ -16,10 +16,6 @@
 
 	export interface ParticipantDataTableToolbarProps {
 		table: Table<Participant>;
-		first_names: FilterOption<string>[];
-		middle_names: FilterOption<string>[];
-		last_names: FilterOption<string>[];
-		emails: FilterOption<string>[];
 	}
 	type ComponentState = {
 		search: string;
@@ -27,7 +23,7 @@
 		timeout?: ReturnType<typeof setTimeout>;
 	};
 
-	let { table, first_names, middle_names, last_names, emails }: ParticipantDataTableToolbarProps =
+	let { table }: ParticipantDataTableToolbarProps =
 		$props();
 
 	let comp_state = $state<ComponentState>({
