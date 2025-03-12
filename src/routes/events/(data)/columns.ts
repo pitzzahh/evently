@@ -248,7 +248,23 @@ export function participantAttendanceColumns(): ColumnDef<ParticipantAttendance>
 					title: 'Latest Time Scanned'
 				}),
 
-			cell: ({ row }) => formatDateToTimeOption(row.original.latest_time_scanned),
+			cell: ({ row }) => formatDateToTimeOption(row.original.latest_time_scanned)
+		},
+		{
+			accessorKey: 'day',
+			header: ({ column }) =>
+				renderComponent(DataTableColumnHeader<ParticipantAttendance, unknown>, {
+					column,
+					title: 'Event Day',
+					class: 'text-xs'
+				}),
+			cell: ({ row }) => {
+				const attendance = row.original;
+				return renderComponent(DataTableBadge, {
+					value: 'Day ' + attendance.day,
+					variant: 'default'
+				});
+			},
 			filterFn: (row, id, value) => {
 				return String(row.getValue(id))
 					.toLowerCase()
@@ -257,7 +273,12 @@ export function participantAttendanceColumns(): ColumnDef<ParticipantAttendance>
 		},
 		{
 			id: 'actions',
-			header: () => 'Actions',
+			header: ({ column }) =>
+				renderComponent(DataTableColumnHeader<ParticipantAttendance, unknown>, {
+					column,
+					title: 'Actions',
+					class: 'text-xs'
+				}),
 			cell: ({ row }) => {
 				const original = row.original;
 				return renderComponent(ParticipantAttendanceDataTableRowActions, {
