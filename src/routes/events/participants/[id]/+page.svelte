@@ -23,6 +23,7 @@
 	import * as DropdownMenu from '@/components/ui/dropdown-menu';
 	import { QRCode, SquareCheckBig } from '@/assets/icons';
 	import type { DocumentMetaDetails } from '@/types/exports/index.js';
+	import type { HelperResponse } from '@/types/generic/index.js';
 
 	interface ComponentState {
 		event_details: EventDetails | undefined;
@@ -40,6 +41,11 @@
 			daily_attendance_report_worker: Worker | null;
 		};
 	}
+
+	type ModifiedDocumentMetaDetails = Omit<DocumentMetaDetails, 'event_details' | 'participants'> & {
+		event_details: string;
+		participants: string;
+	};
 
 	let { data } = $props();
 
@@ -313,13 +319,6 @@
 		}, 500) as unknown as number;
 	}
 
-	function onDailyAttendanceReportWorkerMessage(message: MessageEvent<DocumentMetaDetails>) {
-		console.log('Daily attendance report worker message:', message);
-		toast.success('Daily attendance report generated successfully', {
-			description: 'The daily attendance report has been generated and is ready for download'
-		});
-	}
-
 	async function load_daily_attendance_report_worker() {
 		if (comp_state.workers.daily_attendance_report_worker) {
 			comp_state.workers.daily_attendance_report_worker.terminate();
@@ -330,11 +329,14 @@
 		comp_state.workers.daily_attendance_report_worker = new DailyAttendanceWorker.default();
 		console.log('QRCodeWorker loaded:', comp_state.workers.daily_attendance_report_worker);
 		comp_state.workers.daily_attendance_report_worker.onmessage = (
-			message: MessageEvent<DocumentMetaDetails>
+			message: MessageEvent<HelperResponse<boolean>>
 		) => {
-			onDailyAttendanceReportWorkerMessage(message);
+			console.log('Daily attendance report worker message:', message);
+			toast.success('Daily attendance report generated successfully', {
+				description: 'The daily attendance report has been generated and is ready for download'
+			});
 		};
-	}	
+	}
 
 	watch(
 		[
@@ -491,17 +493,16 @@
 											description: 'Please refresh the page and try again'
 										});
 									}
-									const message: DocumentMetaDetails = {
+									comp_state.workers.daily_attendance_report_worker.postMessage({
 										info: {
 											creator: 'Evently',
 											title: `${comp_state.event_details.event_name} Daily Attendance Report`,
 											subject: 'Daily Attendance Report',
 											producer: 'Evently'
 										},
-										event_details: comp_state.event_details,
-										participants: comp_state.participants
-									};
-									comp_state.workers.daily_attendance_report_worker.postMessage(message);
+										event_details: JSON.stringify(comp_state.event_details),
+										participants: JSON.stringify(comp_state.participants)
+									});
 									toast.info('Generating daily attendance report', {
 										description: 'Please wait while we generate the report'
 									});
