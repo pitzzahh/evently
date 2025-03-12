@@ -5,48 +5,45 @@ import type {
   TDocumentDefinitions
 } from 'pdfmake/interfaces';
 import type { DocumentMetaDetails } from "@/types/exports";
-import { createQrPngDataUrl } from '@svelte-put/qr';
-import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
+import { createQrSvgString } from '@svelte-put/qr';
 
-export async function generateQRCodesPDF(props: DocumentMetaDetails) {
+export function generateQRCodesPDF(props: DocumentMetaDetails) {
   const { info, event_details, participants } = props;
 
   if (!participants || participants.length === 0) {
     toast.error("No participants found to generate QR codes");
     return;
   }
-
-  const calculateOptimalColumns = (totalItems: number): number => {
-    if (totalItems <= 4) return totalItems;
-    if (totalItems <= 8) return Math.min(4, Math.ceil(totalItems / 2));
-    return 4;
-  };
-
-  const columnsPerRow = calculateOptimalColumns(participants.length);
-  const rows: any[] = [];
-  let currentRow: any[] = [];
-
-  const new_participants = await Promise.all(participants
-    .sort((a, b) => a.first_name.localeCompare(b.first_name))
-    .map(async (participant) => {
-      return {
-        ...participant,
-        qr: await createQrPngDataUrl({
-          data: participant.id,
-          width: 500,
-          height: 500,
-          shape: 'circle',
-          backgroundFill: '#fff',
-        })
-      };
-    }));
-
   try {
-    const qrCodePromises = new_participants.map(async (participant) => {
+    const calculateOptimalColumns = (totalItems: number): number => {
+      if (totalItems <= 4) return totalItems;
+      if (totalItems <= 8) return Math.min(4, Math.ceil(totalItems / 2));
+      return 4;
+    };
+
+    const columnsPerRow = calculateOptimalColumns(participants.length);
+    const rows: any[] = [];
+    let currentRow: any[] = [];
+
+    const new_participants = participants
+      .sort((a, b) => a.first_name.localeCompare(b.first_name))
+      .map((participant) => {
+        return {
+          ...participant,
+          qr: createQrSvgString({
+            data: participant.id,
+            width: 500,
+            height: 500,
+            shape: 'circle',
+          })
+        };
+      });
+
+    new_participants.map((participant) => {
       return {
         stack: [
           {
-            image: participant.qr,
+            svg: participant.qr,
             fit: [100, 100],
             alignment: 'center'
           },
@@ -59,11 +56,7 @@ export async function generateQRCodesPDF(props: DocumentMetaDetails) {
         margin: [10, 10, 10, 20],
         alignment: 'center'
       };
-    });
-
-    const cells = await Promise.all(qrCodePromises);
-
-    cells.forEach((cell, index) => {
+    }).forEach((cell, index) => {
       currentRow.push(cell);
 
       if (currentRow.length === columnsPerRow || index === participants.length - 1) {
