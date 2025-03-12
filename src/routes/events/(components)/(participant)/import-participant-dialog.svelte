@@ -42,6 +42,7 @@
 	let files = $state<UploadedFile[]>([]);
 
 	const onUpload: FileDropZoneProps['onUpload'] = async (files) => {
+		console.log('files', files);
 		await Promise.allSettled(files.map((file) => uploadFile(file)));
 	};
 
@@ -143,6 +144,8 @@
 					{onUpload}
 					{onFileRejected}
 					maxFileSize={10 * MEGABYTE}
+					maxFiles={1}
+					fileCount={files.length}
 					accept="application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 				/>
 				{#if no_file}
