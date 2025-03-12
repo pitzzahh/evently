@@ -15,7 +15,7 @@
 	import { onMount } from 'svelte';
 	import ParticipantAttendanceDataTable from '@routes/events/(components)/(participant)/participant-attendance-data-table.svelte';
 	import { checkEventStatus, getEventDayInfo } from '@routes/events/utils';
-	import { cubicIn, cubicOut } from 'svelte/easing';
+	import { cubicIn, cubicOut, quartInOut } from 'svelte/easing';
 	import { StatusPill } from '@/components/snippets/events.svelte';
 	import { ImportParticipantDialog } from '@routes/events/(components)/(participant)';
 	import { cn } from '@/utils';
@@ -474,6 +474,19 @@
 			window.removeEventListener('keydown', handleKeydown);
 		};
 	});
+
+	watch(
+		() => comp_state.last_scanned_participant,
+		() => {
+			let timeout: number;
+			if (comp_state.last_scanned_participant) {
+				timeout = setTimeout(() => {
+					comp_state.last_scanned_participant = null;
+				}, 5000) as unknown as number;
+			}
+			return () => timeout;
+		}
+	);
 </script>
 
 <div in:fly={{ y: 20 }} class="grid gap-6">
@@ -649,8 +662,7 @@
 
 {#if comp_state.last_scanned_participant}
 	<div
-		in:fly={{ y: -20, easing: cubicIn }}
-		out:fly={{ y: -20, easing: cubicOut }}
+		transition:fly={{ y: -20, duration: 200, easing: quartInOut }}
 		class="fixed right-8 top-10 z-20"
 	>
 		<Card.Root class="relative w-[400px]">
