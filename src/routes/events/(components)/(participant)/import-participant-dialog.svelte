@@ -80,11 +80,10 @@
 		const [selected_file] = files;
 		console.log('selected_file', selected_file);
 		const { file } = selected_file;
-		const participants = await readParticipants(file, event_id);
-
-		COLLECTIONS.PARTICIPANT_COLLECTION.insertMany(participants);
-
-		console.log('participants', COLLECTIONS.PARTICIPANT_COLLECTION.find({ event_id }).fetch());
+		COLLECTIONS.PARTICIPANT_COLLECTION.insertMany(await readParticipants(file, event_id));
+		open_add_participants_dialog = false;
+		files = [];
+		toast.success('Participants imported successfully!');
 	}
 
 	$effect(() => {
