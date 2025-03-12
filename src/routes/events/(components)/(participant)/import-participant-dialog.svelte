@@ -3,12 +3,10 @@
 	import * as Dialog from '@/components/ui/dialog';
 	import { Import, X, Sheet } from '@/assets/icons';
 	import {
-		displaySize,
 		FileDropZone,
 		MEGABYTE,
 		type FileDropZoneProps
 	} from '@/components/custom/file-drop-zone';
-	import { onDestroy } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	import { SvelteDate } from 'svelte/reactivity';
 	import { cn, sleep } from '@/utils';
@@ -94,7 +92,7 @@
 </script>
 
 <Dialog.Root bind:open={open_add_participants_dialog}>
-	<Dialog.Trigger class={buttonVariants({ variant: 'ghost' })}
+	<Dialog.Trigger {disabled} class={buttonVariants({ variant: 'ghost' })}
 		><Import class="size-4" />Import Excel Participants</Dialog.Trigger
 	>
 	<Dialog.Content class="max-w-[750px]">
