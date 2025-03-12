@@ -63,3 +63,9 @@ export type KeysByType<Source extends object, PickType> = {
  */
 export type PickByType<Source extends object, PickType> =
   Pick<Source, KeysByType<Source, PickType>>;
+
+export type HelperResponse<T> = {
+  status: number;
+  message: string;
+  data?: T;
+}

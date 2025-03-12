@@ -1,3 +1,6 @@
+import type { WebviewLabel, WebviewOptions } from "@tauri-apps/api/webview";
+import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
+
 interface WindowOptions {
   url: string;
   target?: '_blank' | '_self' | '_parent' | '_top';
@@ -34,4 +37,25 @@ export function newWindow(options: WindowOptions) {
   }).map(([key, value]) => `${key}=${value}`).join(', ');
 
   window.open(options.url, options.target ?? '_blank', featureString);
+}
+
+export async function newWebViewWindow(label: WebviewLabel, options?: Omit<WebviewOptions, 'x' | 'y' | 'width' | 'height'>) {
+  // Sanitize the label
+  const sanitizedLabel = label.replace(/[^a-zA-Z0-9\-\/:_]/g, '');
+
+  const existingWindow = await WebviewWindow.getByLabel(sanitizedLabel);
+  if (existingWindow) {
+    existingWindow.close();
+  }
+  const webview_window = new WebviewWindow(sanitizedLabel, {
+    ...options,
+    title: label,
+  });
+  webview_window.once('tauri://created', () => {
+    console.log('Webview window created:', sanitizedLabel);
+  });
+  webview_window.once('tauri://error', (event) => {
+    console.error('Error creating webview window:', sanitizedLabel, event);
+  });
+  return webview_window;
 }
