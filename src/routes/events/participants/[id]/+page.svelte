@@ -36,6 +36,9 @@
 		all_participants_attendance: ParticipantAttendance[];
 		barcode: string;
 		timeout: number | null;
+		workers: {
+			qr_code_worker: Worker | null;
+		};
 	}
 
 	let comp_state = $state<ComponentState>({
@@ -48,11 +51,16 @@
 		current_day_participants_attendance: [],
 		all_participants_attendance: [],
 		barcode: '',
-		timeout: null
+		timeout: null,
+		workers: {
+			qr_code_worker: null
+		}
 	});
+
 	const event_status = $derived(
 		checkEventStatus(comp_state.event_details?.start_date, comp_state.event_details?.end_date)
 	);
+
 	const current_event_day = $derived(
 		comp_state.event_details
 			? getEventDayInfo(
@@ -61,80 +69,6 @@
 					new Date()
 				).currentDay
 			: null
-	);
-
-	watch(
-		[
-			() => COLLECTIONS.PARTICIPANT_COLLECTION.isLoading(),
-			() => COLLECTIONS.EVENT_SCHEDULE_COLLECTION.isLoading(),
-			() => COLLECTIONS.EVENT_DETAILS_COLLECTION.isLoading(),
-			() => COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.isLoading()
-		],
-		() => {
-			const participants_cursor = COLLECTIONS.PARTICIPANT_COLLECTION.find(
-				{
-					event_id: data.event_id
-				},
-				{
-					sort: {
-						created: -1
-					}
-				}
-			);
-			const event_schedule_cursor = COLLECTIONS.EVENT_SCHEDULE_COLLECTION.find({
-				event_id: data.event_id
-			});
-
-			comp_state.event_schedules = event_schedule_cursor.fetch();
-			comp_state.event_details = COLLECTIONS.EVENT_DETAILS_COLLECTION.findOne({
-				id: data.event_id
-			});
-
-			if (current_event_day) {
-				comp_state.current_day_participants_attendance = getPopulatedAttendanceRecords(
-					data.event_id,
-					current_event_day
-				) as ParticipantAttendance[];
-			}
-
-			comp_state.all_participants_attendance = getPopulatedAttendanceRecords(
-				data.event_id
-			) as ParticipantAttendance[];
-
-			comp_state.participants = participants_cursor.fetch().map((participant) => {
-				const event_days = comp_state.event_details?.difference_in_days;
-				const total_days_attended = comp_state.all_participants_attendance.reduce(
-					(acc, participant_attendance) => {
-						if (
-							participant_attendance.participant_id === participant.id &&
-							participant_attendance.am_time_in &&
-							participant_attendance.pm_time_in
-						) {
-							return (acc += 1);
-						}
-						return (acc += 0);
-					},
-					0
-				);
-
-				const attendance_status =
-					event_days === total_days_attended
-						? 'complete'
-						: event_days && event_days < total_days_attended
-							? 'incomplete'
-							: 'absent';
-
-				return {
-					...participant,
-					attendance_status: event_status === 'finished' ? attendance_status : undefined
-				};
-			});
-
-			return () => {
-				participants_cursor.cleanup();
-				event_schedule_cursor.cleanup();
-			};
-		}
 	);
 
 	function getPopulatedAttendanceRecords(eventId: string, current_event_day?: number) {
@@ -376,9 +310,93 @@
 		}, 500) as unknown as number;
 	}
 
+	async function load_workers() {
+		if (comp_state.workers.qr_code_worker) {
+			comp_state.workers.qr_code_worker.terminate();
+		}
+		const QRCodeWorker = await import('$lib/workers/generate-qr-codes.worker?worker');
+		comp_state.workers.qr_code_worker = new QRCodeWorker.default();
+		console.log('QRCodeWorker loaded:', comp_state.workers.qr_code_worker);
+		comp_state.workers.qr_code_worker.postMessage({});
+	}
+
+	watch(
+		[
+			() => COLLECTIONS.PARTICIPANT_COLLECTION.isLoading(),
+			() => COLLECTIONS.EVENT_SCHEDULE_COLLECTION.isLoading(),
+			() => COLLECTIONS.EVENT_DETAILS_COLLECTION.isLoading(),
+			() => COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.isLoading()
+		],
+		() => {
+			const participants_cursor = COLLECTIONS.PARTICIPANT_COLLECTION.find(
+				{
+					event_id: data.event_id
+				},
+				{
+					sort: {
+						created: -1
+					}
+				}
+			);
+			const event_schedule_cursor = COLLECTIONS.EVENT_SCHEDULE_COLLECTION.find({
+				event_id: data.event_id
+			});
+
+			comp_state.event_schedules = event_schedule_cursor.fetch();
+			comp_state.event_details = COLLECTIONS.EVENT_DETAILS_COLLECTION.findOne({
+				id: data.event_id
+			});
+
+			if (current_event_day) {
+				comp_state.current_day_participants_attendance = getPopulatedAttendanceRecords(
+					data.event_id,
+					current_event_day
+				) as ParticipantAttendance[];
+			}
+
+			comp_state.all_participants_attendance = getPopulatedAttendanceRecords(
+				data.event_id
+			) as ParticipantAttendance[];
+
+			comp_state.participants = participants_cursor.fetch().map((participant) => {
+				const event_days = comp_state.event_details?.difference_in_days;
+				const total_days_attended = comp_state.all_participants_attendance.reduce(
+					(acc, participant_attendance) => {
+						if (
+							participant_attendance.participant_id === participant.id &&
+							participant_attendance.am_time_in &&
+							participant_attendance.pm_time_in
+						) {
+							return (acc += 1);
+						}
+						return (acc += 0);
+					},
+					0
+				);
+
+				const attendance_status =
+					event_days === total_days_attended
+						? 'complete'
+						: event_days && event_days < total_days_attended
+							? 'incomplete'
+							: 'absent';
+
+				return {
+					...participant,
+					attendance_status: event_status === 'finished' ? attendance_status : undefined
+				};
+			});
+
+			return () => {
+				participants_cursor.cleanup();
+				event_schedule_cursor.cleanup();
+			};
+		}
+	);
+
 	onMount(() => {
 		window.addEventListener('keydown', handleKeydown);
-
+		load_workers();
 		return () => {
 			if (comp_state.timeout) clearTimeout(comp_state.timeout);
 			window.removeEventListener('keydown', handleKeydown);
@@ -574,7 +592,6 @@
 				<Card.Title class="text-xl">Scan Result</Card.Title>
 				<Card.Description>Participant information</Card.Description>
 			</Card.Header>
-
 			<Card.Content class="flex w-full justify-between">
 				<div>
 					<h5 class="font-semibold">
