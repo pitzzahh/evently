@@ -5,6 +5,10 @@ export default defineConfig({
 	define: {
 		'process.env.IS_PREACT': JSON.stringify('true'),
 	},
-	plugins: [sveltekit()]
+	plugins: [sveltekit()],
+	build: {
+		rollupOptions: {
+			external: ['moment']
+		}
+	}
 });
-	
