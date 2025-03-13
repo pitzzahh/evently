@@ -458,12 +458,10 @@
 	);
 
 	onMount(() => {
-		window.addEventListener('keydown', handleKeydown);
 		load_daily_attendance_report_worker();
 		load_qr_code_worker();
 		return () => {
 			if (comp_state.timeout) clearTimeout(comp_state.timeout);
-			window.removeEventListener('keydown', handleKeydown);
 		};
 	});
 
@@ -480,6 +478,8 @@
 		}
 	);
 </script>
+
+<svelte:document onkeydown={handleKeydown} />
 
 <div in:fly={{ y: 20 }} class="grid gap-6">
 	<div class="flex items-center justify-between">
@@ -522,7 +522,7 @@
 										});
 									}
 
-									generateQRCodesPDF({
+									comp_state.workers.qr_code_worker.postMessage({
 										info: {
 											creator: 'Evently',
 											title: `${comp_state.event_details.event_name} QR Codes`,
@@ -531,17 +531,6 @@
 										},
 										event_details: comp_state.event_details,
 										participants: comp_state.participants
-									}).then((result) => {
-										if (result.status !== 200 || !result.data) {
-											return toast.error('Failed to generate QR Code', {
-												description: result.message ?? 'No data received from the worker'
-											});
-										}
-										const file_name = `${comp_state.event_details?.event_name} QR Codes`;
-										download_document(result.data, file_name);
-										toast.success('QR codes generated successfully', {
-											description: 'The QR codes have been generated and are ready for download'
-										});
 									});
 									toast.info('Generating QR codes', {
 										description: 'Please wait while we generate the QR codes'
@@ -563,7 +552,7 @@
 										});
 									}
 
-									generateDailyAttendanceReportPDF({
+									comp_state.workers.daily_attendance_report_worker.postMessage({
 										info: {
 											creator: 'Evently',
 											title: `${comp_state.event_details.event_name} Daily Attendance Report`,
@@ -572,20 +561,7 @@
 										},
 										event_details: comp_state.event_details,
 										participants: comp_state.participants
-									}).then((result) => {
-										if (result.status !== 200 || !result.data) {
-											return toast.error('Failed to generate daily attendance report', {
-												description: result.message ?? 'No data received from the worker'
-											});
-										}
-										const file_name = `${comp_state.event_details?.event_name} Daily Attendance Report`;
-										download_document(result.data, file_name);
-										toast.success('Daily attendance report generated successfully', {
-											description:
-												'The daily attendance report has been generated and is ready for download'
-										});
 									});
-
 									toast.info('Generating daily attendance report', {
 										description: 'Please wait while we generate the report'
 									});
