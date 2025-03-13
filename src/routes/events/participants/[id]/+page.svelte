@@ -528,7 +528,8 @@
 										participants: JSON.stringify(comp_state.participants)
 									});
 									toast.info('Generating QR codes', {
-										description: 'Please wait while we generate the QR codes'
+										description:
+											'Please wait while we generate the QR codes, or feel free to do other things'
 									});
 								}}><QRCode />Participants QR codes</DropdownMenu.Item
 							>
@@ -558,7 +559,8 @@
 										participants: JSON.stringify(comp_state.participants)
 									});
 									toast.info('Generating daily attendance report', {
-										description: 'Please wait while we generate the report'
+										description:
+											'Please wait while we generate the report, or feel free to do other things'
 									});
 								}}><SquareCheckBig />Daily Attendance Report</DropdownMenu.Item
 							>
