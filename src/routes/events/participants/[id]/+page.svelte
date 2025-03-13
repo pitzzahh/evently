@@ -15,18 +15,13 @@
 	import { onMount } from 'svelte';
 	import ParticipantAttendanceDataTable from '@routes/events/(components)/(participant)/participant-attendance-data-table.svelte';
 	import { checkEventStatus, getEventDayInfo } from '@routes/events/utils';
-	import { cubicIn, cubicOut, quartInOut } from 'svelte/easing';
+	import { quartInOut } from 'svelte/easing';
 	import { StatusPill } from '@/components/snippets/events.svelte';
 	import { ImportParticipantDialog } from '@routes/events/(components)/(participant)';
 	import { cn } from '@/utils';
 	import * as DropdownMenu from '@/components/ui/dropdown-menu';
 	import { QRCode, SquareCheckBig } from '@/assets/icons';
 	import type { HelperResponse } from '@/types/generic/index.js';
-	import { newWebViewWindow } from '@/utils/windows/index.js';
-	import {
-		generateDailyAttendanceReportPDF,
-		generateQRCodesPDF
-	} from '@/utils/exports/pdf/index.js';
 
 	interface ComponentState {
 		event_details: EventDetails | undefined;
@@ -529,8 +524,8 @@
 											subject: 'QR Codes',
 											producer: 'Evently'
 										},
-										event_details: comp_state.event_details,
-										participants: comp_state.participants
+										event_details: JSON.stringify(comp_state.event_details),
+										participants: JSON.stringify(comp_state.participants)
 									});
 									toast.info('Generating QR codes', {
 										description: 'Please wait while we generate the QR codes'
@@ -559,8 +554,8 @@
 											subject: 'Daily Attendance Report',
 											producer: 'Evently'
 										},
-										event_details: comp_state.event_details,
-										participants: comp_state.participants
+										event_details: JSON.stringify(comp_state.event_details),
+										participants: JSON.stringify(comp_state.participants)
 									});
 									toast.info('Generating daily attendance report', {
 										description: 'Please wait while we generate the report'
