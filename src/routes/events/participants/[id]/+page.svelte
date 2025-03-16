@@ -22,6 +22,7 @@
 	import * as DropdownMenu from '@/components/ui/dropdown-menu';
 	import { QRCode, SquareCheckBig } from '@/assets/icons';
 	import type { HelperResponse } from '@/types/generic/index.js';
+	import QrCodeScanner from '@/components/custom/qr-code-scanner/qr-code-scanner.svelte';
 
 	interface ComponentState {
 		event_details: EventDetails | undefined;
@@ -577,6 +578,7 @@
 		</div>
 	</div>
 
+	<QrCodeScanner onDetect={(data) => handleScanParticipant(data)} />
 	<Tabs.Root value="participants">
 		<Tabs.List
 			class={cn('grid h-auto w-full max-w-[600px] grid-cols-2', {

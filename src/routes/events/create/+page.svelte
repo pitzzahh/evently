@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { slide } from 'svelte/transition';
+	import { slide, } from 'svelte/transition';
 	import { EventForm } from '@routes/events/(components)';
 
 	let { data } = $props();
