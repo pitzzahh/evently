@@ -426,7 +426,7 @@
 				</div>
 			</div>
 		</div>
-		<ImageCropper.Root>
+		<ImageCropper.Root src="https://github.com/shadcn.png">
 			<ImageCropper.UploadTrigger>
 				<ImageCropper.Preview class="h-64 w-64 rounded-md" />
 			</ImageCropper.UploadTrigger>
