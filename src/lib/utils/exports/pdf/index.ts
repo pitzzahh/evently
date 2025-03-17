@@ -270,7 +270,8 @@ export async function generateDailyAttendanceReportPDF(props: DocumentMetaDetail
     const document_definition: TDocumentDefinitions = {
       info: info,
       pageSize: 'LEGAL',
-      pageMargins: [10, 20, 10, 20],
+      pageOrientation: 'landscape', // Change to landscape for better column visibility
+      pageMargins: [20, 40, 20, 40],
       header: {
         text: event_details.event_name,
         alignment: 'center',
@@ -294,10 +295,27 @@ export async function generateDailyAttendanceReportPDF(props: DocumentMetaDetail
         {
           table: {
             headerRows: 1,
-            widths: ['*', '*', '*', '*', '*', '*'],
+            widths: ['20%', '15%', '15%', '15%', '15%', '20%'], // Explicit width percentages
             body: tableBody
           },
-          layout: 'lightHorizontalLines'
+          layout: {
+            hLineWidth: function (i, node) {
+              return (i === 0 || i === node.table.body.length) ? 2 : 1;
+            },
+            vLineWidth: function (i, node) {
+              return 1;
+            },
+            hLineColor: function (i) {
+              return i === 0 ? '#000' : '#aaa';
+            },
+            vLineColor: function () {
+              return '#aaa';
+            },
+            paddingLeft: function () { return 4; },
+            paddingRight: function () { return 4; },
+            paddingTop: function () { return 4; },
+            paddingBottom: function () { return 4; }
+          }
         },
         {
           columns: [
