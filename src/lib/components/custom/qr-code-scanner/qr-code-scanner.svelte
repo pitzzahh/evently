@@ -14,7 +14,7 @@
 		height = 350,
 		paused = $bindable(false),
 		fps = 30,
-		aspectRatio = 2,
+		aspectRatio = 1.777778,
 		onDetect,
 		onError,
 		singleScanMode = true,
@@ -113,7 +113,8 @@
 				aspectRatio,
 				supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA],
 				formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
-				rememberLastUsedCamera: true
+				rememberLastUsedCamera: true,
+				disableFlip: true
 			},
 			false // non-verbose
 		);
@@ -171,23 +172,27 @@
 	}
 </script>
 
-<div class="relative h-full w-full">
-	<div id="qr-scanner" class="h-full max-h-[80vh] w-full !border-none"></div>
+<div class="grid place-items-center gap-2">
+	<div class="relative w-full">
+		<div id="qr-scanner" class="h-full w-full !border-none"></div>
 
-	{#if scanComplete && lastResult && singleScanMode}
-		<div class="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-green-600/85">
-			<div class="text-center text-white">
-				<div class="mb-4 text-4xl">✓</div>
-				<p>Scan Complete</p>
-				<button
-					class="mt-4 rounded bg-white px-4 py-2 font-bold text-green-600 hover:bg-gray-100"
-					onclick={reset}
-				>
-					Scan Again
-				</button>
+		{#if scanComplete && lastResult && singleScanMode}
+			<div
+				class="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-green-600/85"
+			>
+				<div class="text-center text-white">
+					<div class="mb-4 text-4xl">✓</div>
+					<p>Scan Complete</p>
+					<button
+						class="mt-4 rounded bg-white px-4 py-2 font-bold text-green-600 hover:bg-gray-100"
+						onclick={reset}
+					>
+						Scan Again
+					</button>
+				</div>
 			</div>
-		</div>
-	{/if}
+		{/if}
+	</div>
 </div>
 
 <style>
@@ -203,20 +208,26 @@
 		position: relative;
 	}
 
+	#qr-scanner :global(#html5-qrcode-button-camera-stop) {
+		visibility: hidden;
+	}
+
 	#qr-scanner :global(#html5-qrcode-button-camera-permission::after) {
 		position: absolute;
 		inset: auto 0 0;
 		display: block;
 		content: 'Allow camera access';
+		text-align: 'center';
+		background: '#196EA6';
+		padding: 4px 6px;
+		border-radius: 1rem;
 		visibility: visible;
-		padding: 10px 0;
 	}
 
-	/* Contain the scanner video and elements */
 	#qr-scanner :global(video) {
 		max-height: 100% !important;
 		max-width: 100% !important;
-		border-radius: 1rem !important;
+		object-fit: contain !important;
 	}
 
 	#qr-scanner :global(#html5-qrcode-anchor-scan-type-change) {
@@ -225,10 +236,12 @@
 
 	#qr-scanner :global(section) {
 		padding: 0 !important;
+		display: hidden;
 	}
 
 	#qr-scanner :global(section div) {
 		padding: 0 !important;
+		display: hidden;
 	}
 
 	/* Add height constraint to the scanner */

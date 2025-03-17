@@ -15,7 +15,7 @@
 		<Camera class="size-4" />
 		Scan with Camera
 	</Dialog.Trigger>
-	<Dialog.Content class="max-w-[900px]">
+	<Dialog.Content class="max-w-[900px] min-h-[500px]">
 		<Dialog.Header>
 			<Dialog.Title>Scan Participant</Dialog.Title>
 		</Dialog.Header>
