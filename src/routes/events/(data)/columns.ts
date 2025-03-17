@@ -129,9 +129,14 @@ export function participantTableColumns(
 					});
 			},
 			filterFn: (row, id, value) => {
-				return String(row.getValue(id))
-					.toLowerCase()
-					.includes(String(value ?? '').toLowerCase());
+				const rowValue = row.getValue(id);
+				const searchValues = Array.isArray(value) ? value.map(v => String(v).toLowerCase()) : [String(value ?? "").toLowerCase()];
+				if (Array.isArray(rowValue)) {
+					return searchValues.some(searchValue => rowValue.some(dateStr => dateStr.toLowerCase().includes(searchValue)));
+				} else {
+					const dateStr = String(rowValue).toLowerCase();
+					return searchValues.some(searchValue => dateStr.includes(searchValue));
+				}
 			}
 		},
 		{
@@ -267,9 +272,14 @@ export function participantAttendanceColumns(): ColumnDef<ParticipantAttendance>
 				});
 			},
 			filterFn: (row, id, value) => {
-				return String(row.getValue(id))
-					.toLowerCase()
-					.includes(String(value ?? '').toLowerCase());
+				const rowValue = row.getValue(id);
+				const searchValues = Array.isArray(value) ? value.map(v => String(v).toLowerCase()) : [String(value ?? "").toLowerCase()];
+				if (Array.isArray(rowValue)) {
+					return searchValues.some(searchValue => rowValue.some(dateStr => dateStr.toLowerCase().includes(searchValue)));
+				} else {
+					const dateStr = String(rowValue).toLowerCase();
+					return searchValues.some(searchValue => dateStr.includes(searchValue));
+				}
 			}
 		},
 		{
