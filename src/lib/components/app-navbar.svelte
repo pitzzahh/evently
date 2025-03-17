@@ -88,7 +88,6 @@
 						COLLECTIONS.EVENT_DETAILS_COLLECTION.removeMany({});
 						COLLECTIONS.PARTICIPANT_COLLECTION.removeMany({});
 						COLLECTIONS.SETTINGS_COLLECTION.removeMany({});
-						goto('/');
 					}}>RESET</Button
 				>
 			{/if}
