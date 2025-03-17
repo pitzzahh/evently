@@ -84,7 +84,7 @@
 	onOpenChange={handleOnOpenChange}
 >
 	{#if comp_state.view_open}
-		<Dialog.Content class="max-w-[950px]">
+		<Dialog.Content class="max-w-[950px]" autofocus={false}>
 			<Dialog.Header>
 				<Dialog.Title>Participant's Information</Dialog.Title>
 			</Dialog.Header>
