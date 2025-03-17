@@ -10,8 +10,8 @@
 	} from 'html5-qrcode';
 
 	let {
-		width = 400,
-		height = 400,
+		width = 350,
+		height = 350,
 		paused = $bindable(false),
 		fps = 60,
 		aspectRatio = 1,
@@ -105,27 +105,22 @@
 	onMount(() => {
 		if (!browser) return;
 
-		try {
-			scanner = new Html5QrcodeScanner(
-				'qr-scanner',
-				{
-					fps,
-					qrbox: { width, height },
-					aspectRatio,
-					supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA],
-					formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
-					rememberLastUsedCamera: true
-				},
-				false // non-verbose
-			);
+		scanner = new Html5QrcodeScanner(
+			'qr-scanner',
+			{
+				fps,
+				qrbox: { width, height },
+				aspectRatio,
+				supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA],
+				formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
+				rememberLastUsedCamera: true
+			},
+			false // non-verbose
+		);
 
-			scanner.render(handleScanSuccess, handleScanFailure);
-			scanning = true;
-			scannerState = Html5QrcodeScannerState.SCANNING;
-		} catch (error) {
-			console.error('Failed to initialize QR scanner:', error);
-			errorMessage = error instanceof Error ? error.message : String(error);
-		}
+		scanner.render(handleScanSuccess, handleScanFailure);
+		scanning = true;
+		scannerState = Html5QrcodeScannerState.SCANNING;
 	});
 
 	// Cleanup on destroy
@@ -176,28 +171,27 @@
 	}
 </script>
 
-<div class="relative">
-	<div id="qr-scanner" class="size-full"></div>
+
+<div>
+	<div id="qr-scanner" class="relative max-h-[500px] min-h-[500px]"></div>
 
 	{#if scanComplete && lastResult && singleScanMode}
-		<div class="scan-success-overlay">
-			<div class="success-content">
-				<div class="success-icon">✓</div>
+		<div class="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-green-600/85">
+			<div class="text-center text-white">
+				<div class="mb-4 text-4xl">✓</div>
 				<p>Scan Complete</p>
-				<button class="reset-button" onclick={reset}> Scan Again </button>
+				<button
+					class="mt-4 rounded bg-white px-4 py-2 font-bold text-green-600 hover:bg-gray-100"
+					onclick={reset}
+				>
+					Scan Again
+				</button>
 			</div>
-		</div>
-	{/if}
-
-	{#if errorMessage}
-		<div class="error-message">
-			{errorMessage}
 		</div>
 	{/if}
 </div>
 
 <style>
-	/* Hide unwanted icons */
 	#qr-scanner :global(img[alt='Info icon']),
 	#qr-scanner :global(img[alt='Camera based scan']) {
 		display: none;
@@ -216,51 +210,5 @@
 		content: 'Allow camera access';
 		visibility: visible;
 		padding: 10px 0;
-	}
-
-	.error-message {
-		color: #ff3e00;
-		margin-top: 8px;
-		font-size: 14px;
-		text-align: center;
-	}
-
-	.scan-success-overlay {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		background-color: rgba(45, 160, 80, 0.85);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		z-index: 1000;
-		border-radius: 8px;
-	}
-
-	.success-content {
-		text-align: center;
-		color: white;
-	}
-
-	.success-icon {
-		font-size: 48px;
-		margin-bottom: 16px;
-	}
-
-	.reset-button {
-		background-color: white;
-		color: #2da050;
-		border: none;
-		padding: 8px 16px;
-		border-radius: 4px;
-		margin-top: 16px;
-		font-weight: bold;
-		cursor: pointer;
-	}
-
-	.reset-button:hover {
-		background-color: #f0f0f0;
 	}
 </style>
