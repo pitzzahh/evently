@@ -560,8 +560,8 @@
 
 	<Tabs.Root value="participants">
 		<Tabs.List
-			class={cn('grid h-auto w-full max-w-[600px] grid-cols-3', {
-				'max-w-[800px]  grid-cols-3': event_status === 'ongoing'
+			class={cn('grid h-auto w-full max-w-[600px] grid-cols-2', {
+				'max-w-[800px] grid-cols-3': event_status === 'ongoing'
 			})}
 		>
 			<Tabs.Trigger value="participants" class="h-auto text-base">
