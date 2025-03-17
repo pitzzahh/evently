@@ -184,10 +184,10 @@
 	</div>
 
 	<!-- EVENT DETAILS -->
-	<div class="grid grid-cols-2 place-content-between gap-6 border-b-2 border-dashed pb-6">
+	<div class="flex justify-between gap-6 border-b-2 border-dashed pb-6">
 		<div class="grid w-full gap-4">
 			<div class="flex w-full justify-between gap-4">
-				<div class="grid-row-2 grid grid-cols-2 place-content-center gap-4">
+				<div class="grid place-content-center gap-4">
 					<div class="flex items-center gap-3">
 						<div class="rounded-md border p-3">
 							<Calendar class="size-5 text-muted-foreground" />
@@ -242,7 +242,6 @@
 					</div>
 				</div>
 			</div>
-
 			<div class="flex items-center justify-between gap-4">
 				<Button variant="ghost" onclick={() => (comp_state.see_more = !comp_state.see_more)}>
 					{comp_state.see_more ? 'See Less' : 'See More'}
