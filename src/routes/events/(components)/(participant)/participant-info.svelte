@@ -51,14 +51,14 @@
 			comp_state.participant_attendance = participant_attendance_cursor.fetch();
 			comp_state.event_schedules = event_schedule_cursor.fetch();
 			tick().then(() => {
-				const lastForm = document.getElementById(
-					`day_${
-						getEventDayInfo(event_details.start_date, event_details.end_date, new Date()).currentDay
-					}`
-				);
+				const currentDay = getEventDayInfo(
+					event_details.start_date,
+					event_details.end_date,
+					new Date()
+				).currentDay;
+				const lastForm = document.getElementById(`day_${currentDay}`);
 				lastForm?.scrollIntoView({ behavior: 'smooth' });
-				//focus
-				lastForm?.focus({ preventScroll: true });
+				setTimeout(() => lastForm?.focus(), 500);
 			});
 			$inspect(comp_state.participant_attendance);
 		}
@@ -113,7 +113,12 @@
 							: participant_attendance?.am_time_in || participant_attendance?.pm_time_in
 								? 'incomplete'
 								: 'absent'}
-					<div class="grid gap-4 rounded-lg border p-4" id="day_{event_schedule.day}">
+					<section
+						class="grid gap-4 rounded-lg border p-4"
+						id="day_{event_schedule.day}"
+						aria-label="Day {event_schedule.day} attendance details"
+						tabindex="-1"
+					>
 						<div class="flex items-center justify-between">
 							<div class="flex gap-2">
 								<Badge>Day {event_schedule.day}</Badge>
@@ -151,7 +156,7 @@
 								period: 'PM'
 							})}
 						</div>
-					</div>
+					</section>
 				{/each}
 			</div>
 		</div>
