@@ -178,9 +178,35 @@ export async function generateDailyAttendanceReportPDF(props: DocumentMetaDetail
       event_status = 'ongoing';
     }
 
-    const participant_attendance = getPopulatedAttendanceRecords(event_details.id, {
-      attendance_records_collection: COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION,
-      participant_collection: COLLECTIONS.PARTICIPANT_COLLECTION,
+    // Get all attendance records for this event
+    const attendance_records = COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION
+      .find({ event_id: event_details.id })
+      .fetch();
+
+    // Create a map of attendance records by participant ID
+    const attendanceByParticipantId = new Map();
+    attendance_records.forEach(record => {
+      attendanceByParticipantId.set(record.participant_id, record);
+    });
+
+    // Create combined participant attendance data for all participants
+    const participant_attendance = participants.map(participant => {
+      const attendance = attendanceByParticipantId.get(participant.id);
+
+      // Determine attendance status
+      let attendance_status: 'complete' | 'incomplete' | 'absent' = 'absent';
+      if (attendance) {
+        // Check if all required check-ins/outs are present
+        const hasAllCheckpoints = attendance.am_time_in && attendance.am_time_out &&
+          attendance.pm_time_in && attendance.pm_time_out;
+        attendance_status = hasAllCheckpoints ? 'complete' : 'incomplete';
+      }
+
+      return {
+        ...participant,
+        ...attendance,
+        attendance_status
+      };
     });
 
     console.log(`Participant Attendance Records: ${JSON.stringify(participant_attendance, null, 2)}`);
