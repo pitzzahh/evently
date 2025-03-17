@@ -1,50 +1,3 @@
-<script module lang="ts">
-	export function getPopulatedAttendanceRecords(
-		event_id: string,
-		collections: {
-			attendance_records_collection: AttendanceRecordCollection;
-			participant_collection: ParticipantCollection;
-		},
-		current_event_day?: string
-	): ParticipantAttendance[] {
-		const attendance_records = collections.attendance_records_collection
-			.find({
-				event_id: event_id,
-				...(current_event_day && { day: current_event_day })
-			})
-			.fetch();
-
-		const participantIds = [...new Set(attendance_records.map((record) => record.participant_id))];
-
-		const participants = collections.participant_collection
-			.find({
-				id: { $in: participantIds }
-			})
-			.fetch();
-
-		const participant_map = new Map(
-			participants.map((participant) => [participant.id, participant])
-		);
-
-		// return new combined objects without modifying originals
-		return attendance_records
-			.map((record) => {
-				const participant = participant_map.get(record.participant_id);
-				return {
-					...record,
-					first_name: participant?.first_name,
-					middle_name: participant?.middle_name,
-					last_name: participant?.last_name,
-					email: participant?.email,
-					participant
-				};
-			})
-			.sort(
-				(a, b) => (b.latest_time_scanned?.getTime() ?? 0) - (a.latest_time_scanned?.getTime() ?? 0)
-			) as ParticipantAttendance[];
-	}
-</script>
-
 <script lang="ts">
 	import { buttonVariants } from '@/components/ui/button';
 	import { Check, Clock, FileOutput, UsersRound, X } from 'lucide-svelte';
@@ -71,6 +24,7 @@
 	import type { HelperResponse } from '@/types/generic/index.js';
 	import QrCodeScannerDialog from '@routes/events/(components)/(participant)/qr-code-scanner-dialog.svelte';
 	import type { AttendanceRecordCollection, ParticipantCollection } from '@/db/models/index.js';
+	import { getPopulatedAttendanceRecords } from '../(utils)/index.js';
 
 	interface ComponentState {
 		event_details: EventDetails | undefined;
@@ -516,8 +470,15 @@
 
 		<div class="flex flex-col items-end gap-2">
 			<div class="flex items-center gap-2">
-				<ImportParticipantDialog event_id={comp_state.event_details?.id ?? 'N/A'} />
 				<QrCodeScannerDialog handleScan={handleScanParticipant} />
+				<AddParticipantsDialog
+					disabled={false}
+					add_participants_form={data.add_participants_form}
+					event_id={comp_state.event_details?.id ?? 'N/A'}
+				/>
+			</div>
+			<div class="justify flex items-center gap-1">
+				<ImportParticipantDialog event_id={comp_state.event_details?.id ?? 'N/A'} />
 				<DropdownMenu.Root>
 					<DropdownMenu.Trigger class={buttonVariants({ variant: 'outline' })}
 						><FileOutput class="size-4" />Export</DropdownMenu.Trigger
@@ -592,13 +553,8 @@
 						</DropdownMenu.Group>
 					</DropdownMenu.Content>
 				</DropdownMenu.Root>
-				<AddParticipantsDialog
-					disabled={false}
-					add_participants_form={data.add_participants_form}
-					event_id={comp_state.event_details?.id ?? 'N/A'}
-				/>
+				{@render StatusPill(event_status)}
 			</div>
-			{@render StatusPill(event_status)}
 		</div>
 	</div>
 
@@ -643,17 +599,13 @@
 
 		{#if event_status === 'ongoing'}
 			<Tabs.Content value="time-in-and-out" class="mt-4">
-				<div class="flex items-start gap-4">
-					<div class="grid flex-1 gap-2">
-						{#if COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.isPulling()}
-							<TableSkeleton />
-						{:else}
-							<ParticipantAttendanceDataTable
-								participants_attendance={comp_state.current_day_participants_attendance}
-							/>
-						{/if}
-					</div>
-				</div>
+				{#if COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.isPulling()}
+					<TableSkeleton />
+				{:else}
+					<ParticipantAttendanceDataTable
+						participants_attendance={comp_state.current_day_participants_attendance}
+					/>
+				{/if}
 			</Tabs.Content>
 		{/if}
 
@@ -725,3 +677,9 @@
 		</Card.Root>
 	</div>
 {/if}
+
+<style>
+	* {
+		border: 1px solid red;
+	}
+</style>

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
-	import QrCodeScanner from '@/components/custom/qr-code-scanner/qr-code-scanner.svelte';
 	import { EventList } from '@routes/events/(components)';
 	import { COLLECTIONS } from '@/db/index';
 	import type { Participant } from '@/db/models/types';

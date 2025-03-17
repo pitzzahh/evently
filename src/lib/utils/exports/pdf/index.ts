@@ -3,10 +3,10 @@ import "pdfmake/build/vfs_fonts";
 import { createQrSvgString } from '@svelte-put/qr';
 import type { CustomTableLayout, TDocumentDefinitions, TFontDictionary } from 'pdfmake/interfaces';
 import type { DocumentMetaDetails } from "@/types/exports";
-import { formatDateToTimeOption } from "@/utils/format";
+import { formatDateTime, formatDateToTimeOption } from "@/utils/format";
 import { COLLECTIONS } from "@/db";
 import type { HelperResponse } from "@/types/generic";
-import { getPopulatedAttendanceRecords } from '@routes/events/participants/[id]/+page.svelte'
+import { getPopulatedAttendanceRecords } from "@routes/events/participants/(utils)";
 
 export async function generateQRCodesPDF(props: DocumentMetaDetails): Promise<HelperResponse<string | null>> {
   const { info, event_details, participants } = props;
@@ -125,20 +125,20 @@ export async function generateQRCodesPDF(props: DocumentMetaDetails): Promise<He
       ],
       styles: {
         header: {
-          fontSize: 20,
+          fontSize: 16,
           bold: true,
-          margin: [0, 0, 0, 10],
+          margin: [0, 0, 0, 8],
           color: '#333',
           decoration: 'underline'
         },
         subheader: {
-          fontSize: 14,
+          fontSize: 12,
           bold: true,
-          margin: [0, 10, 0, 5],
+          margin: [0, 8, 0, 4],
           color: '#555'
         },
         participantText: {
-          fontSize: 12,
+          fontSize: 11,
           bold: true,
           color: '#007ACC'
         }
@@ -166,11 +166,52 @@ export async function generateDailyAttendanceReportPDF(props: DocumentMetaDetail
     return { status: 404, message: "No participants found to generate attendance report", data: null };
   }
   try {
+    // Determine event status
+    const currentDate = new Date();
+    const startDate = new Date(event_details.start_date);
+    const endDate = new Date(event_details.end_date);
 
-    const participant_attendance = getPopulatedAttendanceRecords(event_details.id, {
-      attendance_records_collection: COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION,
-      participant_collection: COLLECTIONS.PARTICIPANT_COLLECTION,
+    let event_status = 'completed';
+    if (currentDate < startDate) {
+      event_status = 'upcoming';
+    } else if (currentDate >= startDate && currentDate <= endDate) {
+      event_status = 'ongoing';
+    }
+
+    // Get all attendance records for this event
+    const attendance_records = COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION
+      .find({ event_id: event_details.id })
+      .fetch();
+
+    // Create a map of attendance records by participant ID
+    const attendanceByParticipantId = new Map();
+    attendance_records.forEach(record => {
+      attendanceByParticipantId.set(record.participant_id, record);
     });
+
+    // Create combined participant attendance data for all participants
+    const participant_attendance = participants.map(participant => {
+      const attendance = attendanceByParticipantId.get(participant.id);
+
+      // Determine attendance status
+      let attendance_status: 'complete' | 'incomplete' | 'absent' = 'absent';
+      if (attendance) {
+        // Check if all required check-ins/outs are present
+        const hasAllCheckpoints = attendance.am_time_in && attendance.am_time_out &&
+          attendance.pm_time_in && attendance.pm_time_out;
+        attendance_status = hasAllCheckpoints ? 'complete' : 'incomplete';
+      }
+
+      return {
+        ...participant,
+        ...attendance,
+        attendance_status
+      };
+    })
+      // Sort participants by last name
+      .sort((a, b) => a.last_name.localeCompare(b.last_name));
+
+    console.log(`Participant Attendance Records: ${JSON.stringify(participant_attendance, null, 2)}`);
 
     const summary = {
       day: new Date().getDate(),
@@ -189,38 +230,67 @@ export async function generateDailyAttendanceReportPDF(props: DocumentMetaDetail
         { text: 'PM Check-out', style: 'tableHeader' },
         { text: 'Status', style: 'tableHeader' }
       ],
-      ...participant_attendance.map(participant => [
-        { text: `${participant.first_name} ${participant.last_name}` },
-        { text: participant.am_time_in?.toString() || 'N/A' },
-        { text: participant.am_time_out?.toString() || 'N/A' },
-        { text: participant.pm_time_in?.toString() || 'N/A' },
-        { text: participant.pm_time_out?.toString() || 'N/A' },
-        { text: participant.attendance_status ?? 'absent', style: `status${(participant.attendance_status ?? 'absent').charAt(0).toUpperCase() + (participant.attendance_status ?? 'absent').slice(1)}` }
-      ])
+      ...participant_attendance.map(participant => {
+        let statusText = '';
+        let statusStyle = '';
+
+        // Check event status first
+        if (event_status === 'ongoing') {
+          statusText = 'Event is currently ongoing';
+          statusStyle = 'statusOngoing';
+        } else if (event_status === 'upcoming') {
+          statusText = "Event hasn't started yet";
+          statusStyle = 'statusUpcoming';
+        } else {
+          // Event is completed, check attendance status
+          const attendance_status = participant.attendance_status ?? 'absent';
+
+          if (attendance_status === 'absent') {
+            statusText = 'Absent';
+            statusStyle = 'statusAbsent';
+          } else if (attendance_status === 'complete') {
+            statusText = 'Complete Attendance';
+            statusStyle = 'statusComplete';
+          } else if (attendance_status === 'incomplete') {
+            statusText = 'Incomplete Attendance';
+            statusStyle = 'statusIncomplete';
+          }
+        }
+
+        return [
+          { text: `${participant.last_name}, ${participant.first_name}${participant.middle_name ? ' ' + participant.middle_name : ''}` },
+          { text: participant.am_time_in ? formatDateToTimeOption(new Date(participant.am_time_in)) : 'N/A' },
+          { text: participant.am_time_out ? formatDateToTimeOption(new Date(participant.am_time_out)) : 'N/A' },
+          { text: participant.pm_time_in ? formatDateToTimeOption(new Date(participant.pm_time_in)) : 'N/A' },
+          { text: participant.pm_time_out ? formatDateToTimeOption(new Date(participant.pm_time_out)) : 'N/A' },
+          { text: statusText, style: statusStyle }
+        ];
+      })
     ];
 
     const document_definition: TDocumentDefinitions = {
       info: info,
-      pageSize: 'A4',
+      pageSize: 'LEGAL',
       pageMargins: [20, 40, 20, 40],
+      header: {
+        text: event_details.event_name,
+        alignment: 'center',
+        margin: [0, 15, 0, 0],
+        fontSize: 16,
+        bold: true
+      },
       content: [
         {
-          text: event_details.event_name,
-          style: 'header',
-          alignment: 'center',
-          margin: [0, 0, 0, 5]
-        },
-        {
-          text: `${event_details.start_date} - ${event_details.end_date} • ${event_details.location || 'N/A'}`,
+          text: `${formatDateTime(event_details.start_date)} - ${formatDateTime(event_details.end_date)} • ${event_details.location || 'N/A'}`,
           style: 'subheader',
           alignment: 'center',
-          margin: [0, 0, 0, 20]
+          margin: [0, 0, 0, 15]
         },
         {
           text: `Daily Attendance Report - Day ${summary.day} (${summary.date})`,
           style: 'subheader',
           alignment: 'center',
-          margin: [0, 0, 0, 10]
+          margin: [0, 0, 0, 8]
         },
         {
           table: {
@@ -242,37 +312,51 @@ export async function generateDailyAttendanceReportPDF(props: DocumentMetaDetail
       ],
       styles: {
         header: {
-          fontSize: 20,
+          fontSize: 16,
           bold: true,
-          margin: [0, 0, 0, 10],
+          margin: [0, 0, 0, 8],
           color: '#333',
           decoration: 'underline'
         },
         subheader: {
-          fontSize: 14,
+          fontSize: 12,
           bold: true,
-          margin: [0, 10, 0, 5],
+          margin: [0, 8, 0, 4],
           color: '#555'
         },
         tableHeader: {
           bold: true,
-          fontSize: 12,
+          fontSize: 11,
           color: 'black'
         },
         statusComplete: {
-          color: 'green'
+          color: 'white',
+          background: '#16a34a',  // green-600
+          bold: true
         },
         statusIncomplete: {
-          color: 'orange'
+          color: 'white',
+          background: '#ca8a04',  // yellow-600
+          bold: true
         },
         statusAbsent: {
-          color: 'red'
+          color: 'white',
+          background: '#dc2626',  // red-600
+          bold: true
+        },
+        statusOngoing: {
+          color: '#374151',  // gray-700
+          bold: true
+        },
+        statusUpcoming: {
+          color: '#374151',  // gray-700
+          bold: true
         },
         summaryBox: {
           alignment: 'center',
-          fontSize: 12,
+          fontSize: 11,
           bold: true,
-          margin: [0, 5, 0, 5]
+          margin: [0, 4, 0, 4]
         }
       },
       footer: function (currentPage, pageCount) {
