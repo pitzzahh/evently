@@ -3,7 +3,7 @@ import "pdfmake/build/vfs_fonts";
 import { createQrSvgString } from '@svelte-put/qr';
 import type { CustomTableLayout, TDocumentDefinitions, TFontDictionary } from 'pdfmake/interfaces';
 import type { DocumentMetaDetails } from "@/types/exports";
-import { formatDateToTimeOption } from "@/utils/format";
+import { formatDateTime, formatDateToTimeOption } from "@/utils/format";
 import { COLLECTIONS } from "@/db";
 import type { HelperResponse } from "@/types/generic";
 import { getPopulatedAttendanceRecords } from "@routes/events/participants/(utils)";
@@ -207,7 +207,9 @@ export async function generateDailyAttendanceReportPDF(props: DocumentMetaDetail
         ...attendance,
         attendance_status
       };
-    });
+    })
+      // Sort participants by last name
+      .sort((a, b) => a.last_name.localeCompare(b.last_name));
 
     console.log(`Participant Attendance Records: ${JSON.stringify(participant_attendance, null, 2)}`);
 
@@ -256,7 +258,7 @@ export async function generateDailyAttendanceReportPDF(props: DocumentMetaDetail
         }
 
         return [
-          { text: `${participant.first_name} ${participant.last_name}` },
+          { text: `${participant.last_name}, ${participant.first_name}${participant.middle_name ? ' ' + participant.middle_name : ''}` },
           { text: participant.am_time_in ? formatDateToTimeOption(new Date(participant.am_time_in)) : 'N/A' },
           { text: participant.am_time_out ? formatDateToTimeOption(new Date(participant.am_time_out)) : 'N/A' },
           { text: participant.pm_time_in ? formatDateToTimeOption(new Date(participant.pm_time_in)) : 'N/A' },
@@ -270,15 +272,16 @@ export async function generateDailyAttendanceReportPDF(props: DocumentMetaDetail
       info: info,
       pageSize: 'LEGAL',
       pageMargins: [20, 40, 20, 40],
+      header: {
+        text: event_details.event_name,
+        alignment: 'center',
+        margin: [0, 20, 0, 0],
+        fontSize: 18,
+        bold: true
+      },
       content: [
         {
-          text: event_details.event_name,
-          style: 'header',
-          alignment: 'center',
-          margin: [0, 0, 0, 5]
-        },
-        {
-          text: `${event_details.start_date} - ${event_details.end_date} • ${event_details.location || 'N/A'}`,
+          text: `${formatDateTime(event_details.start_date)} - ${formatDateTime(event_details.end_date)} • ${event_details.location || 'N/A'}`,
           style: 'subheader',
           alignment: 'center',
           margin: [0, 0, 0, 20]
