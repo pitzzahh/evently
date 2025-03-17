@@ -113,7 +113,7 @@
 							: participant_attendance?.am_time_in || participant_attendance?.pm_time_in
 								? 'incomplete'
 								: 'absent'}
-					<section
+					<div
 						class="grid gap-4 rounded-lg border p-4"
 						id="day_{event_schedule.day}"
 						aria-label="Day {event_schedule.day} attendance details"
@@ -156,7 +156,7 @@
 								period: 'PM'
 							})}
 						</div>
-					</section>
+					</div>
 				{/each}
 			</div>
 		</div>
