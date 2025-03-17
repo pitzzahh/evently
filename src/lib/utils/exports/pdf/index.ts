@@ -7,6 +7,7 @@ import { formatDateTime, formatDateToTimeOption } from "@/utils/format";
 import { COLLECTIONS } from "@/db";
 import type { HelperResponse } from "@/types/generic";
 import { getPopulatedAttendanceRecords } from "@routes/events/participants/(utils)";
+import { makeTag } from "..";
 
 export async function generateQRCodesPDF(props: DocumentMetaDetails): Promise<HelperResponse<string | null>> {
   const { info, event_details, participants } = props;
@@ -263,7 +264,7 @@ export async function generateDailyAttendanceReportPDF(props: DocumentMetaDetail
           { text: participant.am_time_out ? formatDateToTimeOption(new Date(participant.am_time_out)) : 'N/A' },
           { text: participant.pm_time_in ? formatDateToTimeOption(new Date(participant.pm_time_in)) : 'N/A' },
           { text: participant.pm_time_out ? formatDateToTimeOption(new Date(participant.pm_time_out)) : 'N/A' },
-          { text: statusText, style: statusStyle }
+          makeTag(statusText)
         ];
       })
     ];
