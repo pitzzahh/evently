@@ -40,10 +40,27 @@
 
 	const date = new SvelteDate();
 	let files = $state<UploadedFile[]>([]);
+	let isImporting = $state(false);
+	let importProgress = $state(0);
 
-	const onUpload: FileDropZoneProps['onUpload'] = async (files) => {
-		console.log('files', JSON.stringify(files, null, 2));
-		await Promise.allSettled(files.map((file) => uploadFile(file)));
+	// A safer console.log that doesn't use Tauri's log plugin if not available
+	function safeLog(...args: any[]) {
+		try {
+			console.log(...args);
+		} catch (e) {
+			// Fallback if the invoke method is undefined (happens in browser context)
+			// Using Function constructor to avoid direct console reference that might be patched
+			new Function('args', 'console.info("Safe log:", ...args)')(args);
+		}
+	}
+
+	const onUpload: FileDropZoneProps['onUpload'] = async (uploadedFiles) => {
+		try {
+			safeLog('Files selected:', uploadedFiles.length);
+			await Promise.allSettled(uploadedFiles.map((file) => uploadFile(file)));
+		} catch (error) {
+			safeLog('Error in onUpload:', error);
+		}
 	};
 
 	const onFileRejected: FileDropZoneProps['onFileRejected'] = async ({ reason, file }) => {
@@ -51,25 +68,33 @@
 	};
 
 	const uploadFile = async (file: File) => {
-		// don't upload duplicate files
-		if (files.find((f) => f.name === file.name)) return;
+		try {
+			// don't upload duplicate files
+			if (files.find((f) => f.name === file.name)) return;
 
-		const urlPromise = new Promise<string>((resolve) => {
-			// add some fake loading time
-			sleep(1000).then(() => resolve(URL.createObjectURL(file)));
-		});
+			const urlPromise = new Promise<string>((resolve) => {
+				// add some fake loading time
+				sleep(1000).then(() => resolve(URL.createObjectURL(file)));
+			});
 
-		files.push({
-			name: file.name,
-			type: file.type,
-			size: file.size,
-			uploadedAt: Date.now(),
-			url: urlPromise,
-			file
-		});
+			files = [
+				...files,
+				{
+					name: file.name,
+					type: file.type,
+					size: file.size,
+					uploadedAt: Date.now(),
+					url: urlPromise,
+					file
+				}
+			];
 
-		// we await since we don't want the onUpload to be complete until the files are actually uploaded
-		await urlPromise;
+			// we await since we don't want the onUpload to be complete until the files are actually uploaded
+			await urlPromise;
+		} catch (error) {
+			safeLog('Error in uploadFile:', error);
+			toast.error(`Error uploading file: ${(error as any).message || 'Unknown error'}`);
+		}
 	};
 
 	async function handleImportParticipants() {
@@ -77,12 +102,49 @@
 			toast.error('No files selected!');
 			return;
 		}
-		const [selected_file] = files;
-		const { file } = JSON.parse(JSON.stringify(selected_file, null, 2));
-		COLLECTIONS.PARTICIPANT_COLLECTION.insertMany(await readParticipants(file, event_id));
-		open_add_participants_dialog = false;
-		files = [];
-		toast.success('Participants imported successfully!');
+
+		try {
+			isImporting = true;
+			importProgress = 10;
+
+			const fileToImport = files[0];
+
+			// Important: Use the actual File object, not a serialized version
+			const actualFile = fileToImport.file;
+
+			importProgress = 30;
+
+			// Read participants from the file
+			const participants = await readParticipants(actualFile, event_id);
+
+			importProgress = 60;
+
+			if (participants.length === 0) {
+				toast.error('No valid participant data found in the file');
+				isImporting = false;
+				return;
+			}
+
+			COLLECTIONS.PARTICIPANT_COLLECTION.insertMany(participants);
+
+			importProgress = 100;
+
+			// Clean up and close dialog
+			for (const file of files) {
+				const url = await file.url;
+				URL.revokeObjectURL(url);
+			}
+
+			files = [];
+			open_add_participants_dialog = false;
+			toast.success(`Successfully imported ${participants.length} participants`);
+		} catch (error) {
+			console.error('Import error:', error);
+			toast.error(`Error importing participants: ${(error as any).message || 'Unknown error'}`);
+		} finally {
+			isImporting = false;
+			importProgress = 0;
+		}
 	}
 
 	$effect(() => {
@@ -97,15 +159,20 @@
 
 	onDestroy(async () => {
 		for (const file of files) {
-			URL.revokeObjectURL(await file.url);
+			try {
+				const url = await file.url;
+				URL.revokeObjectURL(url);
+			} catch (e) {
+				// Ignore errors during cleanup
+			}
 		}
 	});
 </script>
 
 <Dialog.Root bind:open={open_add_participants_dialog}>
-	<Dialog.Trigger {disabled} class={buttonVariants({ variant: 'ghost' })}
-		><Import class="size-4" />Import Excel Participants</Dialog.Trigger
-	>
+	<Dialog.Trigger {disabled} class={buttonVariants({ variant: 'ghost' })}>
+		<Import class="size-4" />Import Excel Participants
+	</Dialog.Trigger>
 	<Dialog.Content class="max-w-[750px]">
 		{@const no_file = files.length === 0}
 		<Dialog.Header>
@@ -152,15 +219,7 @@
 							<div class="flex place-items-center gap-2">
 								{#await file.url then src}
 									<div class="relative size-9 overflow-clip">
-										{#if file.type.startsWith('image/')}
-											<img
-												{src}
-												alt={file.name}
-												class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 overflow-clip"
-											/>
-										{:else if file.type.startsWith('video/')}
-											video
-										{/if}
+										<span class="text-2xl">📊</span>
 									</div>
 								{/await}
 								<div class="flex flex-col">
@@ -194,12 +253,35 @@
 		<Dialog.Footer>
 			<AlertDialog.Root>
 				<AlertDialog.Trigger
-					disabled={no_file}
+					disabled={no_file || isImporting}
 					class={cn(buttonVariants({ variant: 'outline', className: 'w-full' }), {
-						'cursor-not-allowed': no_file
+						'cursor-not-allowed': no_file || isImporting,
+						'opacity-50': isImporting
 					})}
 				>
-					Import Participants
+					{#if isImporting}
+						<span class="flex items-center">
+							<svg class="mr-2 h-4 w-4 animate-spin" viewBox="0 0 24 24">
+								<circle
+									class="opacity-25"
+									cx="12"
+									cy="12"
+									r="10"
+									stroke="currentColor"
+									stroke-width="4"
+									fill="none"
+								></circle>
+								<path
+									class="opacity-75"
+									fill="currentColor"
+									d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+								></path>
+							</svg>
+							Importing... {importProgress}%
+						</span>
+					{:else}
+						Import Participants
+					{/if}
 				</AlertDialog.Trigger>
 				<AlertDialog.Content>
 					<AlertDialog.Header>
