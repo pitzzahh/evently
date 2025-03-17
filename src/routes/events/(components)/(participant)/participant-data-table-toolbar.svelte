@@ -16,6 +16,7 @@
 
 	export interface ParticipantDataTableToolbarProps {
 		table: Table<Participant>;
+		setGlobalFilter: (value: string) => void;
 	}
 	type ComponentState = {
 		search: string;
@@ -23,8 +24,7 @@
 		timeout?: ReturnType<typeof setTimeout>;
 	};
 
-	let { table }: ParticipantDataTableToolbarProps =
-		$props();
+	let { table, setGlobalFilter }: ParticipantDataTableToolbarProps = $props();
 
 	let comp_state = $state<ComponentState>({
 		search: '',
@@ -43,21 +43,17 @@
 	<div class="m-1 flex items-center justify-between space-x-2">
 		<div class="flex flex-1 items-center space-x-2">
 			<Input
-				placeholder="Filter position by {convertToNormalText(comp_state.where_to_search)}..."
-				bind:value={
-					() => comp_state.search,
-					(v) => {
-						clearTimeout(comp_state.timeout);
-						comp_state.search = v;
-						comp_state.timeout = setTimeout(() => {
-							table.getColumn(comp_state.where_to_search)?.setFilterValue(v);
-						}, 500);
-					}
-				}
+				placeholder="Search participant"
+				value={(table.getState().globalFilter as string) ?? ''}
+				onchange={(e) => {
+					setGlobalFilter(e.currentTarget.value);
+				}}
+				oninput={(e) => {
+					setGlobalFilter(e.currentTarget.value);
+				}}
 				type="search"
 				class="h-8 w-[150px] min-w-[300px] lg:w-min"
 			/>
-			<DataTableSearchFilter {table} bind:where_to_search={comp_state.where_to_search} />
 			{#if over_attendance_status_col}
 				<DataTableFacetedFilter
 					column={over_attendance_status_col}
@@ -69,11 +65,11 @@
 						},
 						{
 							label: 'Incomplete',
-							value: 'icomplete'
+							value: 'incomplete'
 						},
 						{
 							label: 'Absent',
-							value: 'asbent'
+							value: 'absent'
 						}
 					]}
 				/>

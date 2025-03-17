@@ -14,9 +14,10 @@
 </script>
 
 <DataTable data={participants_attendance} columns={participantAttendanceColumns()}>
-	{#snippet data_table_toolbar({ table })}
+	{#snippet data_table_toolbar({ table, setGlobalFilter })}
 		<ParticipantAttendanceDataTableToolbar
 			{table}
+			{setGlobalFilter}
 			days_opt={event_days
 				? Array.from({ length: event_days }, (_, i) => ({
 						label: 'Day ' + (i + 1),
