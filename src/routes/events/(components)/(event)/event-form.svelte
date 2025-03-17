@@ -427,10 +427,25 @@
 				</div>
 			</div>
 		</div>
+		<Form.Field {form} name="cover" class="sr-only">
+			<Form.Control>
+				{#snippet children({ props })}
+					<Form.Label>Event Cover Photo</Form.Label>
+					<input hidden {...props} bind:value={$formData.cover} />
+				{/snippet}
+			</Form.Control>
+			<Form.FieldErrors />
+		</Form.Field>
 		<ImageCropper.Root
 			onCropped={async (url) => {
 				const file = await getFileFromUrl(url);
-				console.log(file);
+				//convert to base64
+				const reader = new FileReader();
+				reader.readAsDataURL(file);
+				reader.onload = () => {
+					const base64 = reader.result as string;
+					$formData.cover = base64;
+				};
 			}}
 		>
 			<ImageCropper.UploadTrigger>
