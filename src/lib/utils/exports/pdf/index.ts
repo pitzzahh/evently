@@ -125,20 +125,20 @@ export async function generateQRCodesPDF(props: DocumentMetaDetails): Promise<He
       ],
       styles: {
         header: {
-          fontSize: 20,
+          fontSize: 16,
           bold: true,
-          margin: [0, 0, 0, 10],
+          margin: [0, 0, 0, 8],
           color: '#333',
           decoration: 'underline'
         },
         subheader: {
-          fontSize: 14,
+          fontSize: 12,
           bold: true,
-          margin: [0, 10, 0, 5],
+          margin: [0, 8, 0, 4],
           color: '#555'
         },
         participantText: {
-          fontSize: 12,
+          fontSize: 11,
           bold: true,
           color: '#007ACC'
         }
@@ -275,8 +275,8 @@ export async function generateDailyAttendanceReportPDF(props: DocumentMetaDetail
       header: {
         text: event_details.event_name,
         alignment: 'center',
-        margin: [0, 20, 0, 0],
-        fontSize: 18,
+        margin: [0, 15, 0, 0],
+        fontSize: 16,
         bold: true
       },
       content: [
@@ -284,13 +284,13 @@ export async function generateDailyAttendanceReportPDF(props: DocumentMetaDetail
           text: `${formatDateTime(event_details.start_date)} - ${formatDateTime(event_details.end_date)} • ${event_details.location || 'N/A'}`,
           style: 'subheader',
           alignment: 'center',
-          margin: [0, 0, 0, 20]
+          margin: [0, 0, 0, 15]
         },
         {
           text: `Daily Attendance Report - Day ${summary.day} (${summary.date})`,
           style: 'subheader',
           alignment: 'center',
-          margin: [0, 0, 0, 10]
+          margin: [0, 0, 0, 8]
         },
         {
           table: {
@@ -312,21 +312,21 @@ export async function generateDailyAttendanceReportPDF(props: DocumentMetaDetail
       ],
       styles: {
         header: {
-          fontSize: 20,
+          fontSize: 16,
           bold: true,
-          margin: [0, 0, 0, 10],
+          margin: [0, 0, 0, 8],
           color: '#333',
           decoration: 'underline'
         },
         subheader: {
-          fontSize: 14,
+          fontSize: 12,
           bold: true,
-          margin: [0, 10, 0, 5],
+          margin: [0, 8, 0, 4],
           color: '#555'
         },
         tableHeader: {
           bold: true,
-          fontSize: 12,
+          fontSize: 11,
           color: 'black'
         },
         statusComplete: {
@@ -354,9 +354,9 @@ export async function generateDailyAttendanceReportPDF(props: DocumentMetaDetail
         },
         summaryBox: {
           alignment: 'center',
-          fontSize: 12,
+          fontSize: 11,
           bold: true,
-          margin: [0, 5, 0, 5]
+          margin: [0, 4, 0, 4]
         }
       },
       footer: function (currentPage, pageCount) {

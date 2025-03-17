@@ -9,6 +9,12 @@ const config = {
 		alias: {
 			"@/*": "./src/lib/*",
 			"@routes": "./src/routes",
+		},
+		csp: {
+			directives: {
+				'script-src': ['self', 'unsafe-inline'],
+				'style-src': ['self', 'unsafe-inline'],
+			}
 		}
 	}
 };
