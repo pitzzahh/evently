@@ -476,14 +476,6 @@
 		}
 	);
 
-	onMount(() => {
-		load_daily_attendance_report_worker();
-		load_qr_code_worker();
-		return () => {
-			if (comp_state.timeout) clearTimeout(comp_state.timeout);
-		};
-	});
-
 	watch(
 		() => comp_state.last_scanned_participant,
 		() => {
@@ -496,6 +488,14 @@
 			return () => timeout;
 		}
 	);
+
+	onMount(() => {
+		load_daily_attendance_report_worker();
+		load_qr_code_worker();
+		return () => {
+			if (comp_state.timeout) clearTimeout(comp_state.timeout);
+		};
+	});
 </script>
 
 <svelte:document onkeydown={handleKeydown} />
