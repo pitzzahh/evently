@@ -9,5 +9,3 @@ onmessage = async (message: MessageEvent<WebWorkerDocumentMetaDetails>) => {
     participants: JSON.parse(message.data.participants) as DocumentMetaDetails['participants'],
   }));
 };
-
-export { };

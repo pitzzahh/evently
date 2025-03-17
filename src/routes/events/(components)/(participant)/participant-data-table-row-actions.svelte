@@ -1,23 +1,26 @@
 <script lang="ts">
-	import { Copy, Ellipsis, Pencil, View } from '@/assets/icons';
+	import { Ellipsis, Pencil, View } from '@/assets/icons';
 	import { Trash } from 'lucide-svelte';
 	import type { Row } from '@tanstack/table-core';
 	import * as DropdownMenu from '@/components/ui/dropdown-menu/index.js';
 	import Button from '@/components/ui/button/button.svelte';
-	import type { Participant } from '@/db/models/types';
+	import type { EventDetails, Participant } from '@/db/models/types';
 	import * as Dialog from '@/components/ui/dialog';
 	import EditParticipantForm from './edit-participant-form.svelte';
 	import type { SuperValidated } from 'sveltekit-superforms';
 	import type { ParticipantSchema } from '@/schema/participant';
-	import QR from '@svelte-put/qr/img/QR.svelte';
-	import ImgQR from '@svelte-put/qr/img/QR.svelte';
 	import { COLLECTIONS } from '@/db';
 	import ParticipantInfo from './participant-info.svelte';
 
 	let {
 		row,
-		participant_form
-	}: { row: Row<Participant>; participant_form: SuperValidated<ParticipantSchema> } = $props();
+		participant_form,
+		event_details
+	}: {
+		row: Row<Participant>;
+		participant_form: SuperValidated<ParticipantSchema>;
+		event_details: EventDetails;
+	} = $props();
 	let comp_state = $state({
 		edit_open: false,
 		remove_open: false,
@@ -87,7 +90,7 @@
 			<Dialog.Header>
 				<Dialog.Title>Participant's Information</Dialog.Title>
 			</Dialog.Header>
-			<ParticipantInfo participant={row.original} />
+			<ParticipantInfo participant={row.original} {event_details} />
 		</Dialog.Content>
 	{/if}
 

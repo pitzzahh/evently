@@ -1,6 +1,11 @@
 <script lang="ts">
 	import { COLLECTIONS } from '@/db';
-	import type { AttendanceRecord, EventSchedule, Participant } from '@/db/models/types';
+	import type {
+		AttendanceRecord,
+		EventDetails,
+		EventSchedule,
+		Participant
+	} from '@/db/models/types';
 	import { generateFullName } from '@/utils/text';
 	import SvgQR from '@svelte-put/qr/svg/QR.svelte';
 	import { watch } from 'runed';
@@ -8,10 +13,12 @@
 	import { Badge } from '@/components/ui/badge';
 	import { formatDate, formatDateToTimeOption } from '@/utils/format';
 	import { cn } from '@/utils';
-	import { checkEventStatus } from '@routes/events/utils';
+	import { checkEventStatus, getEventDayInfo } from '@routes/events/utils';
+	import { tick } from 'svelte';
 
-	interface Props {
+	interface ParticipantInfoProps {
 		participant: Participant;
+		event_details: EventDetails;
 	}
 
 	interface ComponentState {
@@ -19,29 +26,41 @@
 		participant_attendance: AttendanceRecord[];
 	}
 
-	let { participant }: Props = $props();
+	let { participant, event_details }: ParticipantInfoProps = $props();
 	let comp_state = $state<ComponentState>({
 		event_schedules: [],
 		participant_attendance: []
 	});
 
-	watch([() => COLLECTIONS.EVENT_SCHEDULE_COLLECTION.isLoading()], () => {
-		const event_id = page.params.id;
+	watch(
+		[
+			() => COLLECTIONS.EVENT_SCHEDULE_COLLECTION.isLoading(),
+			() => COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.isPushing()
+		],
+		() => {
+			const event_id = page.params.id;
 
-		const event_schedule_cursor = COLLECTIONS.EVENT_SCHEDULE_COLLECTION.find({
-			event_id
-		});
-		const participant_attendance_cursor = COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.find({
-			event_id,
+			const event_schedule_cursor = COLLECTIONS.EVENT_SCHEDULE_COLLECTION.find({
+				event_id
+			});
+			const participant_attendance_cursor = COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.find({
+				participant_id: participant.id,
+				event_id
+			});
 
-			participant_id: participant.id
-		});
-
-		comp_state.participant_attendance = participant_attendance_cursor.fetch();
-		comp_state.event_schedules = event_schedule_cursor.fetch();
-
-		$inspect(comp_state.participant_attendance);
-	});
+			comp_state.participant_attendance = participant_attendance_cursor.fetch();
+			comp_state.event_schedules = event_schedule_cursor.fetch();
+			tick().then(() => {
+				const lastForm = document.getElementById(
+					`day_${
+						getEventDayInfo(event_details.start_date, event_details.end_date, new Date()).currentDay
+					}`
+				);
+				lastForm?.scrollIntoView({ behavior: 'smooth' });
+			});
+			$inspect(comp_state.participant_attendance);
+		}
+	);
 </script>
 
 <div class="flex items-center gap-4">
@@ -92,8 +111,7 @@
 							: participant_attendance?.am_time_in || participant_attendance?.pm_time_in
 								? 'incomplete'
 								: 'absent'}
-
-					<div class="grid gap-4 rounded-lg border p-4">
+					<div class="grid gap-4 rounded-lg border p-4" id="day_{event_schedule.day}">
 						<div class="flex items-center justify-between">
 							<div class="flex gap-2">
 								<Badge>Day {event_schedule.day}</Badge>

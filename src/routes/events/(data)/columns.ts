@@ -6,7 +6,7 @@ import {
 	DataTableBadge
 } from '@/components/custom/data-table';
 import { ParticipantDataTableRowActions } from '@routes/events/(components)';
-import type { Participant, ParticipantAttendance } from '@/db/models/types';
+import type { EventDetails, Participant, ParticipantAttendance } from '@/db/models/types';
 import type { SuperValidated } from 'sveltekit-superforms';
 import type { ParticipantSchema } from '@/schema/participant';
 import { formatDateToTimeOption } from '@/utils/format';
@@ -16,7 +16,8 @@ import { cn } from '@/utils';
 
 export function participantTableColumns(
 	participant_form: SuperValidated<ParticipantSchema>,
-	event_status: 'upcoming' | 'ongoing' | 'finished'
+	event_status: 'upcoming' | 'ongoing' | 'finished',
+	event_details: EventDetails
 ): ColumnDef<Participant>[] {
 	return [
 		{
@@ -147,7 +148,7 @@ export function participantTableColumns(
 		{
 			id: 'actions',
 			header: () => 'Actions',
-			cell: ({ row }) => renderComponent(ParticipantDataTableRowActions, { participant_form, row })
+			cell: ({ row }) => renderComponent(ParticipantDataTableRowActions, { participant_form, row, event_details })
 		}
 	];
 }
