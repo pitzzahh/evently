@@ -32,7 +32,9 @@
 			event_id
 		});
 		const participant_attendance_cursor = COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.find({
-			event_id
+			event_id,
+
+			participant_id: participant.id
 		});
 
 		comp_state.participant_attendance = participant_attendance_cursor.fetch();
@@ -78,7 +80,7 @@
 			<div class="grid w-full gap-2">
 				{#each comp_state.event_schedules as event_schedule}
 					{@const participant_attendance = comp_state.participant_attendance.find(
-						(p) => event_schedule.day === p.day
+						(p) => event_schedule.day.toString() === p.day
 					)}
 					{@const event_day_status = checkEventStatus(
 						event_schedule.am_start,
