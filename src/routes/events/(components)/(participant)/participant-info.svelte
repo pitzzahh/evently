@@ -25,21 +25,27 @@
 		participant_attendance: []
 	});
 
-	watch([() => COLLECTIONS.EVENT_SCHEDULE_COLLECTION.isLoading()], () => {
-		const event_id = page.params.id;
+	watch(
+		[
+			() => COLLECTIONS.EVENT_SCHEDULE_COLLECTION.isLoading(),
+			() => COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.isPushing()
+		],
+		() => {
+			const event_id = page.params.id;
 
-		const event_schedule_cursor = COLLECTIONS.EVENT_SCHEDULE_COLLECTION.find({
-			event_id
-		});
-		const participant_attendance_cursor = COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.find({
-			event_id
-		});
+			const event_schedule_cursor = COLLECTIONS.EVENT_SCHEDULE_COLLECTION.find({
+				event_id
+			});
+			const participant_attendance_cursor = COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.find({
+				event_id
+			});
 
-		comp_state.participant_attendance = participant_attendance_cursor.fetch();
-		comp_state.event_schedules = event_schedule_cursor.fetch();
+			comp_state.participant_attendance = participant_attendance_cursor.fetch();
+			comp_state.event_schedules = event_schedule_cursor.fetch();
 
-		$inspect(comp_state.participant_attendance);
-	});
+			$inspect(comp_state.participant_attendance);
+		}
+	);
 </script>
 
 <div class="flex items-center gap-4">

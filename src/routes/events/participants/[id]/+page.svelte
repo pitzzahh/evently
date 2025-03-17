@@ -317,7 +317,7 @@
 			comp_state.workers.daily_attendance_report_worker.terminate();
 		}
 		const DailyAttendanceWorker = await import(
-			'$lib/workers/generate-daily-attendance.worker?worker'
+			'$lib/workers/generate-daily-attendance-worker?worker'
 		);
 		comp_state.workers.daily_attendance_report_worker = new DailyAttendanceWorker.default();
 		comp_state.workers.daily_attendance_report_worker.onmessage = (
@@ -346,7 +346,7 @@
 		if (comp_state.workers.qr_code_worker) {
 			comp_state.workers.qr_code_worker.terminate();
 		}
-		const QRCodeWorker = await import('$lib/workers/generate-qr-codes.worker?worker');
+		const QRCodeWorker = await import('$lib/workers/generate-qr-codes-worker?worker');
 		comp_state.workers.qr_code_worker = new QRCodeWorker.default();
 		comp_state.workers.qr_code_worker.onmessage = (
 			message: MessageEvent<HelperResponse<string | null>>
