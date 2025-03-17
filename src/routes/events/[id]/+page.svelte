@@ -124,70 +124,80 @@
 	}
 </script>
 
-<div in:fly={{ y: 20 }} class="grid gap-6">
-	<div class="flex items-center justify-between">
-		<h2 class="text-5xl font-semibold">{comp_state.event_details?.event_name ?? 'N/A'}</h2>
-		<div class="flex items-center gap-2">
-			{@render StatusPill(event_status)}
-			<Button
-				size="lg"
-				href={`/events/participants/${comp_state.event_details?.id}`}
-				class="rounded-lg border px-4 py-3 text-sm"
-			>
-				<View class="size-5" />
-				View Participants
-			</Button>
-			<Dialog.Root
-				open={comp_state.confimation_open}
-				onOpenChange={(value) => (comp_state.confimation_open = value)}
-			>
-				<DropdownMenu.Root>
-					<DropdownMenu.Trigger>
-						<button class="rounded-md border p-3"><Settings class="size-5" /></button>
-					</DropdownMenu.Trigger>
-					<DropdownMenu.Content side="bottom" align="end" sideOffset={10}>
-						<DropdownMenu.Group>
-							<DropdownMenu.Item
-								onclick={() => {
-									if (comp_state.event_details?.id) {
-										goto(`/events/edit/${comp_state.event_details?.id}`);
-									}
-								}}><Edit class="size-4" /> Edit event</DropdownMenu.Item
-							>
-							<DropdownMenu.Item
-								onclick={() => (comp_state.confimation_open = true)}
-								class="!text-red-600 hover:!bg-red-600/20"
-								><Trash class="size-4" />Delete event</DropdownMenu.Item
-							>
-						</DropdownMenu.Group>
-					</DropdownMenu.Content>
-				</DropdownMenu.Root>
+<div in:fly={{ y: 20 }} class="grid gap-4">
+	<div class="flex items-start gap-6 border-b-2 border-dashed pb-6">
+		<Avatar.Root
+			class={cn(
+				'h-full w-full max-w-[280px] rounded-md ring-2 ring-accent ring-offset-2 ring-offset-background '
+			)}
+		>
+			<Avatar.Image src={comp_state.event_details?.cover} />
+			<Avatar.Fallback class="h-full w-full max-w-[280px] rounded-md">EVENT COVER</Avatar.Fallback>
+		</Avatar.Root>
 
-				<Dialog.Content>
-					<Dialog.Header>
-						<Dialog.Title>Remove Event</Dialog.Title>
-						<Dialog.Description>
-							This action cannot be undone. Are you sure you want to permanently delete this event?
-						</Dialog.Description>
-					</Dialog.Header>
-					<Dialog.Footer>
-						<Button class="bg-red-600 hover:!bg-red-600/80" onclick={handleDeleteEvent}
-							>Delete</Button
-						>
-						<Button variant="outline" onclick={() => (comp_state.confimation_open = false)}
-							>Cancel</Button
-						>
-					</Dialog.Footer>
-				</Dialog.Content>
-			</Dialog.Root>
-		</div>
-	</div>
+		<div class="flex w-full flex-1 flex-col gap-4">
+			<div class="flex w-full items-center justify-between">
+				<h2 class="text-5xl font-semibold">{comp_state.event_details?.event_name ?? 'N/A'}</h2>
+				<div class="flex items-center gap-2">
+					{@render StatusPill(event_status)}
+					<Button
+						size="lg"
+						href={`/events/participants/${comp_state.event_details?.id}`}
+						class="rounded-lg border px-4 py-3 text-sm"
+					>
+						<View class="size-5" />
+						View Participants
+					</Button>
+					<Dialog.Root
+						open={comp_state.confimation_open}
+						onOpenChange={(value) => (comp_state.confimation_open = value)}
+					>
+						<DropdownMenu.Root>
+							<DropdownMenu.Trigger>
+								<button class="rounded-md border p-3"><Settings class="size-5" /></button>
+							</DropdownMenu.Trigger>
+							<DropdownMenu.Content side="bottom" align="end" sideOffset={10}>
+								<DropdownMenu.Group>
+									<DropdownMenu.Item
+										onclick={() => {
+											if (comp_state.event_details?.id) {
+												goto(`/events/edit/${comp_state.event_details?.id}`);
+											}
+										}}><Edit class="size-4" /> Edit event</DropdownMenu.Item
+									>
+									<DropdownMenu.Item
+										onclick={() => (comp_state.confimation_open = true)}
+										class="!text-red-600 hover:!bg-red-600/20"
+										><Trash class="size-4" />Delete event</DropdownMenu.Item
+									>
+								</DropdownMenu.Group>
+							</DropdownMenu.Content>
+						</DropdownMenu.Root>
 
-	<!-- EVENT DETAILS -->
-	<div class="flex justify-between gap-6 border-b-2 border-dashed pb-6">
-		<div class="grid w-full gap-4">
-			<div class="flex w-full justify-between gap-4">
-				<div class="grid place-content-center gap-4">
+						<Dialog.Content>
+							<Dialog.Header>
+								<Dialog.Title>Remove Event</Dialog.Title>
+								<Dialog.Description>
+									This action cannot be undone. Are you sure you want to permanently delete this
+									event?
+								</Dialog.Description>
+							</Dialog.Header>
+							<Dialog.Footer>
+								<Button class="bg-red-600 hover:!bg-red-600/80" onclick={handleDeleteEvent}
+									>Delete</Button
+								>
+								<Button variant="outline" onclick={() => (comp_state.confimation_open = false)}
+									>Cancel</Button
+								>
+							</Dialog.Footer>
+						</Dialog.Content>
+					</Dialog.Root>
+				</div>
+			</div>
+
+			<!-- EVENT DETAILS -->
+			<div class="grid gap-4">
+				<div class="flex items-center gap-8">
 					<div class="flex items-center gap-3">
 						<div class="rounded-md border p-3">
 							<Calendar class="size-5 text-muted-foreground" />
@@ -200,17 +210,6 @@
 								{formatDateToTimeOption(comp_state.event_schedules.at(0)?.am_start)} - {formatDateToTimeOption(
 									comp_state.event_schedules.at(0)?.pm_end
 								)}
-							</p>
-						</div>
-					</div>
-					<div class="flex items-center gap-3">
-						<div class="rounded-md border p-3">
-							<UsersRound class="size-5 text-muted-foreground" />
-						</div>
-						<div>
-							<p class="text-base font-medium">{comp_state.participants.length}</p>
-							<p class=" text-muted-foreground">
-								Participant{comp_state.participants.length > 1 ? 's' : ''}
 							</p>
 						</div>
 					</div>
@@ -231,6 +230,21 @@
 							<p class=" text-muted-foreground">Duration</p>
 						</div>
 					</div>
+				</div>
+
+				<div class="flex items-center gap-8">
+					<div class="flex items-center gap-3">
+						<div class="rounded-md border p-3">
+							<UsersRound class="size-5 text-muted-foreground" />
+						</div>
+						<div>
+							<p class="text-base font-medium">{comp_state.participants.length}</p>
+							<p class=" text-muted-foreground">
+								Participant{comp_state.participants.length > 1 ? 's' : ''}
+							</p>
+						</div>
+					</div>
+
 					<div class="flex items-center gap-3">
 						<div class="rounded-md border p-3">
 							<MapPin class="size-5 text-muted-foreground" />
@@ -241,22 +255,30 @@
 						</div>
 					</div>
 				</div>
-			</div>
-			<div class="flex items-center justify-between gap-4">
-				<Button variant="ghost" onclick={() => (comp_state.see_more = !comp_state.see_more)}>
-					{comp_state.see_more ? 'See Less' : 'See More'}
-				</Button>
+
+				<div
+					class="grid w-full gap-2 overflow-hidden rounded-lg border bg-white/40 p-2 backdrop-blur-lg backdrop-filter transition-all duration-300 dark:bg-[#151e28]/20"
+				>
+					<p
+						class="h-auto w-full rounded-tl-md rounded-tr-md border bg-white p-3 text-sm font-medium dark:bg-[#151e28]"
+					>
+						Description
+					</p>
+					<div class="p-4">
+						<p>{comp_state.event_details?.description || 'No description'}</p>
+					</div>
+				</div>
 			</div>
 		</div>
-		<Avatar.Root
-			class={cn(
-				'size-20 h-64 w-64 rounded-md ring-2 ring-accent ring-offset-2 ring-offset-background '
-			)}
-		>
-			<Avatar.Image src={comp_state.event_details?.cover} />
-			<Avatar.Fallback class="h-64 w-64 rounded-md">EVENT COVER</Avatar.Fallback>
-		</Avatar.Root>
 	</div>
+
+	<Button
+		variant="outline"
+		class="place-self-end"
+		onclick={() => (comp_state.see_more = !comp_state.see_more)}
+	>
+		{comp_state.see_more ? 'See Less' : 'See More'}
+	</Button>
 	<div
 		class={cn(
 			'grid gap-3 overflow-hidden rounded-lg border bg-white p-4 transition-all duration-300 dark:bg-[#151e28]',
