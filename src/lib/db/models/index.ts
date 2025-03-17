@@ -132,6 +132,7 @@ export class EventDetailsCollection extends Collection<EventDetails> {
 	difference_in_days!: number;
 	start_date!: Date;
 	end_date!: Date;
+	cover?: string;
 	created?: Date;
 	updated?: Date;
 
@@ -169,6 +170,7 @@ export class EventDetailsCollection extends Collection<EventDetails> {
 		this.difference_in_days = data.difference_in_days;
 		this.start_date = new Date(data.start_date);
 		this.end_date = new Date(data.end_date);
+		this.cover = data.cover;
 		this.created = data.created ? new Date(data.created) : undefined;
 		this.updated = data.updated ? new Date(data.updated) : undefined;
 	}
