@@ -599,17 +599,13 @@
 
 		{#if event_status === 'ongoing'}
 			<Tabs.Content value="time-in-and-out" class="mt-4">
-				<div class="flex items-start gap-4">
-					<div class="grid flex-1 gap-2">
-						{#if COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.isPulling()}
-							<TableSkeleton />
-						{:else}
-							<ParticipantAttendanceDataTable
-								participants_attendance={comp_state.current_day_participants_attendance}
-							/>
-						{/if}
-					</div>
-				</div>
+				{#if COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.isPulling()}
+					<TableSkeleton />
+				{:else}
+					<ParticipantAttendanceDataTable
+						participants_attendance={comp_state.current_day_participants_attendance}
+					/>
+				{/if}
 			</Tabs.Content>
 		{/if}
 
@@ -681,3 +677,9 @@
 		</Card.Root>
 	</div>
 {/if}
+
+<style>
+	* {
+		border: 1px solid red;
+	}
+</style>
