@@ -580,8 +580,7 @@
 			{/if}
 		</Tabs.List>
 
-		<Tabs.Content value="participants" class="mt-4">
-			<div class="grid gap-2">
+		<Tabs.Content value="participants" class="mt-4 grid gap-2">
 				{#if COLLECTIONS.PARTICIPANT_COLLECTION.isPulling()}
 					<TableSkeleton />
 				{:else}
@@ -594,33 +593,36 @@
 						/>
 					{/key}
 				{/if}
-			</div>
 		</Tabs.Content>
 
 		{#if event_status === 'ongoing'}
-			<Tabs.Content value="time-in-and-out" class="mt-4">
-				{#if COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.isPulling()}
-					<TableSkeleton />
-				{:else}
-					<ParticipantAttendanceDataTable
-						participants_attendance={comp_state.current_day_participants_attendance}
-					/>
-				{/if}
-			</Tabs.Content>
-		{/if}
-
-		<Tabs.Content value="all-time-in-and-out" class="mt-4">
-			<div class="flex items-start gap-4">
+			<Tabs.Content value="time-in-and-out" class="mt-4 flex items-start gap-4">
 				<div class="grid flex-1 gap-2">
 					{#if COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.isPulling()}
 						<TableSkeleton />
 					{:else}
+						<div class="max-h-[70vh] overflow-x-auto">
+							<ParticipantAttendanceDataTable
+								participants_attendance={comp_state.current_day_participants_attendance}
+							/>
+						</div>
+					{/if}
+				</div>
+			</Tabs.Content>
+		{/if}
+
+		<Tabs.Content value="all-time-in-and-out" class="mt-4 flex items-start gap-4">
+			<div class="grid flex-1 gap-2">
+				{#if COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.isPulling()}
+					<TableSkeleton />
+				{:else}
+					<div class="max-h-[70vh] overflow-x-auto">
 						<ParticipantAttendanceDataTable
 							event_days={comp_state.event_details?.difference_in_days}
 							participants_attendance={comp_state.all_participants_attendance}
 						/>
-					{/if}
-				</div>
+					</div>
+				{/if}
 			</div>
 		</Tabs.Content>
 	</Tabs.Root>
@@ -677,9 +679,3 @@
 		</Card.Root>
 	</div>
 {/if}
-
-<style>
-	* {
-		border: 1px solid red;
-	}
-</style>
