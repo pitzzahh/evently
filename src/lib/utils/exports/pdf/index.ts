@@ -6,6 +6,7 @@ import type { DocumentMetaDetails } from "@/types/exports";
 import { formatDateToTimeOption } from "@/utils/format";
 import { COLLECTIONS } from "@/db";
 import type { HelperResponse } from "@/types/generic";
+import { getPopulatedAttendanceRecords } from '@routes/events/participants/[id]/+page.svelte'
 
 export async function generateQRCodesPDF(props: DocumentMetaDetails): Promise<HelperResponse<string | null>> {
   const { info, event_details, participants } = props;
@@ -165,6 +166,12 @@ export async function generateDailyAttendanceReportPDF(props: DocumentMetaDetail
     return { status: 404, message: "No participants found to generate attendance report", data: null };
   }
   try {
+
+    const participant_attendance = getPopulatedAttendanceRecords(event_details.id, {
+      attendance_records_collection: COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION,
+      participant_collection: COLLECTIONS.PARTICIPANT_COLLECTION,
+    });
+
     const attendanceRecords = COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.find({
       event_id: event_details.id,
       day: new Date().getDate().toString()
