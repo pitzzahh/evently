@@ -26,6 +26,7 @@
 	import * as ImageCropper from '@/components/custom/image-cropper';
 	import { watch } from 'runed';
 	import { checkEventStatus } from '@routes/events/utils';
+	import { getFileFromUrl } from '@/components/custom/image-cropper';
 
 	interface EventFormProps {
 		event_to_edit?: EventDetails;
@@ -426,7 +427,12 @@
 				</div>
 			</div>
 		</div>
-		<ImageCropper.Root src="https://github.com/shadcn.png">
+		<ImageCropper.Root
+			onCropped={async (url) => {
+				const file = await getFileFromUrl(url);
+				console.log(file);
+			}}
+		>
 			<ImageCropper.UploadTrigger>
 				<ImageCropper.Preview class="h-64 w-64 rounded-md" />
 			</ImageCropper.UploadTrigger>
