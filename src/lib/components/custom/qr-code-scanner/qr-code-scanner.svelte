@@ -171,6 +171,7 @@
 	}
 </script>
 
+
 <div>
 	<div id="qr-scanner" class="relative max-h-[500px] min-h-[500px]"></div>
 
@@ -191,7 +192,6 @@
 </div>
 
 <style>
-	/* Hide unwanted icons - keeping these in regular CSS since they use :global */
 	#qr-scanner :global(img[alt='Info icon']),
 	#qr-scanner :global(img[alt='Camera based scan']) {
 		display: none;

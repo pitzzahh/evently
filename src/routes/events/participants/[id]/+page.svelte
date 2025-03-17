@@ -1,3 +1,50 @@
+<script module lang="ts">
+	export function getPopulatedAttendanceRecords(
+		event_id: string,
+		collections: {
+			attendance_records_collection: AttendanceRecordCollection;
+			participant_collection: ParticipantCollection;
+		},
+		current_event_day?: string
+	): ParticipantAttendance[] {
+		const attendance_records = collections.attendance_records_collection
+			.find({
+				event_id: event_id,
+				...(current_event_day && { day: current_event_day })
+			})
+			.fetch();
+
+		const participantIds = [...new Set(attendance_records.map((record) => record.participant_id))];
+
+		const participants = collections.participant_collection
+			.find({
+				id: { $in: participantIds }
+			})
+			.fetch();
+
+		const participant_map = new Map(
+			participants.map((participant) => [participant.id, participant])
+		);
+
+		// return new combined objects without modifying originals
+		return attendance_records
+			.map((record) => {
+				const participant = participant_map.get(record.participant_id);
+				return {
+					...record,
+					first_name: participant?.first_name,
+					middle_name: participant?.middle_name,
+					last_name: participant?.last_name,
+					email: participant?.email,
+					participant
+				};
+			})
+			.sort(
+				(a, b) => (b.latest_time_scanned?.getTime() ?? 0) - (a.latest_time_scanned?.getTime() ?? 0)
+			) as ParticipantAttendance[];
+	}
+</script>
+
 <script lang="ts">
 	import { buttonVariants } from '@/components/ui/button';
 	import { Check, Clock, FileOutput, UsersRound, X } from 'lucide-svelte';
@@ -23,6 +70,7 @@
 	import { QRCode, SquareCheckBig } from '@/assets/icons';
 	import type { HelperResponse } from '@/types/generic/index.js';
 	import QrCodeScannerDialog from '@routes/events/(components)/(participant)/qr-code-scanner-dialog.svelte';
+	import type { AttendanceRecordCollection, ParticipantCollection } from '@/db/models/index.js';
 
 	interface ComponentState {
 		event_details: EventDetails | undefined;
@@ -73,40 +121,6 @@
 				).currentDay.toString()
 			: null
 	);
-
-	function getPopulatedAttendanceRecords(eventId: string, current_event_day?: string) {
-		const attendance_records = COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.find({
-			event_id: eventId,
-			...(current_event_day && { day: current_event_day })
-		}).fetch();
-
-		const participantIds = [...new Set(attendance_records.map((record) => record.participant_id))];
-
-		const participants = COLLECTIONS.PARTICIPANT_COLLECTION.find({
-			id: { $in: participantIds }
-		}).fetch();
-
-		const participant_map = new Map(
-			participants.map((participant) => [participant.id, participant])
-		);
-
-		// return new combined objects without modifying originals
-		return attendance_records
-			.map((record) => {
-				const participant = participant_map.get(record.participant_id);
-				return {
-					...record,
-					first_name: participant?.first_name,
-					middle_name: participant?.middle_name,
-					last_name: participant?.last_name,
-					email: participant?.email,
-					participant
-				};
-			})
-			.sort(
-				(a, b) => (b.latest_time_scanned?.getTime() ?? 0) - (a.latest_time_scanned?.getTime() ?? 0)
-			);
-	}
 
 	/**
 	 * Process a barcode scan and record participant attendance
@@ -274,6 +288,10 @@
 			if (current_event_day) {
 				comp_state.current_day_participants_attendance = getPopulatedAttendanceRecords(
 					event.id,
+					{
+						attendance_records_collection: COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION,
+						participant_collection: COLLECTIONS.PARTICIPANT_COLLECTION
+					},
 					current_event_day
 				) as ParticipantAttendance[];
 			}
@@ -409,13 +427,18 @@
 			if (current_event_day) {
 				comp_state.current_day_participants_attendance = getPopulatedAttendanceRecords(
 					data.event_id,
+					{
+						attendance_records_collection: COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION,
+						participant_collection: COLLECTIONS.PARTICIPANT_COLLECTION
+					},
 					current_event_day
 				) as ParticipantAttendance[];
 			}
 
-			comp_state.all_participants_attendance = getPopulatedAttendanceRecords(
-				data.event_id
-			) as ParticipantAttendance[];
+			comp_state.all_participants_attendance = getPopulatedAttendanceRecords(data.event_id, {
+				attendance_records_collection: COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION,
+				participant_collection: COLLECTIONS.PARTICIPANT_COLLECTION
+			}) as ParticipantAttendance[];
 
 			comp_state.participants = participants_cursor.fetch().map((participant) => {
 				const event_days = comp_state.event_details?.difference_in_days;
@@ -453,14 +476,6 @@
 		}
 	);
 
-	onMount(() => {
-		load_daily_attendance_report_worker();
-		load_qr_code_worker();
-		return () => {
-			if (comp_state.timeout) clearTimeout(comp_state.timeout);
-		};
-	});
-
 	watch(
 		() => comp_state.last_scanned_participant,
 		() => {
@@ -473,6 +488,14 @@
 			return () => timeout;
 		}
 	);
+
+	onMount(() => {
+		load_daily_attendance_report_worker();
+		load_qr_code_worker();
+		return () => {
+			if (comp_state.timeout) clearTimeout(comp_state.timeout);
+		};
+	});
 </script>
 
 <svelte:document onkeydown={handleKeydown} />

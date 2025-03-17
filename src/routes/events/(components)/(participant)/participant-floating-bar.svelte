@@ -3,9 +3,8 @@
 	import type { Participant } from '@/db/models/types';
 	import { Separator } from '@/components/ui/separator';
 	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
-	import { Trash, X } from 'lucide-svelte';
+	import { Trash, X } from '@/assets/icons';
 	import { fly } from 'svelte/transition';
-
 	import { Button, buttonVariants } from '$lib/components/ui/button/index.js';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import { COLLECTIONS } from '@/db';
@@ -25,17 +24,6 @@
 
 	const selected_rows = $derived(table.getFilteredSelectedRowModel().rows);
 
-	$effect(() => {
-		function handleKeyDown(event: KeyboardEvent) {
-			if (event.key === 'Escape') {
-				table.toggleAllRowsSelected(false);
-			}
-		}
-
-		window.addEventListener('keydown', handleKeyDown);
-		return () => window.removeEventListener('keydown', handleKeyDown);
-	});
-
 	function handleDeleteSelectedRows() {
 		selected_rows.forEach((row) => {
 			const participant_id = row.original.id;
@@ -51,6 +39,14 @@
 		table.toggleAllRowsSelected(false);
 	}
 </script>
+
+<svelte:document
+	onkeydown={(e) => {
+		if (e.key === 'Escape') {
+			table.toggleAllRowsSelected(false);
+		}
+	}}
+/>
 
 <div
 	in:fly={{ y: 20 }}
