@@ -8,7 +8,7 @@ export class AttendanceRecordCollection extends Collection<AttendanceRecord> {
 	id!: string;
 	participant_id!: string;
 	event_id!: string;
-	day!: number;
+	day!: string;
 	am_time_in?: Date;
 	am_time_out?: Date;
 	pm_time_in?: Date;
