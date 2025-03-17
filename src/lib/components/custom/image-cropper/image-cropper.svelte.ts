@@ -1,9 +1,3 @@
-/*
-	jsrepo 1.40.1
-	Installed from github/ieedan/shadcn-svelte-extras
-	2-25-2025
-*/
-
 import type { ReadableBoxedValues, WritableBoxedValues } from '@/utils/box';
 import { Context } from 'runed';
 import type { CropArea, DispatchEvents } from 'svelte-easy-crop';

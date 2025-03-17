@@ -49,6 +49,7 @@ export type EventDetails = Pick<
 	| 'start_date'
 	| 'end_date'
 	| 'settings_id'
+	| 'cover'
 	| 'created'
 	| 'updated'
 >;

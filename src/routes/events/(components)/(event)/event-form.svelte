@@ -26,6 +26,7 @@
 	import * as ImageCropper from '@/components/custom/image-cropper';
 	import { watch } from 'runed';
 	import { checkEventStatus } from '@routes/events/utils';
+	import { getFileFromUrl } from '@/components/custom/image-cropper';
 
 	interface EventFormProps {
 		event_to_edit?: EventDetails;
@@ -426,7 +427,27 @@
 				</div>
 			</div>
 		</div>
-		<ImageCropper.Root>
+		<Form.Field {form} name="cover" class="sr-only">
+			<Form.Control>
+				{#snippet children({ props })}
+					<Form.Label>Event Cover Photo</Form.Label>
+					<input hidden {...props} bind:value={$formData.cover} />
+				{/snippet}
+			</Form.Control>
+			<Form.FieldErrors />
+		</Form.Field>
+		<ImageCropper.Root
+			onCropped={async (url) => {
+				const file = await getFileFromUrl(url);
+				//convert to base64
+				const reader = new FileReader();
+				reader.readAsDataURL(file);
+				reader.onload = () => {
+					const base64 = reader.result as string;
+					$formData.cover = base64;
+				};
+			}}
+		>
 			<ImageCropper.UploadTrigger>
 				<ImageCropper.Preview class="h-64 w-64 rounded-md" />
 			</ImageCropper.UploadTrigger>

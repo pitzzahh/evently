@@ -560,7 +560,7 @@
 
 	<Tabs.Root value="participants">
 		<Tabs.List
-			class={cn('grid h-auto w-full max-w-[600px] grid-cols-2', {
+			class={cn('grid h-auto w-full max-w-[600px] grid-cols-3', {
 				'max-w-[800px]  grid-cols-3': event_status === 'ongoing'
 			})}
 		>
@@ -581,48 +581,46 @@
 		</Tabs.List>
 
 		<Tabs.Content value="participants" class="mt-4">
-			<div class="grid gap-2">
+			<div class="grid gap-2 overflow-x-auto">
 				{#if COLLECTIONS.PARTICIPANT_COLLECTION.isPulling()}
 					<TableSkeleton />
 				{:else}
-					{#key event_status}
-						<ParticipantDataTable
-							participant_form={data.participant_form}
-							participants={comp_state.participants}
-							{event_status}
-							event_details={comp_state.event_details!}
-						/>
-					{/key}
+					<ParticipantDataTable
+						participant_form={data.participant_form}
+						participants={comp_state.participants}
+						{event_status}
+						event_details={comp_state.event_details!}
+					/>
+				{/if}
+			</div>
+		</Tabs.Content>
+
+		<Tabs.Content value="all-time-in-and-out" class="mt-4">
+			<div class="grid gap-2">
+				{#if COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.isPulling()}
+					<TableSkeleton />
+				{:else}
+					<ParticipantAttendanceDataTable
+						event_days={comp_state.event_details?.difference_in_days}
+						participants_attendance={comp_state.all_participants_attendance}
+					/>
 				{/if}
 			</div>
 		</Tabs.Content>
 
 		{#if event_status === 'ongoing'}
 			<Tabs.Content value="time-in-and-out" class="mt-4">
-				{#if COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.isPulling()}
-					<TableSkeleton />
-				{:else}
-					<ParticipantAttendanceDataTable
-						participants_attendance={comp_state.current_day_participants_attendance}
-					/>
-				{/if}
-			</Tabs.Content>
-		{/if}
-
-		<Tabs.Content value="all-time-in-and-out" class="mt-4">
-			<div class="flex items-start gap-4">
-				<div class="grid flex-1 gap-2">
+				<div class="grid gap-2">
 					{#if COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.isPulling()}
 						<TableSkeleton />
 					{:else}
 						<ParticipantAttendanceDataTable
-							event_days={comp_state.event_details?.difference_in_days}
-							participants_attendance={comp_state.all_participants_attendance}
+							participants_attendance={comp_state.current_day_participants_attendance}
 						/>
 					{/if}
 				</div>
-			</div>
-		</Tabs.Content>
+			</Tabs.Content>
+		{/if}
 	</Tabs.Root>
 </div>
 

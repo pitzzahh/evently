@@ -7,6 +7,7 @@ import { formatDateTime, formatDateToTimeOption } from "@/utils/format";
 import { COLLECTIONS } from "@/db";
 import type { HelperResponse } from "@/types/generic";
 import { getPopulatedAttendanceRecords } from "@routes/events/participants/(utils)";
+import { makeTag, type TagVariant } from "..";
 
 export async function generateQRCodesPDF(props: DocumentMetaDetails): Promise<HelperResponse<string | null>> {
   const { info, event_details, participants } = props;
@@ -232,28 +233,26 @@ export async function generateDailyAttendanceReportPDF(props: DocumentMetaDetail
       ],
       ...participant_attendance.map(participant => {
         let statusText = '';
-        let statusStyle = '';
+        let status_variant: TagVariant = 'default';
 
         // Check event status first
         if (event_status === 'ongoing') {
           statusText = 'Event is currently ongoing';
-          statusStyle = 'statusOngoing';
         } else if (event_status === 'upcoming') {
           statusText = "Event hasn't started yet";
-          statusStyle = 'statusUpcoming';
+          status_variant = 'secondary';
         } else {
           // Event is completed, check attendance status
           const attendance_status = participant.attendance_status ?? 'absent';
 
           if (attendance_status === 'absent') {
             statusText = 'Absent';
-            statusStyle = 'statusAbsent';
+            status_variant = 'destructive';
           } else if (attendance_status === 'complete') {
             statusText = 'Complete Attendance';
-            statusStyle = 'statusComplete';
           } else if (attendance_status === 'incomplete') {
             statusText = 'Incomplete Attendance';
-            statusStyle = 'statusIncomplete';
+            status_variant = 'outline';
           }
         }
 
@@ -263,7 +262,7 @@ export async function generateDailyAttendanceReportPDF(props: DocumentMetaDetail
           { text: participant.am_time_out ? formatDateToTimeOption(new Date(participant.am_time_out)) : 'N/A' },
           { text: participant.pm_time_in ? formatDateToTimeOption(new Date(participant.pm_time_in)) : 'N/A' },
           { text: participant.pm_time_out ? formatDateToTimeOption(new Date(participant.pm_time_out)) : 'N/A' },
-          { text: statusText, style: statusStyle }
+          makeTag(statusText, undefined, status_variant)
         ];
       })
     ];
@@ -271,7 +270,7 @@ export async function generateDailyAttendanceReportPDF(props: DocumentMetaDetail
     const document_definition: TDocumentDefinitions = {
       info: info,
       pageSize: 'LEGAL',
-      pageMargins: [20, 40, 20, 40],
+      pageMargins: [10, 20, 10, 20],
       header: {
         text: event_details.event_name,
         alignment: 'center',

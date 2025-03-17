@@ -6,7 +6,8 @@ export const eventSchema = z.object({
 	location: z.string().trim(),
 	start_date: z.date(),
 	is_multi_day_event: z.boolean().default(false),
-	end_date: z.date()
+	end_date: z.date(),
+	cover: z.string().optional(),
 });
 
 export type EventSchema = z.infer<typeof eventSchema>;

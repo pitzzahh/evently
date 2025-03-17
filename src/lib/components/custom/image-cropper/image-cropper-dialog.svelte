@@ -1,12 +1,6 @@
-<!--
-	jsrepo 1.40.1
-	Installed from github/ieedan/shadcn-svelte-extras
-	2-25-2025
--->
-
 <script lang="ts">
-	import * as Dialog from '@/components/ui/dialog';
-	import { cn } from '@/utils/styles';
+	import * as Dialog from '$lib/components/ui/dialog';
+	import { cn } from '@/utils';
 	import { useImageCropperDialog } from './image-cropper.svelte.js';
 	import type { ImageCropperDialogProps } from './types';
 
