@@ -1,9 +1,3 @@
-<!--
-	jsrepo 1.40.1
-	Installed from github/ieedan/shadcn-svelte-extras
-	2-25-2025
--->
-
 <script lang="ts">
 	import { type ButtonProps, Button } from '@/components/ui/button';
 	import type { WithoutChildren } from 'bits-ui';
