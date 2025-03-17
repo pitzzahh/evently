@@ -271,7 +271,7 @@ export async function generateDailyAttendanceReportPDF(props: DocumentMetaDetail
     const document_definition: TDocumentDefinitions = {
       info: info,
       pageSize: 'LEGAL',
-      pageMargins: [20, 40, 20, 40],
+      pageMargins: [10, 20, 10, 20],
       header: {
         text: event_details.event_name,
         alignment: 'center',
