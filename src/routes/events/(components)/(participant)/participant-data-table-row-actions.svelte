@@ -49,42 +49,40 @@
 	}
 </script>
 
-<Dialog.Dialog
+<DropdownMenu.Root>
+	<DropdownMenu.Trigger>
+		{#snippet child({ props })}
+			<Button {...props} variant="ghost" class="flex h-8 w-8 p-0 data-[state=open]:bg-muted">
+				<Ellipsis />
+				<span class="sr-only">Open Menu</span>
+			</Button>
+		{/snippet}
+	</DropdownMenu.Trigger>
+	<DropdownMenu.Content class="w-auto" align="end">
+		<DropdownMenu.Item onclick={() => (comp_state.view_open = true)}>
+			<View />
+			View
+		</DropdownMenu.Item>
+		<DropdownMenu.Item onclick={() => (comp_state.edit_open = true)}>
+			<Pencil />
+			Edit
+		</DropdownMenu.Item>
+		<DropdownMenu.Item
+			onclick={() => (comp_state.remove_open = true)}
+			class="text-red-600 hover:!bg-red-600/20 hover:!text-red-600"
+		>
+			<Trash />
+			Remove
+		</DropdownMenu.Item>
+
+		<div></div>
+	</DropdownMenu.Content>
+</DropdownMenu.Root>
+
+<Dialog.Root
 	open={comp_state.edit_open || comp_state.remove_open || comp_state.view_open}
 	onOpenChange={handleOnOpenChange}
 >
-	<DropdownMenu.Root>
-		<DropdownMenu.Trigger>
-			{#snippet child({ props })}
-				<Button {...props} variant="ghost" class="flex h-8 w-8 p-0 data-[state=open]:bg-muted">
-					<Ellipsis />
-					<span class="sr-only">Open Menu</span>
-				</Button>
-			{/snippet}
-		</DropdownMenu.Trigger>
-		<DropdownMenu.Content class="w-auto" align="end">
-			<DropdownMenu.Item onclick={() => (comp_state.view_open = true)}>
-				<View />
-				View
-			</DropdownMenu.Item>
-
-			<DropdownMenu.Item onclick={() => (comp_state.edit_open = true)}>
-				<Pencil />
-				Edit
-			</DropdownMenu.Item>
-
-			<DropdownMenu.Item
-				onclick={() => (comp_state.remove_open = true)}
-				class="text-red-600 hover:!bg-red-600/20 hover:!text-red-600"
-			>
-				<Trash />
-				Remove
-			</DropdownMenu.Item>
-
-			<div></div>
-		</DropdownMenu.Content>
-	</DropdownMenu.Root>
-
 	{#if comp_state.view_open}
 		<Dialog.Content class="max-w-[950px]">
 			<Dialog.Header>
@@ -126,4 +124,4 @@
 			</Dialog.Footer>
 		</Dialog.Content>
 	{/if}
-</Dialog.Dialog>
+</Dialog.Root>
