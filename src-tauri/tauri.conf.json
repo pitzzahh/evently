@@ -14,9 +14,9 @@
 			{
 				"center": true,
 				"title": "evently v1.1.3",
-				"width": 950,
+				"width": 1000,
 				"height": 650,
-				"minWidth": 950,
+				"minWidth": 1000,
 				"minHeight": 650,
 				"resizable": true,
 				"fullscreen": false,

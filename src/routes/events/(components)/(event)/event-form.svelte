@@ -4,7 +4,7 @@
 	import Textarea from '@/components/ui/textarea/textarea.svelte';
 	import { eventSchema, type EventSchema } from '@/schema/event';
 	import { Info, MapPin, Ticket } from 'lucide-svelte';
-	import { type SuperValidated, superForm } from 'sveltekit-superforms';
+	import SuperDebug, { type SuperValidated, superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { nanoid } from 'nanoid';
 	import { EventTimePicker } from '..';
@@ -81,6 +81,7 @@
 							description: $formData.description,
 							is_multi_day: difference_in_days > 1,
 							difference_in_days,
+							cover: $formData.cover,
 							start_date: comp_state.event_dates.at(0)?.am_start as Date,
 							end_date: comp_state.event_dates.at(-1)?.pm_end as Date,
 							updated: new Date()
@@ -109,6 +110,7 @@
 					description: $formData.description,
 					is_multi_day: difference_in_days > 1,
 					difference_in_days,
+					cover: $formData.cover,
 					start_date: comp_state.event_dates.at(0)?.am_start as Date,
 					end_date: comp_state.event_dates.at(-1)?.pm_end as Date,
 					updated: new Date()
@@ -300,6 +302,24 @@
 		});
 	}
 
+	async function imageFileToDataUrl(file: File) {
+		if (!file) {
+			throw new Error('No file provided');
+		}
+		return new Promise<string>((resolve, reject) => {
+			const reader = new FileReader();
+			reader.onloadend = () => {
+				if (typeof reader.result === 'string') {
+					resolve(reader.result);
+				} else {
+					reject(new Error('Failed to convert file to data URL'));
+				}
+			};
+			reader.onerror = reject;
+			reader.readAsDataURL(file);
+		});
+	}
+
 	onMount(() => {
 		handleGenerateEventDates();
 		$formData.start_date = comp_state.date_range.start.toDate(getLocalTimeZone());
@@ -439,13 +459,7 @@
 		<ImageCropper.Root
 			onCropped={async (url) => {
 				const file = await getFileFromUrl(url);
-				//convert to base64
-				const reader = new FileReader();
-				reader.readAsDataURL(file);
-				reader.onload = () => {
-					const base64 = reader.result as string;
-					$formData.cover = base64;
-				};
+				$formData.cover = await imageFileToDataUrl(file);
 			}}
 		>
 			<ImageCropper.UploadTrigger>
@@ -504,6 +518,8 @@
 			</div>
 		</div>
 	</div>
+
+	<SuperDebug data={$formData} />
 
 	<Form.Button
 		disabled={!hasRequiredData($formData, ['title', 'location', 'start_date', 'end_date'])}
