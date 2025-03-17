@@ -4,7 +4,7 @@
 	import Textarea from '@/components/ui/textarea/textarea.svelte';
 	import { eventSchema, type EventSchema } from '@/schema/event';
 	import { Info, MapPin, Ticket } from 'lucide-svelte';
-	import { type SuperValidated, superForm } from 'sveltekit-superforms';
+	import SuperDebug, { type SuperValidated, superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { nanoid } from 'nanoid';
 	import { EventTimePicker } from '..';
@@ -504,6 +504,8 @@
 			</div>
 		</div>
 	</div>
+
+	<SuperDebug data={$formData} />
 
 	<Form.Button
 		disabled={!hasRequiredData($formData, ['title', 'location', 'start_date', 'end_date'])}
