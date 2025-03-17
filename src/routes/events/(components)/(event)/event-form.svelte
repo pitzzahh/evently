@@ -300,6 +300,24 @@
 		});
 	}
 
+	async function imageFileToDataUrl(file: File) {
+		if (!file) {
+			throw new Error('No file provided');
+		}
+		return new Promise<string>((resolve, reject) => {
+			const reader = new FileReader();
+			reader.onloadend = () => {
+				if (typeof reader.result === 'string') {
+					resolve(reader.result);
+				} else {
+					reject(new Error('Failed to convert file to data URL'));
+				}
+			};
+			reader.onerror = reject;
+			reader.readAsDataURL(file);
+		});
+	}
+
 	onMount(() => {
 		handleGenerateEventDates();
 		$formData.start_date = comp_state.date_range.start.toDate(getLocalTimeZone());
@@ -439,13 +457,7 @@
 		<ImageCropper.Root
 			onCropped={async (url) => {
 				const file = await getFileFromUrl(url);
-				//convert to base64
-				const reader = new FileReader();
-				reader.readAsDataURL(file);
-				reader.onload = () => {
-					const base64 = reader.result as string;
-					$formData.cover = base64;
-				};
+				$formData.cover = await imageFileToDataUrl(file);
 			}}
 		>
 			<ImageCropper.UploadTrigger>
