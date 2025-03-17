@@ -100,7 +100,7 @@
 			scannerState = Html5QrcodeScannerState.SCANNING;
 		}
 	}
-	
+
 	// Initialize scanner on mount
 	onMount(() => {
 		if (!browser) return;
@@ -176,7 +176,7 @@
 	}
 </script>
 
-<div class="qr-scanner-container">
+<div class="relative">
 	<div id="qr-scanner" class="size-full"></div>
 
 	{#if scanComplete && lastResult && singleScanMode}
@@ -197,10 +197,6 @@
 </div>
 
 <style>
-	.qr-scanner-container {
-		position: relative;
-	}
-
 	/* Hide unwanted icons */
 	#qr-scanner :global(img[alt='Info icon']),
 	#qr-scanner :global(img[alt='Camera based scan']) {
