@@ -11,6 +11,7 @@
 		View,
 		Clock
 	} from '@/assets/icons';
+	import * as Avatar from '@/components/ui/avatar';
 	import { cn } from '@/utils/styles';
 	import { EventTimePicker } from '@routes/events/(components)';
 	import * as DropdownMenu from '@/components/ui/dropdown-menu/index.js';
@@ -126,10 +127,16 @@
 <div in:fly={{ y: 20 }} class="grid gap-6">
 	<div class="flex items-center justify-between">
 		<h2 class="text-5xl font-semibold">{comp_state.event_details?.event_name ?? 'N/A'}</h2>
-
 		<div class="flex items-center gap-2">
 			{@render StatusPill(event_status)}
-
+			<Button
+				size="lg"
+				href={`/events/participants/${comp_state.event_details?.id}`}
+				class="rounded-lg border px-4 py-3 text-sm"
+			>
+				<View class="size-5" />
+				View Participants
+			</Button>
 			<Dialog.Root
 				open={comp_state.confimation_open}
 				onOpenChange={(value) => (comp_state.confimation_open = value)}
@@ -177,67 +184,53 @@
 	</div>
 
 	<!-- EVENT DETAILS -->
-	<div class="grid gap-6 border-b-2 border-dashed pb-6">
-		<div class="flex items-end justify-between">
-			<div class="grid w-full gap-4">
-				<div class="flex w-full justify-between gap-4">
-					<div class="flex gap-5">
-						<div class="flex items-center gap-3">
-							<div class="rounded-md border p-3">
-								<Calendar class="size-5 text-muted-foreground" />
-							</div>
-							<div>
-								<p class="text-base font-medium">
-									{formatDateTime(comp_state.event_details?.start_date)}
-								</p>
-								<p class="text-muted-foreground">
-									{formatDateToTimeOption(comp_state.event_schedules.at(0)?.am_start)} - {formatDateToTimeOption(
-										comp_state.event_schedules.at(0)?.pm_end
-									)}
-								</p>
-							</div>
+	<div class="grid grid-cols-2 place-content-between gap-6 border-b-2 border-dashed pb-6">
+		<div class="grid w-full gap-4">
+			<div class="flex w-full justify-between gap-4">
+				<div class="grid-row-2 grid grid-cols-2 place-content-center gap-4">
+					<div class="flex items-center gap-3">
+						<div class="rounded-md border p-3">
+							<Calendar class="size-5 text-muted-foreground" />
 						</div>
-						<div class="flex items-center gap-3">
-							<div class="rounded-md border p-3">
-								<UsersRound class="size-5 text-muted-foreground" />
-							</div>
-							<div>
-								<p class="text-base font-medium">{comp_state.participants.length}</p>
-								<p class=" text-muted-foreground">
-									Participant{comp_state.participants.length > 1 ? 's' : ''}
-								</p>
-							</div>
+						<div>
+							<p class="text-base font-medium">
+								{formatDateTime(comp_state.event_details?.start_date)}
+							</p>
+							<p class="text-muted-foreground">
+								{formatDateToTimeOption(comp_state.event_schedules.at(0)?.am_start)} - {formatDateToTimeOption(
+									comp_state.event_schedules.at(0)?.pm_end
+								)}
+							</p>
 						</div>
-
-						<div class="flex items-center gap-3">
-							<div class="rounded-md border p-3">
-								<Clock class="size-5 text-muted-foreground" />
-							</div>
-
-							<div>
-								<p class="text-base font-medium">
-									{comp_state.event_details?.difference_in_days}
-									{comp_state.event_details?.difference_in_days &&
-									comp_state.event_details?.difference_in_days > 1
-										? 'days'
-										: 'day'} event
-								</p>
-								<p class=" text-muted-foreground">Duration</p>
-							</div>
+					</div>
+					<div class="flex items-center gap-3">
+						<div class="rounded-md border p-3">
+							<UsersRound class="size-5 text-muted-foreground" />
+						</div>
+						<div>
+							<p class="text-base font-medium">{comp_state.participants.length}</p>
+							<p class=" text-muted-foreground">
+								Participant{comp_state.participants.length > 1 ? 's' : ''}
+							</p>
 						</div>
 					</div>
 
-					<Button
-						size="lg"
-						href={`/events/participants/${comp_state.event_details?.id}`}
-						class="rounded-lg border px-4 py-3 text-sm"
-					>
-						<View class="size-5" />
-						View Participants
-					</Button>
-				</div>
+					<div class="flex items-center gap-3">
+						<div class="rounded-md border p-3">
+							<Clock class="size-5 text-muted-foreground" />
+						</div>
 
-				<div class="flex items-center justify-between gap-4">
+						<div>
+							<p class="text-base font-medium">
+								{comp_state.event_details?.difference_in_days}
+								{comp_state.event_details?.difference_in_days &&
+								comp_state.event_details?.difference_in_days > 1
+									? 'days'
+									: 'day'} event
+							</p>
+							<p class=" text-muted-foreground">Duration</p>
+						</div>
+					</div>
 					<div class="flex items-center gap-3">
 						<div class="rounded-md border p-3">
 							<MapPin class="size-5 text-muted-foreground" />
@@ -247,55 +240,65 @@
 							<p class=" text-muted-foreground">Location</p>
 						</div>
 					</div>
-
-					<Button variant="ghost" onclick={() => (comp_state.see_more = !comp_state.see_more)}>
-						{comp_state.see_more ? 'See Less' : 'See More'}
-					</Button>
 				</div>
 			</div>
+
+			<div class="flex items-center justify-between gap-4">
+				<Button variant="ghost" onclick={() => (comp_state.see_more = !comp_state.see_more)}>
+					{comp_state.see_more ? 'See Less' : 'See More'}
+				</Button>
+			</div>
 		</div>
-		<div
+		<Avatar.Root
 			class={cn(
-				'grid gap-3 overflow-hidden rounded-lg border bg-white p-4 transition-all duration-300 dark:bg-[#151e28]',
-				{
-					'm-0 h-0 p-0 opacity-0': !comp_state.see_more,
-					'h-auto opacity-100': comp_state.see_more
-				}
+				'size-20 h-64 w-64 rounded-md ring-2 ring-accent ring-offset-2 ring-offset-background '
 			)}
 		>
-			<!-- EVENT STATS -->
-			<div
-				class={cn('transition-scale grid gap-3 rounded-lg border p-4 duration-300', {
-					'origin-top scale-y-0 opacity-0': !comp_state.see_more,
-					'scale-y-100 opacity-100': comp_state.see_more
-				})}
-			>
-				<div class="flex items-center justify-between">
-					<h3 class="text-lg font-semibold">Event Stats</h3>
-					<div class="rounded-md border border-blue-500 bg-blue-500/20 p-2">
-						<ChartBar class="size-5 text-blue-500" />
-					</div>
+			<Avatar.Image src={comp_state.event_details?.cover} />
+			<Avatar.Fallback class="h-64 w-64 rounded-md">EVENT COVER</Avatar.Fallback>
+		</Avatar.Root>
+	</div>
+	<div
+		class={cn(
+			'grid gap-3 overflow-hidden rounded-lg border bg-white p-4 transition-all duration-300 dark:bg-[#151e28]',
+			{
+				'm-0 h-0 p-0 opacity-0': !comp_state.see_more,
+				'h-auto opacity-100': comp_state.see_more
+			}
+		)}
+	>
+		<!-- EVENT STATS -->
+		<div
+			class={cn('transition-scale grid gap-3 rounded-lg border p-4 duration-300', {
+				'origin-top scale-y-0 opacity-0': !comp_state.see_more,
+				'scale-y-100 opacity-100': comp_state.see_more
+			})}
+		>
+			<div class="flex items-center justify-between">
+				<h3 class="text-lg font-semibold">Event Stats</h3>
+				<div class="rounded-md border border-blue-500 bg-blue-500/20 p-2">
+					<ChartBar class="size-5 text-blue-500" />
 				</div>
+			</div>
 
-				<div class="grid gap-2 text-sm">
-					<div class="flex justify-between">
-						<p class="text-muted-foreground">Total Spots</p>
-						<p>100</p>
-					</div>
-					<div class="flex justify-between">
-						<p class="text-muted-foreground">Spots Remaining</p>
-						<p>95</p>
-					</div>
-					<div class="flex justify-between">
-						<p class="text-muted-foreground">
-							{#if event_status === 'upcoming' || event_status === 'ongoing'}
-								Attending
-							{:else if event_status === 'finished'}
-								Attended
-							{/if}
-						</p>
-						<p>{comp_state.participants.length}</p>
-					</div>
+			<div class="grid gap-2 text-sm">
+				<div class="flex justify-between">
+					<p class="text-muted-foreground">Total Spots</p>
+					<p>100</p>
+				</div>
+				<div class="flex justify-between">
+					<p class="text-muted-foreground">Spots Remaining</p>
+					<p>95</p>
+				</div>
+				<div class="flex justify-between">
+					<p class="text-muted-foreground">
+						{#if event_status === 'upcoming' || event_status === 'ongoing'}
+							Attending
+						{:else if event_status === 'finished'}
+							Attended
+						{/if}
+					</p>
+					<p>{comp_state.participants.length}</p>
 				</div>
 			</div>
 		</div>
