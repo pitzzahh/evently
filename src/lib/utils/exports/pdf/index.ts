@@ -172,29 +172,12 @@ export async function generateDailyAttendanceReportPDF(props: DocumentMetaDetail
       participant_collection: COLLECTIONS.PARTICIPANT_COLLECTION,
     });
 
-    const attendanceRecords = COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.find({
-      event_id: event_details.id,
-      day: new Date().getDate().toString()
-    }).fetch();
-
-    const participantsWithAttendance = participants.map(participant => {
-      const attendance = attendanceRecords.find(record => record.participant_id === participant.id);
-      return {
-        ...participant,
-        am_time_in: attendance ? formatDateToTimeOption(attendance.am_time_in) : '-',
-        am_time_out: attendance ? formatDateToTimeOption(attendance.am_time_out) : '-',
-        pm_time_in: attendance ? formatDateToTimeOption(attendance.pm_time_in) : '-',
-        pm_time_out: attendance ? formatDateToTimeOption(attendance.pm_time_out) : '-',
-        attendance_status: attendance ? participant.attendance_status : 'absent'
-      };
-    });
-
     const summary = {
       day: new Date().getDate(),
       date: new Date().toLocaleDateString(),
       total_participants: participants.length,
-      present: participantsWithAttendance.filter(p => p.attendance_status !== 'absent').length,
-      absent: participantsWithAttendance.filter(p => p.attendance_status === 'absent').length
+      present: participant_attendance.filter(p => p.attendance_status !== 'absent').length,
+      absent: participant_attendance.filter(p => p.attendance_status === 'absent').length
     };
 
     const tableBody = [
@@ -206,12 +189,12 @@ export async function generateDailyAttendanceReportPDF(props: DocumentMetaDetail
         { text: 'PM Check-out', style: 'tableHeader' },
         { text: 'Status', style: 'tableHeader' }
       ],
-      ...participantsWithAttendance.map(participant => [
-        `${participant.first_name} ${participant.last_name}`,
-        participant.am_time_in,
-        participant.am_time_out,
-        participant.pm_time_in,
-        participant.pm_time_out,
+      ...participant_attendance.map(participant => [
+        { text: `${participant.first_name} ${participant.last_name}` },
+        { text: participant.am_time_in?.toString() || 'N/A' },
+        { text: participant.am_time_out?.toString() || 'N/A' },
+        { text: participant.pm_time_in?.toString() || 'N/A' },
+        { text: participant.pm_time_out?.toString() || 'N/A' },
         { text: participant.attendance_status ?? 'absent', style: `status${(participant.attendance_status ?? 'absent').charAt(0).toUpperCase() + (participant.attendance_status ?? 'absent').slice(1)}` }
       ])
     ];
