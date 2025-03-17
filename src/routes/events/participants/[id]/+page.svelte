@@ -471,6 +471,14 @@
 		<div class="flex flex-col items-end gap-2">
 			<div class="flex items-center gap-2">
 				<QrCodeScannerDialog handleScan={handleScanParticipant} />
+				<AddParticipantsDialog
+					disabled={false}
+					add_participants_form={data.add_participants_form}
+					event_id={comp_state.event_details?.id ?? 'N/A'}
+				/>
+			</div>
+			<div class="justify flex items-center gap-1">
+				<ImportParticipantDialog event_id={comp_state.event_details?.id ?? 'N/A'} />
 				<DropdownMenu.Root>
 					<DropdownMenu.Trigger class={buttonVariants({ variant: 'outline' })}
 						><FileOutput class="size-4" />Export</DropdownMenu.Trigger
@@ -545,14 +553,6 @@
 						</DropdownMenu.Group>
 					</DropdownMenu.Content>
 				</DropdownMenu.Root>
-				<AddParticipantsDialog
-					disabled={false}
-					add_participants_form={data.add_participants_form}
-					event_id={comp_state.event_details?.id ?? 'N/A'}
-				/>
-			</div>
-			<div class="justify flex items-center">
-				<ImportParticipantDialog event_id={comp_state.event_details?.id ?? 'N/A'} />
 				{@render StatusPill(event_status)}
 			</div>
 		</div>
