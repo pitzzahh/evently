@@ -1,22 +1,3 @@
-<!-- let {
-    width = 250,
-    height = 250,
-    paused = $bindable(false),
-    fps = 60,
-    aspectRatio = 1,
-    onDetect,
-    onError
-}: {
-    width?: number;
-    height?: number;
-    paused?: boolean;
-    fps?: number;
-    aspectRatio?: number;
-    onError?: (message: string) => void;
-    onDetect: (message: string) => void;
-} = $props(); -->
-
-<!-- src/lib/components/custom/qr-code-scanner/qr-code-scanner.svelte -->
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { onMount, onDestroy } from 'svelte';
@@ -27,18 +8,17 @@
 		Html5QrcodeSupportedFormats,
 		Html5QrcodeScannerState
 	} from 'html5-qrcode';
-	import { boolean } from 'zod';
 
 	let {
-		width = 250,
-		height = 250,
+		width = 400,
+		height = 400,
 		paused = $bindable(false),
 		fps = 60,
 		aspectRatio = 1,
 		onDetect,
 		onError,
-		singleScanMode = false,
-		resetAfter = 2000,
+		singleScanMode = true,
+		resetAfter = 5000,
 		autoPauseDelay = 500
 	}: {
 		width?: number;
@@ -120,7 +100,7 @@
 			scannerState = Html5QrcodeScannerState.SCANNING;
 		}
 	}
-
+	
 	// Initialize scanner on mount
 	onMount(() => {
 		if (!browser) return;
@@ -197,7 +177,7 @@
 </script>
 
 <div class="qr-scanner-container">
-	<div id="qr-scanner" class="size-[500px]"></div>
+	<div id="qr-scanner" class="size-full"></div>
 
 	{#if scanComplete && lastResult && singleScanMode}
 		<div class="scan-success-overlay">
