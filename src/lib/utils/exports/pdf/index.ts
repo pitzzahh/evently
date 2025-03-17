@@ -6,7 +6,7 @@ import type { DocumentMetaDetails } from "@/types/exports";
 import { formatDateToTimeOption } from "@/utils/format";
 import { COLLECTIONS } from "@/db";
 import type { HelperResponse } from "@/types/generic";
-import { getPopulatedAttendanceRecords } from '@routes/events/participants/[id]/+page.svelte'
+import { getPopulatedAttendanceRecords } from "@routes/events/participants/(utils)";
 
 export async function generateQRCodesPDF(props: DocumentMetaDetails): Promise<HelperResponse<string | null>> {
   const { info, event_details, participants } = props;
@@ -172,6 +172,8 @@ export async function generateDailyAttendanceReportPDF(props: DocumentMetaDetail
       participant_collection: COLLECTIONS.PARTICIPANT_COLLECTION,
     });
 
+    console.log(`Participant Attendance Records: ${JSON.stringify(participant_attendance, null, 2)}`);
+
     const summary = {
       day: new Date().getDate(),
       date: new Date().toLocaleDateString(),
@@ -191,10 +193,10 @@ export async function generateDailyAttendanceReportPDF(props: DocumentMetaDetail
       ],
       ...participant_attendance.map(participant => [
         { text: `${participant.first_name} ${participant.last_name}` },
-        { text: participant.am_time_in?.toString() || 'N/A' },
-        { text: participant.am_time_out?.toString() || 'N/A' },
-        { text: participant.pm_time_in?.toString() || 'N/A' },
-        { text: participant.pm_time_out?.toString() || 'N/A' },
+        { text: participant.am_time_in ? formatDateToTimeOption(new Date(participant.am_time_in)) : 'N/A' },
+        { text: participant.am_time_out ? formatDateToTimeOption(new Date(participant.am_time_out)) : 'N/A' },
+        { text: participant.pm_time_in ? formatDateToTimeOption(new Date(participant.pm_time_in)) : 'N/A' },
+        { text: participant.pm_time_out ? formatDateToTimeOption(new Date(participant.pm_time_out)) : 'N/A' },
         { text: participant.attendance_status ?? 'absent', style: `status${(participant.attendance_status ?? 'absent').charAt(0).toUpperCase() + (participant.attendance_status ?? 'absent').slice(1)}` }
       ])
     ];
