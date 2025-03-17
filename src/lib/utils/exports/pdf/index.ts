@@ -167,7 +167,7 @@ export async function generateDailyAttendanceReportPDF(props: DocumentMetaDetail
   try {
     const attendanceRecords = COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.find({
       event_id: event_details.id,
-      day: new Date().getDate()
+      day: new Date().getDate().toString()
     }).fetch();
 
     const participantsWithAttendance = participants.map(participant => {
