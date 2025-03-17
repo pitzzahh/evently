@@ -13,8 +13,8 @@
 		width = 350,
 		height = 350,
 		paused = $bindable(false),
-		fps = 60,
-		aspectRatio = 1,
+		fps = 30,
+		aspectRatio = 2,
 		onDetect,
 		onError,
 		singleScanMode = true,
@@ -171,9 +171,8 @@
 	}
 </script>
 
-
-<div>
-	<div id="qr-scanner" class="relative max-h-[500px] min-h-[500px]"></div>
+<div class="relative h-full w-full">
+	<div id="qr-scanner" class="h-full max-h-[80vh] w-full !border-none"></div>
 
 	{#if scanComplete && lastResult && singleScanMode}
 		<div class="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-green-600/85">
@@ -192,6 +191,7 @@
 </div>
 
 <style>
+	/* Hide unwanted icons */
 	#qr-scanner :global(img[alt='Info icon']),
 	#qr-scanner :global(img[alt='Camera based scan']) {
 		display: none;
@@ -210,5 +210,29 @@
 		content: 'Allow camera access';
 		visibility: visible;
 		padding: 10px 0;
+	}
+
+	/* Contain the scanner video and elements */
+	#qr-scanner :global(video) {
+		max-height: 100% !important;
+		max-width: 100% !important;
+		border-radius: 1rem !important;
+	}
+
+	#qr-scanner :global(#html5-qrcode-anchor-scan-type-change) {
+		display: none;
+	}
+
+	#qr-scanner :global(section) {
+		padding: 0 !important;
+	}
+
+	#qr-scanner :global(section div) {
+		padding: 0 !important;
+	}
+
+	/* Add height constraint to the scanner */
+	#qr-scanner {
+		overflow: hidden;
 	}
 </style>
