@@ -57,6 +57,8 @@
 					}`
 				);
 				lastForm?.scrollIntoView({ behavior: 'smooth' });
+				//focus
+				lastForm?.focus({ preventScroll: true });
 			});
 			$inspect(comp_state.participant_attendance);
 		}
