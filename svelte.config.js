@@ -9,14 +9,6 @@ const config = {
 		alias: {
 			"@/*": "./src/lib/*",
 			"@routes": "./src/routes",
-		},
-		csp: {
-			directives: {
-				'script-src': ['self', 'unsafe-inline', 'http://tauri.localhost', 'http://localhost'],
-				'connect-src': ['self', 'unsafe-inline', 'unsafe-eval', 'http://localhost'],
-				'img-src': ['self', 'data:'],
-				'style-src': ['self', 'unsafe-inline', 'http://localhost', 'http://tauri.localhost'],
-			}
 		}
 	}
 };
