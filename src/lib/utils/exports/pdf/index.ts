@@ -166,6 +166,17 @@ export async function generateDailyAttendanceReportPDF(props: DocumentMetaDetail
     return { status: 404, message: "No participants found to generate attendance report", data: null };
   }
   try {
+    // Determine event status
+    const currentDate = new Date();
+    const startDate = new Date(event_details.start_date);
+    const endDate = new Date(event_details.end_date);
+
+    let event_status = 'completed';
+    if (currentDate < startDate) {
+      event_status = 'upcoming';
+    } else if (currentDate >= startDate && currentDate <= endDate) {
+      event_status = 'ongoing';
+    }
 
     const participant_attendance = getPopulatedAttendanceRecords(event_details.id, {
       attendance_records_collection: COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION,
@@ -191,14 +202,42 @@ export async function generateDailyAttendanceReportPDF(props: DocumentMetaDetail
         { text: 'PM Check-out', style: 'tableHeader' },
         { text: 'Status', style: 'tableHeader' }
       ],
-      ...participant_attendance.map(participant => [
-        { text: `${participant.first_name} ${participant.last_name}` },
-        { text: participant.am_time_in ? formatDateToTimeOption(new Date(participant.am_time_in)) : 'N/A' },
-        { text: participant.am_time_out ? formatDateToTimeOption(new Date(participant.am_time_out)) : 'N/A' },
-        { text: participant.pm_time_in ? formatDateToTimeOption(new Date(participant.pm_time_in)) : 'N/A' },
-        { text: participant.pm_time_out ? formatDateToTimeOption(new Date(participant.pm_time_out)) : 'N/A' },
-        { text: participant.attendance_status ?? 'absent', style: `status${(participant.attendance_status ?? 'absent').charAt(0).toUpperCase() + (participant.attendance_status ?? 'absent').slice(1)}` }
-      ])
+      ...participant_attendance.map(participant => {
+        let statusText = '';
+        let statusStyle = '';
+
+        // Check event status first
+        if (event_status === 'ongoing') {
+          statusText = 'Event is currently ongoing';
+          statusStyle = 'statusOngoing';
+        } else if (event_status === 'upcoming') {
+          statusText = "Event hasn't started yet";
+          statusStyle = 'statusUpcoming';
+        } else {
+          // Event is completed, check attendance status
+          const attendance_status = participant.attendance_status ?? 'absent';
+
+          if (attendance_status === 'absent') {
+            statusText = 'Absent';
+            statusStyle = 'statusAbsent';
+          } else if (attendance_status === 'complete') {
+            statusText = 'Complete Attendance';
+            statusStyle = 'statusComplete';
+          } else if (attendance_status === 'incomplete') {
+            statusText = 'Incomplete Attendance';
+            statusStyle = 'statusIncomplete';
+          }
+        }
+
+        return [
+          { text: `${participant.first_name} ${participant.last_name}` },
+          { text: participant.am_time_in ? formatDateToTimeOption(new Date(participant.am_time_in)) : 'N/A' },
+          { text: participant.am_time_out ? formatDateToTimeOption(new Date(participant.am_time_out)) : 'N/A' },
+          { text: participant.pm_time_in ? formatDateToTimeOption(new Date(participant.pm_time_in)) : 'N/A' },
+          { text: participant.pm_time_out ? formatDateToTimeOption(new Date(participant.pm_time_out)) : 'N/A' },
+          { text: statusText, style: statusStyle }
+        ];
+      })
     ];
 
     const document_definition: TDocumentDefinitions = {
@@ -262,13 +301,27 @@ export async function generateDailyAttendanceReportPDF(props: DocumentMetaDetail
           color: 'black'
         },
         statusComplete: {
-          color: 'green'
+          color: 'white',
+          background: '#16a34a',  // green-600
+          bold: true
         },
         statusIncomplete: {
-          color: 'orange'
+          color: 'white',
+          background: '#ca8a04',  // yellow-600
+          bold: true
         },
         statusAbsent: {
-          color: 'red'
+          color: 'white',
+          background: '#dc2626',  // red-600
+          bold: true
+        },
+        statusOngoing: {
+          color: '#374151',  // gray-700
+          bold: true
+        },
+        statusUpcoming: {
+          color: '#374151',  // gray-700
+          bold: true
         },
         summaryBox: {
           alignment: 'center',
