@@ -629,7 +629,7 @@
 {#if comp_state.last_scanned_participant}
 	<div
 		transition:fly={{ y: -20, duration: 200, easing: quartInOut }}
-		class="fixed right-8 top-10 z-20"
+		class="fixed right-8 top-10 z-[9999]"
 	>
 		<Card.Root class="relative w-[400px]">
 			<button
@@ -677,9 +677,3 @@
 		</Card.Root>
 	</div>
 {/if}
-
-<style>
-	* {
-		border: 1px solid red;
-	}
-</style>
