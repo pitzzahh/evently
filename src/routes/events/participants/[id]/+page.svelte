@@ -22,7 +22,7 @@
 	import * as DropdownMenu from '@/components/ui/dropdown-menu';
 	import { QRCode, SquareCheckBig } from '@/assets/icons';
 	import type { HelperResponse } from '@/types/generic/index.js';
-	import QrCodeScanner from '@/components/custom/qr-code-scanner/qr-code-scanner.svelte';
+	import QrCodeScannerDialog from '@routes/events/(components)/(participant)/qr-code-scanner-dialog.svelte';
 
 	interface ComponentState {
 		event_details: EventDetails | undefined;
@@ -70,11 +70,11 @@
 					comp_state.event_details.start_date,
 					comp_state.event_details.end_date,
 					new Date()
-				).currentDay
+				).currentDay.toString()
 			: null
 	);
 
-	function getPopulatedAttendanceRecords(eventId: string, current_event_day?: number) {
+	function getPopulatedAttendanceRecords(eventId: string, current_event_day?: string) {
 		const attendance_records = COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.find({
 			event_id: eventId,
 			...(current_event_day && { day: current_event_day })
@@ -161,7 +161,7 @@
 			const existing_attendance = COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.findOne({
 				participant_id: participant.id,
 				event_id: event.id,
-				day: current_event_day as number
+				day: current_event_day!
 			});
 
 			// Prepare response message variables
@@ -246,7 +246,7 @@
 				const attendanceId = COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.insert({
 					event_id: event.id,
 					participant_id: participant.id,
-					day: current_event_day as number,
+					day: current_event_day!,
 					am_time_in: period === 'AM' ? now : undefined,
 					pm_time_in: period === 'PM' ? now : undefined,
 					latest_time_scanned: now,
@@ -494,6 +494,7 @@
 		<div class="flex flex-col items-end gap-2">
 			<div class="flex items-center gap-2">
 				<ImportParticipantDialog event_id={comp_state.event_details?.id ?? 'N/A'} />
+				<QrCodeScannerDialog handleScan={handleScanParticipant} />
 				<DropdownMenu.Root>
 					<DropdownMenu.Trigger class={buttonVariants({ variant: 'outline' })}
 						><FileOutput class="size-4" />Export</DropdownMenu.Trigger
@@ -578,7 +579,6 @@
 		</div>
 	</div>
 
-	<QrCodeScanner onDetect={(data) => handleScanParticipant(data)} />
 	<Tabs.Root value="participants">
 		<Tabs.List
 			class={cn('grid h-auto w-full max-w-[600px] grid-cols-2', {

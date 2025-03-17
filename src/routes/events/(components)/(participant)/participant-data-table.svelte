@@ -22,8 +22,8 @@
 	data={participants}
 	columns={participantTableColumns(participant_form, event_status, event_details)}
 >
-	{#snippet data_table_toolbar({ table })}
-		<ParticipantDataTableToolbar {table} />
+	{#snippet data_table_toolbar({ table, setGlobalFilter })}
+		<ParticipantDataTableToolbar {setGlobalFilter} {table} />
 	{/snippet}
 
 	{#snippet floating_bar({ table })}

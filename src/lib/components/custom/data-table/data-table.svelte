@@ -24,7 +24,9 @@
 	interface DataTableProps {
 		columns: ColumnDef<TData, TValue>[];
 		data: TData[];
-		data_table_toolbar?: Snippet<[{ table: Table<TData> }]>;
+		data_table_toolbar?: Snippet<
+			[{ table: Table<TData>; setGlobalFilter: (value: string) => void }]
+		>;
 		floating_bar?: Snippet<[{ table: Table<TData> }]>;
 		fetching?: boolean;
 	}
@@ -115,17 +117,10 @@
 </script>
 
 {#if data_table_toolbar}
-	{@render data_table_toolbar?.({ table })}
-{:else}
-	<Input
-		placeholder="Search data..."
-		bind:value={globalFilter}
-		type="search"
-		class="h-8 w-[150px] min-w-[300px] lg:w-min"
-	/>
+	{@render data_table_toolbar?.({ table, setGlobalFilter: (value) => (globalFilter = value) })}
 {/if}
 
-{#if floating_bar && table.getFilteredSelectedRowModel ().rows.length > 0}
+{#if floating_bar && table.getFilteredSelectedRowModel().rows.length > 0}
 	{@render floating_bar({ table })}
 {/if}
 
