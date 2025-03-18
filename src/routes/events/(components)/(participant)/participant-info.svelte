@@ -84,6 +84,11 @@
 				setTimeout(() => current_day_card?.focus(), 500);
 			});
 			$inspect(comp_state.participant_attendance);
+
+			return () => {
+				participant_attendance_cursor.cleanup();
+				event_schedule_cursor.cleanup();
+			};
 		}
 	);
 
