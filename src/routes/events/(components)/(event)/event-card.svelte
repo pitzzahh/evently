@@ -13,6 +13,8 @@
 		TimelineContent,
 		TimelineOppositeContent
 	} from 'svelte-vertical-timeline';
+	import { cn } from '@/utils';
+	import * as Avatar from '@/components/ui/avatar';
 
 	interface ComponentState {
 		number_of_participants: number;
@@ -26,6 +28,7 @@
 		created,
 		difference_in_days,
 		is_multi_day,
+		cover,
 		end_date,
 		start_date
 	}: EventDetails = $props();
@@ -74,37 +77,43 @@
 	</TimelineSeparator>
 	<TimelineContent style="margin: 0;">
 		<div
-			class="mb-10 ms-4 rounded-xl border bg-white p-4 transition duration-500 ease-in-out hover:border-black/50 dark:bg-[#151e28] dark:hover:border-white/50"
+			class="mb-10 ms-4 flex rounded-xl border bg-white transition duration-500 ease-in-out hover:border-black/50 dark:bg-[#151e28] dark:hover:border-white/50"
 		>
-			<div class="mb-1 flex items-center gap-1">
-				<Badge
-					variant="outline"
-					class="border border-gray-500 bg-gray-500/10 px-2 py-1 text-center text-xs font-medium dark:bg-gray-500/30"
-					>{formatDateTime(new Date(start_date))}</Badge
-				> - <Badge
-					variant="outline"
-					class="border border-gray-500 bg-gray-500/10 px-2 py-1 text-center text-xs font-medium dark:bg-gray-500/30"
-					>{formatDateTime(new Date(end_date))}</Badge
-				>
-			</div>
-			<div class="relative flex w-full items-start justify-between">
-				<div class="grid place-content-start gap-1">
-					<h3 class="text-lg font-semibold text-gray-900 dark:text-white">{event_name}</h3>
-					<div class="flex items-center gap-1 text-muted-foreground">
-						<MapPin class="size-4" />
-						<p>{location}</p>
+			<Avatar.Root class={cn('h-[200px] w-[200px]')}>
+				<Avatar.Image src={cover} />
+				<Avatar.Fallback class="h-[200px] w-[200px]">EVENT COVER</Avatar.Fallback>
+			</Avatar.Root>
+			<div class="flex w-full justify-between p-4">
+				<div class="relative flex w-full flex-col items-start justify-between">
+					<div class="mb-1 flex items-start gap-1">
+						<Badge
+							variant="outline"
+							class="border border-gray-500 bg-gray-500/10 px-2 py-1 text-center text-xs font-medium dark:bg-gray-500/30"
+							>{formatDateTime(new Date(start_date))}</Badge
+						> - <Badge
+							variant="outline"
+							class="border border-gray-500 bg-gray-500/10 px-2 py-1 text-center text-xs font-medium dark:bg-gray-500/30"
+							>{formatDateTime(new Date(end_date))}</Badge
+						>
 					</div>
+					<div class="grid place-content-start gap-1">
+						<h3 class="text-lg font-semibold text-gray-900 dark:text-white">{event_name}</h3>
+						<div class="flex items-center gap-1 text-muted-foreground">
+							<MapPin class="size-4" />
+							<p>{location}</p>
+						</div>
 
-					<Button
-						href="/events/{id}"
-						class="mt-3 inline-flex w-[150px] items-center rounded-lg border px-4 py-2 text-sm font-medium dark:border-white/20"
-					>
-						See Details
-						<ChevronRightIcon />
-					</Button>
-				</div>
-				<div class="absolute -right-6 -top-14 rounded-lg bg-white dark:bg-[#1C1E20]">
-					{@render StatusPill(event_status, 'sm')}
+						<Button
+							href="/events/{id}"
+							class="mt-3 inline-flex w-[150px] items-center rounded-lg border px-4 py-2 text-sm font-medium dark:border-white/20"
+						>
+							See Details
+							<ChevronRightIcon />
+						</Button>
+					</div>
+					<div class="absolute -top-8 right-[-8.5rem] rounded-lg bg-white dark:bg-[#1C1E20]">
+						{@render StatusPill(event_status, 'sm')}
+					</div>
 				</div>
 				<div class="flex flex-col items-center gap-1">
 					<p class="text-4xl font-semibold">{comp_state.number_of_participants}</p>
