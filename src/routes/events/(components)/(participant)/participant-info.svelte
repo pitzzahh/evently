@@ -4,7 +4,8 @@
 		AttendanceRecord,
 		EventDetails,
 		EventSchedule,
-		Participant
+		Participant,
+		ParticipantAttendance
 	} from '@/db/models/types';
 	import { generateFullName } from '@/utils/text';
 	import SvgQR from '@svelte-put/qr/svg/QR.svelte';
@@ -27,7 +28,7 @@
 		{ label: 'All', value: 'all' },
 		{ label: 'Complete', value: 'complete' },
 		{ label: 'Incomplete', value: 'incomplete' },
-		{ label: 'Absent', value: 'complete' }
+		{ label: 'Absent', value: 'absent' }
 	] as const;
 
 	interface ComponentState {
@@ -55,7 +56,16 @@
 		});
 
 		comp_state.participant_attendance = participant_attendance_cursor.fetch();
-		comp_state.event_schedules = event_schedule_cursor.fetch();
+
+		comp_state.event_schedules = event_schedule_cursor.fetch().filter((event_sched) => {
+			const participant_attendance = comp_state.participant_attendance.find(
+				(p) => event_sched.day.toString() === p.day
+			);
+			if (comp_state.filtered_attendance_status === 'all') return event_sched;
+
+			return getAttendanceStatus(participant_attendance) === comp_state.filtered_attendance_status;
+		});
+
 		tick().then(() => {
 			const currentDay = getEventDayInfo(
 				event_details.start_date,
@@ -68,6 +78,14 @@
 		});
 		$inspect(comp_state.participant_attendance);
 	});
+
+	function getAttendanceStatus(participant_attendance?: ParticipantAttendance) {
+		return participant_attendance?.am_time_in && participant_attendance?.pm_time_in
+			? 'complete'
+			: participant_attendance?.am_time_in || participant_attendance?.pm_time_in
+				? 'incomplete'
+				: 'absent';
+	}
 </script>
 
 <div class="flex items-center gap-4">
@@ -105,7 +123,24 @@
 		<div class="grid h-[400px] gap-4 overflow-auto">
 			<!-- FILTERS -->
 			<fieldset class="space-y-4">
-				<RadioGroup.Root value="all" name="spacing" class="grid grid-cols-4 gap-2">
+				<RadioGroup.Root
+					value="all"
+					name="spacing"
+					class="grid grid-cols-4 gap-2"
+					onValueChange={(value) => {
+						const event_id = page.params.id;
+						const event_schedule_cursor = COLLECTIONS.EVENT_SCHEDULE_COLLECTION.find({
+							event_id
+						});
+
+						comp_state.event_schedules = event_schedule_cursor.fetch().filter((event_sched) => {
+							const participant_attendance = comp_state.participant_attendance.find(
+								(p) => event_sched.day.toString() === p.day
+							);
+							return getAttendanceStatus(participant_attendance) === value;
+						});
+					}}
+				>
 					{#each filter_attendance_statuses as f, idx}
 						<label
 							for={`${idx}-${f.value}`}
@@ -131,12 +166,7 @@
 						event_schedule.am_start,
 						event_schedule.pm_end
 					)}
-					{@const attendance_status =
-						participant_attendance?.am_time_in && participant_attendance.pm_time_in
-							? 'complete'
-							: participant_attendance?.am_time_in || participant_attendance?.pm_time_in
-								? 'incomplete'
-								: 'absent'}
+					{@const attendance_status = getAttendanceStatus(participant_attendance)}
 					<div
 						class="grid gap-4 rounded-lg border p-4"
 						id="day_{event_schedule.day}"

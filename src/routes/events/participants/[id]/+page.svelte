@@ -23,8 +23,8 @@
 	import { QRCode, SquareCheckBig } from '@/assets/icons';
 	import type { HelperResponse } from '@/types/generic/index.js';
 	import QrCodeScannerDialog from '@routes/events/(components)/(participant)/qr-code-scanner-dialog.svelte';
-	import type { AttendanceRecordCollection, ParticipantCollection } from '@/db/models/index.js';
 	import { getPopulatedAttendanceRecords } from '../(utils)/index.js';
+	import { effect } from '@maverick-js/signals';
 
 	interface ComponentState {
 		event_details: EventDetails | undefined;
@@ -351,6 +351,76 @@
 		document.body.removeChild(a);
 	}
 
+	effect(() => {
+		const participants_cursor = COLLECTIONS.PARTICIPANT_COLLECTION.find(
+			{
+				event_id: data.event_id
+			},
+			{
+				sort: {
+					created: -1
+				}
+			}
+		);
+		const event_schedule_cursor = COLLECTIONS.EVENT_SCHEDULE_COLLECTION.find({
+			event_id: data.event_id
+		});
+
+		comp_state.event_schedules = event_schedule_cursor.fetch();
+		comp_state.event_details = COLLECTIONS.EVENT_DETAILS_COLLECTION.findOne({
+			id: data.event_id
+		});
+
+		if (current_event_day) {
+			comp_state.current_day_participants_attendance = getPopulatedAttendanceRecords(
+				data.event_id,
+				{
+					attendance_records_collection: COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION,
+					participant_collection: COLLECTIONS.PARTICIPANT_COLLECTION
+				},
+				current_event_day
+			) as ParticipantAttendance[];
+		}
+
+		comp_state.all_participants_attendance = getPopulatedAttendanceRecords(data.event_id, {
+			attendance_records_collection: COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION,
+			participant_collection: COLLECTIONS.PARTICIPANT_COLLECTION
+		}) as ParticipantAttendance[];
+
+		comp_state.participants = participants_cursor.fetch().map((participant) => {
+			const event_days = comp_state.event_details?.difference_in_days;
+			const total_days_attended = comp_state.all_participants_attendance.reduce(
+				(acc, participant_attendance) => {
+					if (
+						participant_attendance.participant_id === participant.id &&
+						participant_attendance.am_time_in &&
+						participant_attendance.pm_time_in
+					) {
+						return (acc += 1);
+					}
+					return (acc += 0);
+				},
+				0
+			);
+
+			const attendance_status =
+				event_days === total_days_attended
+					? 'complete'
+					: event_days && event_days < total_days_attended
+						? 'incomplete'
+						: 'absent';
+
+			return {
+				...participant,
+				attendance_status: event_status === 'finished' ? attendance_status : undefined
+			};
+		});
+
+		return () => {
+			participants_cursor.cleanup();
+			event_schedule_cursor.cleanup();
+		};
+	});
 	watch(
 		[
 			() => COLLECTIONS.PARTICIPANT_COLLECTION.isLoading(),
@@ -422,11 +492,6 @@
 					attendance_status: event_status === 'finished' ? attendance_status : undefined
 				};
 			});
-
-			return () => {
-				participants_cursor.cleanup();
-				event_schedule_cursor.cleanup();
-			};
 		}
 	);
 
