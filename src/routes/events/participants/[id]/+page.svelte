@@ -584,12 +584,14 @@
 				{#if COLLECTIONS.PARTICIPANT_COLLECTION.isPulling()}
 					<TableSkeleton />
 				{:else}
-					<ParticipantDataTable
-						participant_form={data.participant_form}
-						participants={comp_state.participants}
-						{event_status}
-						event_details={comp_state.event_details!}
-					/>
+					{#key event_status}
+						<ParticipantDataTable
+							participant_form={data.participant_form}
+							participants={comp_state.participants}
+							{event_status}
+							event_details={comp_state.event_details!}
+						/>
+					{/key}
 				{/if}
 			</div>
 		</Tabs.Content>
