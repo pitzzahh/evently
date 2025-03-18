@@ -87,7 +87,7 @@
 			</Avatar.Root>
 			<div class="flex w-full justify-between p-4">
 				<div class="relative flex w-full flex-col items-start justify-between">
-					<div class="mb-1 flex items-start gap-1">
+					<div class="flex items-start gap-1">
 						<Badge
 							variant="outline"
 							class="border border-gray-500 bg-gray-500/10 px-2 py-1 text-center text-xs font-medium dark:bg-gray-500/30"
