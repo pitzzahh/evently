@@ -332,19 +332,19 @@
 				($formData.title = event_to_edit.event_name || ''),
 				($formData.is_multi_day_event = event_to_edit.is_multi_day || false),
 				($formData.location = event_to_edit.location || '');
-
-			comp_state.date_range = {
-				start: new CalendarDate(
-					event_to_edit.start_date.getFullYear(),
-					event_to_edit.start_date.getMonth() + 1,
-					event_to_edit.start_date.getDate()
-				),
-				end: new CalendarDate(
-					event_to_edit.end_date.getFullYear(),
-					event_to_edit.end_date.getMonth() + 1,
-					event_to_edit.end_date.getDate()
-				)
-			};
+			($formData.cover = event_to_edit.cover || ''),
+				(comp_state.date_range = {
+					start: new CalendarDate(
+						event_to_edit.start_date.getFullYear(),
+						event_to_edit.start_date.getMonth() + 1,
+						event_to_edit.start_date.getDate()
+					),
+					end: new CalendarDate(
+						event_to_edit.end_date.getFullYear(),
+						event_to_edit.end_date.getMonth() + 1,
+						event_to_edit.end_date.getDate()
+					)
+				});
 
 			comp_state.event_dates = event_schedules as any;
 		}
@@ -457,6 +457,7 @@
 			<Form.FieldErrors />
 		</Form.Field>
 		<ImageCropper.Root
+			src={$formData.cover}
 			onCropped={async (url) => {
 				const file = await getFileFromUrl(url);
 				$formData.cover = await imageFileToDataUrl(file);
