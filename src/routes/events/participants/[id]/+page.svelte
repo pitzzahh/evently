@@ -295,7 +295,7 @@
 			message: MessageEvent<HelperResponse<string | null>>
 		) => {
 			if (message.data.status !== 200 || message.data.data === null) {
-				return toast.error('Failed to generate daily attendance report', {
+				return toast.warning('Failed to generate daily attendance report', {
 					description: message.data.message
 				});
 			}
@@ -323,7 +323,7 @@
 			message: MessageEvent<HelperResponse<string | null>>
 		) => {
 			if (message.data.status !== 200 || message.data.data === null) {
-				return toast.error('Failed to generate QR codes', {
+				return toast.warning('Failed to generate QR codes', {
 					description: message.data.message
 				});
 			}
