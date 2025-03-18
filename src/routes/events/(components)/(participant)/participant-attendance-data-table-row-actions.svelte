@@ -51,25 +51,34 @@
 		override_open: false
 	});
 
-	watch([() => am_time_out, () => am_time_in, () => pm_time_in, () => pm_time_out], () => {
-		comp_state.am_out.time = am_time_out
-			? new Time(am_time_out.getHours(), am_time_out.getMinutes())
-			: undefined;
-		comp_state.am_in.time = am_time_in
-			? new Time(am_time_in.getHours(), am_time_in.getMinutes())
-			: undefined;
-		comp_state.pm_in.time = pm_time_in
-			? new Time(pm_time_in.getHours(), pm_time_in.getMinutes())
-			: undefined;
-		comp_state.pm_out.time = pm_time_out
-			? new Time(pm_time_out.getHours(), pm_time_out.getMinutes())
-			: undefined;
+	watch(
+		[
+			() => am_time_out,
+			() => am_time_in,
+			() => pm_time_in,
+			() => pm_time_out,
+			() => comp_state.override_open
+		],
+		() => {
+			comp_state.am_out.time = am_time_out
+				? new Time(am_time_out.getHours(), am_time_out.getMinutes())
+				: undefined;
+			comp_state.am_in.time = am_time_in
+				? new Time(am_time_in.getHours(), am_time_in.getMinutes())
+				: undefined;
+			comp_state.pm_in.time = pm_time_in
+				? new Time(pm_time_in.getHours(), pm_time_in.getMinutes())
+				: undefined;
+			comp_state.pm_out.time = pm_time_out
+				? new Time(pm_time_out.getHours(), pm_time_out.getMinutes())
+				: undefined;
 
-		comp_state.am_out.period = am_time_out && am_time_out.getHours() >= 12 ? 'PM' : 'AM';
-		comp_state.am_in.period = am_time_in && am_time_in.getHours() >= 12 ? 'PM' : 'AM';
-		comp_state.pm_in.period = pm_time_in && pm_time_in.getHours() >= 12 ? 'PM' : 'AM';
-		comp_state.pm_out.period = pm_time_out && pm_time_out.getHours() >= 12 ? 'PM' : 'AM';
-	});
+			comp_state.am_out.period = am_time_out && am_time_out.getHours() >= 12 ? 'PM' : 'AM';
+			comp_state.am_in.period = am_time_in && am_time_in.getHours() >= 12 ? 'PM' : 'AM';
+			comp_state.pm_in.period = pm_time_in && pm_time_in.getHours() >= 12 ? 'PM' : 'AM';
+			comp_state.pm_out.period = pm_time_out && pm_time_out.getHours() >= 12 ? 'PM' : 'AM';
+		}
+	);
 
 	function validateTimes(): boolean {
 		if (comp_state.am_in.time && comp_state.am_out.time) {
@@ -151,10 +160,15 @@
 		<div class="grid gap-4">
 			<PeriodTimePicker
 				period="AM"
-				handleSetDefaultTime={(type) =>
-					type === 'in'
-						? handleSetDefaultTimeValue((time) => (comp_state.am_in.time = time), 8)
-						: handleSetDefaultTimeValue((time) => (comp_state.am_out.time = time), 12)}
+				handleSetDefaultTime={(type) => {
+					if (type === 'in') {
+						handleSetDefaultTimeValue((time) => (comp_state.am_in.time = time), 8);
+						comp_state.am_in.period = 'AM';
+					} else {
+						handleSetDefaultTimeValue((time) => (comp_state.am_out.time = time), 12);
+						comp_state.am_out.period = 'PM';
+					}
+				}}
 				bind:time_in={comp_state.am_in.time}
 				bind:time_in_period={comp_state.am_in.period}
 				bind:time_out={comp_state.am_out.time}
@@ -166,18 +180,24 @@
 			/>
 			<PeriodTimePicker
 				period="PM"
-				handleSetDefaultTime={(type) =>
-					type === 'in'
-						? handleSetDefaultTimeValue((time) => (comp_state.pm_in.time = time), 13)
-						: handleSetDefaultTimeValue((time) => (comp_state.pm_out.time = time), 16)}
+				handleSetDefaultTime={(type) => {
+					if (type === 'in') {
+						handleSetDefaultTimeValue((time) => (comp_state.pm_in.time = time), 13);
+						comp_state.pm_in.period = 'PM';
+					} else {
+						handleSetDefaultTimeValue((time) => (comp_state.pm_out.time = time), 16);
+						comp_state.pm_out.period = 'PM';
+					}
+				}}
 				bind:time_in={comp_state.pm_in.time}
 				bind:time_in_period={comp_state.pm_in.period}
 				bind:time_out={comp_state.pm_out.time}
 				bind:time_out_period={comp_state.pm_out.period}
-				handleRemoveTime={(type) =>
+				handleRemoveTime={(type) => {
 					type === 'in'
 						? (comp_state.pm_in.time = undefined)
-						: (comp_state.pm_out.time = undefined)}
+						: (comp_state.pm_out.time = undefined);
+				}}
 			/>
 		</div>
 		<Dialog.Footer>

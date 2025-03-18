@@ -4,7 +4,8 @@
 		AttendanceRecord,
 		EventDetails,
 		EventSchedule,
-		Participant
+		Participant,
+		ParticipantAttendance
 	} from '@/db/models/types';
 	import { generateFullName } from '@/utils/text';
 	import SvgQR from '@svelte-put/qr/svg/QR.svelte';
@@ -15,21 +16,32 @@
 	import { cn } from '@/utils';
 	import { checkEventStatus, getEventDayInfo } from '@routes/events/utils';
 	import { tick } from 'svelte';
+	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
+	import { effect } from '@maverick-js/signals';
 
 	interface ParticipantInfoProps {
 		participant: Participant;
 		event_details: EventDetails;
 	}
 
+	let filter_attendance_statuses = [
+		{ label: 'All', value: 'all' },
+		{ label: 'Complete', value: 'complete' },
+		{ label: 'Incomplete', value: 'incomplete' },
+		{ label: 'Absent', value: 'absent' }
+	] as const;
+
 	interface ComponentState {
 		event_schedules: EventSchedule[];
 		participant_attendance: AttendanceRecord[];
+		filtered_attendance_status: (typeof filter_attendance_statuses)[number]['value'];
 	}
 
 	let { participant, event_details }: ParticipantInfoProps = $props();
 	let comp_state = $state<ComponentState>({
 		event_schedules: [],
-		participant_attendance: []
+		participant_attendance: [],
+		filtered_attendance_status: 'all'
 	});
 
 	watch(
@@ -49,20 +61,44 @@
 			});
 
 			comp_state.participant_attendance = participant_attendance_cursor.fetch();
-			comp_state.event_schedules = event_schedule_cursor.fetch();
+
+			comp_state.event_schedules = event_schedule_cursor.fetch().filter((event_sched) => {
+				const participant_attendance = comp_state.participant_attendance.find(
+					(p) => event_sched.day.toString() === p.day
+				);
+				if (comp_state.filtered_attendance_status === 'all') return event_sched;
+
+				return (
+					getAttendanceStatus(participant_attendance) === comp_state.filtered_attendance_status
+				);
+			});
+
 			tick().then(() => {
 				const currentDay = getEventDayInfo(
 					event_details.start_date,
 					event_details.end_date,
 					new Date()
 				).currentDay;
-				const lastForm = document.getElementById(`day_${currentDay}`);
-				lastForm?.scrollIntoView({ behavior: 'smooth' });
-				setTimeout(() => lastForm?.focus(), 500);
+				const current_day_card = document.getElementById(`day_${currentDay}`);
+				current_day_card?.scrollIntoView({ behavior: 'smooth' });
+				setTimeout(() => current_day_card?.focus(), 500);
 			});
 			$inspect(comp_state.participant_attendance);
+
+			return () => {
+				participant_attendance_cursor.cleanup();
+				event_schedule_cursor.cleanup();
+			};
 		}
 	);
+
+	function getAttendanceStatus(participant_attendance?: ParticipantAttendance) {
+		return participant_attendance?.am_time_in && participant_attendance?.pm_time_in
+			? 'complete'
+			: participant_attendance?.am_time_in || participant_attendance?.pm_time_in
+				? 'incomplete'
+				: 'absent';
+	}
 </script>
 
 <div class="flex items-center gap-4">
@@ -97,7 +133,43 @@
 
 		<div class="w-full border-t-2 border-dashed"></div>
 
-		<div class="h-[400px] overflow-auto">
+		<div class="grid h-[400px] gap-4 overflow-auto">
+			<!-- FILTERS -->
+			<fieldset class="space-y-4">
+				<RadioGroup.Root
+					value="all"
+					name="spacing"
+					class="grid grid-cols-4 gap-2"
+					onValueChange={(value) => {
+						const event_id = page.params.id;
+						const event_schedule_cursor = COLLECTIONS.EVENT_SCHEDULE_COLLECTION.find({
+							event_id
+						});
+
+						comp_state.event_schedules = event_schedule_cursor.fetch().filter((event_sched) => {
+							const participant_attendance = comp_state.participant_attendance.find(
+								(p) => event_sched.day.toString() === p.day
+							);
+							return getAttendanceStatus(participant_attendance) === value;
+						});
+					}}
+				>
+					{#each filter_attendance_statuses as f, idx}
+						<label
+							for={`${idx}-${f.value}`}
+							class="has-data-[state=checked]:border-ring shadow-xs has-data-disabled:cursor-not-allowed has-data-disabled:opacity-50 relative flex cursor-pointer flex-col items-center gap-3 rounded-md border border-input px-2 py-3 text-center outline-none transition-[color,box-shadow] focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50"
+						>
+							<RadioGroup.Item
+								id={`${idx}-${f.value}`}
+								value={f.value}
+								class="sr-only after:absolute after:inset-0"
+							/>
+							<p class="text-sm font-medium leading-none text-foreground">{f.label}</p>
+						</label>
+					{/each}
+				</RadioGroup.Root>
+			</fieldset>
+
 			<div class="grid w-full gap-2">
 				{#each comp_state.event_schedules as event_schedule}
 					{@const participant_attendance = comp_state.participant_attendance.find(
@@ -107,12 +179,7 @@
 						event_schedule.am_start,
 						event_schedule.pm_end
 					)}
-					{@const attendance_status =
-						participant_attendance?.am_time_in && participant_attendance.pm_time_in
-							? 'complete'
-							: participant_attendance?.am_time_in || participant_attendance?.pm_time_in
-								? 'incomplete'
-								: 'absent'}
+					{@const attendance_status = getAttendanceStatus(participant_attendance)}
 					<div
 						class="grid gap-4 rounded-lg border p-4"
 						id="day_{event_schedule.day}"

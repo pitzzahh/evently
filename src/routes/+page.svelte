@@ -1,29 +1,12 @@
 <script lang="ts">
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
 	import { EventList } from '@routes/events/(components)';
-	import { COLLECTIONS } from '@/db/index';
-	import type { Participant } from '@/db/models/types';
 	import { CalendarArrowDown, CalendarArrowUp } from '@/assets/icons';
-	interface ComponentState {
-		participants: Participant[];
-		current_tab: 'upcoming' | 'past';
-	}
 
-	let comp_state = $state<ComponentState>({
-		participants: [],
-		current_tab: 'upcoming'
-	});
-
-	$effect(() => {
-		const cursor = COLLECTIONS.PARTICIPANT_COLLECTION.find({});
-		comp_state.participants = cursor.fetch();
-		return () => {
-			cursor.cleanup();
-		};
-	});
+	let current_tab = $state<'upcoming' | 'past'>('upcoming');
 </script>
 
-<Tabs.Root bind:value={comp_state.current_tab}>
+<Tabs.Root bind:value={current_tab}>
 	<div class="flex items-center justify-between gap-4">
 		<h2 class="text-4xl font-semibold">Events</h2>
 		<Tabs.List class="grid h-auto w-full max-w-[300px] grid-cols-2">
