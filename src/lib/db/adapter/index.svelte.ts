@@ -36,18 +36,40 @@ export function createTauriFilesystemAdapter(filename: string) {
 }
 
 export function svelteReactivityAdapter() {
-  return createReactivityAdapter({
-    create() {
-      let dep = $state(0);
-      return {
-        depend() {
-          dep;
-        },
-        notify() {
-          dep += 1;
-        }
-      };
-    },
-    isInScope: () => !!$effect.tracking()
-  });
+  // Check if we're in a web worker
+  //@ts-ignore
+  const isWebWorker = typeof self !== 'undefined' && typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+
+  if (isWebWorker) {
+    // Web worker context, use a simple implementation
+    return createReactivityAdapter({
+      create() {
+        return {
+          depend() {
+            // No-op in web worker
+          },
+          notify() {
+            // No-op in web worker
+          }
+        };
+      },
+      isInScope: () => false // Not reactive in web worker
+    });
+  } else {
+    // Regular context, use Svelte's reactivity primitives
+    return createReactivityAdapter({
+      create() {
+        let dep = $state(0);
+        return {
+          depend() {
+            dep;
+          },
+          notify() {
+            dep += 1;
+          }
+        };
+      },
+      isInScope: () => !!$effect.tracking()
+    });
+  }
 }
