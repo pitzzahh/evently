@@ -253,6 +253,18 @@
 					</div>
 				</div>
 			</div>
+			<div
+				class="grid w-full gap-2 overflow-hidden rounded-lg border bg-white/40 p-2 backdrop-blur-lg backdrop-filter transition-all duration-300 dark:bg-[#151e28]/20"
+			>
+				<p
+					class="h-auto w-full rounded-tl-md rounded-tr-md border bg-white p-3 text-sm font-medium dark:bg-[#151e28]"
+				>
+					Description
+				</p>
+				<div class="p-4">
+					<p>{comp_state.event_details?.description || 'No description'}</p>
+				</div>
+			</div>
 		</div>
 	</div>
 
