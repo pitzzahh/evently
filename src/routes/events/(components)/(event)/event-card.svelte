@@ -5,7 +5,14 @@
 	import { COLLECTIONS } from '@/db';
 	import type { EventDetails } from '@/db/models/types';
 	import { formatDate, formatDateTime } from '@/utils/format';
-	import { ChevronRightIcon, MapPin, UsersRound } from 'lucide-svelte';
+	import {
+		ChevronRightIcon,
+		Image,
+		ImageOff,
+		ImageOffIcon,
+		MapPin,
+		UsersRound
+	} from 'lucide-svelte';
 	import { watch } from 'runed';
 	import {
 		TimelineItem,
@@ -85,7 +92,7 @@
 				<Avatar.Image src={cover} />
 				<Avatar.Fallback
 					class="h-full w-[190px] overflow-hidden rounded-none rounded-l-xl lg:w-[200px]"
-					>EVENT COVER</Avatar.Fallback
+					><Image class="size-16 text-muted-foreground opacity-50" /></Avatar.Fallback
 				>
 			</Avatar.Root>
 			<div class="flex w-full items-start justify-between gap-4 p-4">
