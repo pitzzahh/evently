@@ -1,4 +1,5 @@
-import { svelteReactivityAdapter } from '@/db/adapter/index.svelte';
+import svelteReactivityAdapter() from '@signaldb/maverickjs';
+import { svelteReactivityAdapter } from '../adapter/index.svelte';
 import { createIndex, Collection } from '@signaldb/core';
 import createOPFSAdapter from '@signaldb/opfs';
 import type { AttendanceRecord, EventDetails, EventSchedule, Participant, Settings } from './types';
