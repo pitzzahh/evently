@@ -79,9 +79,11 @@
 		<div
 			class="mb-10 ms-4 flex rounded-xl border bg-white transition duration-500 ease-in-out hover:border-black/50 dark:bg-[#151e28] dark:hover:border-white/50"
 		>
-			<Avatar.Root class={cn('h-[200px] w-[200px]')}>
+			<Avatar.Root class={cn('h-[200px] w-[200px] overflow-hidden rounded-none rounded-l-xl')}>
 				<Avatar.Image src={cover} />
-				<Avatar.Fallback class="h-[200px] w-[200px]">EVENT COVER</Avatar.Fallback>
+				<Avatar.Fallback class="h-[200px] w-[200px] overflow-hidden rounded-none rounded-l-xl"
+					>EVENT COVER</Avatar.Fallback
+				>
 			</Avatar.Root>
 			<div class="flex w-full justify-between p-4">
 				<div class="relative flex w-full flex-col items-start justify-between">
