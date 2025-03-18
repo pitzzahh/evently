@@ -3,11 +3,11 @@ import "pdfmake/build/vfs_fonts";
 import { createQrSvgString } from '@svelte-put/qr';
 import type { CustomTableLayout, TDocumentDefinitions, TFontDictionary } from 'pdfmake/interfaces';
 import type { DocumentMetaDetails } from "@/types/exports";
-import { formatDateTime, formatDateToTimeOption } from "@/utils/format";
+import { formatDate, formatDateTime, formatDateToTimeOption } from "@/utils/format";
 import { COLLECTIONS } from "@/db";
 import type { HelperResponse } from "@/types/generic";
-import { getPopulatedAttendanceRecords } from "@routes/events/participants/(utils)";
 import { makeTag, type TagVariant } from "..";
+import { getEventDayInfo } from "@routes/events/utils";
 
 export async function generateQRCodesPDF(props: DocumentMetaDetails): Promise<HelperResponse<string | null>> {
   const { info, event_details, participants } = props;
@@ -171,7 +171,6 @@ export async function generateDailyAttendanceReportPDF(props: DocumentMetaDetail
     const currentDate = new Date();
     const startDate = new Date(event_details.start_date);
     const endDate = new Date(event_details.end_date);
-
     let event_status = 'completed';
     if (currentDate < startDate) {
       event_status = 'upcoming';
@@ -214,9 +213,23 @@ export async function generateDailyAttendanceReportPDF(props: DocumentMetaDetail
 
     console.log(`Participant Attendance Records: ${JSON.stringify(participant_attendance, null, 2)}`);
 
+    const current_event_day =
+      event_details
+        ? getEventDayInfo(
+          event_details.start_date,
+          event_details.end_date,
+          new Date()
+        ).currentDay.toString()
+        : null
+
+    // Calculate the date for the current event day
+    const currentEventDate = event_details && current_event_day && !isNaN(parseInt(current_event_day))
+      ? new Date(new Date(event_details.start_date).getTime() + (parseInt(current_event_day) - 1) * 24 * 60 * 60 * 1000)
+      : new Date();
+
     const summary = {
-      day: new Date().getDate(),
-      date: new Date().toLocaleDateString(),
+      day: current_event_day,
+      date: formatDate(currentEventDate),
       total_participants: participants.length,
       present: participant_attendance.filter(p => p.attendance_status !== 'absent').length,
       absent: participant_attendance.filter(p => p.attendance_status === 'absent').length
@@ -262,7 +275,7 @@ export async function generateDailyAttendanceReportPDF(props: DocumentMetaDetail
           { text: participant.am_time_out ? formatDateToTimeOption(new Date(participant.am_time_out)) : 'N/A' },
           { text: participant.pm_time_in ? formatDateToTimeOption(new Date(participant.pm_time_in)) : 'N/A' },
           { text: participant.pm_time_out ? formatDateToTimeOption(new Date(participant.pm_time_out)) : 'N/A' },
-          makeTag(statusText, undefined, status_variant)
+          makeTag(statusText, Math.max(40, 10 + statusText.length * 4), status_variant)
         ];
       })
     ];
