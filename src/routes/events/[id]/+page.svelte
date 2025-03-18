@@ -127,19 +127,19 @@
 	<div class="flex items-start gap-6 border-b-2 border-dashed pb-6">
 		<Avatar.Root
 			class={cn(
-				'aspect-square h-[280px] w-[280px] rounded-md ring-2 ring-accent ring-offset-2 ring-offset-background '
+				'aspect-square h-[240px] w-[240px] rounded-md ring-2 ring-accent ring-offset-2 ring-offset-background '
 			)}
 		>
 			<Avatar.Image src={comp_state.event_details?.cover} />
-			<Avatar.Fallback class="aspect-square h-[280px] w-[280px] rounded-md"
+			<Avatar.Fallback class="aspect-square h-[240px] w-[240px] rounded-md"
 				>EVENT COVER</Avatar.Fallback
 			>
 		</Avatar.Root>
 
 		<div class="flex w-full flex-1 flex-col gap-4">
-			<div class="flex w-full items-center justify-between">
+			<div class="flex w-full items-start justify-between gap-2">
 				<h2 class="text-5xl font-semibold">{comp_state.event_details?.event_name ?? 'N/A'}</h2>
-				<div class="flex items-center gap-2">
+				<div class="flex items-start gap-2">
 					{@render StatusPill(event_status)}
 					<Button
 						size="lg"
@@ -253,21 +253,20 @@
 					</div>
 				</div>
 			</div>
-			<div
-				class="grid w-full gap-2 overflow-hidden rounded-lg border bg-white/40 p-2 backdrop-blur-lg backdrop-filter transition-all duration-300 dark:bg-[#151e28]/20"
-			>
-				<p
-					class="h-auto w-full rounded-tl-md rounded-tr-md border bg-white p-3 text-sm font-medium dark:bg-[#151e28]"
-				>
-					Description
-				</p>
-				<div class="p-4">
-					<p>{comp_state.event_details?.description || 'No description'}</p>
-				</div>
-			</div>
 		</div>
 	</div>
-
+	<div
+		class="grid w-full gap-2 overflow-hidden rounded-lg border bg-white/40 p-2 backdrop-blur-lg backdrop-filter transition-all duration-300 dark:bg-[#151e28]/20"
+	>
+		<p
+			class="h-auto w-full rounded-tl-md rounded-tr-md border bg-white p-3 text-sm font-medium dark:bg-[#151e28]"
+		>
+			Description
+		</p>
+		<div class="p-4">
+			<p>{comp_state.event_details?.description || 'No description'}</p>
+		</div>
+	</div>
 	<Button
 		variant="outline"
 		class="place-self-end"
