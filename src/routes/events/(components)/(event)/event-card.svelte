@@ -8,8 +8,6 @@
 	import {
 		ChevronRightIcon,
 		Image,
-		ImageOff,
-		ImageOffIcon,
 		MapPin,
 		UsersRound
 	} from 'lucide-svelte';
