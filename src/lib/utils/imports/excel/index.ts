@@ -1,5 +1,6 @@
 import type { Participant } from "@/db/models/types";
 import ExcelJS from 'exceljs';
+import { validateExcelHeaders } from "..";
 
 export async function readParticipants(file: File, event_id: string): Promise<Omit<Participant, 'id'>[]> {
   const arrayBuffer = await file.arrayBuffer();
@@ -12,6 +13,19 @@ export async function readParticipants(file: File, event_id: string): Promise<Om
   }
 
   console.log('Worksheet found:', JSON.stringify(worksheet.name));
+
+  // Extract headers from the first row
+  const headerRow = worksheet.getRow(1).values;
+  const headers = Array.isArray(headerRow)
+    ? headerRow.slice(1).map(header => header?.toString() || '')
+    : [];
+
+  // Validate headers
+  const validationResult = validateExcelHeaders(headers);
+
+  if (validationResult.status !== 200) {
+    throw new Error(validationResult.message);
+  }
 
   const participants = worksheet.getSheetValues()
     .slice(2) // Skip header row
