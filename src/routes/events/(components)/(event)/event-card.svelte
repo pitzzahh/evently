@@ -77,37 +77,42 @@
 	</TimelineSeparator>
 	<TimelineContent style="margin: 0;">
 		<div
-			class="mb-10 ms-4 flex rounded-xl border bg-white transition duration-500 ease-in-out hover:border-black/50 dark:bg-[#151e28] dark:hover:border-white/50"
+			class="mb-10 ms-4 flex h-[200px] rounded-xl border bg-white transition duration-500 ease-in-out hover:border-black/50 dark:bg-[#151e28] dark:hover:border-white/50"
 		>
-			<Avatar.Root class={cn('h-[200px] w-[200px] overflow-hidden rounded-none rounded-l-xl')}>
+			<Avatar.Root
+				class={cn('h-full w-[190px] overflow-hidden rounded-none rounded-l-xl lg:w-[200px]')}
+			>
 				<Avatar.Image src={cover} />
-				<Avatar.Fallback class="h-[200px] w-[200px] overflow-hidden rounded-none rounded-l-xl"
+				<Avatar.Fallback
+					class="h-full w-[190px] overflow-hidden rounded-none rounded-l-xl lg:w-[200px]"
 					>EVENT COVER</Avatar.Fallback
 				>
 			</Avatar.Root>
-			<div class="flex w-full justify-between p-4">
-				<div class="relative flex w-full flex-col items-start justify-between">
+			<div class="flex w-full items-start justify-between gap-4 p-4">
+				<div class="relative flex w-full flex-col items-start justify-between gap-3">
 					<div class="flex items-start gap-1">
 						<Badge
 							variant="outline"
-							class="border border-gray-500 bg-gray-500/10 px-2 py-1 text-center text-xs font-medium dark:bg-gray-500/30"
+							class="border border-gray-500 bg-gray-500/10 px-2 py-1 text-center text-[10px] font-medium dark:bg-gray-500/30 lg:text-xs"
 							>{formatDateTime(new Date(start_date))}</Badge
 						> - <Badge
 							variant="outline"
-							class="border border-gray-500 bg-gray-500/10 px-2 py-1 text-center text-xs font-medium dark:bg-gray-500/30"
+							class="border border-gray-500 bg-gray-500/10 px-2 py-1 text-center text-[10px] font-medium dark:bg-gray-500/30 lg:text-xs"
 							>{formatDateTime(new Date(end_date))}</Badge
 						>
 					</div>
 					<div class="grid place-content-start gap-1">
-						<h3 class="text-lg font-semibold text-gray-900 dark:text-white">{event_name}</h3>
-						<div class="flex items-center gap-1 text-muted-foreground">
+						<h3 class="truncate text-xl font-semibold text-gray-900 dark:text-white lg:text-2xl">
+							{event_name}
+						</h3>
+						<div class="flex items-center gap-1 text-base text-muted-foreground lg:text-lg">
 							<MapPin class="size-4" />
 							<p>{location}</p>
 						</div>
 
 						<Button
 							href="/events/{id}"
-							class="mt-3 inline-flex w-[150px] items-center rounded-lg border px-4 py-2 text-sm font-medium dark:border-white/20"
+							class="mt-3 inline-flex w-[150px] items-center rounded-lg border  px-3 py-1 text-xs font-medium dark:border-white/20 lg:px-4 lg:py-2 lg:text-sm"
 						>
 							See Details
 							<ChevronRightIcon />
@@ -117,12 +122,12 @@
 						{@render StatusPill(event_status, 'sm')}
 					</div>
 				</div>
-				<div class="flex flex-col items-center gap-1">
+				<div class="flex flex-col items-center gap-1 self-center">
 					<p class="text-4xl font-semibold">{comp_state.number_of_participants}</p>
 
 					<div class="flex items-center gap-2 text-muted-foreground">
 						<UsersRound class="size-4" />
-						<p class="text-sm font-medium">
+						<p class=" text-sm font-medium">
 							Participant{comp_state.number_of_participants > 1 ? 's' : ''}
 						</p>
 					</div>
