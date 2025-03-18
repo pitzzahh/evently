@@ -26,6 +26,7 @@
 	import { checkEventStatus, getEventDayInfo } from '../utils/index.js';
 	import * as Dialog from '@/components/ui/dialog';
 	import { onMount } from 'svelte';
+	import { Image } from 'lucide-svelte';
 
 	let { data } = $props();
 
@@ -127,72 +128,76 @@
 	<div class="flex items-start gap-6 border-b-2 border-dashed pb-6">
 		<Avatar.Root
 			class={cn(
-				'aspect-square h-[240px] w-[240px] rounded-md ring-2 ring-accent ring-offset-2 ring-offset-background '
+				'aspect-square size-[200px] rounded-md ring-2 ring-accent ring-offset-2 ring-offset-background lg:size-[240px] '
 			)}
 		>
 			<Avatar.Image src={comp_state.event_details?.cover} />
-			<Avatar.Fallback class="aspect-square h-[240px] w-[240px] rounded-md"
-				>EVENT COVER</Avatar.Fallback
-			>
+			<Avatar.Fallback class="aspect-square size-[200px] rounded-md lg:size-[240px]">
+				<Image class="size-16 text-muted-foreground opacity-50" />
+			</Avatar.Fallback>
 		</Avatar.Root>
 
 		<div class="flex w-full flex-1 flex-col gap-4">
-			<div class="flex w-full items-start justify-between gap-2">
-				<h2 class="text-5xl font-semibold">{comp_state.event_details?.event_name ?? 'N/A'}</h2>
-				<div class="flex items-start gap-2">
-					{@render StatusPill(event_status)}
-					<Button
-						size="lg"
-						href={`/events/participants/${comp_state.event_details?.id}`}
-						class="rounded-lg border px-4 py-3 text-sm"
-					>
-						<View class="size-5" />
-						View Participants
-					</Button>
-					<Dialog.Root
-						open={comp_state.confimation_open}
-						onOpenChange={(value) => (comp_state.confimation_open = value)}
-					>
-						<DropdownMenu.Root>
-							<DropdownMenu.Trigger>
-								<button class="rounded-md border p-3"><Settings class="size-5" /></button>
-							</DropdownMenu.Trigger>
-							<DropdownMenu.Content side="bottom" align="end" sideOffset={10}>
-								<DropdownMenu.Group>
-									<DropdownMenu.Item
-										onclick={() => {
-											if (comp_state.event_details?.id) {
-												goto(`/events/edit/${comp_state.event_details?.id}`);
-											}
-										}}><Edit class="size-4" /> Edit event</DropdownMenu.Item
-									>
-									<DropdownMenu.Item
-										onclick={() => (comp_state.confimation_open = true)}
-										class="!text-red-600 hover:!bg-red-600/20"
-										><Trash class="size-4" />Delete event</DropdownMenu.Item
-									>
-								</DropdownMenu.Group>
-							</DropdownMenu.Content>
-						</DropdownMenu.Root>
+			<div class="flex w-full items-start justify-between gap-4">
+				<h2 class="text-4xl font-semibold lg:text-5xl">
+					{comp_state.event_details?.event_name ?? 'N/A'}
+				</h2>
+				<div class="grid gap-2">
+					<div class="flex items-center gap-2">
+						<Button
+							size="lg"
+							href={`/events/participants/${comp_state.event_details?.id}`}
+							class="rounded-lg border px-4 py-3 text-sm"
+						>
+							<View class="size-5" />
+							View Participants
+						</Button>
+						<Dialog.Root
+							open={comp_state.confimation_open}
+							onOpenChange={(value) => (comp_state.confimation_open = value)}
+						>
+							<DropdownMenu.Root>
+								<DropdownMenu.Trigger>
+									<button class="rounded-md border p-3"><Settings class="size-5" /></button>
+								</DropdownMenu.Trigger>
+								<DropdownMenu.Content side="bottom" align="end" sideOffset={10}>
+									<DropdownMenu.Group>
+										<DropdownMenu.Item
+											onclick={() => {
+												if (comp_state.event_details?.id) {
+													goto(`/events/edit/${comp_state.event_details?.id}`);
+												}
+											}}><Edit class="size-4" /> Edit event</DropdownMenu.Item
+										>
+										<DropdownMenu.Item
+											onclick={() => (comp_state.confimation_open = true)}
+											class="!text-red-600 hover:!bg-red-600/20"
+											><Trash class="size-4" />Delete event</DropdownMenu.Item
+										>
+									</DropdownMenu.Group>
+								</DropdownMenu.Content>
+							</DropdownMenu.Root>
 
-						<Dialog.Content>
-							<Dialog.Header>
-								<Dialog.Title>Remove Event</Dialog.Title>
-								<Dialog.Description>
-									This action cannot be undone. Are you sure you want to permanently delete this
-									event?
-								</Dialog.Description>
-							</Dialog.Header>
-							<Dialog.Footer>
-								<Button class="bg-red-600 hover:!bg-red-600/80" onclick={handleDeleteEvent}
-									>Delete</Button
-								>
-								<Button variant="outline" onclick={() => (comp_state.confimation_open = false)}
-									>Cancel</Button
-								>
-							</Dialog.Footer>
-						</Dialog.Content>
-					</Dialog.Root>
+							<Dialog.Content>
+								<Dialog.Header>
+									<Dialog.Title>Remove Event</Dialog.Title>
+									<Dialog.Description>
+										This action cannot be undone. Are you sure you want to permanently delete this
+										event?
+									</Dialog.Description>
+								</Dialog.Header>
+								<Dialog.Footer>
+									<Button class="bg-red-600 hover:!bg-red-600/80" onclick={handleDeleteEvent}
+										>Delete</Button
+									>
+									<Button variant="outline" onclick={() => (comp_state.confimation_open = false)}
+										>Cancel</Button
+									>
+								</Dialog.Footer>
+							</Dialog.Content>
+						</Dialog.Root>
+					</div>
+					{@render StatusPill(event_status)}
 				</div>
 			</div>
 
@@ -255,16 +260,19 @@
 			</div>
 		</div>
 	</div>
+
 	<div
 		class="grid w-full gap-2 overflow-hidden rounded-lg border bg-white/40 p-2 backdrop-blur-lg backdrop-filter transition-all duration-300 dark:bg-[#151e28]/20"
 	>
 		<p
-			class="h-auto w-full rounded-tl-md rounded-tr-md border bg-white p-3 text-sm font-medium dark:bg-[#151e28]"
+			class="h-auto w-full rounded-tl-md rounded-tr-md border bg-white px-3 py-2 text-sm font-medium dark:bg-[#151e28]"
 		>
 			Description
 		</p>
-		<div class="p-4">
-			<p>{comp_state.event_details?.description || 'No description'}</p>
+		<div class="px-3 py-2">
+			<p class={cn('text-muted-foreground', !!!comp_state.event_details?.description && 'italic')}>
+				{comp_state.event_details?.description || 'No description'}
+			</p>
 		</div>
 	</div>
 	<Button
