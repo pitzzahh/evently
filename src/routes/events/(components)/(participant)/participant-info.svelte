@@ -17,7 +17,6 @@
 	import { checkEventStatus, getEventDayInfo } from '@routes/events/utils';
 	import { tick } from 'svelte';
 	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
-	import { effect } from '@maverick-js/signals';
 
 	interface ParticipantInfoProps {
 		participant: Participant;
@@ -47,7 +46,8 @@
 	watch(
 		[
 			() => COLLECTIONS.EVENT_SCHEDULE_COLLECTION.isLoading(),
-			() => COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.isLoading()
+			() => COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.isLoading(),
+			() => comp_state.filtered_attendance_status
 		],
 		() => {
 			const event_id = page.params.id;
@@ -63,15 +63,28 @@
 			comp_state.participant_attendance = participant_attendance_cursor.fetch();
 
 			comp_state.event_schedules = event_schedule_cursor.fetch().filter((event_sched) => {
+				const event_day_status = checkEventStatus(event_sched.am_start, event_sched.pm_end);
+				const is_finished = event_day_status === 'finished';
+
+				if (comp_state.filtered_attendance_status === 'all') {
+					return true;
+				}
+
 				const participant_attendance = comp_state.participant_attendance.find(
-					(p) => event_sched.day.toString() === p.day
+					(p) => event_sched.day.toString() === p.day.toString()
 				);
-				if (comp_state.filtered_attendance_status === 'all') return event_sched;
+
+				if (!participant_attendance && is_finished) {
+					return comp_state.filtered_attendance_status === 'absent';
+				}
 
 				return (
+					is_finished &&
 					getAttendanceStatus(participant_attendance) === comp_state.filtered_attendance_status
 				);
 			});
+
+			$inspect(comp_state.participant_attendance);
 
 			tick().then(() => {
 				const currentDay = getEventDayInfo(
@@ -137,22 +150,9 @@
 			<!-- FILTERS -->
 			<fieldset class="space-y-4">
 				<RadioGroup.Root
-					value="all"
+					bind:value={comp_state.filtered_attendance_status}
 					name="spacing"
 					class="grid grid-cols-4 gap-2"
-					onValueChange={(value) => {
-						const event_id = page.params.id;
-						const event_schedule_cursor = COLLECTIONS.EVENT_SCHEDULE_COLLECTION.find({
-							event_id
-						});
-
-						comp_state.event_schedules = event_schedule_cursor.fetch().filter((event_sched) => {
-							const participant_attendance = comp_state.participant_attendance.find(
-								(p) => event_sched.day.toString() === p.day
-							);
-							return getAttendanceStatus(participant_attendance) === value;
-						});
-					}}
 				>
 					{#each filter_attendance_statuses as f, idx}
 						<label
@@ -173,7 +173,7 @@
 			<div class="grid w-full gap-2">
 				{#each comp_state.event_schedules as event_schedule}
 					{@const participant_attendance = comp_state.participant_attendance.find(
-						(p) => event_schedule.day.toString() === p.day
+						(p) => event_schedule.day.toString() === p.day.toString()
 					)}
 					{@const event_day_status = checkEventStatus(
 						event_schedule.am_start,
