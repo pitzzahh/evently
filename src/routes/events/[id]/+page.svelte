@@ -26,6 +26,7 @@
 	import { checkEventStatus, getEventDayInfo } from '../utils/index.js';
 	import * as Dialog from '@/components/ui/dialog';
 	import { onMount } from 'svelte';
+	import { effect } from '@maverick-js/signals';
 
 	let { data } = $props();
 
@@ -58,37 +59,25 @@
 			: null
 	);
 
-	watch(
-		[
-			() => COLLECTIONS.PARTICIPANT_COLLECTION.isPushing(),
-			() => COLLECTIONS.EVENT_SCHEDULE_COLLECTION.isPushing(),
-			() => COLLECTIONS.EVENT_DETAILS_COLLECTION.isPushing()
-		],
-		() => {
-			const participants_cursor = COLLECTIONS.PARTICIPANT_COLLECTION.find({
-				event_id: data.event_id
-			});
-			const event_schedule_cursor = COLLECTIONS.EVENT_SCHEDULE_COLLECTION.find({
-				event_id: data.event_id
-			});
+	effect(() => {
+		const participants_cursor = COLLECTIONS.PARTICIPANT_COLLECTION.find({
+			event_id: data.event_id
+		});
+		const event_schedule_cursor = COLLECTIONS.EVENT_SCHEDULE_COLLECTION.find({
+			event_id: data.event_id
+		});
 
-			comp_state.event_details = COLLECTIONS.EVENT_DETAILS_COLLECTION.findOne({
-				id: data.event_id
-			});
+		comp_state.event_details = COLLECTIONS.EVENT_DETAILS_COLLECTION.findOne({
+			id: data.event_id
+		});
 
-			comp_state.participants = participants_cursor.fetch();
-			comp_state.event_schedules = event_schedule_cursor.fetch();
+		comp_state.participants = participants_cursor.fetch();
+		comp_state.event_schedules = event_schedule_cursor.fetch();
 
-			$inspect(
-				comp_state.event_details?.start_date && comp_state.event_details.start_date > new Date()
-			);
-
-			return () => {
-				participants_cursor.cleanup();
-				event_schedule_cursor.cleanup();
-			};
-		}
-	);
+		$inspect(
+			comp_state.event_details?.start_date && comp_state.event_details.start_date > new Date()
+		);
+	});
 
 	onMount(() => {
 		if (!comp_state.event_details) {

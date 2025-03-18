@@ -10,8 +10,8 @@
 	import * as Alert from '@/components/ui/alert/index.js';
 	import { CircleAlert, Plus } from '@/assets/icons';
 	import { Button } from '@/components/ui/button';
-	import { watch } from 'runed';
 	import { Calendar } from 'lucide-svelte';
+	import { effect } from '@maverick-js/signals';
 
 	interface ComponentState {
 		refetch: boolean;
@@ -91,42 +91,31 @@
 		}
 	}
 
-	watch(
-		[
-			() => COLLECTIONS.EVENT_DETAILS_COLLECTION.isLoading(),
-			() => COLLECTIONS.EVENT_DETAILS_COLLECTION.isReady(),
-			() => comp_state.refetch
-		],
-		() => {
-			const events_cursor = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(
-				{},
-				{
-					limit: comp_state.infinite_loader.limit,
-					sort: {
-						start_date: type === 'upcoming' ? 1 : -1 // Changed sorting order
-					}
+	effect(() => {
+		const events_cursor = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(
+			{},
+			{
+				limit: comp_state.infinite_loader.limit,
+				sort: {
+					start_date: type === 'upcoming' ? 1 : -1 // Changed sorting order
 				}
-			);
+			}
+		);
 
-			const current_date = new Date();
-			comp_state.infinite_loader.events = events_cursor.fetch().filter((e) => {
-				if (type === 'upcoming') {
-					return e.start_date > current_date || e.end_date > current_date;
-				} else {
-					return e.end_date < current_date;
-				}
-			});
-			clearTimeout(comp_state.timeout);
-			comp_state.timeout = setTimeout(
-				() => (comp_state.refetch = !comp_state.refetch),
-				1000
-			) as unknown as number;
-			return () => {
-				events_cursor.cleanup();
-				clearTimeout(comp_state.timeout);
-			};
-		}
-	);
+		const current_date = new Date();
+		comp_state.infinite_loader.events = events_cursor.fetch().filter((e) => {
+			if (type === 'upcoming') {
+				return e.start_date > current_date || e.end_date > current_date;
+			} else {
+				return e.end_date < current_date;
+			}
+		});
+		clearTimeout(comp_state.timeout);
+		comp_state.timeout = setTimeout(
+			() => (comp_state.refetch = !comp_state.refetch),
+			1000
+		) as unknown as number;
+	});
 </script>
 
 <Timeline style="width: 100%; padding: 0;">

@@ -1,4 +1,5 @@
-import { svelteReactivityAdapter } from '@/db/adapter/index.svelte';
+import maverickjsReactivityAdapter from '@signaldb/maverickjs';
+import { svelteReactivityAdapter } from '../adapter/index.svelte';
 import { createIndex, Collection } from '@signaldb/core';
 import createOPFSAdapter from '@signaldb/opfs';
 import type { AttendanceRecord, EventDetails, EventSchedule, Participant, Settings } from './types';
@@ -20,7 +21,7 @@ export class AttendanceRecordCollection extends Collection<AttendanceRecord> {
 	constructor(data?: AttendanceRecord) {
 		super({
 			name: 'attendance_records',
-			reactivity: svelteReactivityAdapter(),
+			reactivity: maverickjsReactivityAdapter,
 			persistence: createOPFSAdapter('attendance_records.json'),
 			transform: (d) => {
 				return {
@@ -78,7 +79,7 @@ export class EventScheduleCollection extends Collection<EventSchedule> {
 	constructor(data?: EventSchedule) {
 		super({
 			name: 'event_schedules',
-			reactivity: svelteReactivityAdapter(),
+			reactivity: maverickjsReactivityAdapter,
 			persistence: createOPFSAdapter('event_schedules.json'),
 			transform: (d) => ({
 				...d,
@@ -139,7 +140,7 @@ export class EventDetailsCollection extends Collection<EventDetails> {
 	constructor(data?: EventDetails) {
 		super({
 			name: 'event_details',
-			reactivity: svelteReactivityAdapter(),
+			reactivity: maverickjsReactivityAdapter,
 			persistence: createOPFSAdapter('event_details.json'),
 			transform: (d) => ({
 				...d,
@@ -292,7 +293,7 @@ export class ParticipantCollection extends Collection<Participant> {
 	constructor(data?: Participant) {
 		super({
 			name: 'participants',
-			reactivity: svelteReactivityAdapter(),
+			reactivity: maverickjsReactivityAdapter,
 			persistence: createOPFSAdapter('participants.json'),
 			transform: (d) => ({
 				...d,
@@ -336,7 +337,7 @@ export class SettingsCollection extends Collection<Settings> {
 	constructor(data?: Settings) {
 		super({
 			name: 'settings',
-			reactivity: svelteReactivityAdapter(),
+			reactivity: maverickjsReactivityAdapter,
 			persistence: createOPFSAdapter('settings.json'),
 			transform: (d) => ({
 				...d,

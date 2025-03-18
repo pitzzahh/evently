@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { EventCalendar } from '@/components/custom/event-calendar';
 	import { scale } from 'svelte/transition';
-	import type { EventDetails } from '@/db/models/types';
 	import { watch } from 'runed';
 	import { COLLECTIONS } from '@/db';
 	import moment from 'moment';
 	import { momentLocalizer, type Event as CalendarEvent } from 'react-big-calendar';
+	import { effect } from '@maverick-js/signals';
 
 	interface ComponentState {
 		event_details: CalendarEvent[];
@@ -15,7 +15,7 @@
 		event_details: []
 	});
 
-	watch([() => COLLECTIONS.EVENT_DETAILS_COLLECTION.isLoading], () => {
+	effect(() => {
 		const event_details_cursor = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(
 			{},
 			{ fieldTracking: true }
@@ -30,7 +30,6 @@
 		});
 
 		$inspect(comp_state.event_details);
-		return () => event_details_cursor.cleanup();
 	});
 </script>
 
