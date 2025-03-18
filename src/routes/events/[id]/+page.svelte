@@ -60,9 +60,9 @@
 
 	watch(
 		[
-			() => COLLECTIONS.PARTICIPANT_COLLECTION.isPushing(),
-			() => COLLECTIONS.EVENT_SCHEDULE_COLLECTION.isPushing(),
-			() => COLLECTIONS.EVENT_DETAILS_COLLECTION.isPushing()
+			() => COLLECTIONS.PARTICIPANT_COLLECTION.isLoading(),
+			() => COLLECTIONS.EVENT_SCHEDULE_COLLECTION.isLoading(),
+			() => COLLECTIONS.EVENT_DETAILS_COLLECTION.isLoading()
 		],
 		() => {
 			const participants_cursor = COLLECTIONS.PARTICIPANT_COLLECTION.find({
@@ -82,7 +82,6 @@
 			$inspect(
 				comp_state.event_details?.start_date && comp_state.event_details.start_date > new Date()
 			);
-
 			return () => {
 				participants_cursor.cleanup();
 				event_schedule_cursor.cleanup();

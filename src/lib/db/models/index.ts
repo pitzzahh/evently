@@ -1,4 +1,3 @@
-import svelteReactivityAdapter() from '@signaldb/maverickjs';
 import { svelteReactivityAdapter } from '../adapter/index.svelte';
 import { createIndex, Collection } from '@signaldb/core';
 import createOPFSAdapter from '@signaldb/opfs';

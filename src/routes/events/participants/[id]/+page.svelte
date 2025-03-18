@@ -23,7 +23,6 @@
 	import { QRCode, SquareCheckBig } from '@/assets/icons';
 	import type { HelperResponse } from '@/types/generic/index.js';
 	import QrCodeScannerDialog from '@routes/events/(components)/(participant)/qr-code-scanner-dialog.svelte';
-	import type { AttendanceRecordCollection, ParticipantCollection } from '@/db/models/index.js';
 	import { getPopulatedAttendanceRecords } from '../(utils)/index.js';
 
 	interface ComponentState {
