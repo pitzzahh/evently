@@ -35,7 +35,7 @@
 	watch(
 		[
 			() => COLLECTIONS.EVENT_SCHEDULE_COLLECTION.isLoading(),
-			() => COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.isPushing()
+			() => COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.isLoading()
 		],
 		() => {
 			const event_id = page.params.id;
