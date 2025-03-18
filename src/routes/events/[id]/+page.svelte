@@ -128,11 +128,13 @@
 	<div class="flex items-start gap-6 border-b-2 border-dashed pb-6">
 		<Avatar.Root
 			class={cn(
-				'h-full w-full max-w-[280px] rounded-md ring-2 ring-accent ring-offset-2 ring-offset-background '
+				'aspect-square h-[280px] w-[280px] rounded-md ring-2 ring-accent ring-offset-2 ring-offset-background '
 			)}
 		>
 			<Avatar.Image src={comp_state.event_details?.cover} />
-			<Avatar.Fallback class="h-full w-full max-w-[280px] rounded-md">EVENT COVER</Avatar.Fallback>
+			<Avatar.Fallback class="aspect-square h-[280px] w-[280px] rounded-md"
+				>EVENT COVER</Avatar.Fallback
+			>
 		</Avatar.Root>
 
 		<div class="flex w-full flex-1 flex-col gap-4">
@@ -196,76 +198,59 @@
 			</div>
 
 			<!-- EVENT DETAILS -->
-			<div class="grid gap-4">
-				<div class="flex items-center gap-8">
-					<div class="flex items-center gap-3">
-						<div class="rounded-md border p-3">
-							<Calendar class="size-5 text-muted-foreground" />
-						</div>
-						<div>
-							<p class="text-base font-medium">
-								{formatDateTime(comp_state.event_details?.start_date)}
-							</p>
-							<p class="text-muted-foreground">
-								{formatDateToTimeOption(comp_state.event_schedules.at(0)?.am_start)} - {formatDateToTimeOption(
-									comp_state.event_schedules.at(0)?.pm_end
-								)}
-							</p>
-						</div>
+			<div class="grid grid-cols-2 grid-rows-2 gap-4">
+				<div class="flex items-center gap-3">
+					<div class="rounded-md border p-3">
+						<Calendar class="size-5 text-muted-foreground" />
 					</div>
-
-					<div class="flex items-center gap-3">
-						<div class="rounded-md border p-3">
-							<Clock class="size-5 text-muted-foreground" />
-						</div>
-
-						<div>
-							<p class="text-base font-medium">
-								{comp_state.event_details?.difference_in_days}
-								{comp_state.event_details?.difference_in_days &&
-								comp_state.event_details?.difference_in_days > 1
-									? 'days'
-									: 'day'} event
-							</p>
-							<p class=" text-muted-foreground">Duration</p>
-						</div>
+					<div>
+						<p class="text-base font-medium">
+							{formatDateTime(comp_state.event_details?.start_date)}
+						</p>
+						<p class="text-muted-foreground">
+							{formatDateToTimeOption(comp_state.event_schedules.at(0)?.am_start)} - {formatDateToTimeOption(
+								comp_state.event_schedules.at(0)?.pm_end
+							)}
+						</p>
 					</div>
 				</div>
 
-				<div class="flex items-center gap-8">
-					<div class="flex items-center gap-3">
-						<div class="rounded-md border p-3">
-							<UsersRound class="size-5 text-muted-foreground" />
-						</div>
-						<div>
-							<p class="text-base font-medium">{comp_state.participants.length}</p>
-							<p class=" text-muted-foreground">
-								Participant{comp_state.participants.length > 1 ? 's' : ''}
-							</p>
-						</div>
+				<div class="flex items-center gap-3">
+					<div class="rounded-md border p-3">
+						<Clock class="size-5 text-muted-foreground" />
 					</div>
 
-					<div class="flex items-center gap-3">
-						<div class="rounded-md border p-3">
-							<MapPin class="size-5 text-muted-foreground" />
-						</div>
-						<div>
-							<p class="text-base font-medium">{comp_state.event_details?.location ?? 'N/A'}</p>
-							<p class=" text-muted-foreground">Location</p>
-						</div>
+					<div>
+						<p class="text-base font-medium">
+							{comp_state.event_details?.difference_in_days}
+							{comp_state.event_details?.difference_in_days &&
+							comp_state.event_details?.difference_in_days > 1
+								? 'days'
+								: 'day'} event
+						</p>
+						<p class=" text-muted-foreground">Duration</p>
 					</div>
 				</div>
 
-				<div
-					class="grid w-full gap-2 overflow-hidden rounded-lg border bg-white/40 p-2 backdrop-blur-lg backdrop-filter transition-all duration-300 dark:bg-[#151e28]/20"
-				>
-					<p
-						class="h-auto w-full rounded-tl-md rounded-tr-md border bg-white p-3 text-sm font-medium dark:bg-[#151e28]"
-					>
-						Description
-					</p>
-					<div class="p-4">
-						<p>{comp_state.event_details?.description || 'No description'}</p>
+				<div class="flex items-center gap-3">
+					<div class="rounded-md border p-3">
+						<UsersRound class="size-5 text-muted-foreground" />
+					</div>
+					<div>
+						<p class="text-base font-medium">{comp_state.participants.length}</p>
+						<p class=" text-muted-foreground">
+							Participant{comp_state.participants.length > 1 ? 's' : ''}
+						</p>
+					</div>
+				</div>
+
+				<div class="flex items-center gap-3">
+					<div class="rounded-md border p-3">
+						<MapPin class="size-5 text-muted-foreground" />
+					</div>
+					<div>
+						<p class="text-base font-medium">{comp_state.event_details?.location ?? 'N/A'}</p>
+						<p class=" text-muted-foreground">Location</p>
 					</div>
 				</div>
 			</div>
