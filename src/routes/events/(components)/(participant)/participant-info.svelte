@@ -17,6 +17,9 @@
 	import { checkEventStatus, getEventDayInfo } from '@routes/events/utils';
 	import { tick } from 'svelte';
 	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
+	import * as Popover from '$lib/components/ui/popover/index.js';
+	import { Calendar, ListFilter } from 'lucide-svelte';
+	import { Button, buttonVariants } from '@/components/ui/button';
 
 	interface ParticipantInfoProps {
 		participant: Participant;
@@ -127,49 +130,89 @@
 	</div>
 
 	<div class="grid w-full gap-4">
-		<div>
-			<h4 class="text-lg font-medium">
-				{generateFullName(
-					{
-						first_name: participant.first_name,
-						last_name: participant.last_name,
-						middle_name: participant.middle_name
-					},
-					{ include_last_name: true }
-				)}
-			</h4>
+		<div class="flex justify-between">
+			<div>
+				<h4 class="text-lg font-medium">
+					{generateFullName(
+						{
+							first_name: participant.first_name,
+							last_name: participant.last_name,
+							middle_name: participant.middle_name
+						},
+						{ include_last_name: true }
+					)}
+				</h4>
 
-			<p class="text-sm text-muted-foreground">
-				{participant.email}
-			</p>
+				<p class="text-sm text-muted-foreground">
+					{participant.email}
+				</p>
+			</div>
+
+			<!-- FILTERS -->
+			<Popover.Root>
+				<Popover.Trigger class={cn(buttonVariants({ size: 'icon', variant: 'outline' }))}
+					><ListFilter class="size-4" /></Popover.Trigger
+				>
+				<Popover.Content class="w-auto" side="left">
+					<p class="mb-1 text-sm font-medium">Filters</p>
+					<fieldset class="sticky top-0 space-y-4 bg-background">
+						<RadioGroup.Root
+							bind:value={comp_state.filtered_attendance_status}
+							name="spacing"
+							class="grid grid-cols-4 gap-2"
+						>
+							{#each filter_attendance_statuses as f, idx}
+								<label
+									for={`${idx}-${f.value}`}
+									class="[&:has([data-state=checked])>div>p]:text-white [&:has([data-state=checked])>div]:border-primary [&:has([data-state=checked])>div]:bg-primary"
+								>
+									<RadioGroup.Item
+										id={`${idx}-${f.value}`}
+										value={f.value}
+										class="sr-only after:absolute after:inset-0"
+									/>
+									<div
+										class="relative flex cursor-pointer flex-col items-center rounded-full border px-2 py-1 text-center"
+									>
+										<p class="text-xs font-medium text-foreground">{f.label}</p>
+									</div>
+								</label>
+							{/each}
+						</RadioGroup.Root>
+					</fieldset>
+				</Popover.Content>
+			</Popover.Root>
 		</div>
 
 		<div class="w-full border-t-2 border-dashed"></div>
 
-		<div class="grid h-[400px] gap-4 overflow-auto">
-			<!-- FILTERS -->
-			<fieldset class="space-y-4">
-				<RadioGroup.Root
-					bind:value={comp_state.filtered_attendance_status}
-					name="spacing"
-					class="grid grid-cols-4 gap-2"
-				>
-					{#each filter_attendance_statuses as f, idx}
-						<label
-							for={`${idx}-${f.value}`}
-							class="has-data-[state=checked]:border-ring shadow-xs has-data-disabled:cursor-not-allowed has-data-disabled:opacity-50 relative flex cursor-pointer flex-col items-center gap-3 rounded-md border border-input px-2 py-3 text-center outline-none transition-[color,box-shadow] focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50"
+		<div class="relative grid h-[400px] gap-4 overflow-auto">
+			{#if comp_state.event_schedules.length === 0 && comp_state.filtered_attendance_status !== 'all'}
+				<div class="grid h-[350px] place-content-center">
+					<div class="grid place-items-center gap-2">
+						<Calendar class="size-[4rem] text-muted-foreground/80" />
+						<div class="grid place-items-center gap-1">
+							<h2 class="text-xl font-medium text-muted-foreground">No event day found</h2>
+							<p class="text-sm text-muted-foreground">
+								{#if comp_state.filtered_attendance_status === 'complete'}
+									No days with complete attendance records found.
+								{:else if comp_state.filtered_attendance_status === 'incomplete'}
+									No days with incomplete attendance records found.
+								{:else if comp_state.filtered_attendance_status === 'absent'}
+									No days with absence records found.
+								{:else}
+									No attendance records match the selected filter.
+								{/if}
+							</p>
+						</div>
+						<Button
+							variant="outline"
+							size="sm"
+							onclick={() => (comp_state.filtered_attendance_status = 'all')}>Reset filter</Button
 						>
-							<RadioGroup.Item
-								id={`${idx}-${f.value}`}
-								value={f.value}
-								class="sr-only after:absolute after:inset-0"
-							/>
-							<p class="text-sm font-medium leading-none text-foreground">{f.label}</p>
-						</label>
-					{/each}
-				</RadioGroup.Root>
-			</fieldset>
-
+					</div>
+				</div>
+			{/if}
 			<div class="grid w-full gap-2">
 				{#each comp_state.event_schedules as event_schedule}
 					{@const participant_attendance = comp_state.participant_attendance.find(
