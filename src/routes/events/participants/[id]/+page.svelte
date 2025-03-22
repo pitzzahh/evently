@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { buttonVariants } from '@/components/ui/button';
-	import { Check, Clock, FileOutput, UsersRound, X } from 'lucide-svelte';
+	import { Check, Clock, FileOutput, ScanBarcode, ScanQrCode, UsersRound, X } from 'lucide-svelte';
 	import { AddParticipantsDialog, ParticipantDataTable } from '@routes/events/(components)';
 	import type { EventSchedule, EventDetails, ParticipantAttendance } from '@/db/models/types';
 	import { fly } from 'svelte/transition';
@@ -17,13 +17,15 @@
 	import { checkEventStatus, getEventDayInfo } from '@routes/events/utils';
 	import { quartInOut } from 'svelte/easing';
 	import { StatusPill } from '@/components/snippets/events.svelte';
-	import { ImportParticipantDialog } from '@routes/events/(components)/(participant)';
 	import { cn } from '@/utils';
 	import * as DropdownMenu from '@/components/ui/dropdown-menu';
 	import { QRCode, SquareCheckBig } from '@/assets/icons';
 	import type { HelperResponse } from '@/types/generic/index.js';
 	import QrCodeScannerDialog from '@routes/events/(components)/(participant)/qr-code-scanner-dialog.svelte';
 	import { getPopulatedAttendanceRecords } from '../(utils)/index.js';
+	import * as Popover from '$lib/components/ui/popover/index.js';
+	import Button from '@/components/ui/button/button.svelte';
+	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 
 	interface ComponentState {
 		event_details: EventDetails | undefined;
@@ -34,12 +36,13 @@
 		scanned_attendance: any | null;
 		current_day_participants_attendance: ParticipantAttendance[];
 		all_participants_attendance: ParticipantAttendance[];
-		barcode: string;
+		qr_code: string;
 		timeout: number | null;
 		workers: {
 			qr_code_worker: Worker | null;
 			daily_attendance_report_worker: Worker | null;
 		};
+		hardware_scanner_enabled: boolean;
 	}
 
 	let { data } = $props();
@@ -53,12 +56,13 @@
 		scanned_attendance: null,
 		current_day_participants_attendance: [],
 		all_participants_attendance: [],
-		barcode: '',
+		qr_code: '',
 		timeout: null,
 		workers: {
 			qr_code_worker: null,
 			daily_attendance_report_worker: null
-		}
+		},
+		hardware_scanner_enabled: false
 	});
 
 	const event_status = $derived(
@@ -76,7 +80,7 @@
 	);
 
 	/**
-	 * Process a barcode scan and record participant attendance
+	 * Process a qr_code scan and record participant attendance
 	 * @param participant_id The ID of the scanned participant
 	 */
 	function handleScanParticipant(participant_id: string) {
@@ -259,11 +263,15 @@
 			event.preventDefault();
 			event.stopPropagation();
 
-			if (comp_state.barcode && comp_state.barcode.length > 5) {
-				handleScanParticipant(comp_state.barcode);
+			if (!comp_state.hardware_scanner_enabled) {
+				return toast.error('Hardware scanning is disbaled');
 			}
 
-			comp_state.barcode = '';
+			if (comp_state.qr_code && comp_state.qr_code.length > 5) {
+				handleScanParticipant(comp_state.qr_code);
+			}
+
+			comp_state.qr_code = '';
 			return;
 		}
 
@@ -272,12 +280,12 @@
 			comp_state.timeout = null;
 		}
 
-		comp_state.barcode += event.key;
+		comp_state.qr_code += event.key;
 
 		// reset if no input received for a while
 		comp_state.timeout = setTimeout(() => {
-			if (comp_state.barcode.length < 5) {
-				comp_state.barcode = '';
+			if (comp_state.qr_code.length < 5) {
+				comp_state.qr_code = '';
 			}
 			comp_state.timeout = null;
 		}, 500) as unknown as number;
@@ -339,6 +347,15 @@
 				});
 			}
 		};
+	}
+
+	function handleToggleHardwareScannerState() {
+		const state = !comp_state.hardware_scanner_enabled;
+		comp_state.hardware_scanner_enabled = state;
+
+		if (state) {
+			toast.success('Hardware scanner enabled. Please make sure the device is plugged');
+		} else toast.info('Hardware scanner disabled');
 	}
 
 	function download_document(url: string, file_name: string) {
@@ -454,7 +471,9 @@
 <svelte:document onkeydown={handleKeydown} />
 
 <div in:fly={{ y: 20 }} class="grid gap-6">
+	<!-- PAGE HEADER -->
 	<div class="flex items-center justify-between">
+		<!-- EVENT NAME -->
 		<div class="grid place-items-start gap-6">
 			<h2 class="text-5xl font-semibold">
 				{comp_state.event_details?.event_name ?? 'N/A'}'s Participants
@@ -466,23 +485,51 @@
 				</Badge>
 			{/if}
 		</div>
+		<!-- END OF EVENT NAME -->
 
 		<div class="flex flex-col items-end gap-2">
 			<div class="flex items-center gap-2">
-				<QrCodeScannerDialog handleScan={handleScanParticipant} />
+				{@render StatusPill(event_status)}
 				<AddParticipantsDialog
 					disabled={false}
 					add_participants_form={data.add_participants_form}
 					event_id={comp_state.event_details?.id ?? 'N/A'}
 				/>
 			</div>
+		</div>
+	</div>
+	<!-- END OF PAGE HEADER -->
+
+	<Tabs.Root value="participants">
+		<div class="flex justify-between">
+			<Tabs.List
+				class={cn('grid h-auto w-full max-w-[600px] grid-cols-2', {
+					'max-w-[800px] grid-cols-3': event_status === 'ongoing'
+				})}
+			>
+				<Tabs.Trigger value="participants" class="h-auto text-base">
+					<UsersRound class="mr-2 size-4" />
+					All participants</Tabs.Trigger
+				>
+				<Tabs.Trigger value="all-time-in-and-out" class="h-auto text-base">
+					<Clock class="mr-2 size-4" />
+					All time in and out
+				</Tabs.Trigger>
+				{#if event_status === 'ongoing'}
+					<Tabs.Trigger value="time-in-and-out" class="h-auto text-base">
+						<Clock class="mr-2 size-4" />
+						Today's time in and out
+					</Tabs.Trigger>
+				{/if}
+			</Tabs.List>
+
+			<!-- ACTIONS -->
 			<div class="justify flex items-center gap-1">
-				<ImportParticipantDialog event_id={comp_state.event_details?.id ?? 'N/A'} />
 				<DropdownMenu.Root>
 					<DropdownMenu.Trigger class={buttonVariants({ variant: 'outline' })}
-						><FileOutput class="size-4" />Export</DropdownMenu.Trigger
+						><FileOutput class="size-4" />Export Data</DropdownMenu.Trigger
 					>
-					<DropdownMenu.Content>
+					<DropdownMenu.Content align="end">
 						<DropdownMenu.Group>
 							<DropdownMenu.GroupHeading class="text-center"
 								>Export Options</DropdownMenu.GroupHeading
@@ -552,32 +599,46 @@
 						</DropdownMenu.Group>
 					</DropdownMenu.Content>
 				</DropdownMenu.Root>
-				{@render StatusPill(event_status)}
-			</div>
-		</div>
-	</div>
 
-	<Tabs.Root value="participants">
-		<Tabs.List
-			class={cn('grid h-auto w-full max-w-[600px] grid-cols-2', {
-				'max-w-[800px] grid-cols-3': event_status === 'ongoing'
-			})}
-		>
-			<Tabs.Trigger value="participants" class="h-auto text-base">
-				<UsersRound class="mr-2 size-4" />
-				All participants</Tabs.Trigger
-			>
-			<Tabs.Trigger value="all-time-in-and-out" class="h-auto text-base">
-				<Clock class="mr-2 size-4" />
-				All time in and out
-			</Tabs.Trigger>
-			{#if event_status === 'ongoing'}
-				<Tabs.Trigger value="time-in-and-out" class="h-auto text-base">
-					<Clock class="mr-2 size-4" />
-					Today's time in and out
-				</Tabs.Trigger>
-			{/if}
-		</Tabs.List>
+				<Tooltip.Provider delayDuration={100}>
+					<Tooltip.Root>
+						<Tooltip.Trigger>
+							<Popover.Root>
+								<Popover.Trigger
+									class={cn(
+										buttonVariants({ size: 'icon', variant: 'outline' }),
+										comp_state.hardware_scanner_enabled && 'border-green-600'
+									)}
+								>
+									<ScanQrCode class="size-4" />
+								</Popover.Trigger>
+								<Popover.Content class="w-auto" side="left">
+									<p class="mb-2 text-sm text-muted-foreground">Choose which to scan</p>
+									<div class="flex items-center gap-1">
+										<QrCodeScannerDialog handleScan={handleScanParticipant} />
+										<Button
+											size="sm"
+											variant="outline"
+											class={cn(comp_state.hardware_scanner_enabled && 'border-green-600')}
+											onclick={handleToggleHardwareScannerState}
+										>
+											<ScanBarcode class="size-4" /> Scan with Hardware Scanner
+											{#if comp_state.hardware_scanner_enabled}
+												<Check class="size-3 rounded-full bg-green-600 p-1" />
+											{/if}
+										</Button>
+									</div>
+								</Popover.Content>
+							</Popover.Root>
+						</Tooltip.Trigger>
+						<Tooltip.Content>
+							<p>Scan</p>
+						</Tooltip.Content>
+					</Tooltip.Root>
+				</Tooltip.Provider>
+			</div>
+			<!-- END OF  ACTIONS -->
+		</div>
 
 		<Tabs.Content value="participants" class="mt-4">
 			<div class="grid gap-2 overflow-x-auto">
