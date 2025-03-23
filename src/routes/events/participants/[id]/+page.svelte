@@ -493,6 +493,7 @@
 				<AddParticipantsDialog
 					disabled={false}
 					add_participants_form={data.add_participants_form}
+					is_event_finished={event_status === 'finished'}
 					event_id={comp_state.event_details?.id ?? 'N/A'}
 				/>
 			</div>
