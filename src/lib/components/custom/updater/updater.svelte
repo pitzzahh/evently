@@ -1,9 +1,15 @@
 <script lang="ts" module>
+	import type { Update } from '@tauri-apps/plugin-updater';
+
 	export type UpdaterProps = {
 		title: string;
 		dismiss: boolean;
 		description: string;
 	};
+
+	interface ComponentState {
+		update: Update | null;
+	}
 </script>
 
 <script lang="ts">
@@ -11,6 +17,10 @@
 	import { X } from 'lucide-svelte';
 
 	let { title, dismiss = $bindable(false), description }: UpdaterProps = $props();
+
+	let { update } = $state<ComponentState>({
+		update: null
+	});
 </script>
 
 <section class="w-full border-b bg-white px-4 py-3 shadow-sm">
