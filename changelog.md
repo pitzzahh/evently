@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.10] - 2025-3-24
+
+### Add
+
+- Event image cover upload feature.
+- Event image cover display in event card.
+
+### Fix
+
+- Daily attendance report generation logic to ensure correct data retrieval.
+- Calendar of events to ensure correct date display.
+
+### Feat
+
+- Camera option for QR code scanning.
+- Toggle option between camera and hardware scanner for QR code scanning.
+
 ## [1.1.3] - 2025-3-12
 
 ### Add
