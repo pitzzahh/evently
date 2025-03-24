@@ -409,7 +409,7 @@
 			}
 			if (message.data.data) {
 				const file_name = `${comp_state.event_details?.event_name} Full Attendance Report`;
-				download_document(message.data.data, file_name);
+				download_document(message.data.data, file_name, 'xlsx');
 				toast.success('Full attendance report generated successfully', {
 					description: 'The full attendance report has been generated and is ready for download'
 				});
@@ -430,10 +430,10 @@
 		} else toast.info('Hardware scanner disabled');
 	}
 
-	function download_document(url: string, file_name: string) {
+	function download_document(url: string, file_name: string, extension: 'pdf' | 'xlsx' = 'pdf') {
 		const a = document.createElement('a');
 		a.href = url;
-		a.download = `${file_name}.pdf`;
+		a.download = `${file_name}.${extension}`;
 		document.body.appendChild(a);
 		a.click();
 		document.body.removeChild(a);
