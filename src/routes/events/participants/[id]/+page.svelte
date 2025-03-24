@@ -535,68 +535,106 @@
 							<DropdownMenu.GroupHeading class="text-center"
 								>Export Options</DropdownMenu.GroupHeading
 							>
+							<DropdownMenu.Sub>
+								<DropdownMenu.SubTrigger>PDF Export</DropdownMenu.SubTrigger>
+								<DropdownMenu.SubContent>
+									<DropdownMenu.Item
+										onclick={() => {
+											if (!comp_state.event_details) {
+												return toast.warning('Event details not available', {
+													description: "Couldn't find event details required to generate QR codes"
+												});
+											}
+
+											if (!comp_state.workers.qr_code_worker) {
+												return toast.error('QR code worker not available', {
+													description: 'Please refresh the page and try again'
+												});
+											}
+
+											comp_state.workers.qr_code_worker.postMessage({
+												info: {
+													creator: 'Evently',
+													title: `${comp_state.event_details.event_name} QR Codes`,
+													subject: 'QR Codes',
+													producer: 'Evently'
+												},
+												event_details: JSON.stringify(comp_state.event_details),
+												participants: JSON.stringify(comp_state.participants)
+											});
+											toast.info('Generating QR codes', {
+												description:
+													'Please wait while we generate the QR codes, or feel free to do other things'
+											});
+										}}><QRCode />Participants QR codes</DropdownMenu.Item
+									>
+									<DropdownMenu.Separator />
+									<DropdownMenu.Item
+										onclick={() => {
+											if (!comp_state.event_details) {
+												return toast.warning('Event details not available', {
+													description: "Couldn't find event details required to generate QR codes"
+												});
+											}
+
+											if (!comp_state.workers.daily_attendance_report_worker) {
+												return toast.error('QR code worker not available', {
+													description: 'Please refresh the page and try again'
+												});
+											}
+
+											comp_state.workers.daily_attendance_report_worker.postMessage({
+												info: {
+													creator: 'Evently',
+													title: `${comp_state.event_details.event_name} Daily Attendance Report`,
+													subject: 'Daily Attendance Report',
+													producer: 'Evently'
+												},
+												event_details: JSON.stringify(comp_state.event_details),
+												participants: JSON.stringify(comp_state.participants)
+											});
+											toast.info('Generating daily attendance report', {
+												description:
+													'Please wait while we generate the report, or feel free to do other things'
+											});
+										}}><SquareCheckBig />Daily Attendance Report</DropdownMenu.Item
+									>
+								</DropdownMenu.SubContent>
+							</DropdownMenu.Sub>
+							<DropdownMenu.Sub>
+								<DropdownMenu.SubTrigger>Excel Export</DropdownMenu.SubTrigger>
+								<DropdownMenu.SubContent>
+									<DropdownMenu.Item
+										onclick={() => {
+											if (!comp_state.event_details) {
+												return toast.warning('Event details not available', {
+													description: "Couldn't find event details required to generate QR codes"
+												});
+											}
+
+											toast.info('Generating QR codes', {
+												description:
+													'Please wait while we generate the QR codes, or feel free to do other things'
+											});
+										}}><QRCode />Participants QR codes</DropdownMenu.Item
+									>
+									<DropdownMenu.Separator />
+									<DropdownMenu.Item
+										onclick={() => {
+											if (!comp_state.event_details) {
+												return toast.warning('Event details not available', {
+													description: "Couldn't find event details required to generate QR codes"
+												});
+											}
+											toast.info('Generating event attendance report', {
+												description:
+													'Please wait while we generate the report, or feel free to do other things'
+											});
+										}}><SquareCheckBig />Event Attendance Report</DropdownMenu.Item
+									>
+								</DropdownMenu.SubContent>
+							</DropdownMenu.Sub>
 							<DropdownMenu.Separator />
-							<DropdownMenu.Item
-								onclick={() => {
-									if (!comp_state.event_details) {
-										return toast.warning('Event details not available', {
-											description: "Couldn't find event details required to generate QR codes"
-										});
-									}
-
-									if (!comp_state.workers.qr_code_worker) {
-										return toast.error('QR code worker not available', {
-											description: 'Please refresh the page and try again'
-										});
-									}
-
-									comp_state.workers.qr_code_worker.postMessage({
-										info: {
-											creator: 'Evently',
-											title: `${comp_state.event_details.event_name} QR Codes`,
-											subject: 'QR Codes',
-											producer: 'Evently'
-										},
-										event_details: JSON.stringify(comp_state.event_details),
-										participants: JSON.stringify(comp_state.participants)
-									});
-									toast.info('Generating QR codes', {
-										description:
-											'Please wait while we generate the QR codes, or feel free to do other things'
-									});
-								}}><QRCode />Participants QR codes</DropdownMenu.Item
-							>
-
-							<DropdownMenu.Item
-								onclick={() => {
-									if (!comp_state.event_details) {
-										return toast.warning('Event details not available', {
-											description: "Couldn't find event details required to generate QR codes"
-										});
-									}
-
-									if (!comp_state.workers.daily_attendance_report_worker) {
-										return toast.error('QR code worker not available', {
-											description: 'Please refresh the page and try again'
-										});
-									}
-
-									comp_state.workers.daily_attendance_report_worker.postMessage({
-										info: {
-											creator: 'Evently',
-											title: `${comp_state.event_details.event_name} Daily Attendance Report`,
-											subject: 'Daily Attendance Report',
-											producer: 'Evently'
-										},
-										event_details: JSON.stringify(comp_state.event_details),
-										participants: JSON.stringify(comp_state.participants)
-									});
-									toast.info('Generating daily attendance report', {
-										description:
-											'Please wait while we generate the report, or feel free to do other things'
-									});
-								}}><SquareCheckBig />Daily Attendance Report</DropdownMenu.Item
-							>
 						</DropdownMenu.Group>
 					</DropdownMenu.Content>
 				</DropdownMenu.Root>
