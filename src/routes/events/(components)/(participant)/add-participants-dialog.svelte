@@ -3,7 +3,7 @@
 	import * as Dialog from '@/components/ui/dialog';
 	import type { AddParticipantsSchema } from '@/schema/participant';
 	import { Import, Plus } from '@/assets/icons';
-	import { message, type SuperValidated } from 'sveltekit-superforms';
+	import { type SuperValidated } from 'sveltekit-superforms';
 	import ParticipantsForm from './participants-form.svelte';
 	import ImportParticipantDialog from './import-participant-dialog.svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';

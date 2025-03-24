@@ -99,7 +99,7 @@
 
 	async function handleImportParticipants() {
 		if (files.length === 0) {
-			toast.error('No files selected!');
+			toast.error('No files selected');
 			return;
 		}
 
