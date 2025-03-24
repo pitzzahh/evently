@@ -391,6 +391,36 @@
 		};
 	}
 
+	async function load_excel_full_attendance_report_worker() {
+		if (comp_state.workers.excel.full_attendance_report_worker) {
+			comp_state.workers.excel.full_attendance_report_worker.terminate();
+		}
+		const FullAttendanceWorker = await import(
+			'$lib/workers/exports/excel/excel-full-attendance-worker?worker'
+		);
+		comp_state.workers.excel.full_attendance_report_worker = new FullAttendanceWorker.default();
+		comp_state.workers.excel.full_attendance_report_worker.onmessage = (
+			message: MessageEvent<HelperResponse<string | null>>
+		) => {
+			if (message.data.status !== 200 || message.data.data === null) {
+				return toast.warning('Failed to generate full attendance report', {
+					description: message.data.message
+				});
+			}
+			if (message.data.data) {
+				const file_name = `${comp_state.event_details?.event_name} Full Attendance Report`;
+				download_document(message.data.data, file_name);
+				toast.success('Full attendance report generated successfully', {
+					description: 'The full attendance report has been generated and is ready for download'
+				});
+			} else {
+				toast.error('Failed to generate full attendance report', {
+					description: 'No data received from the worker'
+				});
+			}
+		};
+	}
+
 	function handleToggleHardwareScannerState() {
 		const state = !comp_state.hardware_scanner_enabled;
 		comp_state.hardware_scanner_enabled = state;
@@ -685,6 +715,22 @@
 													description: "Couldn't find event details required to generate QR codes"
 												});
 											}
+											if (!comp_state.workers.excel.full_attendance_report_worker) {
+												return toast.error('Full attendance report worker not available', {
+													description: 'Please refresh the page and try again'
+												});
+											}
+
+											comp_state.workers.excel.full_attendance_report_worker.postMessage({
+												info: {
+													creator: 'Evently',
+													title: `${comp_state.event_details.event_name} Full Attendance Report`,
+													subject: 'Full Attendance Report',
+													producer: 'Evently'
+												},
+												event_details: JSON.stringify(comp_state.event_details),
+												participants: JSON.stringify(comp_state.participants)
+											});
 
 											toast.info('Generating QR codes', {
 												description:
@@ -713,7 +759,7 @@
 									<ScanQrCode class="size-4" />
 								</Popover.Trigger>
 								<Popover.Content class="w-auto" side="left">
-									<p class="mb-2 text-sm text-muted-foreground">Choose which to scan</p>
+									<p class="mb-2 text-sm text-muted-foreground">Choose which scanner to use</p>
 									<div class="flex items-center gap-1">
 										<QrCodeScannerDialog handleScan={handleScanParticipant} />
 										<Button
