@@ -1,9 +1,10 @@
 <script lang="ts" generics="TData">
-	import { Settings2 } from "@/assets/icons";
-	import type { Table } from "@tanstack/table-core";
-	import { buttonVariants } from "@/components/ui/button/index.js";
-	import * as DropdownMenu from "@/components/ui/dropdown-menu/index.js";
-	import { untrack } from "svelte";
+	import { Settings2 } from '@/assets/icons';
+	import type { Table } from '@tanstack/table-core';
+	import { buttonVariants } from '@/components/ui/button/index.js';
+	import * as DropdownMenu from '@/components/ui/dropdown-menu/index.js';
+	import { untrack } from 'svelte';
+	import { convertToNormalText } from '@/utils/text';
 	interface Props {
 		table: Table<TData>;
 		default_hidden_columns?: (keyof TData)[];
@@ -25,9 +26,9 @@
 <DropdownMenu.Root>
 	<DropdownMenu.Trigger
 		class={buttonVariants({
-			variant: "outline",
-			size: "sm",
-			class: "ml-auto h-8 flex",
+			variant: 'outline',
+			size: 'sm',
+			class: 'ml-auto flex h-8'
 		})}
 	>
 		<Settings2 />
@@ -39,19 +40,21 @@
 			<DropdownMenu.Separator />
 			{#each table
 				.getAllColumns()
-				.filter((col) => typeof col.accessorFn !== "undefined" && col.getCanHide()) as column}
+				.filter((col) => typeof col.accessorFn !== 'undefined' && col.getCanHide()) as column}
 				<DropdownMenu.CheckboxItem
-					bind:checked={() => column.getIsVisible(),
-					(v) => {
-						column.toggleVisibility(!!v);
-						default_hidden_columns = table
-							.getAllColumns()
-							.filter((col) => !col.getIsVisible())
-							.map((col) => col.id as keyof TData);
-					}}
+					bind:checked={
+						() => column.getIsVisible(),
+						(v) => {
+							column.toggleVisibility(!!v);
+							default_hidden_columns = table
+								.getAllColumns()
+								.filter((col) => !col.getIsVisible())
+								.map((col) => col.id as keyof TData);
+						}
+					}
 					class="capitalize"
 				>
-					{column.id}
+					{convertToNormalText(column.id, true, ['_'])}
 				</DropdownMenu.CheckboxItem>
 			{/each}
 		</DropdownMenu.Group>

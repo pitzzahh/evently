@@ -1,28 +1,30 @@
 <script lang="ts">
-	import { createTauriFilesystemAdapter, svelteReactivityAdapter } from '@/db/adapter/index.svelte';
-	import { Collection } from '@signaldb/core';
-	const Posts = new Collection({
-		persistence: createTauriFilesystemAdapter('posts.json'),
-		reactivity: svelteReactivityAdapter()
-	});
+	import * as Tabs from '$lib/components/ui/tabs/index.js';
+	import { EventList } from '@routes/events/(components)';
+	import { CalendarArrowDown, CalendarArrowUp } from '@/assets/icons';
 
-	let items: any[] = $state.raw([]);
-	$effect(() => {
-		const cursor = Posts.find({});
-		items = cursor.fetch();
-
-		return () => {
-			cursor.cleanup();
-		};
-	});
+	let current_tab = $state<'upcoming' | 'past'>('upcoming');
 </script>
 
-<button onclick={() => Posts.insert({ title: 'Post', author: 'Author' })}> Add Post </button>
+<Tabs.Root bind:value={current_tab}>
+	<div class="flex items-center justify-between gap-4">
+		<h2 class="text-4xl font-semibold">Events</h2>
+		<Tabs.List class="grid h-auto w-full max-w-[300px] grid-cols-2">
+			<Tabs.Trigger value="upcoming" class="h-auto text-base">
+				<CalendarArrowUp class="mr-2 size-[18px]" />
+				Upcoming</Tabs.Trigger
+			>
+			<Tabs.Trigger value="past" class="h-auto text-base">
+				<CalendarArrowDown class="mr-2 size-[18px]" />
+				Past</Tabs.Trigger
+			>
+		</Tabs.List>
+	</div>
 
-<ul>
-	{#each items as post}
-		<li>
-			<strong>{post.title}</strong> by {post.author}
-		</li>
+	{@const contents = ['upcoming', 'past']}
+	{#each contents as content (content)}
+		<Tabs.Content value={content} class="mt-10">
+			<EventList type={content as 'upcoming' | 'past'} />
+		</Tabs.Content>
 	{/each}
-</ul>
+</Tabs.Root>

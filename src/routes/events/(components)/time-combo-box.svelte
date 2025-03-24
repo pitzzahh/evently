@@ -1,23 +1,24 @@
 <script lang="ts">
-	import Check from 'lucide-svelte/icons/check';
+	import { Check, Clock } from '@/assets/icons';
 	import { tick } from 'svelte';
-	import * as Command from '$lib/components/ui/command/index.js';
-	import * as Popover from '$lib/components/ui/popover/index.js';
-	import { cn } from '$lib/utils.js';
+	import * as Command from '@/components/ui/command';
+	import * as Popover from '@/components/ui/popover';
+	import { cn } from '@/utils/styles';
 
 	let {
 		time_options,
 		selected_time,
-		onTimeSelect
-	}: { time_options: string[]; selected_time: string; onTimeSelect: (new_time: string) => void } =
-		$props();
+		onTimeSelect,
+		is_disabled
+	}: {
+		time_options: string[];
+		selected_time: string;
+		onTimeSelect: (new_time: string) => void;
+		is_disabled?: boolean;
+	} = $props();
 
 	let open = $state(false);
 	let triggerRef = $state<HTMLButtonElement>(null!);
-
-	$effect(() => {
-		console.log(selected_time);
-	});
 
 	// We want to refocus the trigger button when the user selects
 	// an item from the list so users can continue navigating the
@@ -31,13 +32,17 @@
 </script>
 
 <Popover.Root bind:open>
-	<Popover.Trigger bind:ref={triggerRef}>
+	<Popover.Trigger bind:ref={triggerRef} disabled={is_disabled}>
 		{#snippet child({ props })}
 			<button
-				class="w-[100px] rounded-br-sm rounded-tr-sm bg-background p-2 text-sm active:scale-95 active:opacity-60"
+				class={cn(
+					'flex w-[120px] items-center justify-center gap-2 rounded-sm border bg-primary p-2 px-3 py-1 text-sm text-white active:scale-95 active:opacity-60 dark:border-white/20',
+					is_disabled && 'cursor-not-allowed'
+				)}
 				{...props}
 			>
 				{selected_time}
+				<Clock class="size-4" />
 			</button>
 		{/snippet}
 	</Popover.Trigger>
@@ -52,7 +57,6 @@
 							value={time}
 							onSelect={() => {
 								onTimeSelect(time);
-								// selected_time = time;
 								closeAndFocusTrigger();
 							}}
 						>
