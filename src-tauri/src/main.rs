@@ -23,24 +23,7 @@ fn main() {
         .unwrap()
         .load();
     tauri::Builder::default()
-        .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_shell::init())
-        .plugin(
-            tauri_plugin_log::Builder::new()
-                .target(tauri_plugin_log::Target::new(
-                    tauri_plugin_log::TargetKind::Webview,
-                ))
-                .format(|out, message, record| {
-                    out.finish(format_args!(
-                        "[{} {}] {}",
-                        record.level(),
-                        record.target(),
-                        message
-                    ))
-                })
-                .timezone_strategy(tauri_plugin_log::TimezoneStrategy::UseLocal)
-                .build(),
-        )
         .plugin(tauri_plugin_updater::Builder::new().build())
         .invoke_handler(tauri::generate_handler![get_env_var, get_exe_path])
         .run(tauri::generate_context!())
