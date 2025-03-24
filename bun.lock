@@ -15,7 +15,9 @@
         "@tanstack/table-core": "^8.21.2",
         "@tauri-apps/api": "^2.4.0",
         "@tauri-apps/plugin-fs": "^2.2.0",
+        "@tauri-apps/plugin-process": "^2.2.0",
         "@tauri-apps/plugin-shell": "^2.2.0",
+        "@tauri-apps/plugin-updater": "^2.6.1",
         "exceljs": "^4.4.0",
         "html5-qrcode": "^2.3.8",
         "mode-watcher": "^0.5.1",
@@ -322,7 +324,11 @@
 
     "@tauri-apps/plugin-fs": ["@tauri-apps/plugin-fs@2.2.0", "", { "dependencies": { "@tauri-apps/api": "^2.0.0" } }, "sha512-+08mApuONKI8/sCNEZ6AR8vf5vI9DXD4YfrQ9NQmhRxYKMLVhRW164vdW5BSLmMpuevftpQ2FVoL9EFkfG9Z+g=="],
 
+    "@tauri-apps/plugin-process": ["@tauri-apps/plugin-process@2.2.0", "", { "dependencies": { "@tauri-apps/api": "^2.0.0" } }, "sha512-uypN2Crmyop9z+KRJr3zl71OyVFgTuvHFjsJ0UxxQ/J5212jVa5w4nPEYjIewcn8bUEXacRebwE6F7owgrbhSw=="],
+
     "@tauri-apps/plugin-shell": ["@tauri-apps/plugin-shell@2.2.0", "", { "dependencies": { "@tauri-apps/api": "^2.0.0" } }, "sha512-iC3Ic1hLmasoboG7BO+7p+AriSoqAwKrIk+Hpk+S/bjTQdXqbl2GbdclghI4gM32X0bls7xHzIFqhRdrlvJeaA=="],
+
+    "@tauri-apps/plugin-updater": ["@tauri-apps/plugin-updater@2.6.1", "", { "dependencies": { "@tauri-apps/api": "^2.0.0" } }, "sha512-iiOevw4kc12Ok99J9KthXwUqwPv1sYjG+tNEDZqPmwvOmIq7s58nKMRz6NJPKXT4U16NzMPffFcP/LUOsz6c4A=="],
 
     "@types/cookie": ["@types/cookie@0.6.0", "", {}, "sha512-4Kh9a6B2bQciAhf7FSuMRRkUWecJgJu9nPnx3yzpsfXX/c50REIqpHY4C82bXP90qrLtXtkDxTZosYO3UpOwlA=="],
 
