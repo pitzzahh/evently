@@ -2,9 +2,7 @@
 	import type { Update } from '@tauri-apps/plugin-updater';
 
 	export type UpdaterProps = {
-		title: string;
 		dismiss: boolean;
-		description: string;
 		update: Update | null;
 	};
 
@@ -21,7 +19,7 @@
 	import { installUpdate } from '@/utils/update';
 	import { toast } from 'svelte-sonner';
 
-	let { title, dismiss = $bindable(false), description, update }: UpdaterProps = $props();
+	let { dismiss = $bindable(false),update }: UpdaterProps = $props();
 
 	let { progress } = $state<ComponentState>({
 		progress: 0
@@ -72,7 +70,9 @@
 	</div>
 
 	<div class="flex items-center justify-between">
-		<Alert.Description>A new version 1.23.4 of the application is available.</Alert.Description>
+		<Alert.Description
+			>A new version {update?.version ?? 'N/A'} of the application is available.</Alert.Description
+		>
 		<Button
 			size="sm"
 			variant="outline"
