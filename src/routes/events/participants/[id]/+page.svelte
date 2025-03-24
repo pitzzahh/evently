@@ -491,9 +491,9 @@
 							participant_attendance.am_time_in &&
 							participant_attendance.pm_time_in
 						) {
-							return (acc += 1);
+							return acc + 1;
 						}
-						return (acc += 0);
+						return acc;
 					},
 					0
 				);
