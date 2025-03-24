@@ -416,11 +416,12 @@ export async function generateFullEventAttendanceReportPDF(
   }
 
   try {
-    // Calculate the total number of days in the event
+    // Calculate the total number of days in the event - fix day calculation
     const startDate = new Date(event_details.start_date);
     const endDate = new Date(event_details.end_date);
     const eventDurationMs = endDate.getTime() - startDate.getTime();
-    const totalDays = Math.ceil(eventDurationMs / (1000 * 60 * 60 * 24)) + 1; // +1 to include start and end dates
+    // Ensure we get the correct number of days for both single and multi-day events
+    const totalDays = Math.max(1, Math.ceil(eventDurationMs / (1000 * 60 * 60 * 24)));
 
     // Get all attendance records for this event
     const attendance_records = COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION
@@ -435,10 +436,10 @@ export async function generateFullEventAttendanceReportPDF(
       for (let day = 1; day <= totalDays; day++) {
         // Create a mock function to generate attendance for specific day
         // This is a workaround since we can't modify DocumentMetaDetails type
-        const generateDayReport = async () => {
+        const generateDayReport = async (): Promise<HelperResponse<string | null>> => {
           try {
-            // Filter attendance records for this specific day
-            const dayAttendanceRecords = attendance_records.filter(record => Number(record.day) === day);
+            // Filter attendance records for this specific day - fix string comparison
+            const dayAttendanceRecords = attendance_records.filter(record => record.day === day.toString());
 
             // Create a map of attendance records by participant ID for this day
             const dayAttendanceByParticipantId = new Map();
@@ -468,17 +469,19 @@ export async function generateFullEventAttendanceReportPDF(
               };
             }).sort((a, b) => a.last_name.localeCompare(b.last_name));
 
-            // Calculate summary for this day
+            // Calculate day summary
+            const presentCount = dayParticipantAttendance.filter(p => p.attendance_status !== 'absent').length;
+
             const daySummary = {
               day,
               date: formatDate(dayDate),
               total_participants: participants.length,
-              present: dayParticipantAttendance.filter(p => p.attendance_status !== 'absent').length,
-              absent: dayParticipantAttendance.filter(p => p.attendance_status === 'absent').length
+              present: presentCount,
+              absent: participants.length - presentCount
             };
 
-            // Generate table for this day
-            const tableBody = [
+            // Create table for this day
+            const dayTableBody = [
               [
                 { text: 'Participant', style: 'tableHeader' },
                 { text: 'AM Check-in', style: 'tableHeader' },
@@ -514,7 +517,7 @@ export async function generateFullEventAttendanceReportPDF(
               })
             ];
 
-            // Create document definition for this day
+            // Generate document definition for this day
             const document_definition: TDocumentDefinitions = {
               info: info,
               pageSize: 'LEGAL',
@@ -544,7 +547,7 @@ export async function generateFullEventAttendanceReportPDF(
                   table: {
                     headerRows: 1,
                     widths: ['20%', '15%', '15%', '15%', '15%', '20%'],
-                    body: tableBody
+                    body: dayTableBody
                   },
                   layout: {
                     hLineWidth: function (i, node) {
@@ -611,6 +614,7 @@ export async function generateFullEventAttendanceReportPDF(
               }
             };
 
+            // Generate PDF and return result
             return await generatePDFFile(document_definition);
           } catch (error) {
             console.error(`Error generating day ${day} report:`, error);
@@ -644,12 +648,13 @@ export async function generateFullEventAttendanceReportPDF(
       attendanceByDay.set(day, new Map<string, any>());
     }
 
-    // Organize attendance records by day and participant
+    // Organize attendance records by day and participant - fix string to number conversion
     attendance_records.forEach(record => {
       const participantId = record.participant_id;
+      const dayNumber = parseInt(record.day);
 
-      if (record.day && typeof record.day === 'number' && attendanceByDay.has(record.day)) {
-        attendanceByDay.get(record.day)?.set(participantId, record);
+      if (!isNaN(dayNumber) && attendanceByDay.has(dayNumber)) {
+        attendanceByDay.get(dayNumber)?.set(participantId, record);
       }
     });
 
