@@ -14,7 +14,7 @@
 
 <script lang="ts">
 	import * as Alert from '@/components/ui/alert';
-	import { AlertCircle, RefreshCw, X } from '@/assets/icons';
+	import { Download, AlertCircle, RefreshCw, X } from '@/assets/icons';
 	import * as Tooltip from '@/components/ui/tooltip';
 	import { Button, buttonVariants } from '@/components/ui/button';
 	import { installUpdate } from '@/utils/update';
@@ -24,8 +24,8 @@
 	let { dismiss = $bindable(false), update }: UpdaterProps = $props();
 
 	let { progress, state } = $state<ComponentState>({
-		state: 'idle',
-		progress: 0
+		state: 'processing',
+		progress: 10
 	});
 
 	async function handle_update() {
@@ -35,15 +35,20 @@
 			});
 		}
 		state = 'processing';
-		installUpdate(update, true, (_p) => {
-			progress = _p;
-			console.log('Update progress:', progress);
-		}, () => {
-			state = 'idle';
-			toast.success('Update installed successfully', {
-				description: 'The application will now restart.'
-			});
-		});
+		installUpdate(
+			update,
+			true,
+			(_p) => {
+				progress = _p;
+				console.log('Update progress:', progress);
+			},
+			() => {
+				state = 'idle';
+				toast.success('Update installed successfully', {
+					description: 'The application will now restart.'
+				});
+			}
+		);
 	}
 </script>
 
@@ -53,15 +58,24 @@
 >
 	<div class="flex items-center justify-between">
 		<div class="flex items-center gap-1">
-			<AlertCircle class="mb-1.5 size-4 text-amber-800 dark:text-amber-300" />
-			<Alert.Title class="text-base text-amber-800 dark:text-amber-300"
-				>Update Available!</Alert.Title
-			>
+			{#if state === 'idle'}
+				<AlertCircle class="mb-1.5 size-4 text-amber-800 dark:text-amber-300" />
+			{:else}
+				<Download class="mb-1.5 size-4 text-amber-800 dark:text-amber-300" />
+			{/if}
+			<Alert.Title class="text-base text-amber-800 dark:text-amber-300">
+				{#if state === 'idle'}
+					Update Available!
+				{:else}
+					Downloading and installing update...
+				{/if}
+			</Alert.Title>
 		</div>
 		<Tooltip.Provider>
 			<Tooltip.Root>
 				<Tooltip.Trigger
-					onclick={() => (dismiss = !dismiss)}
+					onclick={() => (dismiss = true)}
+					disabled={state === 'processing'}
 					class={buttonVariants({
 						variant: 'outline',
 						size: 'sm',
@@ -72,16 +86,21 @@
 					<X class="h-3 w-3" />
 				</Tooltip.Trigger>
 				<Tooltip.Content>
-					<p>Add to library</p>
+					<p>Dismiss update notification</p>
 				</Tooltip.Content>
 			</Tooltip.Root>
 		</Tooltip.Provider>
 	</div>
 
 	<div class="flex items-center justify-between">
-		<Alert.Description
-			>A new version {update?.version ?? 'N/A'} of the application is available.</Alert.Description
-		>
+		<Alert.Description>
+			{#if state === 'idle'}
+				A new version {update?.version ?? 'N/A'} of the application is available.
+			{:else}
+				Please wait while the update is being installed. The application will restart automatically
+				after the update is installed.
+			{/if}
+		</Alert.Description>
 		<Button
 			size="sm"
 			variant="outline"
@@ -93,4 +112,10 @@
 			Update Now
 		</Button>
 	</div>
+	{#if state === 'processing'}
+		<Progress
+			value={progress}
+			class="mt-2 h-2 w-full rounded-full bg-amber-200 dark:bg-amber-700"
+		/>
+	{/if}
 </Alert.Root>
