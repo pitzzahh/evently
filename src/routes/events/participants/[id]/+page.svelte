@@ -739,10 +739,8 @@
 											});
 										}}><QRCode />Full Attendance Report</DropdownMenu.Item
 									>
-									<DropdownMenu.Separator />
 								</DropdownMenu.SubContent>
 							</DropdownMenu.Sub>
-							<DropdownMenu.Separator />
 						</DropdownMenu.Group>
 					</DropdownMenu.Content>
 				</DropdownMenu.Root>
