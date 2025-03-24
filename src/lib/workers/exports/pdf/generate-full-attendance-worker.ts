@@ -7,5 +7,5 @@ onmessage = async (message: MessageEvent<WebWorkerDocumentMetaDetails>) => {
     ...message.data,
     event_details: JSON.parse(message.data.event_details) as DocumentMetaDetails['event_details'],
     participants: JSON.parse(message.data.participants) as DocumentMetaDetails['participants'],
-  }, false));
+  }));
 };
