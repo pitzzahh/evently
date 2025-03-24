@@ -26,6 +26,7 @@
 	import * as Popover from '$lib/components/ui/popover/index.js';
 	import Button from '@/components/ui/button/button.svelte';
 	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
+	import { generateQRCodes } from '@/utils/exports/pdf/index.js';
 
 	interface ComponentState {
 		event_details: EventDetails | undefined;
@@ -448,6 +449,8 @@
 				description: "Couldn't find event details required to generate QR codes"
 			});
 		}
+
+		const participants_with_qr_codes = generateQRCodes(comp_state.participants);
 	}
 
 	watch(
