@@ -5,6 +5,16 @@ import { formatDate, formatDateTime, formatDateToTimeOption } from "@/utils/form
 import { COLLECTIONS } from "@/db";
 import type { TagVariant } from "..";
 
+// Helper function to convert ArrayBuffer to binary string
+function arrayBufferToBinaryString(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return binary;
+}
+
 export async function generateFullEventAttendanceReportExcel(
   props: DocumentMetaDetails
 ): Promise<HelperResponse<string | null>> {
@@ -296,8 +306,9 @@ export async function generateFullEventAttendanceReportExcel(
     // Convert workbook to buffer
     const buffer = await workbook.xlsx.writeBuffer();
 
-    // Convert buffer to base64 data URL
-    const base64 = Buffer.from(buffer).toString('base64');
+    // Convert buffer to base64 data URL using browser-compatible approach
+    const binaryString = arrayBufferToBinaryString(buffer);
+    const base64 = btoa(binaryString);
     const dataUrl = `data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,${base64}`;
 
     return {
@@ -306,7 +317,7 @@ export async function generateFullEventAttendanceReportExcel(
       data: dataUrl
     };
   } catch (error) {
-    console.error(JSON.stringify(error, null, 2));
+    console.error(error);
     return { status: 500, message: (error as Error).message ?? "Failed to generate Excel report", data: null };
   }
 }
