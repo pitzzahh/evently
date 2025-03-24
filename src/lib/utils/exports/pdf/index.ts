@@ -428,6 +428,8 @@ export async function generateFullEventAttendanceReportPDF(
       .find({ event_id: event_details.id })
       .fetch();
 
+    console.log(`Found ${attendance_records.length} attendance records for event`, attendance_records);
+
     // If separateFiles is true, generate a separate PDF for each day
     if (separate_files) {
       const pdfPromises: Promise<HelperResponse<string | null>>[] = [];
@@ -685,9 +687,18 @@ export async function generateFullEventAttendanceReportPDF(
       const dayDate = new Date(startDate.getTime() + (day - 1) * 24 * 60 * 60 * 1000);
       const dayAttendanceMap = attendanceByDay.get(day) || new Map();
 
+      console.log(`Processing day ${day} with ${dayAttendanceMap.size} attendance records`);
+
       // Process attendance for this day
       const dayParticipantAttendance = participants.map(participant => {
-        const attendance = dayAttendanceMap.get(participant.id);
+        // Ensure we're comparing the same types for ID lookup
+        const participantId = participant.id;
+        const attendance = dayAttendanceMap.get(participantId);
+
+        // Debug the lookup
+        if (attendance) {
+          console.log(`Found attendance for ${participant.first_name} ${participant.last_name}:`, attendance);
+        }
 
         // Determine attendance status
         let attendance_status: 'complete' | 'incomplete' | 'absent' = 'absent';
@@ -697,10 +708,14 @@ export async function generateFullEventAttendanceReportPDF(
           attendance_status = hasAllCheckpoints ? 'complete' : 'incomplete';
         }
 
+        // Directly copy the attendance fields to ensure they are available
         return {
           ...participant,
-          ...(attendance || {}),
-          attendance_status
+          attendance_status,
+          am_time_in: attendance?.am_time_in || null,
+          am_time_out: attendance?.am_time_out || null,
+          pm_time_in: attendance?.pm_time_in || null,
+          pm_time_out: attendance?.pm_time_out || null
         };
       }).sort((a, b) => a.last_name.localeCompare(b.last_name));
 
