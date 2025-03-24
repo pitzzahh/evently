@@ -6,6 +6,7 @@
 	import { toast, Toaster } from 'svelte-sonner';
 	import AppNavbar from '@/components/app-navbar.svelte';
 	import { getCurrentWindow } from '@tauri-apps/api/window';
+	import NewAppVerAlert from '@/components/new-app-ver-alert.svelte';
 
 	let { children } = $props();
 </script>
@@ -38,8 +39,10 @@
 	<RenderScan />
 {/if}
 <AppNavbar />
+
 <div class="flex size-full justify-center">
 	<div class="flex flex-1 flex-col gap-4 p-4 pt-8 md:max-w-[80%] md:px-0">
+		<NewAppVerAlert />
 		{@render children()}
 	</div>
 </div>
