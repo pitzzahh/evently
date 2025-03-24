@@ -24,9 +24,12 @@
 
 	onMount(() => {
 		async function check_for_updates() {
+			console.log('Checking for updates...');
 			update = await checkForUpdates();
+			if (update) {
+				toast.info('Update available');
+			}
 		}
-		if (!('__TAURI__' in window)) return;
 		check_for_updates();
 	});
 </script>
