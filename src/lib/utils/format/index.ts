@@ -1,8 +1,43 @@
 import { DateFormatter } from '@internationalized/date';
 
-export const monthFormatter = new DateFormatter('fil', {
+export const monthFormatter = new DateFormatter('en-US', {
 	dateStyle: 'long'
 });
+
+export function formatDateToTimeOption(date?: Date): string {
+	if (!date) return 'Invalid date';
+	const hours = date.getHours();
+	const minutes = date.getMinutes();
+	const ampm = hours >= 12 ? 'PM' : 'AM';
+	const formattedHours = hours % 12 === 0 ? 12 : hours % 12;
+	const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
+	return `${formattedHours}:${formattedMinutes} ${ampm}`;
+}
+
+export function createDate(event_date: Date, time: string | undefined, defaultTime: string) {
+	const { hours, minutes } = extractHoursAndMinutes(time || defaultTime);
+	return new Date(
+		event_date.getFullYear(),
+		event_date.getMonth(),
+		event_date.getDate(),
+		hours,
+		minutes
+	);
+}
+
+export function extractHoursAndMinutes(time: string): { hours: number; minutes: number } {
+	const [timePart, modifier] = time.split(' ');
+	let [hours, minutes] = timePart.split(':').map(Number);
+
+	if (modifier === 'PM' && hours !== 12) {
+		hours += 12;
+	} else if (modifier === 'AM' && hours === 12) {
+		hours = 0;
+	}
+
+	return { hours, minutes };
+}
+
 export function formatPath(path: string): string {
 	return path.replace(/^C:\\/, '').replace(/\\/g, '/');
 }
@@ -14,7 +49,7 @@ export const formatDate = (date?: Date | null, lang: string = 'en-PH') => {
 
 export function formatDateTime(date?: Date | null, lang: string = 'en-PH') {
 	return date
-		? new Date(date).toLocaleDateString(lang, { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' })
+		? new Date(date).toLocaleDateString(lang, { year: 'numeric', month: 'long', day: 'numeric' })
 		: 'N/A';
 }
 
@@ -60,51 +95,141 @@ interface LocaleData {
 	tens: string[];
 	thousands: string[];
 	format: (whole: string, fractional: string) => string;
-	currency?: { whole: string; fractional: string };  // Make currency optional
+	currency?: { whole: string; fractional: string }; // Make currency optional
 }
 
 const locales: { [key: string]: LocaleData } = {
 	en: {
 		belowTwenty: [
-			"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
-			"ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen",
-			"seventeen", "eighteen", "nineteen"
+			'zero',
+			'one',
+			'two',
+			'three',
+			'four',
+			'five',
+			'six',
+			'seven',
+			'eight',
+			'nine',
+			'ten',
+			'eleven',
+			'twelve',
+			'thirteen',
+			'fourteen',
+			'fifteen',
+			'sixteen',
+			'seventeen',
+			'eighteen',
+			'nineteen'
 		],
-		tens: ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"],
-		thousands: ["", "thousand", "million", "billion", "trillion"],
-		currency: { whole: "dollars", fractional: "cents" },
+		tens: ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'],
+		thousands: ['', 'thousand', 'million', 'billion', 'trillion'],
+		currency: { whole: 'dollars', fractional: 'cents' },
 		format: (whole, fractional) => `${whole} and ${fractional}`
 	},
 	en_ordinals: {
 		belowTwenty: [
-			"zero", "first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth",
-			"tenth", "eleventh", "twelfth", "thirteenth", "fourteenth", "fifteenth", "sixteenth",
-			"seventeenth", "eighteenth", "nineteenth"
+			'zero',
+			'first',
+			'second',
+			'third',
+			'fourth',
+			'fifth',
+			'sixth',
+			'seventh',
+			'eighth',
+			'ninth',
+			'tenth',
+			'eleventh',
+			'twelfth',
+			'thirteenth',
+			'fourteenth',
+			'fifteenth',
+			'sixteenth',
+			'seventeenth',
+			'eighteenth',
+			'nineteenth'
 		],
-		tens: ["", "", "twentieth", "thirtieth", "fortieth", "fiftieth", "sixtieth", "seventieth", "eightieth", "ninetieth"],
-		thousands: ["", "thousandth", "millionth", "billionth", "trillionth"],
+		tens: [
+			'',
+			'',
+			'twentieth',
+			'thirtieth',
+			'fortieth',
+			'fiftieth',
+			'sixtieth',
+			'seventieth',
+			'eightieth',
+			'ninetieth'
+		],
+		thousands: ['', 'thousandth', 'millionth', 'billionth', 'trillionth'],
 		format: (whole, fractional) => whole
 	},
 	en_ph: {
 		belowTwenty: [
-			"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
-			"ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen",
-			"seventeen", "eighteen", "nineteen"
+			'zero',
+			'one',
+			'two',
+			'three',
+			'four',
+			'five',
+			'six',
+			'seven',
+			'eight',
+			'nine',
+			'ten',
+			'eleven',
+			'twelve',
+			'thirteen',
+			'fourteen',
+			'fifteen',
+			'sixteen',
+			'seventeen',
+			'eighteen',
+			'nineteen'
 		],
-		tens: ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"],
-		thousands: ["", "thousand", "million", "billion", "trillion"],
-		currency: { whole: "pesos", fractional: "centavos" },
+		tens: ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'],
+		thousands: ['', 'thousand', 'million', 'billion', 'trillion'],
+		currency: { whole: 'pesos', fractional: 'centavos' },
 		format: (whole, fractional) => `${whole} and ${fractional}`
 	},
 	es: {
 		belowTwenty: [
-			"cero", "uno", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho", "nueve",
-			"diez", "once", "doce", "trece", "catorce", "quince", "dieciséis",
-			"diecisiete", "dieciocho", "diecinueve"
+			'cero',
+			'uno',
+			'dos',
+			'tres',
+			'cuatro',
+			'cinco',
+			'seis',
+			'siete',
+			'ocho',
+			'nueve',
+			'diez',
+			'once',
+			'doce',
+			'trece',
+			'catorce',
+			'quince',
+			'dieciséis',
+			'diecisiete',
+			'dieciocho',
+			'diecinueve'
 		],
-		tens: ["", "", "veinte", "treinta", "cuarenta", "cincuenta", "sesenta", "setenta", "ochenta", "noventa"],
-		thousands: ["", "mil", "millón", "mil millones", "billón"],
-		currency: { whole: "dólares", fractional: "centavos" },
+		tens: [
+			'',
+			'',
+			'veinte',
+			'treinta',
+			'cuarenta',
+			'cincuenta',
+			'sesenta',
+			'setenta',
+			'ochenta',
+			'noventa'
+		],
+		thousands: ['', 'mil', 'millón', 'mil millones', 'billón'],
+		currency: { whole: 'dólares', fractional: 'centavos' },
 		format: (whole, fractional) => `${whole} con ${fractional}`
 	}
 };
@@ -134,7 +259,7 @@ export function numberToWordsWithLocale(number: number, locale: string): string 
 		}
 		// Handle numbers 100 and above (e.g., 123 -> "one hundred twenty-three")
 		else {
-			const thousandIndex = Math.floor(Math.log(n) / Math.log(1000));  // Determines which scale (thousand, million, etc.)
+			const thousandIndex = Math.floor(Math.log(n) / Math.log(1000)); // Determines which scale (thousand, million, etc.)
 			const divisor = Math.pow(1000, thousandIndex);
 			const prefix = Math.floor(n / divisor);
 			const suffix = n % divisor;

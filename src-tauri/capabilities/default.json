@@ -1,45 +1,34 @@
 {
-  "$schema": "../gen/schemas/desktop-schema.json",
-  "identifier": "default",
-  "description": "enables the default permissions",
-  "windows": [
-    "main"
-  ],
-  "permissions": [
-    "core:default",
-    "log:default",
-    "process:default",
-    "core:window:allow-start-dragging",
-    "core:window:allow-set-fullscreen",
-    "updater:default",
-    "fs:scope-home",
-    "fs:allow-home-read",
-    "fs:allow-home-write",
-    "fs:scope-home-index",
-    "fs:allow-home-read-recursive",
-    "fs:allow-home-write-recursive",
-    "fs:scope-home-recursive",
-    "fs:scope-applocaldata",
-    {
-      "identifier": "fs:read-files",
-      "allow": [
-        {
-          "path": "$APPLOCALDATA/*"
-        }
-      ]
-    },
-    {
-      "identifier": "fs:write-files",
-      "allow": [
-        {
-          "path": "$APPLOCALDATA/*"
-        }
-      ]
-    }
-  ],
-  "platforms": [
-    "macOS",
-    "windows",
-    "linux"
-  ]
+	"$schema": "../gen/schemas/desktop-schema.json",
+	"identifier": "default",
+	"description": "enables the default permissions",
+	"windows": [
+		"main"
+	],
+	"permissions": [
+		"core:default",
+		"process:default",
+		"core:window:allow-is-fullscreen",
+		"core:window:allow-create",
+		"core:window:allow-close",
+		"core:webview:allow-create-webview-window",
+		"core:webview:allow-get-all-webviews",
+		"core:window:allow-start-dragging",
+		"core:window:allow-set-fullscreen",
+		"updater:default",
+		"fs:scope-home",
+		"fs:allow-home-read",
+		"fs:scope-home-index",
+		"fs:allow-home-read-recursive",
+		"fs:scope-home-recursive",
+		"fs:read-files",
+		"fs:allow-read-file",
+		"fs:allow-home-write",
+		"fs:allow-home-write-recursive"
+	],
+	"platforms": [
+		"macOS",
+		"windows",
+		"linux"
+	]
 }
