@@ -1,13 +1,31 @@
 import pdfMake from "pdfmake/build/pdfmake";
 import "pdfmake/build/vfs_fonts";
 import { createQrSvgString } from '@svelte-put/qr';
-import type { Content, CustomTableLayout, TDocumentDefinitions, TFontDictionary } from 'pdfmake/interfaces';
+import type { Column, Content, CustomTableLayout, TDocumentDefinitions, TFontDictionary } from 'pdfmake/interfaces';
 import type { DocumentMetaDetails } from "@/types/exports";
 import { formatDate, formatDateTime, formatDateToTimeOption } from "@/utils/format";
 import { COLLECTIONS } from "@/db";
 import type { HelperResponse } from "@/types/generic";
 import { makeTag, type TagVariant } from "..";
 import { getEventDayInfo } from "@routes/events/utils";
+import type { Participant } from "@/db/models/types";
+
+export function generateQRCodes(participants: Participant[], options?: {
+  width: number,
+  height: number
+}) {
+  return participants
+    .sort((a, b) => a.first_name.localeCompare(b.first_name))
+    .map((participant) => ({
+      ...participant,
+      qr: createQrSvgString({
+        data: participant.id,
+        width: options?.width ?? 500,
+        height: options?.height ?? 500,
+        shape: 'circle',
+      })
+    }));
+}
 
 export async function generateQRCodesPDF(props: DocumentMetaDetails): Promise<HelperResponse<string | null>> {
   const { info, event_details, participants } = props;
@@ -24,19 +42,9 @@ export async function generateQRCodesPDF(props: DocumentMetaDetails): Promise<He
 
     const columnsPerRow = calculateOptimalColumns(participants.length);
 
-    const new_participants = participants
-      .sort((a, b) => a.first_name.localeCompare(b.first_name))
-      .map((participant) => ({
-        ...participant,
-        qr: createQrSvgString({
-          data: participant.id,
-          width: 500,
-          height: 500,
-          shape: 'circle',
-        })
-      }));
+    const new_participants = generateQRCodes(participants)
 
-    const rows: any[][] = new_participants.reduce((acc: any[][], participant, index) => {
+    const rows: Column[][] = new_participants.reduce((acc: any[][], participant, index) => {
       const cell = {
         stack: [
           {
@@ -74,7 +82,7 @@ export async function generateQRCodesPDF(props: DocumentMetaDetails): Promise<He
     // Ensure all rows have the correct number of columns
     rows.forEach(row => {
       while (row.length < columnsPerRow) {
-        row.push({ text: '', border: [false, false, false, false] });
+        row.push({ text: '' });
       }
     });
 
