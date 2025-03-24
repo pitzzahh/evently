@@ -406,8 +406,7 @@ export async function generateDailyAttendanceReportPDF(props: DocumentMetaDetail
 }
 
 export async function generateFullEventAttendanceReportPDF(
-  props: DocumentMetaDetails,
-  separate_files: boolean = false
+  props: DocumentMetaDetails
 ): Promise<HelperResponse<string | null> | HelperResponse<string[]>> {
   const { info, event_details, participants } = props;
 
@@ -432,11 +431,6 @@ export async function generateFullEventAttendanceReportPDF(
 
     // Get current date for event status determination
     const currentDate = new Date();
-
-    // If separateFiles is true, generate a separate PDF for each day
-    if (separate_files) {
-      // ...existing code for separate files...
-    }
 
     // Generate a single PDF with all days
     // Create a map of attendance records by participant ID and day
