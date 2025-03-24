@@ -10,6 +10,7 @@
 	import { Button } from '@/components/ui/button/index.js';
 	import { dev } from '$app/environment';
 	import { COLLECTIONS } from '@/db';
+	import evently_logo from '@/assets/evently-logo.svg';
 
 	const isActive = (pathname: string) => page.url.pathname === pathname;
 	const routes = [
@@ -21,10 +22,10 @@
 <header
 	class="sticky top-0 z-10 flex h-auto w-full shrink-0 items-center justify-between gap-8 border-b bg-background/40 bg-clip-padding px-4 py-3
  	backdrop-blur-md backdrop-filter transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 md:gap-0"
->	
-	
+>
 	<a href="/" class="cursor-pointer text-lg font-bold">
-	<img src="evently-logo.svg" class="size-12" alt="evently logo"></a>
+		<img src={evently_logo} class="size-12" alt="evently logo" /></a
+	>
 
 	<div class="flex w-full justify-between md:max-w-[90.6%]">
 		<div class="flex items-center gap-5">
