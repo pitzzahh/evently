@@ -24,8 +24,8 @@
 	let { dismiss = $bindable(false), update }: UpdaterProps = $props();
 
 	let { progress, state } = $state<ComponentState>({
-		state: 'processing',
-		progress: 10
+		state: 'idle',
+		progress: 0
 	});
 
 	async function handle_update() {
