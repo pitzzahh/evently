@@ -107,7 +107,7 @@
 			};
 		}
 	);
-
+	
 	function getAttendanceStatus(participant_attendance?: ParticipantAttendance) {
 		return participant_attendance?.am_time_in && participant_attendance?.pm_time_in
 			? 'complete'
@@ -150,9 +150,18 @@
 
 			<!-- FILTERS -->
 			<Popover.Root>
-				<Popover.Trigger class={cn(buttonVariants({ size: 'icon', variant: 'outline' }))}
-					><ListFilter class="size-4" /></Popover.Trigger
+				<Popover.Trigger
+					class={cn(
+						'relative',
+						buttonVariants({ size: 'icon', variant: 'outline' }),
+						comp_state.filtered_attendance_status !== 'all' && 'border-blue-500'
+					)}
 				>
+					{#if comp_state.filtered_attendance_status !== 'all'}
+						<div class="absolute -right-1 -top-1 size-3 rounded-full bg-blue-500"></div>
+					{/if}
+					<ListFilter class="size-4" />
+				</Popover.Trigger>
 				<Popover.Content class="w-auto" side="left">
 					<p class="mb-1 text-sm font-medium">Filters</p>
 					<fieldset class="sticky top-0 space-y-4 bg-background">

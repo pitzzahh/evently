@@ -20,7 +20,7 @@
 	interface ImportParticipantsDialogProps {
 		event_id: string;
 		disabled?: boolean;
-		open_add_participants_dialog?: boolean;
+		open_add_excel_participants_dialog?: boolean;
 	}
 
 	type UploadedFile = {
@@ -35,7 +35,7 @@
 	let {
 		event_id,
 		disabled = false,
-		open_add_participants_dialog = $bindable(false)
+		open_add_excel_participants_dialog = $bindable(false)
 	}: ImportParticipantsDialogProps = $props();
 
 	const date = new SvelteDate();
@@ -136,7 +136,7 @@
 			}
 
 			files = [];
-			open_add_participants_dialog = false;
+			open_add_excel_participants_dialog = false;
 			toast.success(`Successfully imported ${participants.length} participants`);
 		} catch (error) {
 			console.error('Import error:', error);
@@ -169,10 +169,7 @@
 	});
 </script>
 
-<Dialog.Root bind:open={open_add_participants_dialog}>
-	<Dialog.Trigger {disabled} class={buttonVariants({ variant: 'ghost' })}>
-		<Import class="size-4" />Import Excel Participants
-	</Dialog.Trigger>
+<Dialog.Root bind:open={open_add_excel_participants_dialog}>
 	<Dialog.Content class="max-w-[750px]">
 		{@const no_file = files.length === 0}
 		<Dialog.Header>
