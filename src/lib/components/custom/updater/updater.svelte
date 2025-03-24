@@ -7,21 +7,24 @@
 	};
 
 	interface ComponentState {
+		state: 'idle' | 'processing';
 		progress: number;
 	}
 </script>
 
 <script lang="ts">
-	import * as Alert from '$lib/components/ui/alert';
+	import * as Alert from '@/components/ui/alert';
 	import { AlertCircle, RefreshCw, X } from '@/assets/icons';
-	import * as Tooltip from '$lib/components/ui/tooltip';
+	import * as Tooltip from '@/components/ui/tooltip';
 	import { Button, buttonVariants } from '@/components/ui/button';
 	import { installUpdate } from '@/utils/update';
 	import { toast } from 'svelte-sonner';
+	import { Progress } from '@/components/ui/progress';
 
-	let { dismiss = $bindable(false),update }: UpdaterProps = $props();
+	let { dismiss = $bindable(false), update }: UpdaterProps = $props();
 
-	let { progress } = $state<ComponentState>({
+	let { progress, state } = $state<ComponentState>({
+		state: 'idle',
 		progress: 0
 	});
 
@@ -31,9 +34,15 @@
 				description: 'Please check for updates again.'
 			});
 		}
+		state = 'processing';
 		installUpdate(update, true, (_p) => {
 			progress = _p;
 			console.log('Update progress:', progress);
+		}, () => {
+			state = 'idle';
+			toast.success('Update installed successfully', {
+				description: 'The application will now restart.'
+			});
 		});
 	}
 </script>
@@ -76,10 +85,11 @@
 		<Button
 			size="sm"
 			variant="outline"
+			disabled={state === 'processing'}
 			onclick={handle_update}
-			class="border-amber-500 text-amber-700 hover:bg-amber-100 dark:text-amber-200 dark:hover:bg-amber-900 dark:hover:text-amber-100"
+			class="group border-amber-500 text-amber-700 hover:bg-amber-100 dark:text-amber-200 dark:hover:bg-amber-900 dark:hover:text-amber-100"
 		>
-			<RefreshCw className="mr-2 h-4 w-4" />
+			<RefreshCw class="mr-2 h-4 w-4 transition-transform duration-200 group-hover:rotate-180" />
 			Update Now
 		</Button>
 	</div>
