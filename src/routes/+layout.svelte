@@ -65,7 +65,6 @@
 		{#if update && !dismiss_update}
 			<Updater dismiss={dismiss_update} {update} />
 		{/if}
-		<Updater dismiss={dismiss_update} {update} />
 		{@render children()}
 	</div>
 </div>
