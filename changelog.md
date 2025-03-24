@@ -7,12 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.2.11] - 2025-3-24
 
-### Fix
-
-- Event list infinite scroll failing circleci build.
-
-## [1.2.10] - 2025-3-24
-
 ### Add
 
 - Event image cover upload feature.
@@ -22,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Daily attendance report generation logic to ensure correct data retrieval.
 - Calendar of events to ensure correct date display.
+- Event list infinite scroll failing circleci build.
 
 ### Feat
 
