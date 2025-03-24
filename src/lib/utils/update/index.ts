@@ -6,7 +6,7 @@ import { toast } from 'svelte-sonner';
  * Check for updates and return the update object if available.
  * @returns {Promise<Update | null>} The update object or null if no update is available.
  */
-export async function checkForUpdates() {
+export async function checkForUpdates(): Promise<Update | null> {
   toast.loading('Checking for updates...');
   return await check();
 }
@@ -17,10 +17,9 @@ export async function checkForUpdates() {
  * @param _progress A callback function to update the progress of the download.
  * @returns void
  */
-export async function installUpdate(update: Update, _relaunch: boolean, _progress: (progress: number) => void) {
+export async function installUpdate(update: Update, _relaunch: boolean, _progress: (progress: number) => void, _onFinished?: () => void) {
   let downloaded = 0;
   let contentLength = 0;
-  // alternatively we could also call update.download() and update.install() separately
   await update.downloadAndInstall((event) => {
     switch (event.event) {
       case 'Started':
@@ -31,11 +30,7 @@ export async function installUpdate(update: Update, _relaunch: boolean, _progres
         _progress && _progress((downloaded / contentLength) * 100);
         break;
       case 'Finished':
-        toast.dismiss();
-        toast.success('Update downloaded successfully',
-          {
-            description: 'The update will be installed now.',
-          });
+        _onFinished?.();
         break;
     }
   });
