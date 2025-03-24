@@ -16,7 +16,7 @@
 	import { EventTimePicker } from '@routes/events/(components)';
 	import * as DropdownMenu from '@/components/ui/dropdown-menu/index.js';
 	import type { EventSchedule, EventDetails } from '@/db/models/types';
-	import { fly } from 'svelte/transition';
+	import { fly, scale, slide } from 'svelte/transition';
 	import { COLLECTIONS } from '@/db/index';
 	import type { Participant } from '@/db/models/types';
 	import { formatDateTime, formatDateToTimeOption } from '@/utils/format';
@@ -27,6 +27,7 @@
 	import * as Dialog from '@/components/ui/dialog';
 	import { onMount } from 'svelte';
 	import { Image } from 'lucide-svelte';
+	import { quartInOut } from 'svelte/easing';
 
 	let { data } = $props();
 
@@ -36,6 +37,9 @@
 		participants: Participant[];
 		see_more: boolean;
 		confimation_open: boolean;
+		num_of_absents: number;
+		num_of_presents: number;
+		num_of_incomplete_attendance: number;
 	}
 
 	let comp_state = $state<ComponentState>({
@@ -43,7 +47,10 @@
 		event_schedules: [],
 		participants: [],
 		see_more: true,
-		confimation_open: false
+		confimation_open: false,
+		num_of_absents: 0,
+		num_of_incomplete_attendance: 0,
+		num_of_presents: 0
 	});
 
 	const event_status = $derived(
@@ -59,11 +66,62 @@
 			: null
 	);
 
+	function getCountByAttendanceStatus(
+		attendance_status: 'complete' | 'incomplete' | 'absent',
+		event_days: number
+	) {
+		const participants_cursor = COLLECTIONS.PARTICIPANT_COLLECTION.find({
+			event_id: data.event_id
+		});
+		const all_participants_attendance_cursor = COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.find({
+			event_id: data.event_id
+		});
+
+		const total_num = participants_cursor.fetch().reduce((acc, participant) => {
+			const total_days_attended = all_participants_attendance_cursor
+				.fetch()
+				.reduce((acc, participant_attendance) => {
+					if (
+						participant_attendance.participant_id === participant.id &&
+						participant_attendance.am_time_in &&
+						participant_attendance.pm_time_in
+					) {
+						return acc + 1;
+					}
+					return acc;
+				}, 0);
+
+			switch (attendance_status) {
+				case 'complete':
+					if (event_days === total_days_attended) {
+						return acc + 1;
+					}
+					break;
+				case 'incomplete':
+					if (event_days && event_days < total_days_attended) {
+						return acc + 1;
+					}
+					break;
+				case 'absent':
+					if (total_days_attended === 0) {
+						return acc + 1;
+					}
+					break;
+				default:
+					return acc;
+			}
+			return acc;
+		}, 0);
+
+		return total_num;
+	}
+
 	watch(
 		[
 			() => COLLECTIONS.PARTICIPANT_COLLECTION.isLoading(),
 			() => COLLECTIONS.EVENT_SCHEDULE_COLLECTION.isLoading(),
-			() => COLLECTIONS.EVENT_DETAILS_COLLECTION.isLoading()
+			() => COLLECTIONS.EVENT_DETAILS_COLLECTION.isLoading(),
+			() => COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.isLoading()
 		],
 		() => {
 			const participants_cursor = COLLECTIONS.PARTICIPANT_COLLECTION.find({
@@ -79,6 +137,22 @@
 
 			comp_state.participants = participants_cursor.fetch();
 			comp_state.event_schedules = event_schedule_cursor.fetch();
+
+			if (comp_state.event_details) {
+				// event stats data
+				comp_state.num_of_absents = getCountByAttendanceStatus(
+					'absent',
+					comp_state.event_details?.difference_in_days
+				);
+				comp_state.num_of_presents = getCountByAttendanceStatus(
+					'complete',
+					comp_state.event_details.difference_in_days
+				);
+				comp_state.num_of_incomplete_attendance = getCountByAttendanceStatus(
+					'incomplete',
+					comp_state.event_details.difference_in_days
+				);
+			}
 
 			$inspect(
 				comp_state.event_details?.start_date && comp_state.event_details.start_date > new Date()
@@ -275,6 +349,7 @@
 			</p>
 		</div>
 	</div>
+
 	<Button
 		variant="outline"
 		class="place-self-end"
@@ -282,51 +357,44 @@
 	>
 		{comp_state.see_more ? 'See Less' : 'See More'}
 	</Button>
-	<div
-		class={cn(
-			'grid gap-3 overflow-hidden rounded-lg border bg-white p-4 transition-all duration-300 dark:bg-[#151e28]',
-			{
-				'm-0 h-0 p-0 opacity-0': !comp_state.see_more,
-				'h-auto opacity-100': comp_state.see_more
-			}
-		)}
-	>
-		<!-- EVENT STATS -->
-		<div
-			class={cn('transition-scale grid gap-3 rounded-lg border p-4 duration-300', {
-				'origin-top scale-y-0 opacity-0': !comp_state.see_more,
-				'scale-y-100 opacity-100': comp_state.see_more
-			})}
-		>
-			<div class="flex items-center justify-between">
-				<h3 class="text-lg font-semibold">Event Stats</h3>
-				<div class="rounded-md border border-blue-500 bg-blue-500/20 p-2">
-					<ChartBar class="size-5 text-blue-500" />
-				</div>
-			</div>
 
-			<div class="grid gap-2 text-sm">
-				<div class="flex justify-between">
-					<p class="text-muted-foreground">Total Spots</p>
-					<p>100</p>
+	{#if comp_state.see_more}
+		<div
+			transition:slide={{ axis: 'y', duration: 400, easing: quartInOut }}
+			class={cn(
+				'grid gap-3 overflow-hidden rounded-lg border bg-white p-4 transition-all duration-300 dark:bg-[#151e28]',
+				{
+					hidden: !comp_state.see_more,
+					block: comp_state.see_more
+				}
+			)}
+		>
+			<!-- EVENT STATS -->
+			<div class="transition-scale grid gap-3 rounded-lg border p-4 duration-300">
+				<div class="flex items-center justify-between">
+					<h3 class="text-lg font-semibold">Event Stats</h3>
+					<div class="rounded-md border border-blue-500 bg-blue-500/20 p-2">
+						<ChartBar class="size-5 text-blue-500" />
+					</div>
 				</div>
-				<div class="flex justify-between">
-					<p class="text-muted-foreground">Spots Remaining</p>
-					<p>95</p>
-				</div>
-				<div class="flex justify-between">
-					<p class="text-muted-foreground">
-						{#if event_status === 'upcoming' || event_status === 'ongoing'}
-							Attending
-						{:else if event_status === 'finished'}
-							Attended
-						{/if}
-					</p>
-					<p>{comp_state.participants.length}</p>
+
+				<div class="grid gap-2 text-sm">
+					<div class="flex justify-between">
+						<p class="text-muted-foreground">Complete Attendance</p>
+						<p>{comp_state.num_of_presents}</p>
+					</div>
+					<div class="flex justify-between">
+						<p class="text-muted-foreground">Incomplete Attendance</p>
+						<p>{comp_state.num_of_incomplete_attendance}</p>
+					</div>
+					<div class="flex justify-between">
+						<p class="text-muted-foreground">Absents</p>
+						<p>{comp_state.num_of_absents}</p>
+					</div>
 				</div>
 			</div>
 		</div>
-	</div>
+	{/if}
 	<div class="flex max-h-[400px] flex-col gap-2 overflow-y-auto pr-1">
 		{#each comp_state.event_schedules as event_date, index}
 			<EventTimePicker
