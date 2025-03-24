@@ -6,9 +6,29 @@
 	import { toast, Toaster } from 'svelte-sonner';
 	import AppNavbar from '@/components/app-navbar.svelte';
 	import { getCurrentWindow } from '@tauri-apps/api/window';
-	import NewAppVerAlert from '@/components/new-app-ver-alert.svelte';
+	import { Update } from '@tauri-apps/plugin-updater';
+	import { Updater } from '@/components/custom/updater';
+	import { checkForUpdates } from '@/utils/update';
+	import { onMount } from 'svelte';
+
+	interface ComponentState {
+		update: Update | null;
+		dismiss_update: boolean;
+	}
 
 	let { children } = $props();
+	let { update, dismiss_update } = $state<ComponentState>({
+		update: null,
+		dismiss_update: false
+	});
+
+	onMount(() => {
+		async function check_for_updates() {
+			update = await checkForUpdates();
+		}
+		if (!('__TAURI__' in window)) return;
+		check_for_updates();
+	});
 </script>
 
 <svelte:window
@@ -42,7 +62,13 @@
 
 <div class="flex size-full justify-center">
 	<div class="flex flex-1 flex-col gap-4 p-4 md:max-w-[80%] md:px-0">
-		<NewAppVerAlert />
+		{#if update && !dismiss_update}
+			<Updater
+				title="Update Available!"
+				dismiss={dismiss_update}
+				description="A new version 1.23.4 of the application is available."
+			/>
+		{/if}
 		{@render children()}
 	</div>
 </div>
