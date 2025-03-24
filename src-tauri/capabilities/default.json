@@ -7,7 +7,6 @@
 	],
 	"permissions": [
 		"core:default",
-		"log:default",
 		"process:default",
 		"core:window:allow-is-fullscreen",
 		"core:window:allow-create",
@@ -17,7 +16,6 @@
 		"core:window:allow-start-dragging",
 		"core:window:allow-set-fullscreen",
 		"updater:default",
-		"dialog:default",
 		"fs:scope-home",
 		"fs:allow-home-read",
 		"fs:scope-home-index",
