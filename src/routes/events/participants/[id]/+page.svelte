@@ -19,7 +19,7 @@
 	import { StatusPill } from '@/components/snippets/events.svelte';
 	import { cn } from '@/utils';
 	import * as DropdownMenu from '@/components/ui/dropdown-menu';
-	import { QRCode, SquareCheckBig } from '@/assets/icons';
+	import { QRCode, SquareCheckBig, Mail } from '@/assets/icons';
 	import type { HelperResponse } from '@/types/generic/index.js';
 	import QrCodeScannerDialog from '@routes/events/(components)/(participant)/qr-code-scanner-dialog.svelte';
 	import { getPopulatedAttendanceRecords } from '../(utils)/index.js';
@@ -438,6 +438,17 @@
 		a.click();
 		document.body.removeChild(a);
 	}
+	async function handle_email_send() {
+		if (event_status === 'finished') {
+			return toast.error('Emailing QR codes is disabled since the event has concluded');
+		}
+
+		if (!comp_state.event_details) {
+			return toast.warning('Event details not available', {
+				description: "Couldn't find event details required to generate QR codes"
+			});
+		}
+	}
 
 	watch(
 		[
@@ -565,12 +576,15 @@
 			<div class="flex items-center gap-2">
 				{@render StatusPill(event_status)}
 				<AddParticipantsDialog
-					disabled={false}
 					add_participants_form={data.add_participants_form}
 					is_event_finished={event_status === 'finished'}
 					event_id={comp_state.event_details?.id ?? 'N/A'}
 				/>
 			</div>
+			<Button variant="secondary" onclick={handle_email_send}>
+				<Mail class="size-4" />
+				Send QR Codes to participants
+			</Button>
 		</div>
 	</div>
 	<!-- END OF PAGE HEADER -->
