@@ -28,6 +28,7 @@
 	import { onMount } from 'svelte';
 	import { Image } from 'lucide-svelte';
 	import { quartInOut } from 'svelte/easing';
+	import Badge from '@/components/ui/badge/badge.svelte';
 
 	let { data } = $props();
 
@@ -381,21 +382,35 @@
 				<div class="grid gap-2 text-sm">
 					<div class="flex justify-between">
 						<p class="text-muted-foreground">Complete Attendance</p>
-						<p>{comp_state.num_of_presents}</p>
+						{#if event_status !== 'finished'}
+							<Badge variant="outline">--:--</Badge>
+						{:else}
+							<p>{comp_state.num_of_presents}</p>
+						{/if}
 					</div>
 					<div class="flex justify-between">
 						<p class="text-muted-foreground">Incomplete Attendance</p>
-						<p>{comp_state.num_of_incomplete_attendance}</p>
+						{#if event_status !== 'finished'}
+							<Badge variant="outline">--:--</Badge>
+						{:else}
+							<p>{comp_state.num_of_incomplete_attendance}</p>
+						{/if}
 					</div>
 					<div class="flex justify-between">
 						<p class="text-muted-foreground">Absents</p>
-						<p>{comp_state.num_of_absents}</p>
+						{#if event_status !== 'finished'}
+							<Badge variant="outline">--:--</Badge>
+						{:else}
+							<p>{comp_state.num_of_absents}</p>
+						{/if}
 					</div>
 				</div>
 			</div>
 		</div>
 	{/if}
-	<div class="flex max-h-[400px] flex-col gap-2 overflow-y-auto pr-1">
+	<div
+		class="duration-400 flex max-h-[400px] flex-col gap-2 overflow-y-auto pr-1 transition ease-in-out"
+	>
 		{#each comp_state.event_schedules as event_date, index}
 			<EventTimePicker
 				{current_event_day}

@@ -11,7 +11,7 @@
 	import { CircleAlert, Plus } from '@/assets/icons';
 	import { Button } from '@/components/ui/button';
 	import { watch } from 'runed';
-	import { Calendar } from 'lucide-svelte';
+	import { Calendar, SearchXIcon } from 'lucide-svelte';
 
 	interface ComponentState {
 		refetch: boolean;
@@ -26,9 +26,10 @@
 
 	export interface EventListProps {
 		type: 'upcoming' | 'past';
+		search_term: string;
 	}
 
-	let { type }: EventListProps = $props();
+	let { type, search_term = $bindable() }: EventListProps = $props();
 
 	let comp_state = $state<ComponentState>({
 		refetch: false,
@@ -97,11 +98,20 @@
 		[
 			() => COLLECTIONS.EVENT_DETAILS_COLLECTION.isLoading(),
 			() => COLLECTIONS.EVENT_DETAILS_COLLECTION.isReady(),
-			() => comp_state.refetch
+			() => comp_state.refetch,
+			() => search_term
 		],
 		() => {
 			const events_cursor = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(
-				{},
+				{
+					// apply the searching when search term is truthy
+					...(search_term && {
+						event_name: {
+							$regex: search_term,
+							$options: 'i'
+						}
+					})
+				},
 				{
 					limit: comp_state.infinite_loader.limit,
 					sort: {
@@ -139,7 +149,7 @@
 			</div>
 		{/each}
 
-		{#if comp_state.infinite_loader.events.length === 0}
+		{#if comp_state.infinite_loader.events.length === 0 && !search_term}
 			<div class="grid h-[65vh] place-content-center">
 				<div class="grid place-items-center gap-4">
 					<Calendar class="size-[7rem] text-muted-foreground/80" />
@@ -150,6 +160,21 @@
 						<p class="text-muted-foreground">There's no {type} events, why not add one?</p>
 						<Button href="/events/create" variant="outline"
 							><Plus class="size-4" /> Create One</Button
+						>
+					</div>
+				</div>
+			</div>
+		{/if}
+
+		{#if comp_state.infinite_loader.events.length === 0 && search_term}
+			<div class="grid h-[65vh] place-content-center">
+				<div class="grid place-items-center gap-4">
+					<Calendar class="size-[7rem] text-muted-foreground/80" />
+					<div class="grid place-items-center gap-2">
+						<h2 class="text-2xl font-medium text-muted-foreground">No exact matches</h2>
+						<p class="text-muted-foreground">There's no events found based on '{search_term}'.</p>
+						<Button onclick={() => (search_term = '')} variant="outline"
+							><SearchXIcon class="size-4" />Clear search</Button
 						>
 					</div>
 				</div>
