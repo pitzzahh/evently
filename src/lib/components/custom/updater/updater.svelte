@@ -5,10 +5,11 @@
 		title: string;
 		dismiss: boolean;
 		description: string;
+		update: Update | null;
 	};
 
 	interface ComponentState {
-		update: Update | null;
+		progress: number;
 	}
 </script>
 
@@ -17,12 +18,26 @@
 	import { AlertCircle, RefreshCw, X } from '@/assets/icons';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import { Button, buttonVariants } from '@/components/ui/button';
+	import { installUpdate } from '@/utils/update';
+	import { toast } from 'svelte-sonner';
 
-	let { title, dismiss = $bindable(false), description }: UpdaterProps = $props();
+	let { title, dismiss = $bindable(false), description, update }: UpdaterProps = $props();
 
-	let { update } = $state<ComponentState>({
-		update: null
+	let { progress } = $state<ComponentState>({
+		progress: 0
 	});
+
+	async function handle_update() {
+		if (!update) {
+			return toast.warning('No update available', {
+				description: 'Please check for updates again.'
+			});
+		}
+		installUpdate(update, true, (_p) => {
+			progress = _p;
+			console.log('Update progress:', progress);
+		});
+	}
 </script>
 
 <Alert.Root
@@ -61,6 +76,7 @@
 		<Button
 			size="sm"
 			variant="outline"
+			onclick={handle_update}
 			class="border-amber-500 text-amber-700 hover:bg-amber-100 dark:text-amber-200 dark:hover:bg-amber-900 dark:hover:text-amber-100"
 		>
 			<RefreshCw className="mr-2 h-4 w-4" />

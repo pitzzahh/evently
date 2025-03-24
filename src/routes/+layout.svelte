@@ -67,6 +67,7 @@
 				title="Update Available!"
 				dismiss={dismiss_update}
 				description="A new version 1.23.4 of the application is available."
+				{update}
 			/>
 		{/if}
 		{@render children()}
