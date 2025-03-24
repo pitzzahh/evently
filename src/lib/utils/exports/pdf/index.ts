@@ -407,7 +407,7 @@ export async function generateDailyAttendanceReportPDF(props: DocumentMetaDetail
 
 export async function generateFullEventAttendanceReportPDF(
   props: DocumentMetaDetails,
-  separateFiles: boolean = false
+  separate_files: boolean = false
 ): Promise<HelperResponse<string | null> | HelperResponse<string[]>> {
   const { info, event_details, participants } = props;
 
@@ -428,7 +428,7 @@ export async function generateFullEventAttendanceReportPDF(
       .fetch();
 
     // If separateFiles is true, generate a separate PDF for each day
-    if (separateFiles) {
+    if (separate_files) {
       const pdfPromises: Promise<HelperResponse<string | null>>[] = [];
 
       // We need to manually handle filtering by day since we can't modify DocumentMetaDetails
