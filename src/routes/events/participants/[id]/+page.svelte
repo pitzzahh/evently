@@ -535,6 +535,7 @@
 		load_pdf_daily_attendance_report_worker();
 		load_pdf_qr_code_worker();
 		load_pdf_full_attendance_report_worker();
+		load_excel_full_attendance_report_worker();
 		return () => {
 			if (comp_state.timeout) clearTimeout(comp_state.timeout);
 		};
