@@ -3,14 +3,20 @@ import { relaunch } from '@tauri-apps/plugin-process';
 import { toast } from 'svelte-sonner';
 
 /**
- * A function that checks for updates and installs them if the provided function returns true.
- * @param fn A function that returns a boolean value. If the function returns true, the update will be installed.
+ * Check for updates and return the update object if available.
+ * @returns {Promise<Update | null>} The update object or null if no update is available.
  */
 export async function checkForUpdates() {
   toast.loading('Checking for updates...');
   return await check();
 }
 
+/**
+ * Check for updates and install them if available.
+ * @param _relaunch Whether to relaunch the app after installing the update.
+ * @param _progress A callback function to update the progress of the download.
+ * @returns void
+ */
 export async function installUpdate(update: Update, _relaunch: boolean, _progress: (progress: number) => void) {
   let downloaded = 0;
   let contentLength = 0;
