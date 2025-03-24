@@ -6,8 +6,32 @@
 	import { toast, Toaster } from 'svelte-sonner';
 	import AppNavbar from '@/components/app-navbar.svelte';
 	import { getCurrentWindow } from '@tauri-apps/api/window';
+	import { Update } from '@tauri-apps/plugin-updater';
+	import { Updater } from '@/components/custom/updater';
+	import { checkForUpdates } from '@/utils/update';
+	import { onMount } from 'svelte';
+
+	interface ComponentState {
+		update: Update | null;
+		dismiss_update: boolean;
+	}
 
 	let { children } = $props();
+	let { update, dismiss_update } = $state<ComponentState>({
+		update: null,
+		dismiss_update: false
+	});
+
+	onMount(() => {
+		async function check_for_updates() {
+			console.log('Checking for updates...');
+			update = await checkForUpdates();
+			if (update) {
+				toast.info('Update available');
+			}
+		}
+		check_for_updates();
+	});
 </script>
 
 <svelte:window
@@ -38,8 +62,12 @@
 	<RenderScan />
 {/if}
 <AppNavbar />
+
 <div class="flex size-full justify-center">
-	<div class="flex flex-1 flex-col gap-4 p-4 pt-8 md:max-w-[80%] md:px-0">
+	<div class="flex flex-1 flex-col gap-4 p-4 md:max-w-[80%] md:px-0">
+		{#if update && !dismiss_update}
+			<Updater dismiss={dismiss_update} {update} />
+		{/if}
 		{@render children()}
 	</div>
 </div>
