@@ -39,9 +39,14 @@
 		qr_code: string;
 		timeout: number | null;
 		workers: {
-			qr_code_worker: Worker | null;
-			daily_attendance_report_worker: Worker | null;
-			full_attendance_report_worker: Worker | null;
+			pdf: {
+				qr_code_worker: Worker | null;
+				daily_attendance_report_worker: Worker | null;
+				full_attendance_report_worker: Worker | null;
+			};
+			excel: {
+				full_attendance_report_worker: Worker | null;
+			};
 		};
 		hardware_scanner_enabled: boolean;
 	}
@@ -60,9 +65,14 @@
 		qr_code: '',
 		timeout: null,
 		workers: {
-			qr_code_worker: null,
-			daily_attendance_report_worker: null,
-			full_attendance_report_worker: null
+			pdf: {
+				qr_code_worker: null,
+				daily_attendance_report_worker: null,
+				full_attendance_report_worker: null
+			},
+			excel: {
+				full_attendance_report_worker: null
+			}
 		},
 		hardware_scanner_enabled: false
 	});
@@ -293,15 +303,15 @@
 		}, 500) as unknown as number;
 	}
 
-	async function load_daily_attendance_report_worker() {
-		if (comp_state.workers.daily_attendance_report_worker) {
-			comp_state.workers.daily_attendance_report_worker.terminate();
+	async function load_pdf_daily_attendance_report_worker() {
+		if (comp_state.workers.pdf.daily_attendance_report_worker) {
+			comp_state.workers.pdf.daily_attendance_report_worker.terminate();
 		}
 		const DailyAttendanceWorker = await import(
 			'$lib/workers/exports/pdf/pdf-daily-attendance-worker?worker'
 		);
-		comp_state.workers.daily_attendance_report_worker = new DailyAttendanceWorker.default();
-		comp_state.workers.daily_attendance_report_worker.onmessage = (
+		comp_state.workers.pdf.daily_attendance_report_worker = new DailyAttendanceWorker.default();
+		comp_state.workers.pdf.daily_attendance_report_worker.onmessage = (
 			message: MessageEvent<HelperResponse<string | null>>
 		) => {
 			if (message.data.status !== 200 || message.data.data === null) {
@@ -323,13 +333,13 @@
 		};
 	}
 
-	async function load_qr_code_worker() {
-		if (comp_state.workers.qr_code_worker) {
-			comp_state.workers.qr_code_worker.terminate();
+	async function load_pdf_qr_code_worker() {
+		if (comp_state.workers.pdf.qr_code_worker) {
+			comp_state.workers.pdf.qr_code_worker.terminate();
 		}
 		const QRCodeWorker = await import('$lib/workers/exports/pdf/pdf-qr-codes-worker?worker');
-		comp_state.workers.qr_code_worker = new QRCodeWorker.default();
-		comp_state.workers.qr_code_worker.onmessage = (
+		comp_state.workers.pdf.qr_code_worker = new QRCodeWorker.default();
+		comp_state.workers.pdf.qr_code_worker.onmessage = (
 			message: MessageEvent<HelperResponse<string | null>>
 		) => {
 			if (message.data.status !== 200 || message.data.data === null) {
@@ -351,15 +361,15 @@
 		};
 	}
 
-	async function load_full_attendance_report_worker() {
-		if (comp_state.workers.full_attendance_report_worker) {
-			comp_state.workers.full_attendance_report_worker.terminate();
+	async function load_pdf_full_attendance_report_worker() {
+		if (comp_state.workers.pdf.full_attendance_report_worker) {
+			comp_state.workers.pdf.full_attendance_report_worker.terminate();
 		}
 		const FullAttendanceWorker = await import(
 			'$lib/workers/exports/pdf/pdf-full-attendance-worker?worker'
 		);
-		comp_state.workers.full_attendance_report_worker = new FullAttendanceWorker.default();
-		comp_state.workers.full_attendance_report_worker.onmessage = (
+		comp_state.workers.pdf.full_attendance_report_worker = new FullAttendanceWorker.default();
+		comp_state.workers.pdf.full_attendance_report_worker.onmessage = (
 			message: MessageEvent<HelperResponse<string | null>>
 		) => {
 			if (message.data.status !== 200 || message.data.data === null) {
@@ -492,9 +502,9 @@
 	);
 
 	onMount(() => {
-		load_daily_attendance_report_worker();
-		load_qr_code_worker();
-		load_full_attendance_report_worker();
+		load_pdf_daily_attendance_report_worker();
+		load_pdf_qr_code_worker();
+		load_pdf_full_attendance_report_worker();
 		return () => {
 			if (comp_state.timeout) clearTimeout(comp_state.timeout);
 		};
@@ -579,13 +589,13 @@
 												});
 											}
 
-											if (!comp_state.workers.qr_code_worker) {
+											if (!comp_state.workers.pdf.qr_code_worker) {
 												return toast.error('QR code worker not available', {
 													description: 'Please refresh the page and try again'
 												});
 											}
 
-											comp_state.workers.qr_code_worker.postMessage({
+											comp_state.workers.pdf.qr_code_worker.postMessage({
 												info: {
 													creator: 'Evently',
 													title: `${comp_state.event_details.event_name} QR Codes`,
@@ -610,13 +620,13 @@
 												});
 											}
 
-											if (!comp_state.workers.daily_attendance_report_worker) {
+											if (!comp_state.workers.pdf.daily_attendance_report_worker) {
 												return toast.error('QR code worker not available', {
 													description: 'Please refresh the page and try again'
 												});
 											}
 
-											comp_state.workers.daily_attendance_report_worker.postMessage({
+											comp_state.workers.pdf.daily_attendance_report_worker.postMessage({
 												info: {
 													creator: 'Evently',
 													title: `${comp_state.event_details.event_name} Daily Attendance Report`,
@@ -641,13 +651,13 @@
 														"Couldn't find event details required to generate full attendance report"
 												});
 											}
-											if (!comp_state.workers.full_attendance_report_worker) {
+											if (!comp_state.workers.pdf.full_attendance_report_worker) {
 												return toast.error('Full attendance report worker not available', {
 													description: 'Please refresh the page and try again'
 												});
 											}
 
-											comp_state.workers.full_attendance_report_worker.postMessage({
+											comp_state.workers.pdf.full_attendance_report_worker.postMessage({
 												info: {
 													creator: 'Evently',
 													title: `${comp_state.event_details.event_name} Full Attendance Report`,
