@@ -737,7 +737,7 @@
 												description:
 													'Please wait while we generate the QR codes, or feel free to do other things'
 											});
-										}}><QRCode />Daily Attendance Report</DropdownMenu.Item
+										}}><QRCode />Full Attendance Report</DropdownMenu.Item
 									>
 									<DropdownMenu.Separator />
 								</DropdownMenu.SubContent>
