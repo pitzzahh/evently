@@ -328,25 +328,28 @@
 
 	watch([() => event_to_edit], () => {
 		if (event_to_edit) {
-			($formData.description = event_to_edit.description || ''),
-				($formData.title = event_to_edit.event_name || ''),
-				($formData.is_multi_day_event = event_to_edit.is_multi_day || false),
-				($formData.location = event_to_edit.location || '');
-			($formData.cover = event_to_edit.cover || ''),
-				(comp_state.date_range = {
-					start: new CalendarDate(
-						event_to_edit.start_date.getFullYear(),
-						event_to_edit.start_date.getMonth() + 1,
-						event_to_edit.start_date.getDate()
-					),
-					end: new CalendarDate(
-						event_to_edit.end_date.getFullYear(),
-						event_to_edit.end_date.getMonth() + 1,
-						event_to_edit.end_date.getDate()
-					)
-				});
+			$formData.description = event_to_edit.description || '';
+			$formData.title = event_to_edit.event_name || '';
+			$formData.is_multi_day_event = event_to_edit.is_multi_day || false;
+			$formData.location = event_to_edit.location || '';
 
-			comp_state.event_dates = event_schedules as any;
+			$formData.cover = event_to_edit.cover || '';
+			comp_state.date_range = {
+				start: new CalendarDate(
+					event_to_edit.start_date.getFullYear(),
+					event_to_edit.start_date.getMonth() + 1,
+					event_to_edit.start_date.getDate()
+				),
+				end: new CalendarDate(
+					event_to_edit.end_date.getFullYear(),
+					event_to_edit.end_date.getMonth() + 1,
+					event_to_edit.end_date.getDate()
+				)
+			};
+
+			if (event_schedules) {
+				comp_state.event_dates = event_schedules;
+			}
 		}
 	});
 </script>
