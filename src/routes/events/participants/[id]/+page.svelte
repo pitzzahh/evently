@@ -41,6 +41,7 @@
 		workers: {
 			qr_code_worker: Worker | null;
 			daily_attendance_report_worker: Worker | null;
+			full_attendance_report_worker: Worker | null;
 		};
 		hardware_scanner_enabled: boolean;
 	}
@@ -60,7 +61,8 @@
 		timeout: null,
 		workers: {
 			qr_code_worker: null,
-			daily_attendance_report_worker: null
+			daily_attendance_report_worker: null,
+			full_attendance_report_worker: null
 		},
 		hardware_scanner_enabled: false
 	});
@@ -349,6 +351,36 @@
 		};
 	}
 
+	async function load_full_attendance_report_worker() {
+		if (comp_state.workers.full_attendance_report_worker) {
+			comp_state.workers.full_attendance_report_worker.terminate();
+		}
+		const FullAttendanceWorker = await import(
+			'$lib/workers/generate-full-attendance-worker?worker'
+		);
+		comp_state.workers.full_attendance_report_worker = new FullAttendanceWorker.default();
+		comp_state.workers.full_attendance_report_worker.onmessage = (
+			message: MessageEvent<HelperResponse<string | null>>
+		) => {
+			if (message.data.status !== 200 || message.data.data === null) {
+				return toast.warning('Failed to generate full attendance report', {
+					description: message.data.message
+				});
+			}
+			if (message.data.data) {
+				const file_name = `${comp_state.event_details?.event_name} Full Attendance Report`;
+				download_document(message.data.data, file_name);
+				toast.success('Full attendance report generated successfully', {
+					description: 'The full attendance report has been generated and is ready for download'
+				});
+			} else {
+				toast.error('Failed to generate full attendance report', {
+					description: 'No data received from the worker'
+				});
+			}
+		};
+	}
+
 	function handleToggleHardwareScannerState() {
 		const state = !comp_state.hardware_scanner_enabled;
 		comp_state.hardware_scanner_enabled = state;
@@ -462,6 +494,7 @@
 	onMount(() => {
 		load_daily_attendance_report_worker();
 		load_qr_code_worker();
+		load_full_attendance_report_worker();
 		return () => {
 			if (comp_state.timeout) clearTimeout(comp_state.timeout);
 		};
@@ -599,6 +632,37 @@
 											});
 										}}><SquareCheckBig />Daily Attendance Report</DropdownMenu.Item
 									>
+									<DropdownMenu.Separator />
+									<DropdownMenu.Item
+										onclick={() => {
+											if (!comp_state.event_details) {
+												return toast.warning('Event details not available', {
+													description:
+														"Couldn't find event details required to generate full attendance report"
+												});
+											}
+											if (!comp_state.workers.full_attendance_report_worker) {
+												return toast.error('Full attendance report worker not available', {
+													description: 'Please refresh the page and try again'
+												});
+											}
+
+											comp_state.workers.full_attendance_report_worker.postMessage({
+												info: {
+													creator: 'Evently',
+													title: `${comp_state.event_details.event_name} Full Attendance Report`,
+													subject: 'Full Attendance Report',
+													producer: 'Evently'
+												},
+												event_details: JSON.stringify(comp_state.event_details),
+												participants: JSON.stringify(comp_state.participants)
+											});
+											toast.info('Generating event full attendance report', {
+												description:
+													'Please wait while we generate the report, or feel free to do other things'
+											});
+										}}><SquareCheckBig />Event Full Attendance Report</DropdownMenu.Item
+									>
 								</DropdownMenu.SubContent>
 							</DropdownMenu.Sub>
 							<DropdownMenu.Sub>
@@ -619,19 +683,6 @@
 										}}><QRCode />Daily Attendance Report</DropdownMenu.Item
 									>
 									<DropdownMenu.Separator />
-									<DropdownMenu.Item
-										onclick={() => {
-											if (!comp_state.event_details) {
-												return toast.warning('Event details not available', {
-													description: "Couldn't find event details required to generate QR codes"
-												});
-											}
-											toast.info('Generating event attendance report', {
-												description:
-													'Please wait while we generate the report, or feel free to do other things'
-											});
-										}}><SquareCheckBig />Event Attendance Report</DropdownMenu.Item
-									>
 								</DropdownMenu.SubContent>
 							</DropdownMenu.Sub>
 							<DropdownMenu.Separator />
