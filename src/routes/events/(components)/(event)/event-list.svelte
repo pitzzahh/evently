@@ -4,8 +4,8 @@
 	import { COLLECTIONS } from '@/db/index';
 	import type { EventDetails } from '@/db/models/types';
 	import { fly } from 'svelte/transition';
-	import { quartIn, quartInOut } from 'svelte/easing';
-	import { InfiniteLoader, loaderState } from 'svelte-infinite';
+	import { quartInOut } from 'svelte/easing';
+	import { InfiniteLoader, LoaderState } from 'svelte-infinite';
 	import { Badge } from '@/components/ui/badge';
 	import * as Alert from '@/components/ui/alert/index.js';
 	import { CircleAlert, Plus } from '@/assets/icons';
@@ -17,6 +17,7 @@
 		refetch: boolean;
 		timeout: number;
 		infinite_loader: {
+			loader_state: LoaderState;
 			events: EventDetails[];
 			limit: number;
 			skip: number;
@@ -33,6 +34,7 @@
 		refetch: false,
 		timeout: 0,
 		infinite_loader: {
+			loader_state: new LoaderState(),
 			events: [],
 			limit: 20,
 			skip: 20
@@ -47,7 +49,7 @@
 			// If there are less results on the first page (page.server loaded data)
 			// than the limit, don't keep trying to fetch more. We're done.
 			if (comp_state.infinite_loader.events.length < comp_state.infinite_loader.limit) {
-				loaderState.complete();
+				comp_state.infinite_loader.loader_state.complete();
 				return;
 			}
 			const events_cursor = COLLECTIONS.EVENT_DETAILS_COLLECTION.find(
@@ -62,7 +64,7 @@
 			);
 
 			if (!events_cursor.count) {
-				loaderState.error();
+				comp_state.infinite_loader.loader_state.error();
 				comp_state.infinite_loader.skip -= 1;
 				return;
 			}
@@ -80,13 +82,13 @@
 			}
 
 			if (comp_state.infinite_loader.events.length >= data.length) {
-				loaderState.complete();
+				comp_state.infinite_loader.loader_state.complete();
 			} else {
-				loaderState.loaded();
+				comp_state.infinite_loader.loader_state.loaded();
 			}
 		} catch (error) {
 			console.error(error);
-			loaderState.error();
+			comp_state.infinite_loader.loader_state.error();
 			comp_state.infinite_loader.skip -= 1;
 		}
 	}
@@ -130,7 +132,7 @@
 </script>
 
 <Timeline style="width: 100%; padding: 0;">
-	<InfiniteLoader triggerLoad={loadMore}>
+	<InfiniteLoader loaderState={comp_state.infinite_loader.loader_state} triggerLoad={loadMore}>
 		{#each comp_state.infinite_loader.events as event, i}
 			<div transition:fly={{ y: 20, duration: 200, delay: i * 100, easing: quartInOut }}>
 				<EventCard {...event} />
