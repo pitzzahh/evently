@@ -64,11 +64,11 @@ git clone https://github.com/pitzzahh/evently.git
 cd evently
 
 # Install dependencies
-npm install
-# or
 bun install
 # or
 yarn install
+# or
+npm install
 ```
 
 ## Usage
@@ -77,18 +77,19 @@ Start the development server:
 
 ```bash
 bun tauri dev
-# or
-npm run tauri dev
 #or
 pnpm run tauri dev
+# or
+npm run tauri dev
 ```
 
 For production builds:
 
 ```bash
-npm run build
-npm run preview
+bun run tauri build
 ```
+
+This will create a production build of the application in the `src-tauri/target/release` directory.
 
 ## Screenshots
 
