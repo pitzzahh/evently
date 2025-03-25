@@ -107,13 +107,39 @@
 			};
 		}
 	);
-	
+
 	function getAttendanceStatus(participant_attendance?: ParticipantAttendance) {
 		return participant_attendance?.am_time_in && participant_attendance?.pm_time_in
 			? 'complete'
 			: participant_attendance?.am_time_in || participant_attendance?.pm_time_in
 				? 'incomplete'
 				: 'absent';
+	}
+
+	function getTimeDifference(date1: Date, date2: Date) {
+		// Truncate seconds and milliseconds by setting them to 0
+		const truncatedDate1 = new Date(date1);
+		truncatedDate1.setSeconds(0, 0);
+
+		const truncatedDate2 = new Date(date2);
+		truncatedDate2.setSeconds(0, 0);
+
+		// Calculate the absolute difference in milliseconds
+		const diffMs = Math.abs(truncatedDate1.getTime() - truncatedDate2.getTime());
+
+		// Convert to minutes
+		const diffMinutes = Math.floor(diffMs / (1000 * 60));
+
+		// Calculate hours and remaining minutes
+		const hours = Math.floor(diffMinutes / 60);
+		const minutes = diffMinutes % 60;
+
+		if (!minutes && !hours) {
+			return;
+		}
+
+		// Return formatted string
+		return `${hours ? `${hours} hour${hours > 1 ? 's' : ''} ` : ''}${minutes} minute${minutes > 1 ? 's' : ''}`;
 	}
 </script>
 
@@ -263,6 +289,10 @@
 								event_period_start: event_schedule?.am_start,
 								event_period_end: event_schedule?.am_end,
 								time_in: participant_attendance?.am_time_in,
+								time_late:
+									participant_attendance?.am_time_in && event_schedule.am_start
+										? getTimeDifference(participant_attendance?.am_time_in, event_schedule.am_start)
+										: undefined,
 								time_out: participant_attendance?.am_time_out,
 								period: 'AM'
 							})}
@@ -271,6 +301,10 @@
 								event_period_start: event_schedule?.pm_start,
 								event_period_end: event_schedule?.pm_end,
 								time_in: participant_attendance?.pm_time_in,
+								time_late:
+									participant_attendance?.pm_time_in && event_schedule.pm_start
+										? getTimeDifference(participant_attendance?.pm_time_in, event_schedule.pm_start)
+										: undefined,
 								time_out: participant_attendance?.pm_time_out,
 								period: 'PM'
 							})}
@@ -287,17 +321,19 @@
 	event_period_end,
 	time_in,
 	time_out,
+	time_late,
 	period
 }: {
 	event_period_start?: Date;
 	event_period_end?: Date;
 	time_in?: Date;
 	time_out?: Date;
+	time_late?: string;
 	period: 'AM' | 'PM';
 })}
 	<div class="grid gap-2">
 		<p class="font-semibold">{period} Time</p>
-		<div class="flex items-center justify-between gap-4">
+		<div class="flex items-start justify-between gap-4">
 			<div class="grid w-full gap-1 rounded-lg border-2 border-dashed p-4">
 				<p class="text-sm font-medium">In</p>
 
@@ -308,7 +344,6 @@
 
 				<div class="flex gap-2">
 					<p class="text-sm text-muted-foreground">Time In</p>
-
 					<Badge
 						variant="outline"
 						class={cn({
@@ -318,6 +353,15 @@
 						{time_in ? formatDateToTimeOption(time_in) : 'No time in'}
 					</Badge>
 				</div>
+
+				{#if time_late}
+					<div class="flex gap-2">
+						<p class="text-sm text-muted-foreground">Time Late</p>
+						<Badge variant="outline" class="text-yellow-500">
+							{time_late}
+						</Badge>
+					</div>
+				{/if}
 			</div>
 
 			<div class="grid w-full gap-1 rounded-lg border-2 border-dashed p-4">
@@ -330,7 +374,6 @@
 
 				<div class="flex gap-2">
 					<p class="text-sm text-muted-foreground">Time Out</p>
-
 					<Badge
 						variant="outline"
 						class={cn({
