@@ -49,7 +49,7 @@ onmessage = async (message: MessageEvent<string>) => {
       try {
         await sendEmail({
           to: participant.email!,
-          subject: `Your QR Code for ${participant.event_id}`,
+          subject: `Your QR Code for ${event_details.event_name}`,
           body: generateQrCodeEmail({
             participant: {
               first_name: participant.first_name,
@@ -73,12 +73,12 @@ onmessage = async (message: MessageEvent<string>) => {
     }
 
     if (failCount === 0) {
-      postMessage({
+      return postMessage({
         status: 200,
         message: `Successfully sent QR codes to all ${successCount} participants`
       });
     } else {
-      postMessage({
+      return postMessage({
         status: 500,
         message: `Sent QR codes to ${successCount} participants, failed for ${failCount} participants`
       });
