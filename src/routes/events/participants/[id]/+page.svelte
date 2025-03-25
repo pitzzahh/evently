@@ -20,13 +20,15 @@
 	import { cn } from '@/utils';
 	import * as DropdownMenu from '@/components/ui/dropdown-menu';
 	import { QRCode, SquareCheckBig, Mail } from '@/assets/icons';
-	import type { HelperResponse } from '@/types/generic/index.js';
+	import type { HelperResponse } from '@/types/generic';
 	import QrCodeScannerDialog from '@routes/events/(components)/(participant)/qr-code-scanner-dialog.svelte';
-	import { getPopulatedAttendanceRecords } from '../(utils)/index.js';
-	import * as Popover from '$lib/components/ui/popover/index.js';
+	import { getPopulatedAttendanceRecords } from '../(utils)';
+	import * as Popover from '$lib/components/ui/popover';
 	import Button from '@/components/ui/button/button.svelte';
-	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
-	import { generateQRCodes } from '@/utils/exports/pdf/index.js';
+	import * as Tooltip from '$lib/components/ui/tooltip';
+	import { generateQRCodes } from '@/utils/exports/pdf';
+	import { generateFullName } from '@/utils/text';
+	import { sendEmail } from '@/utils/email/index.js';
 
 	interface ComponentState {
 		event_details: EventDetails | undefined;
@@ -451,6 +453,32 @@
 		}
 
 		const participants_with_qr_codes = generateQRCodes(comp_state.participants);
+
+		participants_with_qr_codes.forEach(async (participant) => {
+			// Send email to each participant with their QR code
+			// This is a placeholder for the actual email sending logic
+			const full_name = generateFullName(
+				{
+					first_name: participant.first_name,
+					middle_name: participant.middle_name,
+					last_name: participant.last_name
+				},
+				{
+					include_last_name: true
+				}
+			);
+
+			console.log(`Sending email to ${full_name} with QR code: ${participant.qr}`);
+
+			await sendEmail({
+				to: participant.email!,
+				subject: `Your QR Code for ${comp_state.event_details?.event_name}`,
+				body: `Hello ${full_name},\n\nHere is your QR code for the event:\n${participant.qr}`
+			}).catch((error) => {
+				console.error(`Failed to send email to ${full_name}:`, error);
+			});
+		});
+		console.log(participants_with_qr_codes);
 	}
 
 	watch(
