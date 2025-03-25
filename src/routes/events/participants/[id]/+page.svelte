@@ -455,7 +455,7 @@
 			}
 			if (message.data.data) {
 				toast.success('QR codes sent successfully', {
-					description: 'The QR codes have been sent to the participants'
+					description: message.data.message
 				});
 			} else {
 				toast.error('Failed to send QR codes', {
