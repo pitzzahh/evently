@@ -26,9 +26,6 @@
 	import * as Popover from '$lib/components/ui/popover';
 	import Button from '@/components/ui/button/button.svelte';
 	import * as Tooltip from '$lib/components/ui/tooltip';
-	import { generateQRCodes } from '@/utils/exports/pdf';
-	import { generateFullName } from '@/utils/text';
-	import { sendEmail } from '@/utils/email/index.js';
 	import { getEnv } from '@/utils/security';
 
 	interface ComponentState {
