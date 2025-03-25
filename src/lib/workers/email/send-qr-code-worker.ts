@@ -1,9 +1,7 @@
 import { generateQrCodeEmail } from "@/components/custom/email";
 import type { Participant } from "@/db/models/types";
 import { sendEmail } from "@/utils/email";
-import { generateQRCodes } from "@/utils/exports/pdf";
 import { generateFullName } from "@/utils/text";
-import { createQrSvgString } from "@svelte-put/qr";
 
 onmessage = async (message: MessageEvent<string>) => {
   const {
