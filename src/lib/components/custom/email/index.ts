@@ -81,6 +81,7 @@ export function generateQrCodeEmail(props: SendQrCodeProps): string {
           <div style="margin-top: 10px; font-size: 12px; color: #a0aec0;">
             If you cannot see the QR code, please contact the event organizer.
           </div>
+          <a href="${participant.qr}" download="${event_name.replace(/\s+/g, '_')}_${fullName.replace(/\s+/g, '_')}.png" style="display: inline-block; margin-top: 12px; padding: 8px 16px; background-color: #4a5568; color: white; text-decoration: none; border-radius: 5px; font-size: 14px; font-weight: 500;">Download QR as PNG</a>
         </div>
       </div>
       
