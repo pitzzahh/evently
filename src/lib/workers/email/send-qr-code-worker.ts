@@ -1,9 +1,12 @@
 import { generateQrCodeEmail } from "@/components/custom/email";
 import type { Participant } from "@/db/models/types";
+import type { HelperResponse } from "@/types/generic";
 import { sendEmail } from "@/utils/email";
 import { generateFullName } from "@/utils/text";
 
 onmessage = async (message: MessageEvent<string>) => {
+  let returned_data: HelperResponse<string | null>
+
   const {
     participants,
     PLUNK_API,
@@ -23,12 +26,14 @@ onmessage = async (message: MessageEvent<string>) => {
   };
 
   if (!PLUNK_API || !PLUNK_SK) {
-    postMessage({
+    returned_data = {
       status: 401,
       message: "Missing PLUNK_API or PLUNK_SK environment variable"
-    });
+    }
+    postMessage(returned_data);
   }
   console.log(participants);
+
 
   const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -73,9 +78,14 @@ onmessage = async (message: MessageEvent<string>) => {
     }
 
     if (failCount === 0) {
-      postMessage({
+      returned_data = {
         status: 200,
         message: `Successfully sent QR codes to all ${successCount} participants`
+      };
+      postMessage({
+        status: 200,
+        message: `Successfully sent QR codes to all ${successCount} participants`,
+        data: successCount
       });
     } else {
       postMessage({
