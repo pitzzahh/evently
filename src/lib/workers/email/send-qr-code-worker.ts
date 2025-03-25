@@ -15,6 +15,7 @@ onmessage = async (message: MessageEvent<string>) => {
   } = JSON.parse(message.data as unknown as string) as {
     participants: (Participant & {
       qr: string;
+      downloadable_qr: string;
     })[];
     PLUNK_API: string;
     PLUNK_SK: string;
@@ -33,7 +34,6 @@ onmessage = async (message: MessageEvent<string>) => {
     postMessage(returned_data);
   }
   console.log(participants);
-
 
   const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -60,7 +60,8 @@ onmessage = async (message: MessageEvent<string>) => {
               first_name: participant.first_name,
               middle_name: participant.middle_name,
               last_name: participant.last_name,
-              qr: participant.qr
+              qr: participant.qr,
+              downloadable_qr: participant.downloadable_qr,
             },
             ...event_details
           })
