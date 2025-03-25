@@ -451,8 +451,8 @@
 					description: message.data.message
 				});
 			}
-			if (message.data.data) {
-				toast.success('QR codes sent successfully', {
+			if (message.data.data || message.data.status === 200) {
+				toast.success(`QR codes sent successfully to ${message.data.data} participants`, {
 					description: message.data.message
 				});
 			} else {
