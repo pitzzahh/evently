@@ -3,10 +3,11 @@ import { generateFullName } from '@/utils/text';
 
 export type SendQrCodeProps = {
   participant: {
-    qr: string;
     first_name: string;
     middle_name?: string;
     last_name: string;
+    qr: string;
+    downloadable_qr: string;
   };
   event_name: string;
   event_date: string;
