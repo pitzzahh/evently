@@ -28,6 +28,7 @@ onmessage = async (message: MessageEvent<string>) => {
       message: "Missing PLUNK_API or PLUNK_SK environment variable"
     });
   }
+  console.log(participants);
 
   const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -72,12 +73,12 @@ onmessage = async (message: MessageEvent<string>) => {
     }
 
     if (failCount === 0) {
-      return postMessage({
+      postMessage({
         status: 200,
         message: `Successfully sent QR codes to all ${successCount} participants`
       });
     } else {
-      return postMessage({
+      postMessage({
         status: 500,
         message: `Sent QR codes to ${successCount} participants, failed for ${failCount} participants`
       });
