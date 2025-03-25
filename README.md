@@ -94,12 +94,12 @@ This will create a production build of the application in the `src-tauri/target/
 ## Screenshots
 
 <p align="center">
-  <img src="events-screenshot.png" alt="Events list" width="45%"/>
-  <img src="screenshot2.png" alt="Event Management" width="45%"/>
+  <img src="upcoming-events.png" alt="Upcoming events list" width="45%"/>
+  <img src="past-events.png" alt="Past events list" width="45%"/>
 </p>
 <p align="center">
-  <img src="screenshot3.png" alt="Attendance Tracking" width="45%"/>
-  <img src="screenshot4.png" alt="Reports" width="45%"/>
+  <img src="event-details.png" alt="Event details" width="45%"/>
+  <img src="event-participants.png" alt="Event participants" width="45%"/>
 </p>
 
 ## Development
