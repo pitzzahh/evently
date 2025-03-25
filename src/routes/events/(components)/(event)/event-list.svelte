@@ -150,7 +150,7 @@
 		{/each}
 
 		{#if comp_state.infinite_loader.events.length === 0 && !search_term}
-			<div class="grid h-[65vh] place-content-center">
+			<div class="grid h-[60vh] place-content-center">
 				<div class="grid place-items-center gap-4">
 					<Calendar class="size-[7rem] text-muted-foreground/80" />
 					<div class="grid place-items-center gap-2">
@@ -167,7 +167,7 @@
 		{/if}
 
 		{#if comp_state.infinite_loader.events.length === 0 && search_term}
-			<div class="grid h-[65vh] place-content-center">
+			<div class="grid h-[60vh] place-content-center">
 				<div class="grid place-items-center gap-4">
 					<Calendar class="size-[7rem] text-muted-foreground/80" />
 					<div class="grid place-items-center gap-2">
