@@ -134,8 +134,12 @@
 				return;
 			}
 
+			const start_of_event_day = new Date(event.start_date);
+			// Set the time to 12:00 AM (start of the day)
+			start_of_event_day.setHours(0, 0, 0, 0);
+
 			// Validate event timing
-			if (now < event.start_date) {
+			if (now < start_of_event_day) {
 				toast.error('Event has not started yet. Attendance cannot be recorded.');
 				return;
 			}
