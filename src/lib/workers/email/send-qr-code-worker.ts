@@ -14,10 +14,11 @@ onmessage = async (message: MessageEvent<string>) => {
     PLUNK_SK: string;
   };
 
-  console.log(participants);
-
   if (!PLUNK_API || !PLUNK_SK) {
-    throw new Error("Missing PLUNK_API or PLUNK_SK environment variable");
+    postMessage({
+      status: 401,
+      message: "Missing PLUNK_API or PLUNK_SK environment variable"
+    });
   }
 
   const participants_with_qr_codes = generateQRCodes(participants);
@@ -58,10 +59,14 @@ onmessage = async (message: MessageEvent<string>) => {
 
     if (failCount === 0) {
       postMessage({
+        status: 200,
         message: `Successfully sent QR codes to all ${successCount} participants`
       });
     } else {
-      throw new Error(`Sent QR codes to ${successCount} participants, failed for ${failCount} participants`);
+      postMessage({
+        status: 500,
+        message: `Sent QR codes to ${successCount} participants, failed for ${failCount} participants`
+      });
     }
   })();
 
