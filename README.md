@@ -16,9 +16,9 @@ Check the [latest release](https://github.com/pitzzahh/evently/releases/latest) 
 
 Available for:
 
-- Windows (.exe, .msi)
-- macOS (.dmg, .app)
-- Linux (.deb, .rpm, .AppImage)
+- Windows
+- macOS
+- Linux
 
 ## Features
 
