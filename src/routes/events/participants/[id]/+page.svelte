@@ -503,21 +503,19 @@
 			});
 		}
 
-		const participants_with_qr_code = await Promise.allSettled(
-			participants.map(async (participant) => ({
-				...participant,
-				qr: await createQrPngDataUrl({
-					data: participant.id,
-					width: 500,
-					height: 500,
-					shape: 'circle'
-				})
-			}))
-		);
-
 		email.send_qr_code_worker.postMessage(
 			JSON.stringify({
-				participants: participants_with_qr_code,
+				participants: await Promise.allSettled(
+					participants.map(async (participant) => ({
+						...participant,
+						qr: await createQrPngDataUrl({
+							data: participant.id,
+							width: 200,
+							height: 200,
+							shape: 'circle'
+						})
+					}))
+				),
 				PLUNK_API: await getEnv('PLUNK_API'),
 				PLUNK_SK: await getEnv('PLUNK_SK'),
 				event_details: {
