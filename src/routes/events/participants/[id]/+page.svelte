@@ -506,6 +506,10 @@
 		}
 		const PLUNK_API = await getEnv('PLUNK_API');
 		const PLUNK_SK = await getEnv('PLUNK_SK');
+		console.log({
+			PLUNK_API,
+			PLUNK_SK
+		});
 		email.send_qr_code_worker.postMessage(JSON.stringify({ participants, PLUNK_API, PLUNK_SK }));
 
 		toast.info(`Sending QR codes to participants`, {
