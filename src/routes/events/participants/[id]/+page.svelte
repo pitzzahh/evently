@@ -502,20 +502,20 @@
 				description: 'Please add participants to the event before sending QR codes'
 			});
 		}
-
+		const participants_with_qr = await Promise.all(
+			participants.map(async (participant) => ({
+				...participant,
+				qr: await createQrPngDataUrl({
+					data: participant.id,
+					width: 200,
+					height: 200,
+					shape: 'circle'
+				})
+			}))
+		);
 		email.send_qr_code_worker.postMessage(
 			JSON.stringify({
-				participants: await Promise.allSettled(
-					participants.map(async (participant) => ({
-						...participant,
-						qr: await createQrPngDataUrl({
-							data: participant.id,
-							width: 200,
-							height: 200,
-							shape: 'circle'
-						})
-					}))
-				),
+				participants: participants_with_qr,
 				PLUNK_API: await getEnv('PLUNK_API'),
 				PLUNK_SK: await getEnv('PLUNK_SK'),
 				event_details: {
