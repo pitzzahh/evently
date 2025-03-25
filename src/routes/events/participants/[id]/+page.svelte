@@ -520,7 +520,7 @@
 				PLUNK_SK: await getEnv('PLUNK_SK'),
 				event_details: {
 					event_name: event_details.event_name,
-					event_date: event_details.start_date.toLocaleDateString(),
+					event_date: event_details.start_date.toISOString(),
 					event_location: event_details.location
 				}
 			})
