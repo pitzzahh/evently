@@ -102,7 +102,7 @@ export function generateQrCodeEmail(props: SendQrCodeProps): string {
           </tr>
           <tr>
             <td style="padding: 8px 0; color: #718096;">Date:</td>
-            <td style="padding: 8px 0; font-weight: 500;">${formatDateTime(the_event_date)}</td>
+            <td style="padding: 8px 0; font-weight: 500;">${formatDateTime(the_event_date, 'en-US')}</td>
           </tr>
           <tr>
             <td style="padding: 8px 0; color: #718096;">Location:</td>
