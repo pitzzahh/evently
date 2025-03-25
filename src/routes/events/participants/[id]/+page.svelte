@@ -77,7 +77,7 @@
 				full_attendance_report_worker: null
 			}
 		},
-		hardware_scanner_enabled: false
+		hardware_scanner_enabled: true
 	});
 
 	const event_status = $derived(
@@ -452,51 +452,9 @@
 			});
 		}
 
-		const participants_with_qr_codes = generateQRCodes(comp_state.participants);
-
-		toast.info(`Sending QR codes to ${participants_with_qr_codes.length} participants`, {
+		toast.info(`Sending QR codes to participants`, {
 			description: 'This may take a few moments. You can continue using the application.'
 		});
-
-		const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-		(async () => {
-			let successCount = 0;
-			let failCount = 0;
-			for (const participant of participants_with_qr_codes) {
-				const full_name = generateFullName(
-					{
-						first_name: participant.first_name,
-						middle_name: participant.middle_name,
-						last_name: participant.last_name
-					},
-					{
-						include_last_name: true
-					}
-				);
-				try {
-					await sendEmail({
-						to: participant.email!,
-						subject: `Your QR Code for ${comp_state.event_details?.event_name}`,
-						body: `Hello ${full_name},\n\nHere is your QR code for the event:\n${participant.qr}`
-					});
-					successCount++;
-					console.log(`Successfully sent email to ${full_name}`);
-				} catch (error) {
-					failCount++;
-					console.error(`Failed to send email to ${full_name}:`, error);
-				}
-				await delay(5000);
-			}
-
-			if (failCount === 0) {
-				toast.success(`Successfully sent QR codes to all ${successCount} participants`);
-			} else {
-				toast.warning(
-					`Sent QR codes to ${successCount} participants, failed for ${failCount} participants`
-				);
-			}
-		})();
 	}
 
 	watch(
