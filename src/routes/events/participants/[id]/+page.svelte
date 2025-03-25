@@ -1,3 +1,40 @@
+<script lang="ts" module>
+	interface ComponentState {
+		event_details: EventDetails | undefined;
+		event_schedules: EventSchedule[];
+		participants: Participant[];
+		last_scanned_participant: Participant | null;
+		scanned_attendance: any | null;
+		current_day_participants_attendance: ParticipantAttendance[];
+		all_participants_attendance: ParticipantAttendance[];
+		qr_code: string;
+		timeout: number | null;
+		workers: {
+			pdf: {
+				qr_code_worker: Worker | null;
+				daily_attendance_report_worker: Worker | null;
+				full_attendance_report_worker: Worker | null;
+			};
+			excel: {
+				full_attendance_report_worker: Worker | null;
+			};
+			email: {
+				send_qr_code_worker: Worker | null;
+			};
+		};
+		hardware_scanner_enabled: boolean;
+	}
+
+	function download_document(url: string, file_name: string, extension: 'pdf' | 'xlsx' = 'pdf') {
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = `${file_name}.${extension}`;
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+	}
+</script>
+
 <script lang="ts">
 	import { buttonVariants } from '@/components/ui/button';
 	import { Check, Clock, FileOutput, ScanBarcode, ScanQrCode, UsersRound, X } from 'lucide-svelte';
@@ -28,32 +65,6 @@
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import { getEnv } from '@/utils/security';
 	import { createQrPngDataUrl } from '@svelte-put/qr';
-
-	interface ComponentState {
-		event_details: EventDetails | undefined;
-		event_schedules: EventSchedule[];
-		participants: Participant[];
-		last_scanned_participant: Participant | null;
-		scanned_attendance: any | null;
-		current_day_participants_attendance: ParticipantAttendance[];
-		all_participants_attendance: ParticipantAttendance[];
-		qr_code: string;
-		timeout: number | null;
-		workers: {
-			pdf: {
-				qr_code_worker: Worker | null;
-				daily_attendance_report_worker: Worker | null;
-				full_attendance_report_worker: Worker | null;
-			};
-			excel: {
-				full_attendance_report_worker: Worker | null;
-			};
-			email: {
-				send_qr_code_worker: Worker | null;
-			};
-		};
-		hardware_scanner_enabled: boolean;
-	}
 
 	let { data } = $props();
 
@@ -476,14 +487,6 @@
 		} else toast.info('Hardware scanner disabled');
 	}
 
-	function download_document(url: string, file_name: string, extension: 'pdf' | 'xlsx' = 'pdf') {
-		const a = document.createElement('a');
-		a.href = url;
-		a.download = `${file_name}.${extension}`;
-		document.body.appendChild(a);
-		a.click();
-		document.body.removeChild(a);
-	}
 	async function handle_email_send(show_toast_if_no_participants: boolean = true) {
 		if (event_status === 'finished') {
 			return toast.error('Emailing QR codes is disabled since the event has concluded');
