@@ -27,6 +27,7 @@
 	import Button from '@/components/ui/button/button.svelte';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import { getEnv } from '@/utils/security';
+	import { createQrPngDataUrl } from '@svelte-put/qr';
 
 	interface ComponentState {
 		event_details: EventDetails | undefined;
@@ -502,9 +503,21 @@
 			});
 		}
 
+		const participants_with_qr_code = await Promise.allSettled(
+			participants.map(async (participant) => ({
+				...participant,
+				qr: await createQrPngDataUrl({
+					data: participant.id,
+					width: 500,
+					height: 500,
+					shape: 'circle'
+				})
+			}))
+		);
+
 		email.send_qr_code_worker.postMessage(
 			JSON.stringify({
-				participants,
+				participants: participants_with_qr_code,
 				PLUNK_API: await getEnv('PLUNK_API'),
 				PLUNK_SK: await getEnv('PLUNK_SK'),
 				event_details: {
