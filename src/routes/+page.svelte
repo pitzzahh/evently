@@ -21,13 +21,15 @@
 		<h2 class="text-4xl font-semibold">Events</h2>
 
 		<div class="flex items-center gap-2">
-			<div class="relative">
-				<Search class="absolute left-3 top-3 size-4 text-muted-foreground" />
+			<div class="group relative">
+				<Search
+					class="absolute left-3 top-3 size-4 text-muted-foreground group-hover:text-black dark:group-hover:text-white"
+				/>
 				<Input
 					bind:value={comp_state.search_term}
 					placeholder="Search an event"
 					type="text"
-					class="h-10 pl-10"
+					class="h-10 border-none bg-gray-400/10 pl-10 dark:bg-white/10 "
 				/>
 			</div>
 			<Tabs.List class="grid h-auto w-full max-w-[300px] grid-cols-2">
