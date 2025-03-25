@@ -1,8 +1,6 @@
 import type { Participant } from "@/db/models/types";
-import type { SendEmailBody } from "@/types/email";
 import type { DocumentMetaDetails } from "@/types/exports";
 import { sendEmail } from "@/utils/email";
-import { generateFullEventAttendanceReportExcel } from "@/utils/exports/excel";
 import { generateQRCodes } from "@/utils/exports/pdf";
 import { getEnv } from "@/utils/security";
 import { generateFullName } from "@/utils/text";
