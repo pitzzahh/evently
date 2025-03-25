@@ -1,15 +1,18 @@
 import type { Participant } from "@/db/models/types";
-import type { DocumentMetaDetails } from "@/types/exports";
 import { sendEmail } from "@/utils/email";
 import { generateQRCodes } from "@/utils/exports/pdf";
-import { getEnv } from "@/utils/security";
 import { generateFullName } from "@/utils/text";
 
 onmessage = async (message: MessageEvent<Participant[]>) => {
-  const participants = message.data;
-
-  const PLUNK_API = await getEnv("PLUNK_API");
-  const PLUNK_SK = await getEnv("PLUNK_SK");
+  const {
+    participants,
+    PLUNK_API,
+    PLUNK_SK
+  } = JSON.parse(message.data as unknown as string) as {
+    participants: Participant[];
+    PLUNK_API: string;
+    PLUNK_SK: string;
+  };
 
   if (!PLUNK_API || !PLUNK_SK) {
     throw new Error("Missing PLUNK_API or PLUNK_SK environment variable");
