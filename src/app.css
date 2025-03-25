@@ -203,3 +203,40 @@ body {
 	font-family: 'Poppins', sans-serif;
 	overflow: hidden;
 }
+
+/* Width and height of the scrollbar */
+::-webkit-scrollbar {
+	width: 8px; /* Vertical scrollbar */
+	height: 8px; /* Horizontal scrollbar */
+}	
+
+/* Track (the background of the scrollbar) */
+::-webkit-scrollbar-track {
+	background: #f1f1f180;
+	border-radius: 10px;
+}
+
+/* Handle (the draggable part) */
+::-webkit-scrollbar-thumb {
+	background: #888;
+	border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+	background: #555;
+}
+
+@media (prefers-color-scheme: dark) {
+	::-webkit-scrollbar-track {
+		background: #2222222d;
+	}
+
+	::-webkit-scrollbar-thumb {
+		background: #555555;
+	}
+
+	::-webkit-scrollbar-thumb:hover {
+		background: #777;
+	}
+}
