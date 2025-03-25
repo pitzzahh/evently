@@ -12,9 +12,7 @@ onmessage = async (message: MessageEvent<Participant[]>) => {
   const PLUNK_SK = await getEnv("PLUNK_SK");
 
   if (!PLUNK_API || !PLUNK_SK) {
-    return postMessage({
-      error: "Missing PLUNK_API or PLUNK_SK environment variable"
-    });
+    throw new Error("Missing PLUNK_API or PLUNK_SK environment variable");
   }
 
   const participants_with_qr_codes = generateQRCodes(participants);
@@ -55,14 +53,10 @@ onmessage = async (message: MessageEvent<Participant[]>) => {
 
     if (failCount === 0) {
       postMessage({
-        success: true,
         message: `Successfully sent QR codes to all ${successCount} participants`
       });
     } else {
-      postMessage({
-        success: false,
-        message: `Sent QR codes to ${successCount} participants, failed for ${failCount} participants`
-      });
+      throw new Error(`Sent QR codes to ${successCount} participants, failed for ${failCount} participants`);
     }
   })();
 
