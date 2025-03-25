@@ -29,6 +29,7 @@
 	import { generateQRCodes } from '@/utils/exports/pdf';
 	import { generateFullName } from '@/utils/text';
 	import { sendEmail } from '@/utils/email/index.js';
+	import { getEnv } from '@/utils/security';
 
 	interface ComponentState {
 		event_details: EventDetails | undefined;
@@ -503,7 +504,9 @@
 				description: 'Please add participants to the event before sending QR codes'
 			});
 		}
-		email.send_qr_code_worker.postMessage(participants);
+		const PLUNK_API = await getEnv('PLUNK_API');
+		const PLUNK_SK = await getEnv('PLUNK_SK');
+		email.send_qr_code_worker.postMessage(JSON.stringify({ participants, PLUNK_API, PLUNK_SK }));
 
 		toast.info(`Sending QR codes to participants`, {
 			description: 'This may take a few moments. You can continue using the application.'
