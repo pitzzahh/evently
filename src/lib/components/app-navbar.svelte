@@ -11,6 +11,7 @@
 	import { dev } from '$app/environment';
 	import { COLLECTIONS } from '@/db';
 	import evently_logo from '@/assets/evently-logo.svg';
+	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 
 	const isActive = (pathname: string) => page.url.pathname === pathname;
 	const routes = [
@@ -43,42 +44,51 @@
 			{/each}
 		</div>
 		<div class="flex items-center gap-4">
-			<Button
-				onclick={toggleMode}
-				role="switch"
-				variant="outline"
-				size="icon"
-				aria-label="Light Switch"
-				aria-checked={$mode === 'light'}
-				class="!shrink-0 [&_svg]:size-5"
-				title="Toggle {$mode === 'dark' ? 'Dark' : 'Light'} Mode"
-			>
-				{#if $mode === 'light'}
-					<div
-						class="absolute inline-flex items-center justify-center"
-						transition:scale={{
-							delay: 50,
-							duration: 200,
-							start: 0.7,
-							easing: cubicOut
-						}}
+			<Tooltip.Provider>
+				<Tooltip.Root delayDuration={0}>
+					<Tooltip.Trigger>
+						<Button
+							onclick={toggleMode}
+							role="switch"
+							variant="outline"
+							size="icon"
+							aria-label="Light Switch"
+							aria-checked={$mode === 'light'}
+							class="hover:bg-bg-gray-400/10 !shrink-0 border-none bg-gray-400/10 backdrop-blur-md backdrop-filter dark:bg-white/10 [&_svg]:size-5"
+						>
+							{#if $mode === 'light'}
+								<div
+									class="absolute inline-flex items-center justify-center"
+									transition:scale={{
+										delay: 50,
+										duration: 200,
+										start: 0.7,
+										easing: cubicOut
+									}}
+								>
+									<Moon strokeWidth={1.5} class="size-6" aria-label="Moon" />
+								</div>
+							{:else}
+								<div
+									class="absolute inline-flex items-center justify-center"
+									transition:scale={{
+										delay: 50,
+										duration: 200,
+										start: 0.7,
+										easing: cubicOut
+									}}
+								>
+									<Sun strokeWidth={1.5} class="size-6" aria-label="Sun" />
+								</div>
+							{/if}
+						</Button></Tooltip.Trigger
 					>
-						<Moon strokeWidth={1.5} class="size-6" aria-label="Moon" />
-					</div>
-				{:else}
-					<div
-						class="absolute inline-flex items-center justify-center"
-						transition:scale={{
-							delay: 50,
-							duration: 200,
-							start: 0.7,
-							easing: cubicOut
-						}}
-					>
-						<Sun strokeWidth={1.5} class="size-6" aria-label="Sun" />
-					</div>
-				{/if}
-			</Button>
+					<Tooltip.Content>
+						<p>Toggle {$mode === 'dark' ? 'Dark' : 'Light'} Mode</p>
+					</Tooltip.Content>
+				</Tooltip.Root>
+			</Tooltip.Provider>
+
 			<NavbarTime />
 			<Button href="/events/create"><Plus class="size-4" /> Create Event</Button>
 			{#if dev}

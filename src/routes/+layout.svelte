@@ -38,9 +38,6 @@
 	oncontextmenu={(e) => e.preventDefault()}
 	onkeydown={async (e) => {
 		if (e.key === 'F5') {
-			toast.info('F5 is disabled', {
-				description: 'This is a system message, F5 is disabled in this application.'
-			});
 			e.preventDefault();
 		}
 		if (e.key === 'F11') {
@@ -56,11 +53,12 @@
 	}}
 />
 
-<div
-	class="min-h-screen bg-cover bg-fixed"
-	style:background-image="url('bg-light.jpg')"
-	data-theme-bg
->
+<div class="relative min-h-screen">
+	<!-- GRADIENT BG -->
+	<div
+		class="fixed left-0 top-0 -z-10 h-[50vh] w-full bg-gradient-to-b from-cyan-200/50 via-pink-100/30 to-background dark:from-sky-700/25 dark:via-pink-600/10"
+	></div>
+
 	<ModeWatcher />
 	<Toaster richColors position="top-center" />
 	{#if dev}
@@ -68,7 +66,7 @@
 	{/if}
 	<AppNavbar />
 	<div class="flex size-full justify-center">
-		<div class="flex flex-1 flex-col gap-4 rounded-lg p-4 md:max-w-[80%] md:px-0">
+		<div class="flex flex-1 flex-col gap-4 rounded-lg p-4 pt-8 md:max-w-[80%] md:px-0">
 			{#if update && !dismiss_update}
 				<Updater dismiss={dismiss_update} {update} />
 			{/if}
@@ -76,9 +74,3 @@
 		</div>
 	</div>
 </div>
-
-<style>
-	:global(.dark) [data-theme-bg] {
-		background-image: url('bg-dark.jpg') !important;
-	}
-</style>
