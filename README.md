@@ -1,12 +1,13 @@
 <div align="center">
   <img src="https://raw.githubusercontent.com/pitzzahh/evently/refs/heads/main/static/favicon.png" alt="Evently Logo" width="200"/>
-  <p style="font-size: 2em; font-weight: bold; margin: 0.5em 0;">Evently</p>
+  <!-- <p style="font-size: 2em; font-weight: bold; margin: 0.5em;">Evently</p> -->
+  <h1>Evently</h1>
   <a href="https://github.com/pitzzahh/evently/actions/workflows/publish.yml">
     <img src="https://github.com/pitzzahh/evently/actions/workflows/publish.yml/badge.svg" alt="publish" />
   </a>
 
   <p>
-    <strong>Evently</strong> is a powerful event attendance management system designed to simplify the process of organizing events and tracking participant attendance. With features such as QR code scanning, real-time attendance tracking, and comprehensive reporting, Evently helps event organizers streamline their workflow.
+    <strong>Evently</strong> is an event attendance management system that helps organize events and track participant attendance. It offers QR code scanning, attendance tracking, and reporting features to assist event organizers with their workflow.
   </p>
 </div>
 
