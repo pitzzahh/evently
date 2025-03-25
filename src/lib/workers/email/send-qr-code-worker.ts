@@ -1,3 +1,4 @@
+import { generateQrCodeEmail } from "@/components/custom/email";
 import type { Participant } from "@/db/models/types";
 import { sendEmail } from "@/utils/email";
 import { generateQRCodes } from "@/utils/exports/pdf";
@@ -7,11 +8,17 @@ onmessage = async (message: MessageEvent<string>) => {
   const {
     participants,
     PLUNK_API,
-    PLUNK_SK
+    PLUNK_SK,
+    event_details
   } = JSON.parse(message.data as unknown as string) as {
     participants: Participant[];
     PLUNK_API: string;
     PLUNK_SK: string;
+    event_details: {
+      event_name: string,
+      event_date: string,
+      event_location: string
+    }
   };
 
   if (!PLUNK_API || !PLUNK_SK) {
@@ -43,7 +50,15 @@ onmessage = async (message: MessageEvent<string>) => {
         await sendEmail({
           to: participant.email!,
           subject: `Your QR Code for ${participant.event_id}`,
-          body: `Hello ${full_name},\n\nHere is your QR code for the event:\n${participant.qr}`
+          body: generateQrCodeEmail({
+            participant: {
+              first_name: participant.first_name,
+              middle_name: participant.middle_name,
+              last_name: participant.last_name,
+              qr: participant.qr
+            },
+            ...event_details
+          })
         }, {
           PLUNK_API,
           PLUNK_SK
