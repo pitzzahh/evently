@@ -3,7 +3,7 @@ import { sendEmail } from "@/utils/email";
 import { generateQRCodes } from "@/utils/exports/pdf";
 import { generateFullName } from "@/utils/text";
 
-onmessage = async (message: MessageEvent<Participant[]>) => {
+onmessage = async (message: MessageEvent<string>) => {
   const {
     participants,
     PLUNK_API,
