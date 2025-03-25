@@ -12,7 +12,9 @@ onmessage = async (message: MessageEvent<string>) => {
     PLUNK_SK,
     event_details
   } = JSON.parse(message.data as unknown as string) as {
-    participants: Participant[];
+    participants: (Participant & {
+      qr: string;
+    })[];
     PLUNK_API: string;
     PLUNK_SK: string;
     event_details: {
@@ -29,24 +31,12 @@ onmessage = async (message: MessageEvent<string>) => {
     });
   }
 
-  const participants_with_qr_codes = participants
-    .sort((a, b) => a.first_name.localeCompare(b.first_name))
-    .map((participant) => ({
-      ...participant,
-      qr: createQrSvgString({
-        data: participant.id,
-        width: 150,
-        height: 150,
-        shape: 'circle',
-      })
-    }))
-
   const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
   (async () => {
     let successCount = 0;
     let failCount = 0;
-    for (const participant of participants_with_qr_codes) {
+    for (const participant of participants) {
       const full_name = generateFullName(
         {
           first_name: participant.first_name,
