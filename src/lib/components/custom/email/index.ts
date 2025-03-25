@@ -7,9 +7,9 @@ export type SendQrCodeProps = {
     middle_name?: string;
     last_name: string;
   };
-  eventName: string;
-  eventDate: string;
-  eventLocation: string;
+  event_name: string;
+  event_date: string;
+  event_location: string;
 };
 
 /**
@@ -20,13 +20,13 @@ export type SendQrCodeProps = {
  * @param {string} props.participant.first_name - First name
  * @param {string} props.participant.middle_name - Middle name (optional)
  * @param {string} props.participant.last_name - Last name
- * @param {string} props.eventName - Name of the event
- * @param {string} props.eventDate - Date of the event
- * @param {string} props.eventLocation - Location of the event
+ * @param {string} props.event_name - Name of the event
+ * @param {string} props.event_date - Date of the event
+ * @param {string} props.event_location - Location of the event
  * @returns {string} - HTML email template as a string
  */
 export function generateQrCodeEmail(props: SendQrCodeProps): string {
-  const { participant, eventName, eventDate, eventLocation } = props;
+  const { participant, event_name, event_date, event_location } = props;
 
   const fullName = generateFullName(
     {
@@ -47,7 +47,7 @@ export function generateQrCodeEmail(props: SendQrCodeProps): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${eventName} - QR Code</title>
+  <title>${event_name} - QR Code</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body style="margin: 0; padding: 0; font-family: 'Poppins', Arial, sans-serif;">
@@ -64,7 +64,7 @@ export function generateQrCodeEmail(props: SendQrCodeProps): string {
       </p>
       
       <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
-        Thank you for registering for <span style="font-weight: 600;">${eventName}</span>. Your QR code for attendance is attached below.
+        Thank you for registering for <span style="font-weight: 600;">${event_name}</span>. Your QR code for attendance is attached below.
       </p>
       
       <div style="margin: 30px 0; text-align: center;">
@@ -89,15 +89,15 @@ export function generateQrCodeEmail(props: SendQrCodeProps): string {
         <table style="width: 100%; border-collapse: collapse; font-size: 15px;">
           <tr>
             <td style="padding: 8px 0; color: #718096; width: 100px;">Event:</td>
-            <td style="padding: 8px 0; font-weight: 500;">${eventName}</td>
+            <td style="padding: 8px 0; font-weight: 500;">${event_name}</td>
           </tr>
           <tr>
             <td style="padding: 8px 0; color: #718096;">Date:</td>
-            <td style="padding: 8px 0; font-weight: 500;">${eventDate}</td>
+            <td style="padding: 8px 0; font-weight: 500;">${event_date}</td>
           </tr>
           <tr>
             <td style="padding: 8px 0; color: #718096;">Location:</td>
-            <td style="padding: 8px 0; font-weight: 500;">${eventLocation}</td>
+            <td style="padding: 8px 0; font-weight: 500;">${event_location}</td>
           </tr>
         </table>
       </div>
@@ -110,7 +110,7 @@ export function generateQrCodeEmail(props: SendQrCodeProps): string {
     <!-- Footer -->
     <div style="text-align: center; padding: 20px; background-color: #f8f9fa; color: #718096; font-size: 14px; border-radius: 0 0 8px 8px; margin-top: 20px;">
       <p style="margin: 0 0 10px 0;">If you have any questions, please contact the event organizer.</p>
-      <p style="margin: 0;">© ${currentYear} ${eventName}. All rights reserved.</p>
+      <p style="margin: 0;">© ${currentYear} ${event_name}. All rights reserved.</p>
     </div>
   </div>
 </body>
