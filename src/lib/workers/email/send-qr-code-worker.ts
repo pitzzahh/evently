@@ -14,6 +14,8 @@ onmessage = async (message: MessageEvent<string>) => {
     PLUNK_SK: string;
   };
 
+  console.log(participants);
+
   if (!PLUNK_API || !PLUNK_SK) {
     throw new Error("Missing PLUNK_API or PLUNK_SK environment variable");
   }
