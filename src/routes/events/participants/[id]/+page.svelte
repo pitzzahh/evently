@@ -442,7 +442,7 @@
 		if (email.send_qr_code_worker) {
 			email.send_qr_code_worker.terminate();
 		}
-		const SendQRWorker = await import('$lib/workers/exports/email/send-qr-code-worker?worker');
+		const SendQRWorker = await import('$lib/workers/email/send-qr-code-worker?worker');
 		email.send_qr_code_worker = new SendQRWorker.default();
 		email.send_qr_code_worker.onmessage = (
 			message: MessageEvent<HelperResponse<string | null>>
@@ -594,6 +594,7 @@
 		load_pdf_qr_code_worker();
 		load_pdf_full_attendance_report_worker();
 		load_excel_full_attendance_report_worker();
+		load_send_qr_code_worker();
 		return () => {
 			if (timeout) clearTimeout(timeout);
 		};
