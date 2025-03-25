@@ -3,6 +3,7 @@ import type { Participant } from "@/db/models/types";
 import { sendEmail } from "@/utils/email";
 import { generateQRCodes } from "@/utils/exports/pdf";
 import { generateFullName } from "@/utils/text";
+import { createQrPngDataUrl } from "@svelte-put/qr";
 
 onmessage = async (message: MessageEvent<string>) => {
   const {
@@ -28,7 +29,17 @@ onmessage = async (message: MessageEvent<string>) => {
     });
   }
 
-  const participants_with_qr_codes = generateQRCodes(participants);
+  const participants_with_qr_codes = await Promise.all(participants
+    .sort((a, b) => a.first_name.localeCompare(b.first_name))
+    .map(async (participant) => ({
+      ...participant,
+      qr: await createQrPngDataUrl({
+        data: participant.id,
+        width: 150,
+        height: 150,
+        shape: 'circle',
+      })
+    })))
 
   const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
