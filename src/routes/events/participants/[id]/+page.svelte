@@ -34,7 +34,6 @@
 		event_details: EventDetails | undefined;
 		event_schedules: EventSchedule[];
 		participants: Participant[];
-		see_more: boolean;
 		last_scanned_participant: Participant | null;
 		scanned_attendance: any | null;
 		current_day_participants_attendance: ParticipantAttendance[];
@@ -50,17 +49,31 @@
 			excel: {
 				full_attendance_report_worker: Worker | null;
 			};
+			email: {
+				send_qr_code_worker: Worker | null;
+			};
 		};
 		hardware_scanner_enabled: boolean;
 	}
 
 	let { data } = $props();
 
-	let comp_state = $state<ComponentState>({
+	let {
+		event_details,
+		event_schedules,
+		participants,
+		last_scanned_participant,
+		scanned_attendance,
+		current_day_participants_attendance,
+		all_participants_attendance,
+		qr_code,
+		timeout,
+		workers: { pdf, excel, email },
+		hardware_scanner_enabled
+	} = $state<ComponentState>({
 		event_details: undefined,
 		event_schedules: [],
 		participants: [],
-		see_more: true,
 		last_scanned_participant: null,
 		scanned_attendance: null,
 		current_day_participants_attendance: [],
@@ -75,20 +88,23 @@
 			},
 			excel: {
 				full_attendance_report_worker: null
+			},
+			email: {
+				send_qr_code_worker: null
 			}
 		},
 		hardware_scanner_enabled: true
 	});
 
 	const event_status = $derived(
-		checkEventStatus(comp_state.event_details?.start_date, comp_state.event_details?.end_date)
+		checkEventStatus(event_details?.start_date, event_details?.end_date)
 	);
 
 	const current_event_day = $derived(
-		comp_state.event_details
+		event_details
 			? getEventDayInfo(
-					comp_state.event_details.start_date,
-					comp_state.event_details.end_date,
+					event_details.start_date,
+					event_details.end_date,
 					new Date()
 				).currentDay.toString()
 			: null
@@ -99,7 +115,7 @@
 	 * @param participant_id The ID of the scanned participant
 	 */
 	function handleScanParticipant(participant_id: string) {
-		if (!comp_state.event_details) {
+		if (!event_details) {
 			toast.error('Event details not available');
 			return;
 		}
@@ -110,7 +126,7 @@
 
 			// Get fresh event data
 			const event = COLLECTIONS.EVENT_DETAILS_COLLECTION.findOne({
-				id: comp_state.event_details.id
+				id: event_details.id
 			});
 
 			if (!event) {
@@ -184,8 +200,8 @@
 					} else {
 						// AM already has both time in and out
 						toast.info(`${participant.first_name} already has complete morning attendance`);
-						comp_state.last_scanned_participant = participant;
-						comp_state.scanned_attendance = existing_attendance;
+						last_scanned_participant = participant;
+						scanned_attendance = existing_attendance;
 						return;
 					}
 				} else {
@@ -217,8 +233,8 @@
 					} else {
 						// PM already has both time in and out
 						toast.info(`${participant.first_name} already has complete PM attendance`);
-						comp_state.last_scanned_participant = participant;
-						comp_state.scanned_attendance = existing_attendance;
+						last_scanned_participant = participant;
+						scanned_attendance = existing_attendance;
 						return;
 					}
 				}
@@ -249,8 +265,8 @@
 			}
 
 			// Update component state with scan results
-			comp_state.last_scanned_participant = participant;
-			comp_state.scanned_attendance = attendance_record;
+			last_scanned_participant = participant;
+			scanned_attendance = attendance_record;
 
 			// Display success message
 			const fullName = `${participant.first_name} ${participant.last_name}`;
@@ -258,7 +274,7 @@
 
 			// Refresh the attendance records display
 			if (current_event_day) {
-				comp_state.current_day_participants_attendance = getPopulatedAttendanceRecords(
+				current_day_participants_attendance = getPopulatedAttendanceRecords(
 					event.id,
 					{
 						attendance_records_collection: COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION,
@@ -278,43 +294,43 @@
 			event.preventDefault();
 			event.stopPropagation();
 
-			if (!comp_state.hardware_scanner_enabled) {
+			if (!hardware_scanner_enabled) {
 				return toast.error('Hardware scanning is disbaled');
 			}
 
-			if (comp_state.qr_code && comp_state.qr_code.length > 5) {
-				handleScanParticipant(comp_state.qr_code);
+			if (qr_code && qr_code.length > 5) {
+				handleScanParticipant(qr_code);
 			}
 
-			comp_state.qr_code = '';
+			qr_code = '';
 			return;
 		}
 
-		if (comp_state.timeout) {
-			clearTimeout(comp_state.timeout);
-			comp_state.timeout = null;
+		if (timeout) {
+			clearTimeout(timeout);
+			timeout = null;
 		}
 
-		comp_state.qr_code += event.key;
+		qr_code += event.key;
 
 		// reset if no input received for a while
-		comp_state.timeout = setTimeout(() => {
-			if (comp_state.qr_code.length < 5) {
-				comp_state.qr_code = '';
+		timeout = setTimeout(() => {
+			if (qr_code.length < 5) {
+				qr_code = '';
 			}
-			comp_state.timeout = null;
+			timeout = null;
 		}, 500) as unknown as number;
 	}
 
 	async function load_pdf_daily_attendance_report_worker() {
-		if (comp_state.workers.pdf.daily_attendance_report_worker) {
-			comp_state.workers.pdf.daily_attendance_report_worker.terminate();
+		if (pdf.daily_attendance_report_worker) {
+			pdf.daily_attendance_report_worker.terminate();
 		}
 		const DailyAttendanceWorker = await import(
 			'$lib/workers/exports/pdf/pdf-daily-attendance-worker?worker'
 		);
-		comp_state.workers.pdf.daily_attendance_report_worker = new DailyAttendanceWorker.default();
-		comp_state.workers.pdf.daily_attendance_report_worker.onmessage = (
+		pdf.daily_attendance_report_worker = new DailyAttendanceWorker.default();
+		pdf.daily_attendance_report_worker.onmessage = (
 			message: MessageEvent<HelperResponse<string | null>>
 		) => {
 			if (message.data.status !== 200 || message.data.data === null) {
@@ -323,7 +339,7 @@
 				});
 			}
 			if (message.data.data) {
-				const file_name = `${comp_state.event_details?.event_name} Daily Attendance Report`;
+				const file_name = `${event_details?.event_name} Daily Attendance Report`;
 				download_document(message.data.data, file_name);
 				toast.success('Daily attendance report generated successfully', {
 					description: 'The daily attendance report has been generated and is ready for download'
@@ -337,21 +353,19 @@
 	}
 
 	async function load_pdf_qr_code_worker() {
-		if (comp_state.workers.pdf.qr_code_worker) {
-			comp_state.workers.pdf.qr_code_worker.terminate();
+		if (pdf.qr_code_worker) {
+			pdf.qr_code_worker.terminate();
 		}
 		const QRCodeWorker = await import('$lib/workers/exports/pdf/pdf-qr-codes-worker?worker');
-		comp_state.workers.pdf.qr_code_worker = new QRCodeWorker.default();
-		comp_state.workers.pdf.qr_code_worker.onmessage = (
-			message: MessageEvent<HelperResponse<string | null>>
-		) => {
+		pdf.qr_code_worker = new QRCodeWorker.default();
+		pdf.qr_code_worker.onmessage = (message: MessageEvent<HelperResponse<string | null>>) => {
 			if (message.data.status !== 200 || message.data.data === null) {
 				return toast.warning('Failed to generate QR codes', {
 					description: message.data.message
 				});
 			}
 			if (message.data.data) {
-				const file_name = `${comp_state.event_details?.event_name} QR Codes`;
+				const file_name = `${event_details?.event_name} QR Codes`;
 				download_document(message.data.data, file_name);
 				toast.success('QR codes generated successfully', {
 					description: 'The QR codes have been generated and are ready for download'
@@ -365,14 +379,14 @@
 	}
 
 	async function load_pdf_full_attendance_report_worker() {
-		if (comp_state.workers.pdf.full_attendance_report_worker) {
-			comp_state.workers.pdf.full_attendance_report_worker.terminate();
+		if (pdf.full_attendance_report_worker) {
+			pdf.full_attendance_report_worker.terminate();
 		}
 		const FullAttendanceWorker = await import(
 			'$lib/workers/exports/pdf/pdf-full-attendance-worker?worker'
 		);
-		comp_state.workers.pdf.full_attendance_report_worker = new FullAttendanceWorker.default();
-		comp_state.workers.pdf.full_attendance_report_worker.onmessage = (
+		pdf.full_attendance_report_worker = new FullAttendanceWorker.default();
+		pdf.full_attendance_report_worker.onmessage = (
 			message: MessageEvent<HelperResponse<string | null>>
 		) => {
 			if (message.data.status !== 200 || message.data.data === null) {
@@ -381,7 +395,7 @@
 				});
 			}
 			if (message.data.data) {
-				const file_name = `${comp_state.event_details?.event_name} Full Attendance Report`;
+				const file_name = `${event_details?.event_name} Full Attendance Report`;
 				download_document(message.data.data, file_name);
 				toast.success('Full attendance report generated successfully', {
 					description: 'The full attendance report has been generated and is ready for download'
@@ -395,14 +409,14 @@
 	}
 
 	async function load_excel_full_attendance_report_worker() {
-		if (comp_state.workers.excel.full_attendance_report_worker) {
-			comp_state.workers.excel.full_attendance_report_worker.terminate();
+		if (excel.full_attendance_report_worker) {
+			excel.full_attendance_report_worker.terminate();
 		}
 		const FullAttendanceWorker = await import(
 			'$lib/workers/exports/excel/excel-full-attendance-worker?worker'
 		);
-		comp_state.workers.excel.full_attendance_report_worker = new FullAttendanceWorker.default();
-		comp_state.workers.excel.full_attendance_report_worker.onmessage = (
+		excel.full_attendance_report_worker = new FullAttendanceWorker.default();
+		excel.full_attendance_report_worker.onmessage = (
 			message: MessageEvent<HelperResponse<string | null>>
 		) => {
 			if (message.data.status !== 200 || message.data.data === null) {
@@ -411,7 +425,7 @@
 				});
 			}
 			if (message.data.data) {
-				const file_name = `${comp_state.event_details?.event_name} Full Attendance Report`;
+				const file_name = `${event_details?.event_name} Full Attendance Report`;
 				download_document(message.data.data, file_name, 'xlsx');
 				toast.success('Full attendance report generated successfully', {
 					description: 'The full attendance report has been generated and is ready for download'
@@ -425,8 +439,8 @@
 	}
 
 	function handleToggleHardwareScannerState() {
-		const state = !comp_state.hardware_scanner_enabled;
-		comp_state.hardware_scanner_enabled = state;
+		const state = !hardware_scanner_enabled;
+		hardware_scanner_enabled = state;
 
 		if (state) {
 			toast.success('Hardware scanner enabled. Please make sure the device is plugged');
@@ -446,7 +460,7 @@
 			return toast.error('Emailing QR codes is disabled since the event has concluded');
 		}
 
-		if (!comp_state.event_details) {
+		if (!event_details) {
 			return toast.warning('Event details not available', {
 				description: "Couldn't find event details required to generate QR codes"
 			});
@@ -479,13 +493,13 @@
 				event_id: data.event_id
 			});
 
-			comp_state.event_schedules = event_schedule_cursor.fetch();
-			comp_state.event_details = COLLECTIONS.EVENT_DETAILS_COLLECTION.findOne({
+			event_schedules = event_schedule_cursor.fetch();
+			event_details = COLLECTIONS.EVENT_DETAILS_COLLECTION.findOne({
 				id: data.event_id
 			});
 
 			if (current_event_day) {
-				comp_state.current_day_participants_attendance = getPopulatedAttendanceRecords(
+				current_day_participants_attendance = getPopulatedAttendanceRecords(
 					data.event_id,
 					{
 						attendance_records_collection: COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION,
@@ -495,14 +509,14 @@
 				) as ParticipantAttendance[];
 			}
 
-			comp_state.all_participants_attendance = getPopulatedAttendanceRecords(data.event_id, {
+			all_participants_attendance = getPopulatedAttendanceRecords(data.event_id, {
 				attendance_records_collection: COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION,
 				participant_collection: COLLECTIONS.PARTICIPANT_COLLECTION
 			}) as ParticipantAttendance[];
 
-			comp_state.participants = participants_cursor.fetch().map((participant) => {
-				const event_days = comp_state.event_details?.difference_in_days;
-				const total_days_attended = comp_state.all_participants_attendance.reduce(
+			participants = participants_cursor.fetch().map((participant) => {
+				const event_days = event_details?.difference_in_days;
+				const total_days_attended = all_participants_attendance.reduce(
 					(acc, participant_attendance) => {
 						if (
 							participant_attendance.participant_id === participant.id &&
@@ -537,12 +551,12 @@
 	);
 
 	watch(
-		() => comp_state.last_scanned_participant,
+		() => last_scanned_participant,
 		() => {
 			let timeout: number;
-			if (comp_state.last_scanned_participant) {
+			if (last_scanned_participant) {
 				timeout = setTimeout(() => {
-					comp_state.last_scanned_participant = null;
+					last_scanned_participant = null;
 				}, 5000) as unknown as number;
 			}
 			return () => timeout;
@@ -555,7 +569,7 @@
 		load_pdf_full_attendance_report_worker();
 		load_excel_full_attendance_report_worker();
 		return () => {
-			if (comp_state.timeout) clearTimeout(comp_state.timeout);
+			if (timeout) clearTimeout(timeout);
 		};
 	});
 </script>
@@ -568,10 +582,10 @@
 		<!-- EVENT NAME -->
 		<div class="grid place-items-start gap-6">
 			<h2 class="text-5xl font-semibold">
-				{comp_state.event_details?.event_name ?? 'N/A'}'s Participants
+				{event_details?.event_name ?? 'N/A'}'s Participants
 			</h2>
 
-			{#if comp_state.event_details && event_status === 'ongoing'}
+			{#if event_details && event_status === 'ongoing'}
 				<Badge variant="outline" class="text-md font-semibold">
 					Day {current_event_day}
 				</Badge>
@@ -585,7 +599,7 @@
 				<AddParticipantsDialog
 					add_participants_form={data.add_participants_form}
 					is_event_finished={event_status === 'finished'}
-					event_id={comp_state.event_details?.id ?? 'N/A'}
+					event_id={event_details?.id ?? 'N/A'}
 				/>
 			</div>
 			<Button variant="secondary" onclick={handle_email_send}>
@@ -635,27 +649,27 @@
 								<DropdownMenu.SubContent>
 									<DropdownMenu.Item
 										onclick={() => {
-											if (!comp_state.event_details) {
+											if (!event_details) {
 												return toast.warning('Event details not available', {
 													description: "Couldn't find event details required to generate QR codes"
 												});
 											}
 
-											if (!comp_state.workers.pdf.qr_code_worker) {
+											if (!pdf.qr_code_worker) {
 												return toast.error('QR code worker not available', {
 													description: 'Please refresh the page and try again'
 												});
 											}
 
-											comp_state.workers.pdf.qr_code_worker.postMessage({
+											pdf.qr_code_worker.postMessage({
 												info: {
 													creator: 'Evently',
-													title: `${comp_state.event_details.event_name} QR Codes`,
+													title: `${event_details.event_name} QR Codes`,
 													subject: 'QR Codes',
 													producer: 'Evently'
 												},
-												event_details: JSON.stringify(comp_state.event_details),
-												participants: JSON.stringify(comp_state.participants)
+												event_details: JSON.stringify(event_details),
+												participants: JSON.stringify(participants)
 											});
 											toast.info('Generating QR codes', {
 												description:
@@ -666,27 +680,27 @@
 									<DropdownMenu.Separator />
 									<DropdownMenu.Item
 										onclick={() => {
-											if (!comp_state.event_details) {
+											if (!event_details) {
 												return toast.warning('Event details not available', {
 													description: "Couldn't find event details required to generate QR codes"
 												});
 											}
 
-											if (!comp_state.workers.pdf.daily_attendance_report_worker) {
+											if (!pdf.daily_attendance_report_worker) {
 												return toast.error('QR code worker not available', {
 													description: 'Please refresh the page and try again'
 												});
 											}
 
-											comp_state.workers.pdf.daily_attendance_report_worker.postMessage({
+											pdf.daily_attendance_report_worker.postMessage({
 												info: {
 													creator: 'Evently',
-													title: `${comp_state.event_details.event_name} Daily Attendance Report`,
+													title: `${event_details.event_name} Daily Attendance Report`,
 													subject: 'Daily Attendance Report',
 													producer: 'Evently'
 												},
-												event_details: JSON.stringify(comp_state.event_details),
-												participants: JSON.stringify(comp_state.participants)
+												event_details: JSON.stringify(event_details),
+												participants: JSON.stringify(participants)
 											});
 											toast.info('Generating daily attendance report', {
 												description:
@@ -697,27 +711,27 @@
 									<DropdownMenu.Separator />
 									<DropdownMenu.Item
 										onclick={() => {
-											if (!comp_state.event_details) {
+											if (!event_details) {
 												return toast.warning('Event details not available', {
 													description:
 														"Couldn't find event details required to generate full attendance report"
 												});
 											}
-											if (!comp_state.workers.pdf.full_attendance_report_worker) {
+											if (!pdf.full_attendance_report_worker) {
 												return toast.error('Full attendance report worker not available', {
 													description: 'Please refresh the page and try again'
 												});
 											}
 
-											comp_state.workers.pdf.full_attendance_report_worker.postMessage({
+											pdf.full_attendance_report_worker.postMessage({
 												info: {
 													creator: 'Evently',
-													title: `${comp_state.event_details.event_name} Full Attendance Report`,
+													title: `${event_details.event_name} Full Attendance Report`,
 													subject: 'Full Attendance Report',
 													producer: 'Evently'
 												},
-												event_details: JSON.stringify(comp_state.event_details),
-												participants: JSON.stringify(comp_state.participants)
+												event_details: JSON.stringify(event_details),
+												participants: JSON.stringify(participants)
 											});
 											toast.info('Generating event full attendance report', {
 												description:
@@ -732,26 +746,26 @@
 								<DropdownMenu.SubContent>
 									<DropdownMenu.Item
 										onclick={() => {
-											if (!comp_state.event_details) {
+											if (!event_details) {
 												return toast.warning('Event details not available', {
 													description: "Couldn't find event details required to generate QR codes"
 												});
 											}
-											if (!comp_state.workers.excel.full_attendance_report_worker) {
+											if (!excel.full_attendance_report_worker) {
 												return toast.error('Full attendance report worker not available', {
 													description: 'Please refresh the page and try again'
 												});
 											}
 
-											comp_state.workers.excel.full_attendance_report_worker.postMessage({
+											excel.full_attendance_report_worker.postMessage({
 												info: {
 													creator: 'Evently',
-													title: `${comp_state.event_details.event_name} Full Attendance Report`,
+													title: `${event_details.event_name} Full Attendance Report`,
 													subject: 'Full Attendance Report',
 													producer: 'Evently'
 												},
-												event_details: JSON.stringify(comp_state.event_details),
-												participants: JSON.stringify(comp_state.participants)
+												event_details: JSON.stringify(event_details),
+												participants: JSON.stringify(participants)
 											});
 
 											toast.info('Generating QR codes', {
@@ -773,7 +787,7 @@
 								<Popover.Trigger
 									class={cn(
 										buttonVariants({ size: 'icon', variant: 'outline' }),
-										comp_state.hardware_scanner_enabled && 'border-green-600'
+										hardware_scanner_enabled && 'border-green-600'
 									)}
 								>
 									<ScanQrCode class="size-4" />
@@ -785,11 +799,11 @@
 										<Button
 											size="sm"
 											variant="outline"
-											class={cn(comp_state.hardware_scanner_enabled && 'border-green-600')}
+											class={cn(hardware_scanner_enabled && 'border-green-600')}
 											onclick={handleToggleHardwareScannerState}
 										>
 											<ScanBarcode class="size-4" /> Scan with Hardware Scanner
-											{#if comp_state.hardware_scanner_enabled}
+											{#if hardware_scanner_enabled}
 												<Check class="size-3 rounded-full bg-green-600 p-1" />
 											{/if}
 										</Button>
@@ -814,9 +828,9 @@
 					{#key event_status}
 						<ParticipantDataTable
 							participant_form={data.participant_form}
-							participants={comp_state.participants}
+							{participants}
 							{event_status}
-							event_details={comp_state.event_details!}
+							event_details={event_details!}
 						/>
 					{/key}
 				{/if}
@@ -829,8 +843,8 @@
 					<TableSkeleton />
 				{:else}
 					<ParticipantAttendanceDataTable
-						event_days={comp_state.event_details?.difference_in_days}
-						participants_attendance={comp_state.all_participants_attendance}
+						event_days={event_details?.difference_in_days}
+						participants_attendance={all_participants_attendance}
 					/>
 				{/if}
 			</div>
@@ -843,7 +857,7 @@
 						<TableSkeleton />
 					{:else}
 						<ParticipantAttendanceDataTable
-							participants_attendance={comp_state.current_day_participants_attendance}
+							participants_attendance={current_day_participants_attendance}
 						/>
 					{/if}
 				</div>
@@ -852,16 +866,13 @@
 	</Tabs.Root>
 </div>
 
-{#if comp_state.last_scanned_participant}
+{#if last_scanned_participant}
 	<div
 		transition:fly={{ y: -20, duration: 200, easing: quartInOut }}
 		class="fixed right-8 top-10 z-[9999]"
 	>
 		<Card.Root class="relative w-[400px]">
-			<button
-				class="absolute right-4 top-4"
-				onclick={() => (comp_state.last_scanned_participant = null)}
-			>
+			<button class="absolute right-4 top-4" onclick={() => (last_scanned_participant = null)}>
 				<X class="size-4" />
 			</button>
 			<Card.Header>
@@ -871,13 +882,11 @@
 			<Card.Content class="flex w-full justify-between">
 				<div>
 					<h5 class="font-semibold">
-						{comp_state.last_scanned_participant.first_name}
-						{comp_state.last_scanned_participant.middle_name
-							? comp_state.last_scanned_participant.middle_name + ' '
-							: ''}
-						{comp_state.last_scanned_participant.last_name}
+						{last_scanned_participant.first_name}
+						{last_scanned_participant.middle_name ? last_scanned_participant.middle_name + ' ' : ''}
+						{last_scanned_participant.last_name}
 					</h5>
-					<p class="text-muted-foreground">{comp_state.last_scanned_participant.email}</p>
+					<p class="text-muted-foreground">{last_scanned_participant.email}</p>
 				</div>
 
 				<div class="flex size-8 items-center justify-center rounded-full bg-green-200">
@@ -889,12 +898,11 @@
 					Date: {new Date().toLocaleDateString()}
 				</Badge>
 				<Badge>
-					{(comp_state.scanned_attendance.am_time_in &&
-						!comp_state.scanned_attendance.am_time_out) ||
-					(comp_state.scanned_attendance.pm_time_in && !comp_state.scanned_attendance.pm_time_out)
+					{(scanned_attendance.am_time_in && !scanned_attendance.am_time_out) ||
+					(scanned_attendance.pm_time_in && !scanned_attendance.pm_time_out)
 						? 'Time in: '
 						: 'Time out: '}
-					{comp_state.scanned_attendance.latest_time_scanned.toLocaleTimeString([], {
+					{scanned_attendance.latest_time_scanned.toLocaleTimeString([], {
 						hour: '2-digit',
 						minute: '2-digit'
 					})}
