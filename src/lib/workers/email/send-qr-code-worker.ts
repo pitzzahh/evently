@@ -81,17 +81,17 @@ onmessage = async (message: MessageEvent<string>) => {
     if (failCount === 0) {
       returned_data = {
         status: 200,
-        message: `Successfully sent QR codes to all ${successCount} participants`
+        message: `Successfully sent QR codes to all ${successCount} ${successCount === 1 ? 'participant' : 'participants'}`
       };
       postMessage({
         status: 200,
-        message: `Successfully sent QR codes to all ${successCount} participants`,
+        message: `Successfully sent QR codes to all ${successCount} ${successCount === 1 ? 'participant' : 'participants'}`,
         data: successCount
       });
     } else {
       postMessage({
         status: 500,
-        message: `Sent QR codes to ${successCount} participants, failed for ${failCount} participants`
+        message: `Sent QR codes to ${successCount} ${successCount === 1 ? 'participant' : 'participants'}, failed for ${failCount} ${failCount === 1 ? 'participant' : 'participants'}`
       });
     }
   })();
