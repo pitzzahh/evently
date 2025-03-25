@@ -438,6 +438,32 @@
 		};
 	}
 
+	async function load_send_qr_code_worker() {
+		if (email.send_qr_code_worker) {
+			email.send_qr_code_worker.terminate();
+		}
+		const SendQRWorker = await import('$lib/workers/exports/email/send-qr-code-worker?worker');
+		email.send_qr_code_worker = new SendQRWorker.default();
+		email.send_qr_code_worker.onmessage = (
+			message: MessageEvent<HelperResponse<string | null>>
+		) => {
+			if (message.data.status !== 200 || message.data.data === null) {
+				return toast.warning('Failed to send QR codes', {
+					description: message.data.message
+				});
+			}
+			if (message.data.data) {
+				toast.success('QR codes sent successfully', {
+					description: 'The QR codes have been sent to the participants'
+				});
+			} else {
+				toast.error('Failed to send QR codes', {
+					description: 'No data received from the worker'
+				});
+			}
+		};
+	}
+
 	function handleToggleHardwareScannerState() {
 		const state = !hardware_scanner_enabled;
 		hardware_scanner_enabled = state;
