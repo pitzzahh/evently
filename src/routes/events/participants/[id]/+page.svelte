@@ -507,9 +507,9 @@
 				...participant,
 				qr: await createQrPngDataUrl({
 					data: participant.id,
-					width: 200,
-					height: 200,
-					shape: 'circle'
+					width: 500,
+					height: 500,
+					backgroundFill: '#fff'
 				})
 			}))
 		);
