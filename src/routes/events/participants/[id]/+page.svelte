@@ -64,7 +64,7 @@
 	import Button from '@/components/ui/button/button.svelte';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import { getEnv } from '@/utils/security';
-	import { createQrPngDataUrl } from '@svelte-put/qr';
+	import { createQrPngDataUrl, createQrSvgDataUrl } from '@svelte-put/qr';
 
 	let { data } = $props();
 
@@ -518,6 +518,12 @@
 					width: 500,
 					height: 500,
 					backgroundFill: '#fff',
+					shape: 'circle'
+				}),
+				downloadable_qr: createQrSvgDataUrl({
+					data: participant.id,
+					width: 500,
+					height: 500,
 					shape: 'circle'
 				})
 			}))
