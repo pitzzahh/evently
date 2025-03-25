@@ -10,6 +10,16 @@
   </p>
 </div>
 
+## Download
+
+Check the [latest release](https://github.com/pitzzahh/evently/releases/latest) for the most up-to-date version.
+
+Available for:
+
+- Windows (.exe, .msi)
+- macOS (.dmg, .app)
+- Linux (.deb, .rpm, .AppImage)
+
 ## Features
 
 ### Event Management
@@ -31,14 +41,12 @@
 - Scan participant QR codes using hardware scanners or device camera
 - Track AM and PM check-in/check-out times
 - Real-time attendance status updates
-- Comprehensive view of attendance statistics
 
 ### Reporting
 
 - Export daily attendance reports to PDF
 - Generate participant QR code sheets in PDF format
 - Export full event attendance records to Excel or PDF
-- Detailed attendance analytics and statistics
 
 ### Additional Features
 
@@ -49,7 +57,7 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/evently.git
+git clone https://github.com/pitzzahh/evently.git
 
 # Navigate to the project directory
 cd evently
@@ -67,11 +75,11 @@ yarn install
 Start the development server:
 
 ```bash
-npm run dev
+bun tauri dev
 # or
-bun run dev
-# or
-yarn dev
+npm run tauri dev
+#or
+pnpm run tauri dev
 ```
 
 For production builds:
@@ -96,16 +104,16 @@ npm run preview
 
 Evently is mainly built with:
 
-- SvelteKit for the frontend
-- shadcn-svelte for UI components
-- Tauri for the cross-platform desktop application
-- TailwindCSS for styling
-- signaldbjs for real-time data synchronization using OPFS
-- pdfmake for PDF generation
-- react-big-calendar for the calendar component
-- exceljs for Excel file handling
-- svelte-put/qr for QR code generation
-- react for rendering the calendar component
+- [SvelteKit](https://github.com/sveltejs/kit) for the frontend
+- [shadcn-svelte](https://github.com/huntabyte/shadcn-svelte) for UI components
+- [Tauri](https://tauri.app/) for the cross-platform desktop application
+- [TailwindCSS](https://github.com/tailwindlabs/tailwindcss) for styling
+- [signaldb](https://github.com/maxnowack/signaldb) for real-time data synchronization using OPFS
+- [pdfmake](https://github.com/bpampuch/pdfmake) for PDF generation
+- [react-big-calendar](https://github.com/jquense/react-big-calendar) for the calendar component
+- [exceljs](https://github.com/exceljs/exceljs) for Excel file handling
+- [svelte-put/qr](https://svelte-put.vnphanquang.com/docs/qr) for QR code generation
+- [React](https://github.com/facebook/react) for rendering the calendar component
 - and many more.
 
 ## Building for Desktop
