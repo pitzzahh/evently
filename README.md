@@ -94,12 +94,12 @@ This will create a production build of the application in the `src-tauri/target/
 ## Screenshots
 
 <p align="center">
-  <img src="upcoming-events.png" alt="Upcoming events list" width="45%"/>
-  <img src="past-events.png" alt="Past events list" width="45%"/>
+  <img src="https://raw.githubusercontent.com/pitzzahh/evently/refs/heads/main/upcoming-events.png" alt="Upcoming events list" width="45%"/>
+  <img src="https://raw.githubusercontent.com/pitzzahh/evently/refs/heads/main/past-events.png" alt="Past events list" width="45%"/>
 </p>
 <p align="center">
-  <img src="event-details.png" alt="Event details" width="45%"/>
-  <img src="event-participants.png" alt="Event participants" width="45%"/>
+  <img src="https://raw.githubusercontent.com/pitzzahh/evently/refs/heads/main/event-details.png" alt="Event details" width="45%"/>
+  <img src="https://raw.githubusercontent.com/pitzzahh/evently/refs/heads/main/event-participants.png" alt="Event participants" width="45%"/>
 </p>
 
 ## Development
