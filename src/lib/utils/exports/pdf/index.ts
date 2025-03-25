@@ -23,6 +23,7 @@ export function generateQRCodes(participants: Participant[], options?: {
         width: options?.width ?? 500,
         height: options?.height ?? 500,
         shape: 'circle',
+        logo: '$lib/assets/evently-logo.svg'
       })
     }));
 }
