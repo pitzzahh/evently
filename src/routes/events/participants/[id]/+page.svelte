@@ -510,7 +510,8 @@
 					data: participant.id,
 					width: 500,
 					height: 500,
-					backgroundFill: '#fff'
+					backgroundFill: '#fff',
+					shape: 'circle'
 				})
 			}))
 		);
