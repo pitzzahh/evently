@@ -480,7 +480,7 @@
 		a.click();
 		document.body.removeChild(a);
 	}
-	async function handle_email_send() {
+	async function handle_email_send(show_toast_if_no_participants: boolean = true) {
 		if (event_status === 'finished') {
 			return toast.error('Emailing QR codes is disabled since the event has concluded');
 		}
@@ -498,6 +498,7 @@
 		}
 
 		if (participants.length === 0) {
+			if (!show_toast_if_no_participants) return;
 			return toast.warning('No participants found', {
 				description: 'Please add participants to the event before sending QR codes'
 			});
@@ -627,7 +628,7 @@
 	watch(
 		() => event_status === 'ongoing',
 		() => {
-			handle_email_send();
+			handle_email_send(false);
 		},
 		{
 			lazy: true
@@ -674,7 +675,7 @@
 					event_id={event_details?.id ?? 'N/A'}
 				/>
 			</div>
-			<Button variant="secondary" onclick={handle_email_send}>
+			<Button variant="secondary" onclick={() => handle_email_send()}>
 				<Mail class="size-4" />
 				Send QR Codes to participants
 			</Button>
