@@ -501,19 +501,19 @@
 				description: 'Please add participants to the event before sending QR codes'
 			});
 		}
-		const PLUNK_API = await getEnv('PLUNK_API');
-		const PLUNK_SK = await getEnv('PLUNK_SK');
-		console.log({
-			PLUNK_API,
-			PLUNK_SK
-		});
-		email.send_qr_code_worker.postMessage(JSON.stringify({ participants, PLUNK_API, PLUNK_SK,
-			event_details: {
-				event_name: event_details.event_name,
-				event_date: event_details.start_date.toLocaleDateString(),
-				event_location: event_details.location
-			}
-		 }));
+
+		email.send_qr_code_worker.postMessage(
+			JSON.stringify({
+				participants,
+				PLUNK_API: await getEnv('PLUNK_API'),
+				PLUNK_SK: await getEnv('PLUNK_SK'),
+				event_details: {
+					event_name: event_details.event_name,
+					event_date: event_details.start_date.toLocaleDateString(),
+					event_location: event_details.location
+				}
+			})
+		);
 
 		toast.info(`Sending QR codes to participants`, {
 			description: 'This may take a few moments. You can continue using the application.'
