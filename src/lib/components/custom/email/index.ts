@@ -42,6 +42,8 @@ export function generateQrCodeEmail(props: SendQrCodeProps): string {
 
   const currentYear = new Date().getFullYear();
 
+  console.log(props)
+
   return `
 <!DOCTYPE html>
 <html lang="en">
