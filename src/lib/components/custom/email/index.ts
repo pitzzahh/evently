@@ -1,4 +1,3 @@
-import { formatDateTime } from '@/utils/format';
 import { generateFullName } from '@/utils/text';
 
 export type SendQrCodeProps = {
@@ -102,7 +101,7 @@ export function generateQrCodeEmail(props: SendQrCodeProps): string {
           </tr>
           <tr>
             <td style="padding: 8px 0; color: #718096;">Date:</td>
-            <td style="padding: 8px 0; font-weight: 500;">${formatDateTime(the_event_date, 'en-US')}</td>
+            <td style="padding: 8px 0; font-weight: 500;">${the_event_date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })} ${the_event_date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}</td>
           </tr>
           <tr>
             <td style="padding: 8px 0; color: #718096;">Location:</td>
