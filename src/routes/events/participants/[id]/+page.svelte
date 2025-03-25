@@ -492,6 +492,19 @@
 			});
 		}
 
+		if (!email.send_qr_code_worker) {
+			return toast.error('Send qr code email worker not available', {
+				description: 'Please refresh the page and try again'
+			});
+		}
+
+		if (participants.length === 0) {
+			return toast.warning('No participants found', {
+				description: 'Please add participants to the event before sending QR codes'
+			});
+		}
+		email.send_qr_code_worker.postMessage(participants);
+
 		toast.info(`Sending QR codes to participants`, {
 			description: 'This may take a few moments. You can continue using the application.'
 		});
