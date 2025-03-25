@@ -28,6 +28,7 @@
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import { getEnv } from '@/utils/security';
 	import { createQrPngDataUrl } from '@svelte-put/qr';
+	import evently_logo from '@/assets/evently-logo.svg';
 
 	interface ComponentState {
 		event_details: EventDetails | undefined;
@@ -511,6 +512,7 @@
 					width: 500,
 					height: 500,
 					backgroundFill: '#fff',
+					logo: evently_logo,
 					shape: 'circle'
 				})
 			}))
