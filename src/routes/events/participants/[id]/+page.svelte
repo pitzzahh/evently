@@ -623,6 +623,16 @@
 		}
 	);
 
+	watch(
+		() => event_status === 'ongoing',
+		() => {
+			handle_email_send();
+		},
+		{
+			lazy: true
+		}
+	);
+
 	onMount(() => {
 		load_pdf_daily_attendance_report_worker();
 		load_pdf_qr_code_worker();
