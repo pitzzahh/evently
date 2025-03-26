@@ -65,7 +65,7 @@
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import { getEnv } from '@/utils/security';
 	import { createQrPngDataUrl } from '@svelte-put/qr';
-	import { getGoogleAuthHeaders } from '@/utils/google';
+	import { getGoogleAuthClient } from '@/utils/google';
 	import {
 		createPublicRawImageUrl,
 		getOrCreateFolder,
@@ -501,7 +501,11 @@
 				});
 				return [];
 			}
-			const google_auth = await getGoogleAuthHeaders(await getEnv('GCP_API_KEY'));
+			const google_auth = await getGoogleAuthClient(
+				await getEnv('GCP_SERVICE_ACCOUNT_EMAIL'),
+				await getEnv('GCP_ACCOUNT_CLIENT_ID'),
+				await getEnv('GCP_SERVICE_ACCOUNT_PRIVATE_KEY')
+			);
 
 			const eventlyFolder = await getOrCreateFolder(google_auth, 'evently');
 
