@@ -1,3 +1,5 @@
+import { formatDateTime } from "@/utils/format";
+
 /**
  * Simple QR Code generator without external libraries
  * Note: This is a basic implementation and supports only alphanumeric data of limited length
@@ -165,10 +167,9 @@ export async function generateEventIdCard(
   ctx.fillText('PARTICIPANT', width / 2, 580 + qrSize / 2);
 
   // Add current date at the bottom
-  const currentDate = new Date().toLocaleDateString();
   ctx.font = '18px Arial';
   ctx.fillStyle = '#777777';
-  ctx.fillText(`Issued: ${currentDate}`, width / 2, height - 50);
+  ctx.fillText(`Issued: ${formatDateTime(new Date())}`, width / 2, height - 50);
 
   // Return the image as data URL
   return canvas.toDataURL('image/png');
