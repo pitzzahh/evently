@@ -121,3 +121,25 @@ export async function findFile(auth: GoogleAuth, file_name: string, folderId?: s
     throw new Error('Failed to search for file in Google Drive', { cause: error });
   }
 }
+
+export async function createPublicRawImageUrl(auth: GoogleAuth, file_id: string) {
+  try {
+    if (!auth) {
+      throw new Error('Google auth is not provided');
+    }
+    const drive = google.drive({ version: 'v3', auth });
+    await drive.permissions.create({
+      fileId: file_id,
+      requestBody: {
+        role: 'reader',
+        type: 'anyone'
+      }
+    });
+    const rawUrl = `https://drive.google.com/uc?export=view&id=${file_id}`;
+    console.log('Public raw image URL created:', rawUrl);
+    return rawUrl;
+  } catch (error) {
+    console.error('Error creating public raw image URL:', error);
+    throw new Error('Failed to create public URL for image in Google Drive', { cause: error });
+  }
+}
