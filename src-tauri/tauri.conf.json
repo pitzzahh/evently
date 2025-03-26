@@ -12,11 +12,11 @@
 	"app": {
 		"windows": [
 			{
-				"center": true,
+				"center": true,	
+				"width": 1200,
 				"title": "evently v1.4.25",
-				"width": 1000,
 				"height": 650,
-				"minWidth": 1000,
+				"minWidth": 1200,
 				"minHeight": 650,
 				"resizable": true,
 				"fullscreen": false,
@@ -25,9 +25,7 @@
 		],
 		"security": {
 			"csp": null,
-			"capabilities": [
-				"default"
-			]
+			"capabilities": ["default"]
 		}
 	},
 	"bundle": {
@@ -50,9 +48,7 @@
 	"plugins": {
 		"updater": {
 			"pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEM5QzkzNkQ2QzFCQzNDRDkKUldUWlBMekIxamJKeVkvcUZmRlR3aExxTnhpYVFncTllSzQ5dUFJRFhkeXZPandEQ294bjBKQXYK",
-			"endpoints": [
-				"https://github.com/pitzzahh/evently/releases/latest/download/latest.json"
-			],
+			"endpoints": ["https://github.com/pitzzahh/evently/releases/latest/download/latest.json"],
 			"windows": {
 				"installMode": "passive"
 			}

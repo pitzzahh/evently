@@ -19,7 +19,7 @@
 	import * as DataTable from '@/components/ui/table/index.js';
 	import type { Snippet } from 'svelte';
 	import type { Table } from '@tanstack/table-core';
-	import { Input } from '@/components/ui/input';
+	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
 
 	interface DataTableProps {
 		columns: ColumnDef<TData, TValue>[];
@@ -124,41 +124,44 @@
 	{@render floating_bar({ table })}
 {/if}
 
-<div class="rounded-md border">
-	<DataTable.Root>
-		<DataTable.Header>
-			{#each table.getHeaderGroups() as headerGroup (headerGroup.id)}
-				<DataTable.Row>
-					{#each headerGroup.headers as header (header.id)}
-						<DataTable.Head colspan={header.colSpan}>
-							{#if !header.isPlaceholder}
-								<FlexRender
-									content={header.column.columnDef.header}
-									context={header.getContext()}
-								/>
-							{/if}
-						</DataTable.Head>
-					{/each}
-				</DataTable.Row>
-			{/each}
-		</DataTable.Header>
-		<DataTable.Body>
-			{#each table.getRowModel().rows as row (row.id)}
-				<DataTable.Row data-state={row.getIsSelected() && 'selected'}>
-					{#each row.getVisibleCells() as cell (cell.id)}
-						<DataTable.Cell>
-							<FlexRender content={cell.column.columnDef.cell} context={cell.getContext()} />
+<ScrollArea class="grid h-full w-full grid-cols-1 overflow-auto">
+	<div class="rounded-md border">
+		<DataTable.Root>
+			<DataTable.Header>
+				{#each table.getHeaderGroups() as headerGroup (headerGroup.id)}
+					<DataTable.Row>
+						{#each headerGroup.headers as header (header.id)}
+							<DataTable.Head colspan={header.colSpan}>
+								{#if !header.isPlaceholder}
+									<FlexRender
+										content={header.column.columnDef.header}
+										context={header.getContext()}
+									/>
+								{/if}
+							</DataTable.Head>
+						{/each}
+					</DataTable.Row>
+				{/each}
+			</DataTable.Header>
+			<DataTable.Body>
+				{#each table.getRowModel().rows as row (row.id)}
+					<DataTable.Row data-state={row.getIsSelected() && 'selected'}>
+						{#each row.getVisibleCells() as cell (cell.id)}
+							<DataTable.Cell>
+								<FlexRender content={cell.column.columnDef.cell} context={cell.getContext()} />
+							</DataTable.Cell>
+						{/each}
+					</DataTable.Row>
+				{:else}
+					<DataTable.Row>
+						<DataTable.Cell colspan={columns.length} class="h-24 text-center">
+							No results.
 						</DataTable.Cell>
-					{/each}
-				</DataTable.Row>
-			{:else}
-				<DataTable.Row>
-					<DataTable.Cell colspan={columns.length} class="h-24 text-center">
-						No results.
-					</DataTable.Cell>
-				</DataTable.Row>
-			{/each}
-		</DataTable.Body>
-	</DataTable.Root>
-</div>
-<DataTablePagination {table} bind:fetching />
+					</DataTable.Row>
+				{/each}
+			</DataTable.Body>
+		</DataTable.Root>
+
+		<DataTablePagination {table} bind:fetching />
+	</div>
+</ScrollArea>

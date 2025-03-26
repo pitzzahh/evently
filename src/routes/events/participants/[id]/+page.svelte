@@ -56,7 +56,7 @@
 	import { StatusPill } from '@/components/snippets/events.svelte';
 	import { cn } from '@/utils';
 	import * as DropdownMenu from '@/components/ui/dropdown-menu';
-	import { QRCode, SquareCheckBig, Mail } from '@/assets/icons';
+	import { QRCode, SquareCheckBig } from '@/assets/icons';
 	import type { HelperResponse } from '@/types/generic';
 	import QrCodeScannerDialog from '@routes/events/(components)/(participant)/qr-code-scanner-dialog.svelte';
 	import { getPopulatedAttendanceRecords } from '../(utils)';
@@ -65,6 +65,7 @@
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import { getEnv } from '@/utils/security';
 	import { createQrPngDataUrl } from '@svelte-put/qr';
+	import { SendEmailToParticipantsDialog } from '@routes/events/(components)/(participant)';
 	import { uploadFile } from '@/utils/upload';
 	import { dataURLtoFile } from '@/utils/file';
 
@@ -294,7 +295,8 @@
 					event.id,
 					{
 						attendance_records_collection: COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION,
-						participant_collection: COLLECTIONS.PARTICIPANT_COLLECTION
+						participant_collection: COLLECTIONS.PARTICIPANT_COLLECTION,
+						event_schedules_collection: COLLECTIONS.EVENT_SCHEDULE_COLLECTION
 					},
 					current_event_day
 				) as ParticipantAttendance[];
@@ -488,7 +490,7 @@
 		hardware_scanner_enabled = state;
 
 		if (state) {
-			toast.success('Hardware scanner enabled. Please make sure the device is plugged');
+			toast.success('Hardware scanner enabled. Please make sure the device is plugged in');
 		} else toast.info('Hardware scanner disabled');
 	}
 
@@ -548,6 +550,7 @@
 			return [];
 		}
 	}
+
 	async function handle_email_send(show_toast_if_no_participants: boolean = true) {
 		if (event_status === 'finished') {
 			return toast.warning('Emailing QR codes is disabled since the event has concluded');
@@ -626,7 +629,8 @@
 					data.event_id,
 					{
 						attendance_records_collection: COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION,
-						participant_collection: COLLECTIONS.PARTICIPANT_COLLECTION
+						participant_collection: COLLECTIONS.PARTICIPANT_COLLECTION,
+						event_schedules_collection: COLLECTIONS.EVENT_SCHEDULE_COLLECTION
 					},
 					current_event_day
 				) as ParticipantAttendance[];
@@ -634,7 +638,8 @@
 
 			all_participants_attendance = getPopulatedAttendanceRecords(data.event_id, {
 				attendance_records_collection: COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION,
-				participant_collection: COLLECTIONS.PARTICIPANT_COLLECTION
+				participant_collection: COLLECTIONS.PARTICIPANT_COLLECTION,
+				event_schedules_collection: COLLECTIONS.EVENT_SCHEDULE_COLLECTION
 			}) as ParticipantAttendance[];
 
 			participants = participants_cursor.fetch().map((participant) => {
@@ -686,16 +691,6 @@
 		}
 	);
 
-	watch(
-		() => event_status === 'ongoing',
-		() => {
-			handle_email_send(false);
-		},
-		{
-			lazy: true
-		}
-	);
-
 	onMount(() => {
 		load_pdf_daily_attendance_report_worker();
 		load_pdf_qr_code_worker();
@@ -736,10 +731,11 @@
 					event_id={event_details?.id ?? 'N/A'}
 				/>
 			</div>
-			<Button variant="secondary" onclick={() => handle_email_send()}>
-				<Mail class="size-4" />
-				Send QR Codes to participants
-			</Button>
+
+			<SendEmailToParticipantsDialog
+				is_event_finished={event_status === 'finished'}
+				handleSendEmail={handle_email_send}
+			/>
 		</div>
 	</div>
 	<!-- END OF PAGE HEADER -->
@@ -748,19 +744,19 @@
 		<div class="flex justify-between">
 			<Tabs.List
 				class={cn('grid h-auto w-full max-w-[600px] grid-cols-2', {
-					'max-w-[800px] grid-cols-3': event_status === 'ongoing'
+					'max-w-[700px] grid-cols-3': event_status === 'ongoing'
 				})}
 			>
-				<Tabs.Trigger value="participants" class="h-auto text-base">
+				<Tabs.Trigger value="participants" class="h-auto text-[0.98rem]">
 					<UsersRound class="mr-2 size-4" />
 					All participants</Tabs.Trigger
 				>
-				<Tabs.Trigger value="all-time-in-and-out" class="h-auto text-base">
+				<Tabs.Trigger value="all-time-in-and-out" class="h-auto text-[0.98rem]">
 					<Clock class="mr-2 size-4" />
 					All time in and out
 				</Tabs.Trigger>
 				{#if event_status === 'ongoing'}
-					<Tabs.Trigger value="time-in-and-out" class="h-auto text-base">
+					<Tabs.Trigger value="time-in-and-out" class="h-auto text-[0.98rem]">
 						<Clock class="mr-2 size-4" />
 						Today's time in and out
 					</Tabs.Trigger>

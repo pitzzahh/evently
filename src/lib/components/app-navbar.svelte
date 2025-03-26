@@ -7,7 +7,7 @@
 	import NavbarTime from './navbar-time.svelte';
 	import { toggleMode, mode } from 'mode-watcher';
 	import { Sun, Moon } from '@/assets/icons';
-	import { Button } from '@/components/ui/button/index.js';
+	import { Button, buttonVariants } from '@/components/ui/button/index.js';
 	import { dev } from '$app/environment';
 	import { COLLECTIONS } from '@/db';
 	import evently_logo from '@/assets/evently-logo.svg';
@@ -46,43 +46,40 @@
 		<div class="flex items-center gap-4">
 			<Tooltip.Provider>
 				<Tooltip.Root delayDuration={0}>
-					<Tooltip.Trigger>
-						<Button
-							onclick={toggleMode}
-							role="switch"
-							variant="outline"
-							size="icon"
-							aria-label="Light Switch"
-							aria-checked={$mode === 'light'}
-							class="hover:bg-bg-gray-400/10 !shrink-0 border-none bg-gray-400/10 backdrop-blur-md backdrop-filter dark:bg-white/10 [&_svg]:size-5"
-						>
-							{#if $mode === 'light'}
-								<div
-									class="absolute inline-flex items-center justify-center"
-									transition:scale={{
-										delay: 50,
-										duration: 200,
-										start: 0.7,
-										easing: cubicOut
-									}}
-								>
-									<Moon strokeWidth={1.5} class="size-6" aria-label="Moon" />
-								</div>
-							{:else}
-								<div
-									class="absolute inline-flex items-center justify-center"
-									transition:scale={{
-										delay: 50,
-										duration: 200,
-										start: 0.7,
-										easing: cubicOut
-									}}
-								>
-									<Sun strokeWidth={1.5} class="size-6" aria-label="Sun" />
-								</div>
-							{/if}
-						</Button></Tooltip.Trigger
+					<Tooltip.Trigger
+						onclick={toggleMode}
+						class={cn(
+							buttonVariants({ variant: 'outline', size: 'icon' }),
+							'hover:bg-bg-gray-400/10 !shrink-0 border-none bg-gray-400/10 backdrop-blur-md backdrop-filter dark:bg-white/10 [&_svg]:size-5'
+						)}
 					>
+						{#if $mode === 'light'}
+							<div
+								class="absolute inline-flex items-center justify-center"
+								transition:scale={{
+									delay: 50,
+									duration: 200,
+									start: 0.7,
+									easing: cubicOut
+								}}
+							>
+								<Moon strokeWidth={1.5} class="size-6" aria-label="Moon" />
+							</div>
+						{:else}
+							<div
+								class="absolute inline-flex items-center justify-center"
+								transition:scale={{
+									delay: 50,
+									duration: 200,
+									start: 0.7,
+									easing: cubicOut
+								}}
+							>
+								<Sun strokeWidth={1.5} class="size-6" aria-label="Sun" />
+							</div>
+						{/if}
+						<!-- </Button> -->
+					</Tooltip.Trigger>
 					<Tooltip.Content>
 						<p>Toggle {$mode === 'dark' ? 'Dark' : 'Light'} Mode</p>
 					</Tooltip.Content>
