@@ -55,7 +55,7 @@ export type EventDetails = Pick<
 >;
 export type Participant = Pick<
 	ParticipantCollection,
-	'id' | 'first_name' | 'middle_name' | 'last_name' | 'email' | 'event_id' | 'created' | 'updated'
+	'id' | 'first_name' | 'middle_name' | 'last_name' | 'email' | 'event_id' | 'qr' | 'created' | 'updated'
 > & { attendance_status?: 'complete' | 'incomplete' | 'absent' };
 export type Settings = Pick<
 	SettingsCollection,
