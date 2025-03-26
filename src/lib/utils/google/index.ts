@@ -1,13 +1,11 @@
 import { google } from 'googleapis';
 
-export async function getGoogleAuth(credentials: {
-  api_key: string | undefined;
-}, scopes: string | string[] | undefined) {
-  if (!credentials.api_key) {
-    throw new Error('Missing credentials for Google API authentication');
+export async function getGoogleAuth(api_key: string | null, scopes: string | string[] | undefined) {
+  if (!api_key) {
+    throw new Error('Missing API Key for Google API authentication');
   }
   return new google.auth.GoogleAuth({
-    apiKey: credentials.api_key,
+    apiKey: api_key,
     scopes
   });
 }
