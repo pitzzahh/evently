@@ -26,28 +26,41 @@ export async function generateEventIdCard(
     throw new Error('Canvas context not available');
   }
 
-  // Set background color
-  ctx.fillStyle = '#FFFFFF';
+  // Set gradient background
+  const gradient = ctx.createLinearGradient(0, 0, width, height);
+  gradient.addColorStop(0, '#FFDEE9');
+  gradient.addColorStop(1, '#B5FFFC');
+  ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, width, height);
 
-  // Add border
+  // Add rounded border
   ctx.strokeStyle = '#000000';
   ctx.lineWidth = 5;
-  ctx.strokeRect(10, 10, width - 20, height - 20);
-
-  // Add event name at the top
-  ctx.fillStyle = '#000000';
-  ctx.font = 'bold 40px Arial';
-  ctx.textAlign = 'center';
-  ctx.fillText(eventName, width / 2, 80);
-
-  // Add separator line
   ctx.beginPath();
-  ctx.moveTo(50, 110);
-  ctx.lineTo(width - 50, 110);
-  ctx.strokeStyle = '#000000';
-  ctx.lineWidth = 2;
+  ctx.moveTo(20, 10);
+  ctx.arcTo(width - 10, 10, width - 10, height - 10, 20);
+  ctx.arcTo(width - 10, height - 10, 10, height - 10, 20);
+  ctx.arcTo(10, height - 10, 10, 10, 20);
+  ctx.arcTo(10, 10, width - 10, 10, 20);
+  ctx.closePath();
   ctx.stroke();
+
+  // Add event name with improved typography
+  ctx.fillStyle = '#333333';
+  ctx.font = 'bold 50px "Helvetica Neue", Arial, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(eventName, width / 2, 100);
+
+  // Add separator line with shadow
+  ctx.beginPath();
+  ctx.moveTo(50, 130);
+  ctx.lineTo(width - 50, 130);
+  ctx.strokeStyle = '#666666';
+  ctx.lineWidth = 3;
+  ctx.shadowColor = '#999999';
+  ctx.shadowBlur = 5;
+  ctx.stroke();
+  ctx.shadowBlur = 0; // Reset shadow
 
   // QR code size
   const qrSize = 350;
@@ -61,21 +74,21 @@ export async function generateEventIdCard(
   });
   ctx.drawImage(qrImage, (width - qrSize) / 2, 150, qrSize, qrSize);
 
-  // Add participant name below QR code
-  ctx.fillStyle = '#000000';
-  ctx.font = '28px Arial';
+  // Add participant name with better styling
+  ctx.fillStyle = '#222222';
+  ctx.font = '30px "Helvetica Neue", Arial, sans-serif';
   ctx.textAlign = 'center';
   ctx.fillText(participantName, width / 2, 550 + qrSize / 2);
 
-  // Add "PARTICIPANT" label
-  ctx.fillStyle = '#555555';
-  ctx.font = '20px Arial';
-  ctx.fillText('PARTICIPANT', width / 2, 580 + qrSize / 2);
+  // Add "PARTICIPANT" label with uppercase and spacing
+  ctx.fillStyle = '#444444';
+  ctx.font = '24px "Helvetica Neue", Arial, sans-serif';
+  ctx.fillText('PARTICIPANT', width / 2, 590 + qrSize / 2);
 
-  // Add current date at the bottom
-  ctx.font = '18px Arial';
-  ctx.fillStyle = '#777777';
-  ctx.fillText(`Issued: ${formatDateTime(new Date())}`, width / 2, height - 50);
+  // Add current date with subtle styling
+  ctx.font = 'italic 18px "Helvetica Neue", Arial, sans-serif';
+  ctx.fillStyle = '#555555';
+  ctx.fillText(`Issued: ${formatDateTime(new Date())}`, width / 2, height - 40);
 
   // Return the image as data URL
   return canvas.toDataURL('image/png');
