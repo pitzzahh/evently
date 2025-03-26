@@ -63,6 +63,7 @@
 		"@tauri-apps/plugin-shell": "^2.2.0",
 		"@tauri-apps/plugin-updater": "^2.6.1",
 		"exceljs": "^4.4.0",
+		"googleapis": "^148.0.0",
 		"html5-qrcode": "^2.3.8",
 		"mode-watcher": "^0.5.1",
 		"nanoid": "^5.1.5",
