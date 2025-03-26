@@ -569,6 +569,10 @@
 			});
 		}
 
+		toast.info(`Sending QR codes to participants`, {
+			description: 'This may take a few moments. You can continue using the application.'
+		});
+
 		const participants_with_qr = await getParticipantsWithQRCode();
 
 		if (participants_with_qr.length === 0) return;
@@ -585,10 +589,6 @@
 				}
 			})
 		);
-
-		toast.info(`Sending QR codes to participants`, {
-			description: 'This may take a few moments. You can continue using the application.'
-		});
 	}
 
 	watch(
