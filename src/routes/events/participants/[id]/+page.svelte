@@ -547,7 +547,7 @@
 	}
 	async function handle_email_send(show_toast_if_no_participants: boolean = true) {
 		if (event_status === 'finished') {
-			return toast.error('Emailing QR codes is disabled since the event has concluded');
+			return toast.warning('Emailing QR codes is disabled since the event has concluded');
 		}
 
 		if (!event_details) {
