@@ -473,7 +473,7 @@
 		hardware_scanner_enabled = state;
 
 		if (state) {
-			toast.success('Hardware scanner enabled. Please make sure the device is plugged');
+			toast.success('Hardware scanner enabled. Please make sure the device is plugged in');
 		} else toast.info('Hardware scanner disabled');
 	}
 
@@ -635,7 +635,7 @@
 			</div>
 			<Button
 				variant="secondary"
-				class="bg-gray-400/10 text-muted-foreground dark:bg-white/10"
+				class="bg-gray-400/10 p-1 text-muted-foreground dark:bg-white/10"
 				onclick={handle_email_send}
 			>
 				<Mail class="size-4" />
@@ -652,16 +652,16 @@
 					'max-w-[700px] grid-cols-3': event_status === 'ongoing'
 				})}
 			>
-				<Tabs.Trigger value="participants" class="h-auto text-[0.98]">
+				<Tabs.Trigger value="participants" class="h-auto text-[0.98rem]">
 					<UsersRound class="mr-2 size-4" />
 					All participants</Tabs.Trigger
 				>
-				<Tabs.Trigger value="all-time-in-and-out" class="h-auto text-[0.98]">
+				<Tabs.Trigger value="all-time-in-and-out" class="h-auto text-[0.98rem]">
 					<Clock class="mr-2 size-4" />
 					All time in and out
 				</Tabs.Trigger>
 				{#if event_status === 'ongoing'}
-					<Tabs.Trigger value="time-in-and-out" class="h-auto text-[0.98]">
+					<Tabs.Trigger value="time-in-and-out" class="h-auto text-[0.98rem]">
 						<Clock class="mr-2 size-4" />
 						Today's time in and out
 					</Tabs.Trigger>
