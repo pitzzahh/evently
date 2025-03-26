@@ -4,18 +4,27 @@ import { google } from 'googleapis';
 export async function uploadFileToGoogleDrive(auth: GoogleAuth, data: {
   file: Blob,
   file_name: string,
-  mime_type: 'image/bmp' | 'image/jpeg' | 'image/x-png'
+  mime_type: 'image/bmp' | 'image/jpeg' | 'image/x-png',
+  parentFolderId?: string
 }) {
   try {
     if (!auth) {
       throw new Error('Google auth is not provided');
     }
     const drive = google.drive({ version: 'v3', auth });
+
+    const requestBody: any = {
+      name: data.file_name,
+      mimeType: data.mime_type
+    };
+
+    // Add file to specific folder if parentFolderId is provided
+    if (data.parentFolderId) {
+      requestBody.parents = [data.parentFolderId];
+    }
+
     const response = await drive.files.create({
-      requestBody: {
-        name: data.file_name,
-        mimeType: data.mime_type
-      },
+      requestBody,
       media: {
         mimeType: data.mime_type,
         body: data.file
@@ -30,17 +39,25 @@ export async function uploadFileToGoogleDrive(auth: GoogleAuth, data: {
   }
 }
 
-export async function createFolder(auth: GoogleAuth, folder_name: string) {
+export async function createFolder(auth: GoogleAuth, folder_name: string, parentFolderId?: string) {
   try {
     if (!auth) {
       throw new Error('Google auth is not provided');
     }
     const drive = google.drive({ version: 'v3', auth });
+
+    const requestBody: any = {
+      name: folder_name,
+      mimeType: 'application/vnd.google-apps.folder'
+    };
+
+    // Add folder to specific parent folder if parentFolderId is provided
+    if (parentFolderId) {
+      requestBody.parents = [parentFolderId];
+    }
+
     const response = await drive.files.create({
-      requestBody: {
-        name: folder_name,
-        mimeType: 'application/vnd.google-apps.folder'
-      },
+      requestBody,
       fields: 'id'
     });
     console.log('Folder created successfully:', response.data.id);
@@ -51,14 +68,22 @@ export async function createFolder(auth: GoogleAuth, folder_name: string) {
   }
 }
 
-export async function findFolder(auth: GoogleAuth, folder_name: string) {
+export async function findFolder(auth: GoogleAuth, folder_name: string, parentFolderId?: string) {
   try {
     if (!auth) {
       throw new Error('Google auth is not provided');
     }
     const drive = google.drive({ version: 'v3', auth });
+
+    let query = `name='${folder_name}' and mimeType='application/vnd.google-apps.folder' and trashed=false`;
+
+    // Add parent folder constraint if parentFolderId is provided
+    if (parentFolderId) {
+      query += ` and '${parentFolderId}' in parents`;
+    }
+
     const response = await drive.files.list({
-      q: `name='${folder_name}' and mimeType='application/vnd.google-apps.folder' and trashed=false`,
+      q: query,
       fields: 'files(id, name, createdTime, modifiedTime)',
       spaces: 'drive'
     });
@@ -76,16 +101,16 @@ export async function findFolder(auth: GoogleAuth, folder_name: string) {
   }
 }
 
-export async function getOrCreateFolder(auth: GoogleAuth, folder_name: string) {
+export async function getOrCreateFolder(auth: GoogleAuth, folder_name: string, parentFolderId?: string) {
   try {
     if (!auth) {
       throw new Error('Google auth is not provided');
     }
-    const existingFolder = await findFolder(auth, folder_name);
+    const existingFolder = await findFolder(auth, folder_name, parentFolderId);
     if (existingFolder) {
       return existingFolder;
     }
-    const folderId = await createFolder(auth, folder_name);
+    const folderId = await createFolder(auth, folder_name, parentFolderId);
     return { id: folderId, name: folder_name };
   } catch (error) {
     console.error('Error getting or creating folder:', error);
