@@ -66,6 +66,12 @@
 	import { getEnv } from '@/utils/security';
 	import { createQrPngDataUrl, createQrSvgDataUrl } from '@svelte-put/qr';
 	import { getGoogleAuth } from '@/utils/google';
+	import {
+		createPublicRawImageUrl,
+		getOrCreateFolder,
+		uploadFileToGoogleDrive
+	} from '@/utils/google/drive';
+	import type { auth } from 'googleapis/build/src/apis/abusiveexperiencereport';
 
 	let { data } = $props();
 
@@ -490,22 +496,74 @@
 
 	async function getParticipantsWithQRCode() {
 		try {
+			if (!event_details) {
+				toast.error('Event details not available', {
+					description: "Couldn't find event details required to generate QR codes"
+				});
+				return [];
+			}
 			const google_auth = await getGoogleAuth(await getEnv('GCP_API_KEY'), [
 				'https://www.googleapis.com/auth/drive',
 				'https://www.googleapis.com/auth/drive.file'
 			]);
 
+			const eventlyFolder = await getOrCreateFolder(google_auth, 'evently');
+
+			if (!eventlyFolder.id) {
+				toast.error('Failed to create evently folder', {
+					description: 'An error occurred while creating the evently folder'
+				});
+				return [];
+			}
+			function dataURLtoBlob(dataurl: string) {
+				var arr = dataurl.split(','),
+					mime = arr[0].match(/:(.*?);/)?.[1] || 'application/octet-stream',
+					bstr = atob(arr[1]),
+					n = bstr.length,
+					u8arr = new Uint8Array(n);
+				while (n--) {
+					u8arr[n] = bstr.charCodeAt(n);
+				}
+				return new Blob([u8arr], { type: mime });
+			}
+
 			const participants_with_qr = await Promise.all(
-				participants.map(async (participant) => ({
-					...participant,
-					qr: await createQrPngDataUrl({
-						data: participant.id,
-						width: 500,
-						height: 500,
-						backgroundFill: '#fff',
-						shape: 'circle'
-					})
-				}))
+				participants.map(async (participant) => {
+					const eventFolder = await getOrCreateFolder(
+						google_auth,
+						event_details?.event_name!,
+						eventlyFolder.id!
+					);
+
+					const qrImageId = await uploadFileToGoogleDrive(google_auth, {
+						file: dataURLtoBlob(
+							await createQrPngDataUrl({
+								data: participant.id,
+								width: 500,
+								height: 500,
+								backgroundFill: '#fff',
+								shape: 'circle'
+							})
+						),
+						file_name: 'qr_code.png',
+						mime_type: 'image/x-png',
+						parentFolderId: eventFolder.id!
+					});
+
+					if (!qrImageId) {
+						toast.error('Failed to upload QR code image', {
+							description: 'An error occurred while uploading the QR code image'
+						});
+						return participant;
+					}
+
+					const public_url = await createPublicRawImageUrl(google_auth, qrImageId);
+
+					return {
+						...participant,
+						qr: public_url
+					};
+				})
 			);
 
 			return participants_with_qr;
