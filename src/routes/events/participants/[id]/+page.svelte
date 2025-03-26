@@ -65,6 +65,7 @@
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import { getEnv } from '@/utils/security';
 	import { createQrPngDataUrl } from '@svelte-put/qr';
+	import { uploadFile } from '@/utils/upload';
 
 	let { data } = $props();
 
@@ -496,23 +497,43 @@
 				return [];
 			}
 
-			function dataURLtoBlob(dataurl: string) {
-				var arr = dataurl.split(','),
-					mime = arr[0].match(/:(.*?);/)?.[1] || 'application/octet-stream',
-					bstr = atob(arr[1]),
-					n = bstr.length,
-					u8arr = new Uint8Array(n);
-				while (n--) {
-					u8arr[n] = bstr.charCodeAt(n);
-				}
-				return new Blob([u8arr], { type: mime });
+			async function url2File(url: string, fileName: string) {
+				const blob = await (await fetch(url)).blob();
+				return new File([blob], fileName, { type: blob.type });
+			}
+
+			const CLOUDINARY_API_URL = await getEnv('CLOUDINARY_API_URL');
+			const CLOUD_NAME = await getEnv('CLOUD_NAME');
+			const UPLOAD_PRESET = await getEnv('UPLOAD_PRESET');
+
+			if (!CLOUDINARY_API_URL || !CLOUD_NAME || !UPLOAD_PRESET) {
+				toast.error('Cloudinary API URL, Cloud Name or Upload Preset not found', {
+					description: 'Please check your environment variables'
+				});
+				return [];
 			}
 
 			const participants_with_qr = await Promise.all(
 				participants.map(async (participant) => {
+					const qr_image = await url2File(
+						await createQrPngDataUrl({
+							data: participant.id,
+							width: 500,
+							height: 500,
+							shape: 'circle'
+						}),
+						`qr-${participant.id}.png`
+					);
+
+					const upload_file = await uploadFile(CLOUDINARY_API_URL, {
+						cloud_name: CLOUD_NAME,
+						upload_preset: UPLOAD_PRESET,
+						file: qr_image,
+						event_name: event_details?.event_name!
+					});
 					return {
 						...participant,
-						qr: ''
+						qr: upload_file.url
 					};
 				})
 			);
@@ -549,24 +570,24 @@
 			});
 		}
 
-		return toast.warning('This feature is still in development');
+		// return toast.warning('This feature is still in development');
 
-		// email.send_qr_code_worker.postMessage(
-		// 	JSON.stringify({
-		// 		participants: getParticipantsWithQRCode(),
-		// 		PLUNK_API: await getEnv('PLUNK_API'),
-		// 		PLUNK_SK: await getEnv('PLUNK_SK'),
-		// 		event_details: {
-		// 			event_name: event_details.event_name,
-		// 			event_date: event_details.start_date.toISOString(),
-		// 			event_location: event_details.location
-		// 		}
-		// 	})
-		// );
+		email.send_qr_code_worker.postMessage(
+			JSON.stringify({
+				participants: getParticipantsWithQRCode(),
+				PLUNK_API: await getEnv('PLUNK_API'),
+				PLUNK_SK: await getEnv('PLUNK_SK'),
+				event_details: {
+					event_name: event_details.event_name,
+					event_date: event_details.start_date.toISOString(),
+					event_location: event_details.location
+				}
+			})
+		);
 
-		// toast.info(`Sending QR codes to participants`, {
-		// 	description: 'This may take a few moments. You can continue using the application.'
-		// });
+		toast.info(`Sending QR codes to participants`, {
+			description: 'This may take a few moments. You can continue using the application.'
+		});
 	}
 
 	watch(
