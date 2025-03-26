@@ -1,3 +1,40 @@
+<script lang="ts" module>
+	interface ComponentState {
+		event_details: EventDetails | undefined;
+		event_schedules: EventSchedule[];
+		participants: Participant[];
+		last_scanned_participant: Participant | null;
+		scanned_attendance: any | null;
+		current_day_participants_attendance: ParticipantAttendance[];
+		all_participants_attendance: ParticipantAttendance[];
+		qr_code: string;
+		timeout: number | null;
+		workers: {
+			pdf: {
+				qr_code_worker: Worker | null;
+				daily_attendance_report_worker: Worker | null;
+				full_attendance_report_worker: Worker | null;
+			};
+			excel: {
+				full_attendance_report_worker: Worker | null;
+			};
+			email: {
+				send_qr_code_worker: Worker | null;
+			};
+		};
+		hardware_scanner_enabled: boolean;
+	}
+
+	function download_document(url: string, file_name: string, extension: 'pdf' | 'xlsx' = 'pdf') {
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = `${file_name}.${extension}`;
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+	}
+</script>
+
 <script lang="ts">
 	import { buttonVariants } from '@/components/ui/button';
 	import { Check, Clock, FileOutput, ScanBarcode, ScanQrCode, UsersRound, X } from 'lucide-svelte';
@@ -26,35 +63,8 @@
 	import * as Popover from '$lib/components/ui/popover';
 	import Button from '@/components/ui/button/button.svelte';
 	import * as Tooltip from '$lib/components/ui/tooltip';
-	import { generateQRCodes } from '@/utils/exports/pdf';
-	import { generateFullName } from '@/utils/text';
-	import { sendEmail } from '@/utils/email/index.js';
-
-	interface ComponentState {
-		event_details: EventDetails | undefined;
-		event_schedules: EventSchedule[];
-		participants: Participant[];
-		last_scanned_participant: Participant | null;
-		scanned_attendance: any | null;
-		current_day_participants_attendance: ParticipantAttendance[];
-		all_participants_attendance: ParticipantAttendance[];
-		qr_code: string;
-		timeout: number | null;
-		workers: {
-			pdf: {
-				qr_code_worker: Worker | null;
-				daily_attendance_report_worker: Worker | null;
-				full_attendance_report_worker: Worker | null;
-			};
-			excel: {
-				full_attendance_report_worker: Worker | null;
-			};
-			email: {
-				send_qr_code_worker: Worker | null;
-			};
-		};
-		hardware_scanner_enabled: boolean;
-	}
+	import { getEnv } from '@/utils/security';
+	import { createQrPngDataUrl, createQrSvgDataUrl } from '@svelte-put/qr';
 
 	let { data } = $props();
 
@@ -456,9 +466,9 @@
 					description: message.data.message
 				});
 			}
-			if (message.data.data) {
-				toast.success('QR codes sent successfully', {
-					description: 'The QR codes have been sent to the participants'
+			if (message.data.data || message.data.status === 200) {
+				toast.success(`QR codes sent successfully to ${message.data.data} participants`, {
+					description: message.data.message
 				});
 			} else {
 				toast.error('Failed to send QR codes', {
@@ -477,15 +487,7 @@
 		} else toast.info('Hardware scanner disabled');
 	}
 
-	function download_document(url: string, file_name: string, extension: 'pdf' | 'xlsx' = 'pdf') {
-		const a = document.createElement('a');
-		a.href = url;
-		a.download = `${file_name}.${extension}`;
-		document.body.appendChild(a);
-		a.click();
-		document.body.removeChild(a);
-	}
-	async function handle_email_send() {
+	async function handle_email_send(show_toast_if_no_participants: boolean = true) {
 		if (event_status === 'finished') {
 			return toast.error('Emailing QR codes is disabled since the event has concluded');
 		}
@@ -495,6 +497,49 @@
 				description: "Couldn't find event details required to generate QR codes"
 			});
 		}
+
+		if (!email.send_qr_code_worker) {
+			return toast.error('Send qr code email worker not available', {
+				description: 'Please refresh the page and try again'
+			});
+		}
+
+		if (participants.length === 0) {
+			if (!show_toast_if_no_participants) return;
+			return toast.warning('No participants found', {
+				description: 'Please add participants to the event before sending QR codes'
+			});
+		}
+		const participants_with_qr = await Promise.all(
+			participants.map(async (participant) => ({
+				...participant,
+				qr: await createQrPngDataUrl({
+					data: participant.id,
+					width: 500,
+					height: 500,
+					backgroundFill: '#fff',
+					shape: 'circle'
+				}),
+				downloadable_qr: createQrSvgDataUrl({
+					data: participant.id,
+					width: 500,
+					height: 500,
+					shape: 'circle'
+				})
+			}))
+		);
+		email.send_qr_code_worker.postMessage(
+			JSON.stringify({
+				participants: participants_with_qr,
+				PLUNK_API: await getEnv('PLUNK_API'),
+				PLUNK_SK: await getEnv('PLUNK_SK'),
+				event_details: {
+					event_name: event_details.event_name,
+					event_date: event_details.start_date.toISOString(),
+					event_location: event_details.location
+				}
+			})
+		);
 
 		toast.info(`Sending QR codes to participants`, {
 			description: 'This may take a few moments. You can continue using the application.'
@@ -593,6 +638,16 @@
 		}
 	);
 
+	watch(
+		() => event_status === 'ongoing',
+		() => {
+			handle_email_send(false);
+		},
+		{
+			lazy: true
+		}
+	);
+
 	onMount(() => {
 		load_pdf_daily_attendance_report_worker();
 		load_pdf_qr_code_worker();
@@ -633,11 +688,7 @@
 					event_id={event_details?.id ?? 'N/A'}
 				/>
 			</div>
-			<Button
-				variant="secondary"
-				class="bg-gray-400/10 p-1 text-muted-foreground dark:bg-white/10"
-				onclick={handle_email_send}
-			>
+			<Button variant="secondary" onclick={() => handle_email_send()}>
 				<Mail class="size-4" />
 				Send QR Codes to participants
 			</Button>

@@ -1,7 +1,7 @@
 {
 	"$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
 	"productName": "evently",
-	"version": "1.4.18",
+	"version": "1.4.25",
 	"identifier": "me.araopj.evently",
 	"build": {
 		"frontendDist": "../build",
@@ -12,9 +12,9 @@
 	"app": {
 		"windows": [
 			{
-				"center": true,
-				"title": "evently v1.4.18",
+				"center": true,	
 				"width": 1200,
+				"title": "evently v1.4.25",
 				"height": 650,
 				"minWidth": 1200,
 				"minHeight": 650,
