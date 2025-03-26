@@ -65,12 +65,6 @@
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import { getEnv } from '@/utils/security';
 	import { createQrPngDataUrl } from '@svelte-put/qr';
-	import { getGoogleAuthClient } from '@/utils/google';
-	import {
-		createPublicRawImageUrl,
-		getOrCreateFolder,
-		uploadFileToGoogleDrive
-	} from '@/utils/google/drive';
 
 	let { data } = $props();
 
@@ -501,20 +495,7 @@
 				});
 				return [];
 			}
-			const google_auth = await getGoogleAuthClient(
-				await getEnv('GCP_SERVICE_ACCOUNT_EMAIL'),
-				await getEnv('GCP_ACCOUNT_CLIENT_ID'),
-				await getEnv('GCP_SERVICE_ACCOUNT_PRIVATE_KEY')
-			);
 
-			const eventlyFolder = await getOrCreateFolder(google_auth, 'evently');
-
-			if (!eventlyFolder.id) {
-				toast.error('Failed to create evently folder', {
-					description: 'An error occurred while creating the evently folder'
-				});
-				return [];
-			}
 			function dataURLtoBlob(dataurl: string) {
 				var arr = dataurl.split(','),
 					mime = arr[0].match(/:(.*?);/)?.[1] || 'application/octet-stream',
@@ -529,39 +510,9 @@
 
 			const participants_with_qr = await Promise.all(
 				participants.map(async (participant) => {
-					const eventFolder = await getOrCreateFolder(
-						google_auth,
-						event_details?.event_name!,
-						eventlyFolder.id!
-					);
-
-					const qrImageId = await uploadFileToGoogleDrive(google_auth, {
-						file: dataURLtoBlob(
-							await createQrPngDataUrl({
-								data: participant.id,
-								width: 500,
-								height: 500,
-								backgroundFill: '#fff',
-								shape: 'circle'
-							})
-						),
-						file_name: 'qr_code.png',
-						mime_type: 'image/x-png',
-						parentFolderId: eventFolder.id!
-					});
-
-					if (!qrImageId) {
-						toast.error('Failed to upload QR code image', {
-							description: 'An error occurred while uploading the QR code image'
-						});
-						return participant;
-					}
-
-					const public_url = await createPublicRawImageUrl(google_auth, qrImageId);
-
 					return {
 						...participant,
-						qr: public_url
+						qr: ''
 					};
 				})
 			);
@@ -597,6 +548,8 @@
 				description: 'Please add participants to the event before sending QR codes'
 			});
 		}
+
+		return toast.warning('This feature is still in development');
 
 		email.send_qr_code_worker.postMessage(
 			JSON.stringify({
