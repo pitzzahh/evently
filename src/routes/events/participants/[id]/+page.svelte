@@ -65,6 +65,7 @@
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import { getEnv } from '@/utils/security';
 	import { createQrPngDataUrl, createQrSvgDataUrl } from '@svelte-put/qr';
+	import { getGoogleAuth } from '@/utils/google';
 
 	let { data } = $props();
 
@@ -489,6 +490,11 @@
 
 	async function getParticipantsWithQRCode() {
 		try {
+			const google_auth = await getGoogleAuth(await getEnv('GCP_API_KEY'), [
+				'https://www.googleapis.com/auth/drive',
+				'https://www.googleapis.com/auth/drive.file'
+			]);
+
 			const participants_with_qr = await Promise.all(
 				participants.map(async (participant) => ({
 					...participant,
