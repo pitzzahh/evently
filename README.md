@@ -130,4 +130,4 @@ This will produce executable files for your operating system in the `src-tauri/t
 
 ## License
 
-MIT License
+Creative Commons Zero v1.0 Universal
