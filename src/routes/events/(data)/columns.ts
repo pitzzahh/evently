@@ -130,12 +130,16 @@ export function participantTableColumns(
 			},
 			filterFn: (row, id, value) => {
 				const rowValue = row.getValue(id);
-				const searchValues = Array.isArray(value) ? value.map(v => String(v).toLowerCase()) : [String(value ?? "").toLowerCase()];
+				const searchValues = Array.isArray(value)
+					? value.map((v) => String(v).toLowerCase())
+					: [String(value ?? '').toLowerCase()];
 				if (Array.isArray(rowValue)) {
-					return searchValues.some(searchValue => rowValue.some(dateStr => dateStr.toLowerCase().includes(searchValue)));
+					return searchValues.some((searchValue) =>
+						rowValue.some((dateStr) => dateStr.toLowerCase().includes(searchValue))
+					);
 				} else {
 					const dateStr = String(rowValue).toLowerCase();
-					return searchValues.some(searchValue => dateStr.includes(searchValue));
+					return searchValues.some((searchValue) => dateStr.includes(searchValue));
 				}
 			}
 		},
@@ -153,7 +157,8 @@ export function participantTableColumns(
 		{
 			id: 'actions',
 			header: () => 'Actions',
-			cell: ({ row }) => renderComponent(ParticipantDataTableRowActions, { participant_form, row, event_details })
+			cell: ({ row }) =>
+				renderComponent(ParticipantDataTableRowActions, { participant_form, row, event_details })
 		}
 	];
 }
@@ -224,7 +229,8 @@ export function participantAttendanceColumns(): ColumnDef<ParticipantAttendance>
 
 				return renderComponent(TimeInOutCell, {
 					time_in: attendance.am_time_in ? formatDateToTimeOption(attendance.am_time_in) : '-:-',
-					time_out: attendance.am_time_out ? formatDateToTimeOption(attendance.am_time_out) : '-:-'
+					time_out: attendance.am_time_out ? formatDateToTimeOption(attendance.am_time_out) : '-:-',
+					late_time_in_duration: attendance.late_am_time_in_duration
 				});
 			}
 		},
@@ -242,7 +248,8 @@ export function participantAttendanceColumns(): ColumnDef<ParticipantAttendance>
 
 				return renderComponent(TimeInOutCell, {
 					time_in: attendance.pm_time_in ? formatDateToTimeOption(attendance.pm_time_in) : '-:-',
-					time_out: attendance.pm_time_out ? formatDateToTimeOption(attendance.pm_time_out) : '-:-'
+					time_out: attendance.pm_time_out ? formatDateToTimeOption(attendance.pm_time_out) : '-:-',
+					late_time_in_duration: attendance.late_pm_time_in_duration
 				});
 			}
 		},
@@ -273,12 +280,16 @@ export function participantAttendanceColumns(): ColumnDef<ParticipantAttendance>
 			},
 			filterFn: (row, id, value) => {
 				const rowValue = row.getValue(id);
-				const searchValues = Array.isArray(value) ? value.map(v => String(v).toLowerCase()) : [String(value ?? "").toLowerCase()];
+				const searchValues = Array.isArray(value)
+					? value.map((v) => String(v).toLowerCase())
+					: [String(value ?? '').toLowerCase()];
 				if (Array.isArray(rowValue)) {
-					return searchValues.some(searchValue => rowValue.some(dateStr => dateStr.toLowerCase().includes(searchValue)));
+					return searchValues.some((searchValue) =>
+						rowValue.some((dateStr) => dateStr.toLowerCase().includes(searchValue))
+					);
 				} else {
 					const dateStr = String(rowValue).toLowerCase();
-					return searchValues.some(searchValue => dateStr.includes(searchValue));
+					return searchValues.some((searchValue) => dateStr.includes(searchValue));
 				}
 			}
 		},
