@@ -65,6 +65,7 @@
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import { getEnv } from '@/utils/security';
 	import { createQrPngDataUrl, createQrSvgDataUrl } from '@svelte-put/qr';
+	import SendEmailToParticipantsDialog from '@routes/events/(components)/(participant)/send-email-to-participants-dialog.svelte';
 
 	let { data } = $props();
 
@@ -488,7 +489,7 @@
 		} else toast.info('Hardware scanner disabled');
 	}
 
-	async function handle_email_send(show_toast_if_no_participants: boolean = true) {
+	async function handleSendEmail(show_toast_if_no_participants: boolean = true) {
 		if (event_status === 'finished') {
 			return toast.error('Emailing QR codes is disabled since the event has concluded');
 		}
@@ -511,6 +512,7 @@
 				description: 'Please add participants to the event before sending QR codes'
 			});
 		}
+
 		const participants_with_qr = await Promise.all(
 			participants.map(async (participant) => ({
 				...participant,
@@ -641,16 +643,6 @@
 		}
 	);
 
-	watch(
-		() => event_status === 'ongoing',
-		() => {
-			handle_email_send(false);
-		},
-		{
-			lazy: true
-		}
-	);
-
 	onMount(() => {
 		load_pdf_daily_attendance_report_worker();
 		load_pdf_qr_code_worker();
@@ -691,14 +683,11 @@
 					event_id={event_details?.id ?? 'N/A'}
 				/>
 			</div>
-			<Button
-				variant="secondary"
-				class="bg-gray-400/10 dark:bg-white/10"
-				onclick={() => handle_email_send()}
-			>
-				<Mail class="size-4" />
-				Send QR Codes to participants
-			</Button>
+
+			<SendEmailToParticipantsDialog
+				is_event_finished={event_status === 'finished'}
+				{handleSendEmail}
+			/>
 		</div>
 	</div>
 	<!-- END OF PAGE HEADER -->
