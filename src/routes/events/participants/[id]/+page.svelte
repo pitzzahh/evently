@@ -487,6 +487,29 @@
 		} else toast.info('Hardware scanner disabled');
 	}
 
+	async function getParticipantsWithQRCode() {
+		try {
+			const participants_with_qr = await Promise.all(
+				participants.map(async (participant) => ({
+					...participant,
+					qr: await createQrPngDataUrl({
+						data: participant.id,
+						width: 500,
+						height: 500,
+						backgroundFill: '#fff',
+						shape: 'circle'
+					})
+				}))
+			);
+
+			return participants_with_qr;
+		} catch (error) {
+			toast.error('Failed to generate QR codes', {
+				description: 'An error occurred while generating QR codes for participants'
+			});
+			return [];
+		}
+	}
 	async function handle_email_send(show_toast_if_no_participants: boolean = true) {
 		if (event_status === 'finished') {
 			return toast.error('Emailing QR codes is disabled since the event has concluded');
@@ -510,27 +533,10 @@
 				description: 'Please add participants to the event before sending QR codes'
 			});
 		}
-		const participants_with_qr = await Promise.all(
-			participants.map(async (participant) => ({
-				...participant,
-				qr: await createQrPngDataUrl({
-					data: participant.id,
-					width: 500,
-					height: 500,
-					backgroundFill: '#fff',
-					shape: 'circle'
-				}),
-				downloadable_qr: createQrSvgDataUrl({
-					data: participant.id,
-					width: 500,
-					height: 500,
-					shape: 'circle'
-				})
-			}))
-		);
+
 		email.send_qr_code_worker.postMessage(
 			JSON.stringify({
-				participants: participants_with_qr,
+				participants: getParticipantsWithQRCode(),
 				PLUNK_API: await getEnv('PLUNK_API'),
 				PLUNK_SK: await getEnv('PLUNK_SK'),
 				event_details: {
