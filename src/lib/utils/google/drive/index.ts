@@ -80,3 +80,29 @@ export async function getOrCreateFolder(auth: GoogleAuth, folder_name: string) {
     throw new Error('Failed to get or create folder in Google Drive', { cause: error });
   }
 }
+
+export async function findFile(auth: GoogleAuth, file_name: string, folderId?: string) {
+  try {
+    const drive = google.drive({ version: 'v3', auth });
+    let query = `name='${file_name}' and trashed=false`;
+    if (folderId) {
+      query += ` and '${folderId}' in parents`;
+    }
+    const response = await drive.files.list({
+      q: query,
+      fields: 'files(id, name, mimeType, createdTime, modifiedTime)',
+      spaces: 'drive'
+    });
+    const files = response.data.files;
+    if (files && files.length > 0) {
+      console.log('File found:', files[0].id);
+      return files[0];
+    } else {
+      console.log('File not found');
+      return null;
+    }
+  } catch (error) {
+    console.error('Error finding file:', error);
+    throw new Error('Failed to search for file in Google Drive', { cause: error });
+  }
+}
