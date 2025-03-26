@@ -68,8 +68,6 @@
 	import { SendEmailToParticipantsDialog } from '@routes/events/(components)/(participant)';
 	import { uploadFile } from '@/utils/upload';
 	import { dataURLtoFile } from '@/utils/file';
-	import { downloadEventIdCard } from '@/utils/exports/image';
-	import { generateFullName } from '@/utils/text';
 
 	let { data } = $props();
 
@@ -518,30 +516,19 @@
 
 			const participants_with_qr = await Promise.all(
 				participants.map(async (participant) => {
-					const png_data_url = await createQrPngDataUrl({
-						data: participant.id,
-						width: 500,
-						height: 500,
-						shape: 'circle',
-						backgroundFill: '#fff'
-					});
-					const qr_image = dataURLtoFile(png_data_url, `qr-${participant.id}.png`);
-
-					const participant_name = generateFullName(
-						{
-							first_name: participant.first_name,
-							middle_name: participant.middle_name,
-							last_name: participant.last_name
-						},
-						{ include_last_name: true }
-					);
-
-					await downloadEventIdCard(event_details?.event_name!, participant_name, png_data_url);
-
 					const upload_file = await uploadFile(CLOUDINARY_API_URL, {
 						cloud_name: CLOUD_NAME,
 						upload_preset: UPLOAD_PRESET,
-						file: qr_image,
+						file: dataURLtoFile(
+							await createQrPngDataUrl({
+								data: participant.id,
+								width: 500,
+								height: 500,
+								shape: 'circle',
+								backgroundFill: '#fff'
+							}),
+							`qr-${participant.id}.png`
+						),
 						event_name: event_details?.event_name!
 					});
 					return {
