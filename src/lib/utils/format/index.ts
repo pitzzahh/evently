@@ -49,7 +49,7 @@ export const formatDate = (date?: Date | null, lang: string = 'en-PH') => {
 
 export function formatDateTime(date?: Date | null, lang: string = 'en-PH') {
 	return date
-		? date.toLocaleDateString(lang, { year: 'numeric', month: 'long', day: 'numeric' })
+		? new Date(date).toLocaleDateString(lang, { year: 'numeric', month: 'long', day: 'numeric' })
 		: 'N/A';
 }
 
