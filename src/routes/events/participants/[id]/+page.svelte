@@ -56,7 +56,7 @@
 	import { StatusPill } from '@/components/snippets/events.svelte';
 	import { cn } from '@/utils';
 	import * as DropdownMenu from '@/components/ui/dropdown-menu';
-	import { QRCode, SquareCheckBig, Mail } from '@/assets/icons';
+	import { QRCode, SquareCheckBig } from '@/assets/icons';
 	import type { HelperResponse } from '@/types/generic';
 	import QrCodeScannerDialog from '@routes/events/(components)/(participant)/qr-code-scanner-dialog.svelte';
 	import { getPopulatedAttendanceRecords } from '../(utils)';
@@ -64,8 +64,8 @@
 	import Button from '@/components/ui/button/button.svelte';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import { getEnv } from '@/utils/security';
-	import { createQrPngDataUrl, createQrSvgDataUrl } from '@svelte-put/qr';
-	import SendEmailToParticipantsDialog from '@routes/events/(components)/(participant)/send-email-to-participants-dialog.svelte';
+	import { createQrPngDataUrl } from '@svelte-put/qr';
+	import { SendEmailToParticipantsDialog } from '@routes/events/(components)/(participant)';
 	import { uploadFile } from '@/utils/upload';
 	import { dataURLtoFile } from '@/utils/file';
 
@@ -550,7 +550,7 @@
 			return [];
 		}
 	}
-  
+
 	async function handle_email_send(show_toast_if_no_participants: boolean = true) {
 		if (event_status === 'finished') {
 			return toast.warning('Emailing QR codes is disabled since the event has concluded');
