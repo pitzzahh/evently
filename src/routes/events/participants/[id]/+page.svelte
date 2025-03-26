@@ -292,7 +292,8 @@
 					event.id,
 					{
 						attendance_records_collection: COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION,
-						participant_collection: COLLECTIONS.PARTICIPANT_COLLECTION
+						participant_collection: COLLECTIONS.PARTICIPANT_COLLECTION,
+						event_schedules_collection: COLLECTIONS.EVENT_SCHEDULE_COLLECTION
 					},
 					current_event_day
 				) as ParticipantAttendance[];
@@ -578,7 +579,8 @@
 					data.event_id,
 					{
 						attendance_records_collection: COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION,
-						participant_collection: COLLECTIONS.PARTICIPANT_COLLECTION
+						participant_collection: COLLECTIONS.PARTICIPANT_COLLECTION,
+						event_schedules_collection: COLLECTIONS.EVENT_SCHEDULE_COLLECTION
 					},
 					current_event_day
 				) as ParticipantAttendance[];
@@ -586,7 +588,8 @@
 
 			all_participants_attendance = getPopulatedAttendanceRecords(data.event_id, {
 				attendance_records_collection: COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION,
-				participant_collection: COLLECTIONS.PARTICIPANT_COLLECTION
+				participant_collection: COLLECTIONS.PARTICIPANT_COLLECTION,
+				event_schedules_collection: COLLECTIONS.EVENT_SCHEDULE_COLLECTION
 			}) as ParticipantAttendance[];
 
 			participants = participants_cursor.fetch().map((participant) => {
@@ -688,7 +691,11 @@
 					event_id={event_details?.id ?? 'N/A'}
 				/>
 			</div>
-			<Button variant="secondary" onclick={() => handle_email_send()}>
+			<Button
+				variant="secondary"
+				class="bg-gray-400/10 dark:bg-white/10"
+				onclick={() => handle_email_send()}
+			>
 				<Mail class="size-4" />
 				Send QR Codes to participants
 			</Button>
