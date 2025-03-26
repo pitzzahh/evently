@@ -66,7 +66,7 @@
 	<div class="flex h-full w-full flex-1 justify-center overflow-y-auto">
 		<div class="flex h-full flex-1 flex-col gap-4 px-4 py-8 md:max-w-[80%] md:px-0">
 			{#if update && !dismiss_update}
-				<Updater dismiss={dismiss_update} {update} />
+				<Updater bind:dismiss={dismiss_update} {update} />
 			{/if}
 			{@render children()}
 		</div>
