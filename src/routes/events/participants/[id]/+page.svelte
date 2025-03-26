@@ -66,6 +66,8 @@
 	import { getEnv } from '@/utils/security';
 	import { createQrPngDataUrl, createQrSvgDataUrl } from '@svelte-put/qr';
 	import SendEmailToParticipantsDialog from '@routes/events/(components)/(participant)/send-email-to-participants-dialog.svelte';
+	import { uploadFile } from '@/utils/upload';
+	import { dataURLtoFile } from '@/utils/file';
 
 	let { data } = $props();
 
@@ -469,9 +471,12 @@
 				});
 			}
 			if (message.data.data || message.data.status === 200) {
-				toast.success(`QR codes sent successfully to ${message.data.data} participants`, {
-					description: message.data.message
-				});
+				toast.success(
+					`QR codes sent successfully to ${message.data.data} ${Number(message.data.data) > 1 ? 'participants' : 'participant'}`,
+					{
+						description: message.data.message
+					}
+				);
 			} else {
 				toast.error('Failed to send QR codes', {
 					description: 'No data received from the worker'
@@ -489,9 +494,66 @@
 		} else toast.info('Hardware scanner disabled');
 	}
 
-	async function handleSendEmail(show_toast_if_no_participants: boolean = true) {
+	async function getParticipantsWithQRCode() {
+		try {
+			if (!event_details) {
+				toast.error('Event details not available', {
+					description: "Couldn't find event details required to generate QR codes"
+				});
+				return [];
+			}
+
+			const CLOUDINARY_API_URL = await getEnv('CLOUDINARY_API_URL');
+			const CLOUD_NAME = await getEnv('CLOUD_NAME');
+			const UPLOAD_PRESET = await getEnv('UPLOAD_PRESET');
+
+			if (!CLOUDINARY_API_URL || !CLOUD_NAME || !UPLOAD_PRESET) {
+				toast.error('Cloudinary API URL, Cloud Name or Upload Preset not found', {
+					description: 'Please check your environment variables'
+				});
+				return [];
+			}
+
+			const participants_with_qr = await Promise.all(
+				participants.map(async (participant) => {
+					const qr_image = dataURLtoFile(
+						await createQrPngDataUrl({
+							data: participant.id,
+							width: 500,
+							height: 500,
+							shape: 'circle',
+							backgroundFill: '#fff'
+						}),
+						`qr-${participant.id}.png`
+					);
+
+					const upload_file = await uploadFile(CLOUDINARY_API_URL, {
+						cloud_name: CLOUD_NAME,
+						upload_preset: UPLOAD_PRESET,
+						file: qr_image,
+						event_name: event_details?.event_name!
+					});
+					return {
+						...participant,
+						qr: upload_file.url
+					};
+				})
+			);
+
+			console.log({ participants_with_qr });
+
+			return participants_with_qr;
+		} catch (error) {
+			toast.error('Failed to generate QR codes', {
+				description: 'An error occurred while generating QR codes for participants'
+			});
+			return [];
+		}
+	}
+  
+	async function handle_email_send(show_toast_if_no_participants: boolean = true) {
 		if (event_status === 'finished') {
-			return toast.error('Emailing QR codes is disabled since the event has concluded');
+			return toast.warning('Emailing QR codes is disabled since the event has concluded');
 		}
 
 		if (!event_details) {
@@ -513,24 +575,14 @@
 			});
 		}
 
-		const participants_with_qr = await Promise.all(
-			participants.map(async (participant) => ({
-				...participant,
-				qr: await createQrPngDataUrl({
-					data: participant.id,
-					width: 500,
-					height: 500,
-					backgroundFill: '#fff',
-					shape: 'circle'
-				}),
-				downloadable_qr: createQrSvgDataUrl({
-					data: participant.id,
-					width: 500,
-					height: 500,
-					shape: 'circle'
-				})
-			}))
-		);
+		toast.info(`Sending QR codes to participants`, {
+			description: 'This may take a few moments. You can continue using the application.'
+		});
+
+		const participants_with_qr = await getParticipantsWithQRCode();
+
+		if (participants_with_qr.length === 0) return;
+
 		email.send_qr_code_worker.postMessage(
 			JSON.stringify({
 				participants: participants_with_qr,
@@ -543,10 +595,6 @@
 				}
 			})
 		);
-
-		toast.info(`Sending QR codes to participants`, {
-			description: 'This may take a few moments. You can continue using the application.'
-		});
 	}
 
 	watch(
@@ -686,7 +734,7 @@
 
 			<SendEmailToParticipantsDialog
 				is_event_finished={event_status === 'finished'}
-				{handleSendEmail}
+				handleSendEmail={handle_email_send}
 			/>
 		</div>
 	</div>

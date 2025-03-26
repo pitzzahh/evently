@@ -93,14 +93,14 @@ This will create a production build of the application in the `src-tauri/target/
 
 ## Screenshots
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/pitzzahh/evently/refs/heads/main/upcoming-events.png" alt="Upcoming events list" width="45%"/>
-  <img src="https://raw.githubusercontent.com/pitzzahh/evently/refs/heads/main/past-events.png" alt="Past events list" width="45%"/>
-</p>
-<p align="center">
-  <img src="https://raw.githubusercontent.com/pitzzahh/evently/refs/heads/main/event-details.png" alt="Event details" width="45%"/>
-  <img src="https://raw.githubusercontent.com/pitzzahh/evently/refs/heads/main/event-participants.png" alt="Event participants" width="45%"/>
-</p>
+<div align="center">
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; justify-items: center; max-width: 1200px; margin: 0 auto;">
+    <img src="https://raw.githubusercontent.com/pitzzahh/evently/refs/heads/main/upcoming-events.png" alt="Upcoming events list" width="100%"/>
+    <img src="https://raw.githubusercontent.com/pitzzahh/evently/refs/heads/main/past-events.png" alt="Past events list" width="100%"/>
+    <img src="https://raw.githubusercontent.com/pitzzahh/evently/refs/heads/main/event-details.png" alt="Event details" width="100%"/>
+    <img src="https://raw.githubusercontent.com/pitzzahh/evently/refs/heads/main/event-participants.png" alt="Event participants" width="100%"/>
+  </div>
+</div>
 
 ## Development
 
@@ -130,4 +130,4 @@ This will produce executable files for your operating system in the `src-tauri/t
 
 ## License
 
-MIT License
+Apache License 2.0
