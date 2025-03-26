@@ -527,11 +527,6 @@
 					});
 					const qr_image = dataURLtoFile(png_data_url, `qr-${participant.id}.png`);
 
-					const html_image = document.createElement('img');
-					html_image.src = png_data_url;
-					html_image.width = 500;
-					html_image.height = 500;
-
 					const participant_name = generateFullName(
 						{
 							first_name: participant.first_name,
@@ -541,7 +536,7 @@
 						{ include_last_name: true }
 					);
 
-					await downloadEventIdCard(event_details?.event_name!, participant_name, html_image);
+					await downloadEventIdCard(event_details?.event_name!, participant_name, png_data_url);
 
 					const upload_file = await uploadFile(CLOUDINARY_API_URL, {
 						cloud_name: CLOUD_NAME,
