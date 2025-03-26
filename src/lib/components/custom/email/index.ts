@@ -79,7 +79,7 @@ export function generateQrCodeEmail(props: SendQrCodeProps): string {
         
         <!-- QR Code Container -->
         <div style="background-color: #ffffff; padding: 15px; display: inline-block; border: 2px solid #e2e8f0; border-radius: 8px;">
-          <!-- PNG QR Code (using the participant.qr data URL) -->
+          <!-- PNG QR Code (using the participant.qr URL from a cdn) -->
           <img src="${participant.qr}" alt="QR Code" style="max-width: 200px; height: auto;" />
           <!-- Fallback if image doesn't render -->
           <div style="margin-top: 10px; font-size: 12px; color: #a0aec0;">
