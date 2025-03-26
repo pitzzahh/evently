@@ -29,6 +29,7 @@
 	import { Image } from 'lucide-svelte';
 	import { quartInOut } from 'svelte/easing';
 	import Badge from '@/components/ui/badge/badge.svelte';
+	import Separator from '@/components/ui/separator/separator.svelte';
 
 	let { data } = $props();
 
@@ -282,15 +283,33 @@
 					<div class="rounded-md border p-3">
 						<Calendar class="size-5 text-muted-foreground" />
 					</div>
-					<div>
-						<p class="text-base font-medium">
-							{formatDateTime(comp_state.event_details?.start_date)}
-						</p>
-						<p class="text-muted-foreground">
-							{formatDateToTimeOption(comp_state.event_schedules.at(0)?.am_start)} - {formatDateToTimeOption(
-								comp_state.event_schedules.at(0)?.pm_end
-							)}
-						</p>
+
+					<div class="flex gap-4">
+						<!-- START DATE -->
+						<div>
+							<p class="text-base font-medium">
+								{formatDateTime(comp_state.event_details?.start_date)}
+							</p>
+							<p class="text-muted-foreground">
+								{formatDateToTimeOption(comp_state.event_schedules.at(0)?.am_start)} - {formatDateToTimeOption(
+									comp_state.event_schedules.at(0)?.pm_end
+								)}
+							</p>
+						</div>
+
+						<Separator orientation="vertical" />
+
+						<!-- END DATE -->
+						<div>
+							<p class="text-base font-medium">
+								{formatDateTime(comp_state.event_details?.end_date)}
+							</p>
+							<p class="text-muted-foreground">
+								{formatDateToTimeOption(comp_state.event_schedules.at(-1)?.am_start)} - {formatDateToTimeOption(
+									comp_state.event_schedules.at(-1)?.pm_end
+								)}
+							</p>
+						</div>
 					</div>
 				</div>
 
