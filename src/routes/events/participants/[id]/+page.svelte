@@ -569,11 +569,13 @@
 			});
 		}
 
-		// return toast.warning('This feature is still in development');
+		const participants_with_qr = await getParticipantsWithQRCode();
+
+		if (participants_with_qr.length === 0) return;
 
 		email.send_qr_code_worker.postMessage(
 			JSON.stringify({
-				participants: await getParticipantsWithQRCode(),
+				participants: participants_with_qr,
 				PLUNK_API: await getEnv('PLUNK_API'),
 				PLUNK_SK: await getEnv('PLUNK_SK'),
 				event_details: {
