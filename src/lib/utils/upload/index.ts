@@ -7,20 +7,31 @@ export async function uploadFile(api: string, options: {
   fd.append('upload_preset', upload_preset);
   fd.append('file', file);
   fd.append('folder', event_name);
-  return fetch(url, {
-    method: 'POST',
-    body: fd,
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      const url = data.secure_url;
-      const tokens = url.split('/');
-      tokens.splice(-3, 0, 'w_150,c_scale');
-      const img = new Image();
-      img.src = tokens.join('/');
-      img.alt = data.public_id;
-    })
-    .catch((error) => {
-      console.error('Error uploading the file:', error);
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      body: fd,
     });
+
+    const data = await response.json();
+
+    if (!data.secure_url) {
+      throw new Error('Upload did not return a secure URL');
+    }
+
+    const originalUrl = data.secure_url;
+    const tokens = originalUrl.split('/');
+    tokens.splice(-3, 0, 'w_150,c_scale');
+    const resizedUrl = tokens.join('/');
+
+    return {
+      url: originalUrl,
+      resizedUrl: resizedUrl,
+      publicId: data.public_id
+    };
+  } catch (error) {
+    console.error('Error uploading the file:', error);
+    throw error; // Re-throw to allow caller to handle the error
+  }
 }
