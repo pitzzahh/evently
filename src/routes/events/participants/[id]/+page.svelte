@@ -633,7 +633,11 @@
 					event_id={event_details?.id ?? 'N/A'}
 				/>
 			</div>
-			<Button variant="secondary" onclick={handle_email_send}>
+			<Button
+				variant="secondary"
+				class="bg-gray-400/10 text-muted-foreground dark:bg-white/10"
+				onclick={handle_email_send}
+			>
 				<Mail class="size-4" />
 				Send QR Codes to participants
 			</Button>
@@ -645,19 +649,19 @@
 		<div class="flex justify-between">
 			<Tabs.List
 				class={cn('grid h-auto w-full max-w-[600px] grid-cols-2', {
-					'max-w-[800px] grid-cols-3': event_status === 'ongoing'
+					'max-w-[700px] grid-cols-3': event_status === 'ongoing'
 				})}
 			>
-				<Tabs.Trigger value="participants" class="h-auto text-base">
+				<Tabs.Trigger value="participants" class="h-auto text-[0.98]">
 					<UsersRound class="mr-2 size-4" />
 					All participants</Tabs.Trigger
 				>
-				<Tabs.Trigger value="all-time-in-and-out" class="h-auto text-base">
+				<Tabs.Trigger value="all-time-in-and-out" class="h-auto text-[0.98]">
 					<Clock class="mr-2 size-4" />
 					All time in and out
 				</Tabs.Trigger>
 				{#if event_status === 'ongoing'}
-					<Tabs.Trigger value="time-in-and-out" class="h-auto text-base">
+					<Tabs.Trigger value="time-in-and-out" class="h-auto text-[0.98]">
 						<Clock class="mr-2 size-4" />
 						Today's time in and out
 					</Tabs.Trigger>
