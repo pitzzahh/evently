@@ -66,6 +66,7 @@
 	import { getEnv } from '@/utils/security';
 	import { createQrPngDataUrl } from '@svelte-put/qr';
 	import { uploadFile } from '@/utils/upload';
+	import { dataURLtoFile } from '@/utils/file';
 
 	let { data } = $props();
 
@@ -495,18 +496,6 @@
 					description: "Couldn't find event details required to generate QR codes"
 				});
 				return [];
-			}
-
-			function dataURLtoFile(dataurl: string, filename: string) {
-				var arr = dataurl.split(','),
-					mime = arr[0].match(/:(.*?);/)?.[1] || 'application/octet-stream',
-					bstr = atob(arr[arr.length - 1]),
-					n = bstr.length,
-					u8arr = new Uint8Array(n);
-				while (n--) {
-					u8arr[n] = bstr.charCodeAt(n);
-				}
-				return new File([u8arr], filename, { type: mime });
 			}
 
 			const CLOUDINARY_API_URL = await getEnv('CLOUDINARY_API_URL');
