@@ -497,9 +497,16 @@
 				return [];
 			}
 
-			async function url2File(url: string, fileName: string) {
-				const blob = await (await fetch(url)).blob();
-				return new File([blob], fileName, { type: blob.type });
+			function dataURLtoFile(dataurl: string, filename: string) {
+				var arr = dataurl.split(','),
+					mime = arr[0].match(/:(.*?);/)?.[1] || 'application/octet-stream',
+					bstr = atob(arr[arr.length - 1]),
+					n = bstr.length,
+					u8arr = new Uint8Array(n);
+				while (n--) {
+					u8arr[n] = bstr.charCodeAt(n);
+				}
+				return new File([u8arr], filename, { type: mime });
 			}
 
 			const CLOUDINARY_API_URL = await getEnv('CLOUDINARY_API_URL');
@@ -515,7 +522,7 @@
 
 			const participants_with_qr = await Promise.all(
 				participants.map(async (participant) => {
-					const qr_image = await url2File(
+					const qr_image = dataURLtoFile(
 						await createQrPngDataUrl({
 							data: participant.id,
 							width: 500,
@@ -537,6 +544,8 @@
 					};
 				})
 			);
+
+			console.log({ participants_with_qr });
 
 			return participants_with_qr;
 		} catch (error) {
@@ -574,7 +583,7 @@
 
 		email.send_qr_code_worker.postMessage(
 			JSON.stringify({
-				participants: getParticipantsWithQRCode(),
+				participants: await getParticipantsWithQRCode(),
 				PLUNK_API: await getEnv('PLUNK_API'),
 				PLUNK_SK: await getEnv('PLUNK_SK'),
 				event_details: {
