@@ -64,14 +64,13 @@
 	import Button from '@/components/ui/button/button.svelte';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import { getEnv } from '@/utils/security';
-	import { createQrPngDataUrl, createQrSvgDataUrl } from '@svelte-put/qr';
-	import { getGoogleAuth } from '@/utils/google';
+	import { createQrPngDataUrl } from '@svelte-put/qr';
+	import { getGoogleAuthHeaders } from '@/utils/google';
 	import {
 		createPublicRawImageUrl,
 		getOrCreateFolder,
 		uploadFileToGoogleDrive
 	} from '@/utils/google/drive';
-	import type { auth } from 'googleapis/build/src/apis/abusiveexperiencereport';
 
 	let { data } = $props();
 
@@ -502,10 +501,7 @@
 				});
 				return [];
 			}
-			const google_auth = await getGoogleAuth(await getEnv('GCP_API_KEY'), [
-				'https://www.googleapis.com/auth/drive',
-				'https://www.googleapis.com/auth/drive.file'
-			]);
+			const google_auth = await getGoogleAuthHeaders(await getEnv('GCP_API_KEY'));
 
 			const eventlyFolder = await getOrCreateFolder(google_auth, 'evently');
 
