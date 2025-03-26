@@ -527,7 +527,8 @@
 							data: participant.id,
 							width: 500,
 							height: 500,
-							shape: 'circle'
+							shape: 'circle',
+							backgroundFill: '#fff'
 						}),
 						`qr-${participant.id}.png`
 					);
