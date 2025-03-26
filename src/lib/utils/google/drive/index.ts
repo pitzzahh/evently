@@ -7,6 +7,9 @@ export async function uploadFileToGoogleDrive(auth: GoogleAuth, data: {
   mime_type: 'image/bmp' | 'image/jpeg' | 'image/x-png'
 }) {
   try {
+    if (!auth) {
+      throw new Error('Google auth is not provided');
+    }
     const drive = google.drive({ version: 'v3', auth });
     const response = await drive.files.create({
       requestBody: {
@@ -29,6 +32,9 @@ export async function uploadFileToGoogleDrive(auth: GoogleAuth, data: {
 
 export async function createFolder(auth: GoogleAuth, folder_name: string) {
   try {
+    if (!auth) {
+      throw new Error('Google auth is not provided');
+    }
     const drive = google.drive({ version: 'v3', auth });
     const response = await drive.files.create({
       requestBody: {
@@ -47,6 +53,9 @@ export async function createFolder(auth: GoogleAuth, folder_name: string) {
 
 export async function findFolder(auth: GoogleAuth, folder_name: string) {
   try {
+    if (!auth) {
+      throw new Error('Google auth is not provided');
+    }
     const drive = google.drive({ version: 'v3', auth });
     const response = await drive.files.list({
       q: `name='${folder_name}' and mimeType='application/vnd.google-apps.folder' and trashed=false`,
@@ -69,6 +78,9 @@ export async function findFolder(auth: GoogleAuth, folder_name: string) {
 
 export async function getOrCreateFolder(auth: GoogleAuth, folder_name: string) {
   try {
+    if (!auth) {
+      throw new Error('Google auth is not provided');
+    }
     const existingFolder = await findFolder(auth, folder_name);
     if (existingFolder) {
       return existingFolder;
@@ -83,6 +95,9 @@ export async function getOrCreateFolder(auth: GoogleAuth, folder_name: string) {
 
 export async function findFile(auth: GoogleAuth, file_name: string, folderId?: string) {
   try {
+    if (!auth) {
+      throw new Error('Google auth is not provided');
+    }
     const drive = google.drive({ version: 'v3', auth });
     let query = `name='${file_name}' and trashed=false`;
     if (folderId) {
