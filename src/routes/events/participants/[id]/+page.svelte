@@ -469,9 +469,12 @@
 				});
 			}
 			if (message.data.data || message.data.status === 200) {
-				toast.success(`QR codes sent successfully to ${message.data.data} participants`, {
-					description: message.data.message
-				});
+				toast.success(
+					`QR codes sent successfully to ${message.data.data} ${Number(message.data.data) > 1 ? 'participants' : 'participant'}`,
+					{
+						description: message.data.message
+					}
+				);
 			} else {
 				toast.error('Failed to send QR codes', {
 					description: 'No data received from the worker'
