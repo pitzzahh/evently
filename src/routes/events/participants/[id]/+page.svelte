@@ -657,9 +657,9 @@
 				);
 
 				const attendance_status =
-					event_days === total_days_attended
+					total_days_attended === event_days
 						? 'complete'
-						: event_days && event_days < total_days_attended
+						: event_days && total_days_attended > 0 && total_days_attended < event_days
 							? 'incomplete'
 							: 'absent';
 
@@ -932,7 +932,7 @@
 										>
 											<ScanBarcode class="size-4" /> Scan with Hardware Scanner
 											{#if hardware_scanner_enabled}
-												<Check class="size-3 rounded-full bg-green-600 p-1" />
+												<Check class="size-3 rounded-full bg-green-600 p-1 text-white" />
 											{/if}
 										</Button>
 									</div>

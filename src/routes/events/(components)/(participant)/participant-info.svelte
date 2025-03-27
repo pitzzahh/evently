@@ -20,6 +20,10 @@
 	import * as Popover from '$lib/components/ui/popover/index.js';
 	import { Calendar, ListFilter } from 'lucide-svelte';
 	import { Button, buttonVariants } from '@/components/ui/button';
+	// import PhotoPreviewer from '@/components/custom/photo-previewer/photo-previewer.svelte';
+
+	// import { createQrPngDataUrl } from '@svelte-put/qr';
+	// import { onMount } from 'svelte';
 
 	interface ParticipantInfoProps {
 		participant: Participant;
@@ -37,13 +41,15 @@
 		event_schedules: EventSchedule[];
 		participant_attendance: AttendanceRecord[];
 		filtered_attendance_status: (typeof filter_attendance_statuses)[number]['value'];
+		qr_src: string;
 	}
 
 	let { participant, event_details }: ParticipantInfoProps = $props();
 	let comp_state = $state<ComponentState>({
 		event_schedules: [],
 		participant_attendance: [],
-		filtered_attendance_status: 'all'
+		filtered_attendance_status: 'all',
+		qr_src: ''
 	});
 
 	watch(
@@ -141,6 +147,16 @@
 		// Return formatted string
 		return `${hours ? `${hours} hour${hours > 1 ? 's' : ''} ` : ''}${minutes} minute${minutes > 1 ? 's' : ''}`;
 	}
+
+	// onMount(async () => {
+	// 	comp_state.qr_src = await createQrPngDataUrl({
+	// 		data: participant.id,
+	// 		shape: 'circle',
+	// 		width: 250,
+	// 		height: 250,
+	// 		backgroundFill: '#fff'
+	// 	});
+	// });
 </script>
 
 <div class="flex items-center gap-4">
