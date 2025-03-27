@@ -16,7 +16,7 @@
 	import { EventTimePicker } from '@routes/events/(components)';
 	import * as DropdownMenu from '@/components/ui/dropdown-menu/index.js';
 	import type { EventSchedule, EventDetails } from '@/db/models/types';
-	import { fly, scale, slide } from 'svelte/transition';
+	import { fly, slide } from 'svelte/transition';
 	import { COLLECTIONS } from '@/db/index';
 	import type { Participant } from '@/db/models/types';
 	import { formatDateTime, formatDateToTimeOption } from '@/utils/format';
@@ -30,6 +30,7 @@
 	import { quartInOut } from 'svelte/easing';
 	import Badge from '@/components/ui/badge/badge.svelte';
 	import Separator from '@/components/ui/separator/separator.svelte';
+	import PhotoPreviewer from '@/components/custom/photo-previewer/photo-previewer.svelte';
 
 	let { data } = $props();
 
@@ -202,16 +203,7 @@
 
 <div in:fly={{ y: 20 }} class="grid gap-4">
 	<div class="flex items-start gap-6 border-b-2 border-dashed pb-6">
-		<Avatar.Root
-			class={cn(
-				'aspect-square size-[200px] rounded-md ring-2 ring-accent ring-offset-2 ring-offset-background lg:size-[240px] '
-			)}
-		>
-			<Avatar.Image src={comp_state.event_details?.cover} />
-			<Avatar.Fallback class="aspect-square size-[200px] rounded-md lg:size-[240px]">
-				<Image class="size-16 text-muted-foreground opacity-50" />
-			</Avatar.Fallback>
-		</Avatar.Root>
+		<PhotoPreviewer image_src={comp_state.event_details?.cover!} />
 
 		<div class="flex w-full flex-1 flex-col gap-4">
 			<div class="flex w-full items-start justify-between gap-4">
