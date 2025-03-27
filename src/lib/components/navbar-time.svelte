@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { formatDateToTimeOption } from '@/utils/format';
+
 	let date = $state(new Date());
 
 	$effect(() => {
@@ -10,14 +12,8 @@
 			clearInterval(intervalId);
 		};
 	});
-
-	const timeOptions: Intl.DateTimeFormatOptions = {
-		hour: '2-digit',
-		minute: '2-digit',
-		hour12: true
-	};
 </script>
 
 <p class="text-sm font-semibold text-muted-foreground">
-	{date.toLocaleTimeString(undefined, timeOptions)}
+	{formatDateToTimeOption(date)}
 </p>
