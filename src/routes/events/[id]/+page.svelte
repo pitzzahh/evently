@@ -101,7 +101,7 @@
 					}
 					break;
 				case 'incomplete':
-					if (event_days && event_days < total_days_attended) {
+					if (total_days_attended > 0 && total_days_attended < event_days && event_days) {
 						return acc + 1;
 					}
 					break;
