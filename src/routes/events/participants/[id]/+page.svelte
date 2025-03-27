@@ -886,7 +886,7 @@
 										>
 											<ScanBarcode class="size-4" /> Scan with Hardware Scanner
 											{#if hardware_scanner_enabled}
-												<Check class="size-3 rounded-full bg-green-600 p-1" />
+												<Check class="size-3 rounded-full bg-green-600 p-1 text-white" />
 											{/if}
 										</Button>
 									</div>
