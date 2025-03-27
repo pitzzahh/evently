@@ -36,6 +36,7 @@
 		(e.target! as HTMLInputElement).value = '';
 	}}
 	type="file"
+	accept="image/*"
 	{id}
 	style="display: none;"
 />

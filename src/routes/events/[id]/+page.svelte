@@ -16,7 +16,7 @@
 	import { EventTimePicker } from '@routes/events/(components)';
 	import * as DropdownMenu from '@/components/ui/dropdown-menu/index.js';
 	import type { EventSchedule, EventDetails } from '@/db/models/types';
-	import { fly, scale, slide } from 'svelte/transition';
+	import { fly, slide } from 'svelte/transition';
 	import { COLLECTIONS } from '@/db/index';
 	import type { Participant } from '@/db/models/types';
 	import { formatDateTime, formatDateToTimeOption } from '@/utils/format';
@@ -29,6 +29,8 @@
 	import { Image } from 'lucide-svelte';
 	import { quartInOut } from 'svelte/easing';
 	import Badge from '@/components/ui/badge/badge.svelte';
+	import Separator from '@/components/ui/separator/separator.svelte';
+	import PhotoPreviewer from '@/components/custom/photo-previewer/photo-previewer.svelte';
 
 	let { data } = $props();
 
@@ -99,7 +101,7 @@
 					}
 					break;
 				case 'incomplete':
-					if (event_days && event_days < total_days_attended) {
+					if (total_days_attended > 0 && total_days_attended < event_days && event_days) {
 						return acc + 1;
 					}
 					break;
@@ -201,20 +203,11 @@
 
 <div in:fly={{ y: 20 }} class="grid gap-4">
 	<div class="flex items-start gap-6 border-b-2 border-dashed pb-6">
-		<Avatar.Root
-			class={cn(
-				'aspect-square size-[200px] rounded-md ring-2 ring-accent ring-offset-2 ring-offset-background lg:size-[240px] '
-			)}
-		>
-			<Avatar.Image src={comp_state.event_details?.cover} />
-			<Avatar.Fallback class="aspect-square size-[200px] rounded-md lg:size-[240px]">
-				<Image class="size-16 text-muted-foreground opacity-50" />
-			</Avatar.Fallback>
-		</Avatar.Root>
+		<PhotoPreviewer image_src={comp_state.event_details?.cover!} />
 
 		<div class="flex w-full flex-1 flex-col gap-4">
 			<div class="flex w-full items-start justify-between gap-4">
-				<h2 class="text-4xl font-semibold lg:text-5xl">
+				<h2 class="text-4xl font-semibold xl:text-5xl">
 					{comp_state.event_details?.event_name ?? 'N/A'}
 				</h2>
 				<div class="grid gap-2">
@@ -277,20 +270,38 @@
 			</div>
 
 			<!-- EVENT DETAILS -->
-			<div class="grid grid-cols-2 grid-rows-2 gap-4">
+			<div class="grid w-full grid-cols-2 grid-rows-2 gap-4">
 				<div class="flex items-center gap-3">
 					<div class="rounded-md border p-3">
 						<Calendar class="size-5 text-muted-foreground" />
 					</div>
-					<div>
-						<p class="text-base font-medium">
-							{formatDateTime(comp_state.event_details?.start_date)}
-						</p>
-						<p class="text-muted-foreground">
-							{formatDateToTimeOption(comp_state.event_schedules.at(0)?.am_start)} - {formatDateToTimeOption(
-								comp_state.event_schedules.at(0)?.pm_end
-							)}
-						</p>
+
+					<div class="flex gap-4">
+						<!-- START DATE -->
+						<div>
+							<p class="text-base font-medium">
+								{formatDateTime(comp_state.event_details?.start_date)}
+							</p>
+							<p class="text-sm text-muted-foreground">
+								{formatDateToTimeOption(comp_state.event_schedules.at(0)?.am_start)} - {formatDateToTimeOption(
+									comp_state.event_schedules.at(0)?.pm_end
+								)}
+							</p>
+						</div>
+
+						<Separator orientation="vertical" />
+
+						<!-- END DATE -->
+						<div>
+							<p class="text-base font-medium">
+								{formatDateTime(comp_state.event_details?.end_date)}
+							</p>
+							<p class="text-sm text-muted-foreground">
+								{formatDateToTimeOption(comp_state.event_schedules.at(-1)?.am_start)} - {formatDateToTimeOption(
+									comp_state.event_schedules.at(-1)?.pm_end
+								)}
+							</p>
+						</div>
 					</div>
 				</div>
 
@@ -307,7 +318,7 @@
 								? 'days'
 								: 'day'} event
 						</p>
-						<p class=" text-muted-foreground">Duration</p>
+						<p class="text-sm text-muted-foreground">Duration</p>
 					</div>
 				</div>
 
@@ -317,7 +328,7 @@
 					</div>
 					<div>
 						<p class="text-base font-medium">{comp_state.participants.length}</p>
-						<p class=" text-muted-foreground">
+						<p class="text-sm text-muted-foreground">
 							Participant{comp_state.participants.length > 1 ? 's' : ''}
 						</p>
 					</div>
@@ -329,7 +340,7 @@
 					</div>
 					<div>
 						<p class="text-base font-medium">{comp_state.event_details?.location ?? 'N/A'}</p>
-						<p class=" text-muted-foreground">Location</p>
+						<p class="text-sm text-muted-foreground">Location</p>
 					</div>
 				</div>
 			</div>

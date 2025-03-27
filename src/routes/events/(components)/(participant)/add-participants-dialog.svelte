@@ -14,7 +14,6 @@
 	interface AddParticipantsDialogProps {
 		add_participants_form: SuperValidated<AddParticipantsSchema>;
 		event_id: string;
-		disabled?: boolean;
 		open_add_participants_dialog?: boolean;
 		is_event_finished: boolean;
 	}
@@ -22,7 +21,6 @@
 	let {
 		add_participants_form,
 		event_id,
-		disabled = false,
 		open_add_participants_dialog = $bindable(false),
 		is_event_finished
 	}: AddParticipantsDialogProps = $props();
@@ -39,7 +37,6 @@
 					toast.info('Adding participant/s is disabled since the event has concluded');
 					return;
 				}
-
 				open_add_participants_dialog = true;
 			}}
 		>

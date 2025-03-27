@@ -22,6 +22,8 @@ export type AttendanceRecord = Pick<
 >;
 export type ParticipantAttendance = (AttendanceRecord & Partial<Participant>) & {
 	participant?: Participant[];
+	late_am_time_in_duration?: string
+	late_pm_time_in_duration?: string
 };
 
 export type EventSchedule = Pick<
@@ -55,7 +57,7 @@ export type EventDetails = Pick<
 >;
 export type Participant = Pick<
 	ParticipantCollection,
-	'id' | 'first_name' | 'middle_name' | 'last_name' | 'email' | 'event_id' | 'created' | 'updated'
+	'id' | 'first_name' | 'middle_name' | 'last_name' | 'email' | 'event_id' | 'qr' | 'created' | 'updated'
 > & { attendance_status?: 'complete' | 'incomplete' | 'absent' };
 export type Settings = Pick<
 	SettingsCollection,

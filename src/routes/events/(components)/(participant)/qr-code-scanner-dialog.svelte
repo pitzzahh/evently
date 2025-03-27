@@ -23,7 +23,7 @@
 			<Dialog.Title>Scan Participant</Dialog.Title>
 		</Dialog.Header>
 		{#if dialog_open}
-			<QrCodeScanner onDetect={(data) => handleScan(data)} />
+			<QrCodeScanner stop_camera={!dialog_open} onDetect={(data) => handleScan(data)} />
 		{/if}
 	</Dialog.Content>
 </Dialog.Root>

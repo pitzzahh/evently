@@ -42,7 +42,7 @@
 				progress = _p;
 				console.log('Update progress:', progress);
 			},
-			() => {
+			() => {	
 				state = 'idle';
 				toast.success('Update installed successfully', {
 					description: 'The application will now restart.'

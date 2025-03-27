@@ -7,10 +7,11 @@
 	import NavbarTime from './navbar-time.svelte';
 	import { toggleMode, mode } from 'mode-watcher';
 	import { Sun, Moon } from '@/assets/icons';
-	import { Button } from '@/components/ui/button/index.js';
+	import { Button, buttonVariants } from '@/components/ui/button/index.js';
 	import { dev } from '$app/environment';
 	import { COLLECTIONS } from '@/db';
 	import evently_logo from '@/assets/evently-logo.svg';
+	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 
 	const isActive = (pathname: string) => page.url.pathname === pathname;
 	const routes = [
@@ -20,7 +21,7 @@
 </script>
 
 <header
-	class="sticky top-0 z-10 flex h-auto w-full shrink-0 items-center justify-between gap-8 border-b bg-background/40 bg-clip-padding px-4 py-3
+	class="sticky top-0 z-10 flex h-auto w-full shrink-0 items-center justify-between gap-8 border-b bg-clip-padding px-4 py-3
  	backdrop-blur-md backdrop-filter transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 md:gap-0"
 >
 	<a href="/" class="cursor-pointer text-lg font-bold">
@@ -43,42 +44,48 @@
 			{/each}
 		</div>
 		<div class="flex items-center gap-4">
-			<Button
-				onclick={toggleMode}
-				role="switch"
-				variant="outline"
-				size="icon"
-				aria-label="Light Switch"
-				aria-checked={$mode === 'light'}
-				class="!shrink-0 [&_svg]:size-5"
-				title="Toggle {$mode === 'dark' ? 'Dark' : 'Light'} Mode"
-			>
-				{#if $mode === 'light'}
-					<div
-						class="absolute inline-flex items-center justify-center"
-						transition:scale={{
-							delay: 50,
-							duration: 200,
-							start: 0.7,
-							easing: cubicOut
-						}}
+			<Tooltip.Provider>
+				<Tooltip.Root delayDuration={0}>
+					<Tooltip.Trigger
+						onclick={toggleMode}
+						class={cn(
+							buttonVariants({ variant: 'outline', size: 'icon' }),
+							'hover:bg-bg-gray-400/10 !shrink-0 border-none bg-gray-400/10 backdrop-blur-md backdrop-filter dark:bg-white/10 [&_svg]:size-5'
+						)}
 					>
-						<Moon strokeWidth={1.5} class="size-6" aria-label="Moon" />
-					</div>
-				{:else}
-					<div
-						class="absolute inline-flex items-center justify-center"
-						transition:scale={{
-							delay: 50,
-							duration: 200,
-							start: 0.7,
-							easing: cubicOut
-						}}
-					>
-						<Sun strokeWidth={1.5} class="size-6" aria-label="Sun" />
-					</div>
-				{/if}
-			</Button>
+						{#if $mode === 'light'}
+							<div
+								class="absolute inline-flex items-center justify-center"
+								transition:scale={{
+									delay: 50,
+									duration: 200,
+									start: 0.7,
+									easing: cubicOut
+								}}
+							>
+								<Moon strokeWidth={1.5} class="size-6" aria-label="Moon" />
+							</div>
+						{:else}
+							<div
+								class="absolute inline-flex items-center justify-center"
+								transition:scale={{
+									delay: 50,
+									duration: 200,
+									start: 0.7,
+									easing: cubicOut
+								}}
+							>
+								<Sun strokeWidth={1.5} class="size-6" aria-label="Sun" />
+							</div>
+						{/if}
+						<!-- </Button> -->
+					</Tooltip.Trigger>
+					<Tooltip.Content>
+						<p>Toggle {$mode === 'dark' ? 'Dark' : 'Light'} Mode</p>
+					</Tooltip.Content>
+				</Tooltip.Root>
+			</Tooltip.Provider>
+
 			<NavbarTime />
 			<Button href="/events/create"><Plus class="size-4" /> Create Event</Button>
 			{#if dev}

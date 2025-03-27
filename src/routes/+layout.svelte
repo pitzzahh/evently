@@ -38,9 +38,6 @@
 	oncontextmenu={(e) => e.preventDefault()}
 	onkeydown={async (e) => {
 		if (e.key === 'F5') {
-			toast.info('F5 is disabled', {
-				description: 'This is a system message, F5 is disabled in this application.'
-			});
 			e.preventDefault();
 		}
 		if (e.key === 'F11') {
@@ -56,18 +53,22 @@
 	}}
 />
 
-<ModeWatcher />
-<Toaster richColors position="top-center" />
-{#if dev}
-	<RenderScan />
-{/if}
-<AppNavbar />
-
-<div class="flex size-full justify-center">
-	<div class="flex flex-1 flex-col gap-4 p-4 md:max-w-[80%] md:px-0">
-		{#if update && !dismiss_update}
-			<Updater dismiss={dismiss_update} {update} />
-		{/if}
-		{@render children()}
+<div class="flex max-h-screen flex-col">
+	<div
+		class="fixed left-0 top-0 -z-10 h-[50vh] w-full bg-gradient-to-b from-cyan-200/50 via-pink-100/30 to-background dark:from-sky-700/25 dark:via-pink-600/10"
+	></div>
+	<ModeWatcher />
+	<Toaster richColors position="top-center" />
+	{#if dev}
+		<RenderScan />
+	{/if}
+	<AppNavbar />
+	<div class="flex h-full w-full flex-1 justify-center overflow-y-auto">
+		<div class="flex h-full flex-1 flex-col gap-4 px-4 py-8 md:max-w-[80%] md:px-0">
+			{#if update && !dismiss_update}
+				<Updater bind:dismiss={dismiss_update} {update} />
+			{/if}
+			{@render children()}
+		</div>
 	</div>
 </div>
