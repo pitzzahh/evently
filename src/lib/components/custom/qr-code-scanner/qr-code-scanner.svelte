@@ -196,56 +196,76 @@
 </div>
 
 <style>
-	/* Hide unwanted icons */
-	#qr-scanner :global(img[alt='Info icon']),
-	#qr-scanner :global(img[alt='Camera based scan']) {
-		display: none;
-	}
-
-	/* Change camera permission button text */
+	/* Customize the "Allow Camera Access" button */
 	#qr-scanner :global(#html5-qrcode-button-camera-permission) {
-		visibility: hidden;
-		position: relative;
+		background-color: #196ea6; /* Change background color */
+		color: white; /* Change text color */
+		font-size: 16px; /* Adjust font size */
+		padding: 10px 20px; /* Add padding */
+		border-radius: 8px; /* Add rounded corners */
+		border: none; /* Remove border */
+		cursor: pointer; /* Add pointer cursor */
+		transition: background-color 0.3s ease; /* Add hover transition */
 	}
 
+	#qr-scanner :global(#html5-qrcode-button-camera-permission:hover) {
+		background-color: #145a8a; /* Darker shade on hover */
+	}
+
+	/* Customize the "Stop Camera" button */
 	#qr-scanner :global(#html5-qrcode-button-camera-stop) {
-		visibility: hidden;
+		background-color: #e63946; /* Change background color */
+		color: white; /* Change text color */
+		font-size: 16px; /* Adjust font size */
+		padding: 10px 20px; /* Add padding */
+		border-radius: 8px; /* Add rounded corners */
+		border: none; /* Remove border */
+		cursor: pointer; /* Add pointer cursor */
+		transition: background-color 0.3s ease; /* Add hover transition */
 	}
 
-	#qr-scanner :global(#html5-qrcode-button-camera-permission::after) {
-		position: absolute;
-		inset: auto 0 0;
-		display: block;
-		content: 'Allow camera access';
-		text-align: 'center';
-		background: '#196EA6';
-		padding: 4px 6px;
-		border-radius: 1rem;
-		visibility: visible;
+	#qr-scanner :global(#html5-qrcode-button-camera-stop:hover) {
+		background-color: #d62839; /* Darker shade on hover */
 	}
 
-	#qr-scanner :global(video) {
-		max-height: 100% !important;
-		max-width: 100% !important;
-		object-fit: contain !important;
-	}
-
+	/* Hide the "Scan Type Change" link */
 	#qr-scanner :global(#html5-qrcode-anchor-scan-type-change) {
 		display: none;
 	}
 
-	#qr-scanner :global(section) {
-		padding: 0 !important;
-		display: hidden;
+	/* Customize the video element */
+	#qr-scanner :global(video) {
+		border-radius: 12px; /* Add rounded corners to the video */
+		box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Add shadow */
+		object-fit: cover; /* Ensure the video fits nicely */
 	}
 
-	#qr-scanner :global(section div) {
-		padding: 0 !important;
-		display: hidden;
-	}
-
-	/* Add height constraint to the scanner */
+	/* Add height constraint to the scanner container */
 	#qr-scanner {
 		overflow: hidden;
+		border-radius: 12px; /* Add rounded corners to the container */
 	}
+
+
+	  /* Customize the "Start Scanning" button */
+	  #qr-scanner :global(#html5-qrcode-button-camera-start) {
+        background-color: #28a745; /* Change background color */
+        color: white; /* Change text color */
+        font-size: 16px; /* Adjust font size */
+        padding: 10px 20px; /* Add padding */
+        border-radius: 8px; /* Add rounded corners */
+        border: none; /* Remove border */
+        cursor: pointer; /* Add pointer cursor */
+        transition: background-color 0.3s ease; /* Add hover transition */
+    }
+
+    #qr-scanner :global(#html5-qrcode-button-camera-start:hover) {
+        background-color: #218838; /* Darker shade on hover */
+    }
+
+    /* Optionally, add focus styles */
+    #qr-scanner :global(#html5-qrcode-button-camera-start:focus) {
+        outline: 2px solid #218838; /* Add focus outline */
+        outline-offset: 2px;
+    }
 </style>
