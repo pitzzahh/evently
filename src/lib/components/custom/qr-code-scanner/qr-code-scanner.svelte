@@ -15,6 +15,7 @@
 		paused = $bindable(false),
 		fps = 30,
 		aspectRatio = 1.777778,
+		stop_camera,
 		onDetect,
 		onError,
 		singleScanMode = true,
@@ -31,6 +32,7 @@
 		singleScanMode?: boolean;
 		autoPauseDelay?: number;
 		resetAfter?: number;
+		stop_camera: boolean
 	} = $props();
 
 	// State using runes
@@ -135,12 +137,18 @@
 		}
 	});
 
+	$effect(() => {
+		if (stop_camera) {
+			document.getElementById('html5-qrcode-button-camera-stop')?.click();
+		}
+	});
+
 	// Effect to handle external pausing/resuming
 	$effect(() => {
 		if (!scanner) return;
 
 		try {
-			if (paused && scanner.getState() === Html5QrcodeScannerState.SCANNING) {
+			if (paused) {
 				scanner.pause();
 				scanning = false;
 				scannerState = Html5QrcodeScannerState.PAUSED;
@@ -196,41 +204,68 @@
 </div>
 
 <style>
-	/* Customize the "Allow Camera Access" button */
+	/* Override styles for the "Allow Camera" button */
 	#qr-scanner :global(#html5-qrcode-button-camera-permission) {
-		background-color: #196ea6; /* Change background color */
-		color: white; /* Change text color */
+		background-color: #4caf50; /* Green background */
+		color: white; /* White text */
 		font-size: 16px; /* Adjust font size */
 		padding: 10px 20px; /* Add padding */
-		border-radius: 8px; /* Add rounded corners */
+		border-radius: 8px; /* Rounded corners */
 		border: none; /* Remove border */
-		cursor: pointer; /* Add pointer cursor */
-		transition: background-color 0.3s ease; /* Add hover transition */
+		cursor: pointer; /* Pointer cursor */
+		transition: background-color 0.3s ease; /* Smooth hover effect */
 	}
 
 	#qr-scanner :global(#html5-qrcode-button-camera-permission:hover) {
-		background-color: #145a8a; /* Darker shade on hover */
+		background-color: #45a049; /* Darker green on hover */
 	}
 
-	/* Customize the "Stop Camera" button */
-	#qr-scanner :global(#html5-qrcode-button-camera-stop) {
-		background-color: #e63946; /* Change background color */
-		color: white; /* Change text color */
+	/* Override styles for the "Start Camera" button */
+	#qr-scanner :global(#html5-qrcode-button-camera-start) {
+		background-color: #025792; /* Blue background */
+		color: white; /* White text */
 		font-size: 16px; /* Adjust font size */
 		padding: 10px 20px; /* Add padding */
-		border-radius: 8px; /* Add rounded corners */
+		border-radius: 8px; /* Rounded corners */
 		border: none; /* Remove border */
-		cursor: pointer; /* Add pointer cursor */
-		transition: background-color 0.3s ease; /* Add hover transition */
+		cursor: pointer; /* Pointer cursor */
+		transition: background-color 0.3s ease; /* Smooth hover effect */
+	}
+
+	#qr-scanner :global(#html5-qrcode-button-camera-start:hover) {
+		background-color: #025792; /* Darker blue on hover */
+	}
+
+	/* Override styles for the "Stop Camera" button */
+	#qr-scanner :global(#html5-qrcode-button-camera-stop) {
+		background-color: #f44336; /* Red background */
+		color: white; /* White text */
+		font-size: 16px; /* Adjust font size */
+		padding: 10px 20px; /* Add padding */
+		border-radius: 8px; /* Rounded corners */
+		border: none; /* Remove border */
+		cursor: pointer; /* Pointer cursor */
+		transition: background-color 0.3s ease; /* Smooth hover effect */
 	}
 
 	#qr-scanner :global(#html5-qrcode-button-camera-stop:hover) {
-		background-color: #d62839; /* Darker shade on hover */
+		background-color: #d32f2f; /* Darker red on hover */
 	}
 
 	/* Hide the "Scan Type Change" link */
 	#qr-scanner :global(#html5-qrcode-anchor-scan-type-change) {
 		display: none;
+	}
+
+	/* Hide unwanted icons */
+	#qr-scanner :global(img[alt='Info icon']),
+	#qr-scanner :global(img[alt='Camera based scan']) {
+		display: none !important; /* Completely hide the icons */
+	}
+
+	/* Hide the "Scan Type Change" link */
+	#qr-scanner :global(#html5-qrcode-anchor-scan-type-change) {
+		display: none !important;
 	}
 
 	/* Customize the video element */
@@ -245,27 +280,4 @@
 		overflow: hidden;
 		border-radius: 12px; /* Add rounded corners to the container */
 	}
-
-
-	  /* Customize the "Start Scanning" button */
-	  #qr-scanner :global(#html5-qrcode-button-camera-start) {
-        background-color: #28a745; /* Change background color */
-        color: white; /* Change text color */
-        font-size: 16px; /* Adjust font size */
-        padding: 10px 20px; /* Add padding */
-        border-radius: 8px; /* Add rounded corners */
-        border: none; /* Remove border */
-        cursor: pointer; /* Add pointer cursor */
-        transition: background-color 0.3s ease; /* Add hover transition */
-    }
-
-    #qr-scanner :global(#html5-qrcode-button-camera-start:hover) {
-        background-color: #218838; /* Darker shade on hover */
-    }
-
-    /* Optionally, add focus styles */
-    #qr-scanner :global(#html5-qrcode-button-camera-start:focus) {
-        outline: 2px solid #218838; /* Add focus outline */
-        outline-offset: 2px;
-    }
 </style>
