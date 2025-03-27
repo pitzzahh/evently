@@ -657,9 +657,9 @@
 				);
 
 				const attendance_status =
-					event_days === total_days_attended
+					total_days_attended === event_days
 						? 'complete'
-						: event_days && event_days < total_days_attended
+						: event_days && total_days_attended > 0 && total_days_attended < event_days
 							? 'incomplete'
 							: 'absent';
 
