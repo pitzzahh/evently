@@ -15,7 +15,6 @@ onmessage = async (message: MessageEvent<string>) => {
   } = JSON.parse(message.data as unknown as string) as {
     participants: (Participant & {
       qr: string;
-      downloadable_qr: string;
     })[];
     PLUNK_API: string;
     PLUNK_SK: string;
@@ -61,7 +60,6 @@ onmessage = async (message: MessageEvent<string>) => {
               middle_name: participant.middle_name,
               last_name: participant.last_name,
               qr: participant.qr,
-              downloadable_qr: participant.downloadable_qr,
             },
             ...event_details
           })

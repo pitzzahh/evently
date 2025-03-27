@@ -1,6 +1,6 @@
 {
 	"name": "evently",
-	"version": "1.4.25",
+	"version": "1.5.35",
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",

@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.35] - 2025-3-27
+
+### Feat
+
+- Added new background images and dynamic themes.
+- Integrated QR code generation and email sending for participants.
+- Enabled hardware scanner functionality.
+- Enhanced search input styling, tooltips, and hover effects.
+- Added Cloudinary API to upload participants' QR codes.
+
+### Fix
+
+- Corrected class attribute formatting and toast messages.
+- Updated message event types and environment variable configurations.
+- Improved QR code generation visibility and date formatting.
+- Resolved issues with participant QR code integration and file input restrictions.
+- Simplified message data parsing and state management.
+- Streamlined QR code handling and file upload processes.
+- Updated Google Drive and authentication utility functions.
+- Removed unused imports and dependencies.
+- Enhanced README documentation and license information.
+
 ## [1.4.25] - 2025-3-24
 
 ### Add
@@ -135,8 +157,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.0] - 2025-2-26
 
 ### Add
-
-> > > > > > > 780889c0b79db13d494d866ac324aabe8f4b8aba
 
 - Initial project setup.
 - Initial changelog implementation.
