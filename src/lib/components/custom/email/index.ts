@@ -38,15 +38,8 @@ export function generateQrCodeEmail(props: SendQrCodeProps): string {
       include_last_name: true
     }
   );
-
   const currentYear = new Date().getFullYear();
   const the_event_date = new Date(event_date);
-
-  console.log({
-    props,
-    the_event_date
-  })
-
   return `<!DOCTYPE html>
 <html lang="en">
 
