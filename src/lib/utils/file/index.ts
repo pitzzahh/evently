@@ -5,7 +5,7 @@
  * @returns A File object created from the data URL
  */
 export function dataURLtoFile(dataurl: string, filename: string) {
-  var arr = dataurl.split(','),
+  let arr = dataurl.split(','),
     mime = arr[0].match(/:(.*?);/)?.[1] || 'application/octet-stream',
     bstr = atob(arr[arr.length - 1]),
     n = bstr.length,
