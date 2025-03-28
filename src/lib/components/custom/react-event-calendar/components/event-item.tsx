@@ -156,7 +156,7 @@ export function EventItem({
         isDragging={isDragging}
         onClick={onClick}
         className={cn(
-          "mt-[var(--event-gap)] h-[var(--event-height)] items-center text-[10px] sm:text-xs",
+          "mt-[var(--event-gap)] cursor-pointer h-[var(--event-height)] items-center text-[10px] sm:text-xs",
           className
         )}
         currentTime={currentTime}

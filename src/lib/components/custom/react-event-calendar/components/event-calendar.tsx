@@ -13,8 +13,7 @@ import {
 	subMonths,
 	subWeeks
 } from 'date-fns';
-import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, PlusIcon } from 'lucide-react';
-// import { toast } from "sonner"
+import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 
 import {
 	addHoursToDate,
@@ -47,6 +46,7 @@ export interface EventCalendarProps {
 	onEventAdd?: (event: CalendarEvent) => void;
 	onEventUpdate?: (event: CalendarEvent) => void;
 	onEventDelete?: (eventId: string) => void;
+	onViewEvent: (eventId: string) => void;
 	className?: string;
 	initialView?: CalendarView;
 }
@@ -57,7 +57,8 @@ export function EventCalendar({
 	onEventUpdate,
 	onEventDelete,
 	className,
-	initialView = 'month'
+	initialView = 'month',
+	onViewEvent
 }: EventCalendarProps) {
 	const [currentDate, setCurrentDate] = useState(new Date());
 	const [view, setView] = useState<CalendarView>(initialView);
@@ -132,9 +133,10 @@ export function EventCalendar({
 	};
 
 	const handleEventSelect = (event: CalendarEvent) => {
+		onViewEvent(event.id);
 		console.log('Event selected:', event); // Debug log
-		setSelectedEvent(event);
-		setIsEventDialogOpen(true);
+		// setSelectedEvent(event);
+		// setIsEventDialogOpen(true);
 	};
 
 	const handleEventCreate = (startTime: Date) => {
@@ -375,4 +377,3 @@ export function EventCalendar({
 		</div>
 	);
 }
-
