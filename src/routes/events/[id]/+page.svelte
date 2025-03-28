@@ -26,7 +26,6 @@
 	import { checkEventStatus, getEventDayInfo } from '../utils/index.js';
 	import * as Dialog from '@/components/ui/dialog';
 	import { onMount } from 'svelte';
-	import { Image } from 'lucide-svelte';
 	import { quartInOut } from 'svelte/easing';
 	import Badge from '@/components/ui/badge/badge.svelte';
 	import Separator from '@/components/ui/separator/separator.svelte';
@@ -168,6 +167,10 @@
 	);
 
 	onMount(() => {
+		window.scrollTo({
+			top: 0,
+			behavior: 'smooth'
+		});
 		if (!comp_state.event_details) {
 			const error_content = {
 				status: 404,
@@ -273,7 +276,7 @@
 			<div class="grid w-full grid-cols-2 grid-rows-2 gap-4">
 				<div class="flex items-center gap-3">
 					<div class="rounded-md border p-3">
-						<Calendar class="size-5 text-muted-foreground" />
+						<Calendar class="text-muted-foreground size-5" />
 					</div>
 
 					<div class="flex gap-4">
@@ -282,7 +285,7 @@
 							<p class="text-base font-medium">
 								{formatDateTime(comp_state.event_details?.start_date)}
 							</p>
-							<p class="text-sm text-muted-foreground">
+							<p class="text-muted-foreground text-sm">
 								{formatDateToTimeOption(comp_state.event_schedules.at(0)?.am_start)} - {formatDateToTimeOption(
 									comp_state.event_schedules.at(0)?.pm_end
 								)}
@@ -296,7 +299,7 @@
 							<p class="text-base font-medium">
 								{formatDateTime(comp_state.event_details?.end_date)}
 							</p>
-							<p class="text-sm text-muted-foreground">
+							<p class="text-muted-foreground text-sm">
 								{formatDateToTimeOption(comp_state.event_schedules.at(-1)?.am_start)} - {formatDateToTimeOption(
 									comp_state.event_schedules.at(-1)?.pm_end
 								)}
@@ -307,7 +310,7 @@
 
 				<div class="flex items-center gap-3">
 					<div class="rounded-md border p-3">
-						<Clock class="size-5 text-muted-foreground" />
+						<Clock class="text-muted-foreground size-5" />
 					</div>
 
 					<div>
@@ -318,17 +321,17 @@
 								? 'days'
 								: 'day'} event
 						</p>
-						<p class="text-sm text-muted-foreground">Duration</p>
+						<p class="text-muted-foreground text-sm">Duration</p>
 					</div>
 				</div>
 
 				<div class="flex items-center gap-3">
 					<div class="rounded-md border p-3">
-						<UsersRound class="size-5 text-muted-foreground" />
+						<UsersRound class="text-muted-foreground size-5" />
 					</div>
 					<div>
 						<p class="text-base font-medium">{comp_state.participants.length}</p>
-						<p class="text-sm text-muted-foreground">
+						<p class="text-muted-foreground text-sm">
 							Participant{comp_state.participants.length > 1 ? 's' : ''}
 						</p>
 					</div>
@@ -336,11 +339,11 @@
 
 				<div class="flex items-center gap-3">
 					<div class="rounded-md border p-3">
-						<MapPin class="size-5 text-muted-foreground" />
+						<MapPin class="text-muted-foreground size-5" />
 					</div>
 					<div>
 						<p class="text-base font-medium">{comp_state.event_details?.location ?? 'N/A'}</p>
-						<p class="text-sm text-muted-foreground">Location</p>
+						<p class="text-muted-foreground text-sm">Location</p>
 					</div>
 				</div>
 			</div>
@@ -420,7 +423,7 @@
 		</div>
 	{/if}
 	<div
-		class="duration-400 flex max-h-[400px] flex-col gap-2 overflow-y-auto pr-1 transition ease-in-out"
+		class="flex max-h-[400px] flex-col gap-2 overflow-y-auto pr-1 transition duration-400 ease-in-out"
 	>
 		{#each comp_state.event_schedules as event_date, index}
 			<EventTimePicker
