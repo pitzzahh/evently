@@ -47,8 +47,13 @@
 
 	{@const contents = ['upcoming', 'past']}
 	{#each contents as content (content)}
-		<Tabs.Content value={content} class="mt-10">
-			<EventList type={content as 'upcoming' | 'past'} bind:search_term={comp_state.search_term} />
-		</Tabs.Content>
+		{#if comp_state.current_tab === content}
+			<Tabs.Content value={content} class="mt-10">
+				<EventList
+					type={content as 'upcoming' | 'past'}
+					bind:search_term={comp_state.search_term}
+				/>
+			</Tabs.Content>
+		{/if}
 	{/each}
 </Tabs.Root>
