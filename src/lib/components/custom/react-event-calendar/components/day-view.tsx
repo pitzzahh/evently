@@ -286,12 +286,12 @@ export function DayView({ currentDate, events, onEventSelect, onEventCreate }: D
 												quarter === 2 && 'top-[calc(var(--week-cells-height)/4*2)]',
 												quarter === 3 && 'top-[calc(var(--week-cells-height)/4*3)]'
 											)}
-											onClick={() => {
-												const startTime = new Date(currentDate);
-												startTime.setHours(hourValue);
-												startTime.setMinutes(quarter * 15);
-												onEventCreate(startTime);
-											}}
+											// onClick={() => {
+											// 	const startTime = new Date(currentDate);
+											// 	startTime.setHours(hourValue);
+											// 	startTime.setMinutes(quarter * 15);
+											// 	onEventCreate(startTime);
+											// }}
 										/>
 									);
 								})}
