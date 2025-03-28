@@ -254,7 +254,7 @@ export function EventCalendar({
 
 	return (
 		<div
-			className="flex flex-1 flex-col rounded-lg border bg-background/10 dark:bg-background/30"
+			className="bg-background/10 dark:bg-background/30 flex flex-1 flex-col rounded-lg border"
 			style={
 				{
 					'--event-height': `${EventHeight}px`,
@@ -375,3 +375,4 @@ export function EventCalendar({
 		</div>
 	);
 }
+
