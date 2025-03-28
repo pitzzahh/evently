@@ -91,6 +91,7 @@
 		"svelte-sonner": "^0.3.28",
 		"svelte-toolbelt": "^0.7.1",
 		"svelte-vertical-timeline": "^2.0.0",
+		"tw-animate-css": "^1.2.4",
 		"zod": "^3.24.2"
 	}
 }
