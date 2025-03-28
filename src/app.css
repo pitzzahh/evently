@@ -1,6 +1,8 @@
-@tailwind base;
+/* @tailwind base;
 @tailwind components;
-@tailwind utilities;
+@tailwind utilities; */
+
+@import 'tailwindcss';
 
 @layer base {
 	:root {
@@ -208,7 +210,7 @@ body {
 ::-webkit-scrollbar {
 	width: 8px; /* Vertical scrollbar */
 	height: 8px; /* Horizontal scrollbar */
-}	
+}
 
 /* Track (the background of the scrollbar) */
 ::-webkit-scrollbar-track {
