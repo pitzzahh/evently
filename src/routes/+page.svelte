@@ -23,7 +23,7 @@
 		<div class="flex items-center gap-2">
 			<div class="group relative">
 				<Search
-					class="absolute left-3 top-3 size-4 text-muted-foreground group-hover:text-black dark:group-hover:text-white"
+					class="text-muted-foreground absolute top-3 left-3 size-4 group-hover:text-black dark:group-hover:text-white"
 				/>
 				<Input
 					bind:value={comp_state.search_term}
