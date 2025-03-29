@@ -131,11 +131,11 @@ To run this project locally, you need to set up environment variables:
 
 Evently is mainly built with:
 
-- [sveltekit](https://github.com/sveltejs/kit) for the frontend
+- [SvelteKit](https://github.com/sveltejs/kit) for the frontend
 - [shadcn-svelte](https://github.com/huntabyte/shadcn-svelte) for UI components
-- [tauri](https://tauri.app/) for the cross-platform desktop application
-- [tailwindcss](https://github.com/tailwindlabs/tailwindcss) for styling
-- [signaldb](https://github.com/maxnowack/signaldb) for real-time data synchronization using OPFS
+- [Tauri](https://tauri.app/) for the cross-platform desktop application
+- [TailwindCSS](https://github.com/tailwindlabs/tailwindcss) for styling
+- [SignalDB](https://github.com/maxnowack/signaldb) for real-time data synchronization using OPFS
 - [pdfmake](https://github.com/bpampuch/pdfmake) for PDF generation
 - [event-calendar](https://originui.com/event-calendar) for the calendar component
 - [exceljs](https://github.com/exceljs/exceljs) for Excel file handling
