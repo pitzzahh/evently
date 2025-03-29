@@ -106,16 +106,16 @@ This will create a production build of the application in the `src-tauri/target/
 
 Evently is mainly built with:
 
-- [SvelteKit](https://github.com/sveltejs/kit) for the frontend
+- [sveltekit](https://github.com/sveltejs/kit) for the frontend
 - [shadcn-svelte](https://github.com/huntabyte/shadcn-svelte) for UI components
-- [Tauri](https://tauri.app/) for the cross-platform desktop application
-- [TailwindCSS](https://github.com/tailwindlabs/tailwindcss) for styling
+- [tauri](https://tauri.app/) for the cross-platform desktop application
+- [tailwindcss](https://github.com/tailwindlabs/tailwindcss) for styling
 - [signaldb](https://github.com/maxnowack/signaldb) for real-time data synchronization using OPFS
 - [pdfmake](https://github.com/bpampuch/pdfmake) for PDF generation
 - [event-calendar](https://originui.com/event-calendar) for the calendar component
 - [exceljs](https://github.com/exceljs/exceljs) for Excel file handling
 - [svelte-put/qr](https://svelte-put.vnphanquang.com/docs/qr) for QR code generation
-- [React](https://github.com/facebook/react) for rendering the calendar component
+- [react](https://github.com/facebook/react) for rendering the calendar component
 - and many more.
 
 ## Building for Desktop
