@@ -37,12 +37,7 @@
 <svelte:document onkeydown={handleKeydown} />
 
 <!-- Clickable Image -->
-<Avatar.Root
-	class={cn(
-		'ring-accent ring-offset-background aspect-square size-[200px] rounded-md ring-2 ring-offset-2 lg:size-[240px]',
-		className
-	)}
->
+<Avatar.Root class={cn('aspect-square size-[200px] rounded-md lg:size-[240px]', className)}>
 	<Avatar.Image
 		src={image_src}
 		onclick={openPreview}
