@@ -11,7 +11,6 @@
 		View,
 		Clock
 	} from '@/assets/icons';
-	import * as Avatar from '@/components/ui/avatar';
 	import { cn } from '@/utils/styles';
 	import { EventTimePicker } from '@routes/events/(components)';
 	import * as DropdownMenu from '@/components/ui/dropdown-menu/index.js';
@@ -44,7 +43,6 @@
 		num_of_incomplete_attendance: number;
 	}
 
-	let div_ref: HTMLDivElement | null = null;
 	let comp_state = $state<ComponentState>({
 		event_details: undefined,
 		event_schedules: [],
@@ -167,20 +165,6 @@
 		}
 	);
 
-	onMount(() => {
-		if (div_ref) {
-			div_ref.scrollTo(0, 0);
-		}
-		
-		if (!comp_state.event_details) {
-			const error_content = {
-				status: 404,
-				message: 'Event not found'
-			};
-			goto(`/events/${data.event_id}?error_content=${JSON.stringify(error_content)}`);
-		}
-	});
-
 	function handleDeleteEvent() {
 		if (comp_state.event_details) {
 			const id = comp_state.event_details.id;
@@ -203,9 +187,19 @@
 			comp_state.confimation_open = false;
 		}
 	}
+
+	onMount(() => {
+		if (!comp_state.event_details) {
+			const error_content = {
+				status: 404,
+				message: 'Event not found'
+			};
+			goto(`/events/${data.event_id}?error_content=${JSON.stringify(error_content)}`);
+		}
+	});
 </script>
 
-<div bind:this={div_ref} in:fly={{ y: 20 }} class="grid gap-4">
+<div in:fly={{ y: 20 }} class="grid gap-4">
 	<div class="flex items-start gap-6 border-b-2 border-dashed pb-6">
 		<PhotoPreviewer image_src={comp_state.event_details?.cover!} />
 
