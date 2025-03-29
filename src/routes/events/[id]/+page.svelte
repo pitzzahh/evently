@@ -28,7 +28,7 @@
 	import { quartInOut } from 'svelte/easing';
 	import Badge from '@/components/ui/badge/badge.svelte';
 	import Separator from '@/components/ui/separator/separator.svelte';
-	import PhotoPreviewer from '@/components/custom/photo-previewer/photo-previewer.svelte';
+	import { PhotoPreviewer } from '@/components/custom/photo-previewer';
 
 	let { data } = $props();
 
@@ -201,7 +201,10 @@
 
 <div in:fly={{ y: 20 }} class="grid gap-4">
 	<div class="flex items-start gap-6 border-b-2 border-dashed pb-6">
-		<PhotoPreviewer image_src={comp_state.event_details?.cover!} />
+		<PhotoPreviewer
+			image_src={comp_state.event_details?.cover!}
+			class="ring-accent ring-offset-background ring-2 ring-offset-2"
+		/>
 
 		<div class="flex w-full flex-1 flex-col gap-4">
 			<div class="flex w-full items-start justify-between gap-4">
