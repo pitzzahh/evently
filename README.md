@@ -109,10 +109,11 @@ Evently is mainly built with:
 - [SvelteKit](https://github.com/sveltejs/kit) for the frontend
 - [shadcn-svelte](https://github.com/huntabyte/shadcn-svelte) for UI components
 - [Tauri](https://tauri.app/) for the cross-platform desktop application
+- [signaldbjs](https://github.com/maxnowack/signaldb) for offline database with js signals.
 - [TailwindCSS](https://github.com/tailwindlabs/tailwindcss) for styling
 - [signaldb](https://github.com/maxnowack/signaldb) for real-time data synchronization using OPFS
 - [pdfmake](https://github.com/bpampuch/pdfmake) for PDF generation
-- [react-big-calendar](https://github.com/jquense/react-big-calendar) for the calendar component
+- [event-calendar](https://originui.com/event-calendar) for the calendar component
 - [exceljs](https://github.com/exceljs/exceljs) for Excel file handling
 - [svelte-put/qr](https://svelte-put.vnphanquang.com/docs/qr) for QR code generation
 - [React](https://github.com/facebook/react) for rendering the calendar component
