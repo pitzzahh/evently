@@ -50,7 +50,7 @@
 						onclick={toggleMode}
 						class={cn(
 							buttonVariants({ variant: 'outline', size: 'icon' }),
-							'hover:bg-bg-gray-400/10 !shrink-0 border-none bg-gray-400/10 backdrop-blur-md backdrop-filter dark:bg-white/10 [&_svg]:size-5'
+							'hover:bg-bg-gray-400/10 cursor-pointer !shrink-0 border-none bg-gray-400/10 backdrop-blur-md backdrop-filter dark:bg-white/10 [&_svg]:size-5'
 						)}
 					>
 						{#if $mode === 'light'}

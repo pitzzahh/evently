@@ -36,7 +36,7 @@
 		{#snippet child({ props })}
 			<button
 				class={cn(
-					'flex w-[120px] items-center justify-center gap-2 rounded-sm border bg-primary p-2 px-3 py-1 text-sm text-white active:scale-95 active:opacity-60 dark:border-white/20',
+					'bg-primary flex w-[120px] cursor-pointer items-center justify-center gap-2 rounded-sm border p-2 px-3 py-1 text-sm text-white active:scale-95 active:opacity-60 dark:border-white/20',
 					is_disabled && 'cursor-not-allowed'
 				)}
 				{...props}
