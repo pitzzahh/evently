@@ -97,11 +97,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-          PLUNK_API: ${{ secrets.PLUNK_API }}
-          PLUNK_SK: ${{ secrets.PLUNK_SK }}
-          CLOUDINARY_API_URL: ${{ secrets.CLOUDINARY_API_URL }}
-          CLOUD_NAME: ${{ secrets.CLOUD_NAME }}
-          UPLOAD_PRESET: ${{ secrets.UPLOAD_PRESET }}
         with:
           tagName: ${{ github.ref_name }}
           releaseName: "${{ env.APP_NAME }} v__VERSION__"
