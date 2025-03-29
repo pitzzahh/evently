@@ -89,8 +89,8 @@ export function EventCalendar({
 				case 'd':
 					setView('day');
 					break;
-				case 'a':
-					setView('agenda');
+				case 'e':
+					setView('events');
 					break;
 			}
 		};
@@ -109,8 +109,8 @@ export function EventCalendar({
 			setCurrentDate(subWeeks(currentDate, 1));
 		} else if (view === 'day') {
 			setCurrentDate(addDays(currentDate, -1));
-		} else if (view === 'agenda') {
-			// For agenda view, go back 30 days (a full month)
+		} else if (view === 'events') {
+			// For events view, go back 30 days (a full month)
 			setCurrentDate(addDays(currentDate, -AgendaDaysToShow));
 		}
 	};
@@ -122,8 +122,8 @@ export function EventCalendar({
 			setCurrentDate(addWeeks(currentDate, 1));
 		} else if (view === 'day') {
 			setCurrentDate(addDays(currentDate, 1));
-		} else if (view === 'agenda') {
-			// For agenda view, go forward 30 days (a full month)
+		} else if (view === 'events') {
+			// For events view, go forward 30 days (a full month)
 			setCurrentDate(addDays(currentDate, AgendaDaysToShow));
 		}
 	};
@@ -239,8 +239,8 @@ export function EventCalendar({
 					<span className="max-md:hidden">{format(currentDate, 'EEE MMMM d, yyyy')}</span>
 				</>
 			);
-		} else if (view === 'agenda') {
-			// Show the month range for agenda view
+		} else if (view === 'events') {
+			// Show the month range for events view
 			const start = currentDate;
 			const end = addDays(currentDate, AgendaDaysToShow - 1);
 
@@ -311,8 +311,8 @@ export function EventCalendar({
 								<DropdownMenuItem onClick={() => setView('day')}>
 									Day <DropdownMenuShortcut>D</DropdownMenuShortcut>
 								</DropdownMenuItem>
-								<DropdownMenuItem onClick={() => setView('agenda')}>
-									Agenda <DropdownMenuShortcut>A</DropdownMenuShortcut>
+								<DropdownMenuItem onClick={() => setView('events')}>
+									Events <DropdownMenuShortcut>E</DropdownMenuShortcut>
 								</DropdownMenuItem>
 							</DropdownMenuContent>
 						</DropdownMenu>
@@ -354,7 +354,7 @@ export function EventCalendar({
 							onEventCreate={handleEventCreate}
 						/>
 					)}
-					{view === 'agenda' && (
+					{view === 'events' && (
 						<AgendaView
 							currentDate={currentDate}
 							events={events}
