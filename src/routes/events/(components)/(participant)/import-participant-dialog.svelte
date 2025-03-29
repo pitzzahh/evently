@@ -175,10 +175,10 @@
 		<Dialog.Header>
 			<Dialog.Title>Importing guide</Dialog.Title>
 			<Dialog.Description>
-				<p class="text-sm text-muted-foreground">
+				<p class="text-muted-foreground text-sm">
 					To import participants, please ensure that the Excel file is formatted as follows:
 				</p>
-				<table class="table-auto text-sm text-muted-foreground">
+				<table class="text-muted-foreground table-auto text-sm">
 					<thead>
 						<tr>
 							<th class="px-4 py-2">last_name</th>
@@ -196,7 +196,7 @@
 						</tr>
 					</tbody>
 				</table>
-				<p class="mt-2 text-sm text-muted-foreground">
+				<p class="text-muted-foreground mt-2 text-sm">
 					The first row should contain the column headers. Please ensure that the file is saved in
 					.xlsx format.
 				</p>
@@ -221,7 +221,7 @@
 								{/await}
 								<div class="flex flex-col">
 									<span>{file.name}</span>
-									<span class="text-xs text-muted-foreground">{displaySize(file.size)}</span>
+									<span class="text-muted-foreground text-xs">{displaySize(file.size)}</span>
 								</div>
 							</div>
 							{#await file.url}

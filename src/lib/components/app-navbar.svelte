@@ -21,8 +21,8 @@
 </script>
 
 <header
-	class="sticky top-0 z-10 flex h-auto w-full shrink-0 items-center justify-between gap-8 border-b bg-clip-padding px-4 py-3
- 	backdrop-blur-md backdrop-filter transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 md:gap-0"
+	class=" sticky top-0 z-10 flex h-auto w-full shrink-0 items-center justify-between gap-8 border-b bg-clip-padding px-4
+ 	py-3 backdrop-blur-sm transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 md:gap-0"
 >
 	<a href="/" class="cursor-pointer text-lg font-bold">
 		<img src={evently_logo} class="size-12" alt="evently logo" /></a
@@ -33,8 +33,8 @@
 			{#each routes as route}
 				<a href={route.pathname}>
 					<p
-						class={cn('flex items-center gap-2 font-semibold text-muted-foreground opacity-50', {
-							'opacity-1 text-inherit transition-colors duration-200': isActive(route.pathname)
+						class={cn('text-muted-foreground flex items-center gap-2 font-semibold opacity-50', {
+							'text-inherit opacity-100 transition-colors duration-200': isActive(route.pathname)
 						})}
 					>
 						<route.icon class="size-6" />
@@ -50,7 +50,7 @@
 						onclick={toggleMode}
 						class={cn(
 							buttonVariants({ variant: 'outline', size: 'icon' }),
-							'hover:bg-bg-gray-400/10 !shrink-0 border-none bg-gray-400/10 backdrop-blur-md backdrop-filter dark:bg-white/10 [&_svg]:size-5'
+							'hover:bg-bg-gray-400/10 cursor-pointer !shrink-0 border-none bg-gray-400/10 backdrop-blur-md backdrop-filter dark:bg-white/10 [&_svg]:size-5'
 						)}
 					>
 						{#if $mode === 'light'}
