@@ -91,6 +91,31 @@ bun run tauri build
 
 This will create a production build of the application in the `src-tauri/target/release` directory.
 
+## Environment Variables Setup
+
+To run this project locally, you need to set up environment variables:
+
+1. Copy the `.env.example` file to a new file named `.env`:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Fill in the values in your new `.env` file:
+
+   ### Email Service (Plunk)
+
+   - `PLUNK_API`: Your Plunk API endpoint
+   - `PLUNK_SK`: Your Plunk secret key from your dashboard
+
+   ### Cloud Storage (Cloudinary)
+
+   - `CLOUDINARY_API_URL`: Cloudinary API URL (typically https://api.cloudinary.com/v1_1)
+   - `CLOUD_NAME`: Your Cloudinary cloud name
+   - `UPLOAD_PRESET`: Your Cloudinary upload preset name
+
+3. Once all environment variables are set, you can start the development server.
+
 ## Screenshots
 
 <div align="center">
