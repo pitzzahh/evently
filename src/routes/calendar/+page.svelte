@@ -5,6 +5,7 @@
 	import { COLLECTIONS } from '@/db';
 	import type { CalendarEvent } from '@/components/custom/react-event-calendar/components';
 	import { checkEventStatus } from '@routes/events/utils';
+	import { goto } from '$app/navigation';
 
 	interface ComponentState {
 		event_details: CalendarEvent[];
@@ -43,5 +44,10 @@
 
 <h2 class="mb-4 text-4xl font-semibold">Calendar of Events</h2>
 <div in:scale class="min-h-dvh p-4">
-	<EventCalendar events={comp_state.event_details} />
+	<EventCalendar
+		events={comp_state.event_details}
+		onViewEvent={(event_id: string) => {
+			goto(`/events/${event_id}`, { replaceState: true });
+		}}
+	/>
 </div>

@@ -46,7 +46,7 @@ export interface EventCalendarProps {
 	onEventAdd?: (event: CalendarEvent) => void;
 	onEventUpdate?: (event: CalendarEvent) => void;
 	onEventDelete?: (eventId: string) => void;
-	onViewEvent: (eventId: string) => void;
+	onViewEvent?: (eventId: string) => void;
 	className?: string;
 	initialView?: CalendarView;
 }
@@ -133,7 +133,7 @@ export function EventCalendar({
 	};
 
 	const handleEventSelect = (event: CalendarEvent) => {
-		onViewEvent(event.id);
+		onViewEvent?.(event.id);
 		console.log('Event selected:', event); // Debug log
 		// setSelectedEvent(event);
 		// setIsEventDialogOpen(true);
