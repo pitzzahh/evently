@@ -109,7 +109,6 @@ Evently is mainly built with:
 - [SvelteKit](https://github.com/sveltejs/kit) for the frontend
 - [shadcn-svelte](https://github.com/huntabyte/shadcn-svelte) for UI components
 - [Tauri](https://tauri.app/) for the cross-platform desktop application
-- [signaldbjs](https://github.com/maxnowack/signaldb) for offline database with js signals.
 - [TailwindCSS](https://github.com/tailwindlabs/tailwindcss) for styling
 - [signaldb](https://github.com/maxnowack/signaldb) for real-time data synchronization using OPFS
 - [pdfmake](https://github.com/bpampuch/pdfmake) for PDF generation
