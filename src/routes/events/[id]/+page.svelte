@@ -44,6 +44,7 @@
 		num_of_incomplete_attendance: number;
 	}
 
+	let div_ref: HTMLDivElement | null = null;
 	let comp_state = $state<ComponentState>({
 		event_details: undefined,
 		event_schedules: [],
@@ -167,10 +168,10 @@
 	);
 
 	onMount(() => {
-		window.scrollTo({
-			top: 0,
-			behavior: 'smooth'
-		});
+		if (div_ref) {
+			div_ref.scrollTo(0, 0);
+		}
+		
 		if (!comp_state.event_details) {
 			const error_content = {
 				status: 404,
@@ -204,7 +205,7 @@
 	}
 </script>
 
-<div in:fly={{ y: 20 }} class="grid gap-4">
+<div bind:this={div_ref} in:fly={{ y: 20 }} class="grid gap-4">
 	<div class="flex items-start gap-6 border-b-2 border-dashed pb-6">
 		<PhotoPreviewer image_src={comp_state.event_details?.cover!} />
 
