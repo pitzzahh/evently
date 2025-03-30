@@ -91,6 +91,31 @@ bun run tauri build
 
 This will create a production build of the application in the `src-tauri/target/release` directory.
 
+## Environment Variables Setup
+
+To run this project locally, you need to set up environment variables:
+
+1. Copy the `.env.example` file to a new file named `.env`:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Fill in the values in your new `.env` file:
+
+   ### Email Service (Plunk)
+
+   - `PLUNK_API`: Your Plunk API endpoint
+   - `PLUNK_SK`: Your Plunk secret key from your dashboard
+
+   ### Cloud Storage (Cloudinary)
+
+   - `CLOUDINARY_API_URL`: Cloudinary API URL (typically https://api.cloudinary.com/v1_1)
+   - `CLOUD_NAME`: Your Cloudinary cloud name
+   - `UPLOAD_PRESET`: Your Cloudinary upload preset name
+
+3. Once all environment variables are set, you can start the development server.
+
 ## Screenshots
 
 <div align="center">
@@ -110,12 +135,12 @@ Evently is mainly built with:
 - [shadcn-svelte](https://github.com/huntabyte/shadcn-svelte) for UI components
 - [Tauri](https://tauri.app/) for the cross-platform desktop application
 - [TailwindCSS](https://github.com/tailwindlabs/tailwindcss) for styling
-- [signaldb](https://github.com/maxnowack/signaldb) for real-time data synchronization using OPFS
+- [SignalDB](https://github.com/maxnowack/signaldb) for real-time data synchronization using OPFS
 - [pdfmake](https://github.com/bpampuch/pdfmake) for PDF generation
-- [react-big-calendar](https://github.com/jquense/react-big-calendar) for the calendar component
+- [event-calendar](https://originui.com/event-calendar) for the calendar component
 - [exceljs](https://github.com/exceljs/exceljs) for Excel file handling
 - [svelte-put/qr](https://svelte-put.vnphanquang.com/docs/qr) for QR code generation
-- [React](https://github.com/facebook/react) for rendering the calendar component
+- [react](https://github.com/facebook/react) for rendering the calendar component
 - and many more.
 
 ## Building for Desktop

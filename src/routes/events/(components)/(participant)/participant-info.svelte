@@ -8,7 +8,7 @@
 		ParticipantAttendance
 	} from '@/db/models/types';
 	import { generateFullName } from '@/utils/text';
-	import SvgQR from '@svelte-put/qr/svg/QR.svelte';
+	import { createQrPngDataUrl } from '@svelte-put/qr';
 	import { watch } from 'runed';
 	import { page } from '$app/state';
 	import { Badge } from '@/components/ui/badge';
@@ -20,10 +20,8 @@
 	import * as Popover from '$lib/components/ui/popover/index.js';
 	import { Calendar, ListFilter } from 'lucide-svelte';
 	import { Button, buttonVariants } from '@/components/ui/button';
-	// import PhotoPreviewer from '@/components/custom/photo-previewer/photo-previewer.svelte';
-
-	// import { createQrPngDataUrl } from '@svelte-put/qr';
-	// import { onMount } from 'svelte';
+	import { PhotoPreviewer } from '@/components/custom/photo-previewer';
+	import { Skeleton } from '@/components/ui/skeleton';
 
 	interface ParticipantInfoProps {
 		participant: Participant;
@@ -161,14 +159,11 @@
 
 <div class="flex items-center gap-4">
 	<div class="bg-white p-2">
-		<SvgQR
-			data={participant.id}
-			logoRatio={107 / 128}
-			shape="circle"
-			width="250"
-			height="250"
-			color="black"
-		/>
+		{#await createQrPngDataUrl( { data: participant.id, logoRatio: 107 / 128, shape: 'circle', width: 250, height: 250, backgroundFill: '#fff' } )}
+			<Skeleton class="h-[250px] w-[250px]" />
+		{:then qr}
+			<PhotoPreviewer image_src={qr} />
+		{/await}
 	</div>
 
 	<div class="grid w-full gap-4">
@@ -185,7 +180,7 @@
 					)}
 				</h4>
 
-				<p class="text-sm text-muted-foreground">
+				<p class="text-muted-foreground text-sm">
 					{participant.email}
 				</p>
 			</div>
@@ -200,13 +195,13 @@
 					)}
 				>
 					{#if comp_state.filtered_attendance_status !== 'all'}
-						<div class="absolute -right-1 -top-1 size-3 rounded-full bg-blue-500"></div>
+						<div class="absolute -top-1 -right-1 size-3 rounded-full bg-blue-500"></div>
 					{/if}
 					<ListFilter class="size-4" />
 				</Popover.Trigger>
 				<Popover.Content class="w-auto" side="left">
 					<p class="mb-1 text-sm font-medium">Filters</p>
-					<fieldset class="sticky top-0 space-y-4 bg-background">
+					<fieldset class="bg-background sticky top-0 space-y-4">
 						<RadioGroup.Root
 							bind:value={comp_state.filtered_attendance_status}
 							name="spacing"
@@ -215,7 +210,7 @@
 							{#each filter_attendance_statuses as f, idx}
 								<label
 									for={`${idx}-${f.value}`}
-									class="[&:has([data-state=checked])>div>p]:text-white [&:has([data-state=checked])>div]:border-primary [&:has([data-state=checked])>div]:bg-primary"
+									class="[&:has([data-state=checked])>div]:border-primary [&:has([data-state=checked])>div]:bg-primary [&:has([data-state=checked])>div>p]:text-white"
 								>
 									<RadioGroup.Item
 										id={`${idx}-${f.value}`}
@@ -225,7 +220,7 @@
 									<div
 										class="relative flex cursor-pointer flex-col items-center rounded-full border px-2 py-1 text-center"
 									>
-										<p class="text-xs font-medium text-foreground">{f.label}</p>
+										<p class="text-foreground text-xs font-medium">{f.label}</p>
 									</div>
 								</label>
 							{/each}
@@ -241,10 +236,10 @@
 			{#if comp_state.event_schedules.length === 0 && comp_state.filtered_attendance_status !== 'all'}
 				<div class="grid h-[350px] place-content-center">
 					<div class="grid place-items-center gap-2">
-						<Calendar class="size-[4rem] text-muted-foreground/80" />
+						<Calendar class="text-muted-foreground/80 size-[4rem]" />
 						<div class="grid place-items-center gap-1">
-							<h2 class="text-xl font-medium text-muted-foreground">No event day found</h2>
-							<p class="text-sm text-muted-foreground">
+							<h2 class="text-muted-foreground text-xl font-medium">No event day found</h2>
+							<p class="text-muted-foreground text-sm">
 								{#if comp_state.filtered_attendance_status === 'complete'}
 									No days with complete attendance records found.
 								{:else if comp_state.filtered_attendance_status === 'incomplete'}
@@ -354,12 +349,12 @@
 				<p class="text-sm font-medium">In</p>
 
 				<div class="flex gap-2">
-					<p class="text-sm text-muted-foreground">Scheduled Time</p>
+					<p class="text-muted-foreground text-sm">Scheduled Time</p>
 					<Badge variant="outline">{formatDateToTimeOption(event_period_start)}</Badge>
 				</div>
 
 				<div class="flex gap-2">
-					<p class="text-sm text-muted-foreground">Time In</p>
+					<p class="text-muted-foreground text-sm">Time In</p>
 					<Badge
 						variant="outline"
 						class={cn({
@@ -372,7 +367,7 @@
 
 				{#if time_late}
 					<div class="flex gap-2">
-						<p class="text-sm text-muted-foreground">Time Late</p>
+						<p class="text-muted-foreground text-sm">Time Late</p>
 						<Badge variant="outline" class="text-yellow-500">
 							{time_late}
 						</Badge>
@@ -384,12 +379,12 @@
 				<p class="text-sm font-medium">Out</p>
 
 				<div class="flex gap-2">
-					<p class="text-sm text-muted-foreground">Scheduled Time</p>
+					<p class="text-muted-foreground text-sm">Scheduled Time</p>
 					<Badge variant="outline">{formatDateToTimeOption(event_period_end)}</Badge>
 				</div>
 
 				<div class="flex gap-2">
-					<p class="text-sm text-muted-foreground">Time Out</p>
+					<p class="text-muted-foreground text-sm">Time Out</p>
 					<Badge
 						variant="outline"
 						class={cn({

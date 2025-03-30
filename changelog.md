@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.47] - 2025-3-30
+
+### Add
+
+- New event calendar UI, migrated from original UI.
+- Updated to TailwindCSS v4.
+- Added event cover photo preview functionality.
+- Implemented participant QR code photo preview.
+
+### Fix
+
+- CI Build failing to generate environment files due to GitHub Actions read-only permissions.
+- Various components affected by TailwindCSS migration.
+
 ## [1.5.42] - 2025-3-27
 
 ### Fix

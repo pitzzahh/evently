@@ -11,7 +11,6 @@
 		View,
 		Clock
 	} from '@/assets/icons';
-	import * as Avatar from '@/components/ui/avatar';
 	import { cn } from '@/utils/styles';
 	import { EventTimePicker } from '@routes/events/(components)';
 	import * as DropdownMenu from '@/components/ui/dropdown-menu/index.js';
@@ -26,11 +25,10 @@
 	import { checkEventStatus, getEventDayInfo } from '../utils/index.js';
 	import * as Dialog from '@/components/ui/dialog';
 	import { onMount } from 'svelte';
-	import { Image } from 'lucide-svelte';
 	import { quartInOut } from 'svelte/easing';
 	import Badge from '@/components/ui/badge/badge.svelte';
 	import Separator from '@/components/ui/separator/separator.svelte';
-	import PhotoPreviewer from '@/components/custom/photo-previewer/photo-previewer.svelte';
+	import { PhotoPreviewer } from '@/components/custom/photo-previewer';
 
 	let { data } = $props();
 
@@ -167,16 +165,6 @@
 		}
 	);
 
-	onMount(() => {
-		if (!comp_state.event_details) {
-			const error_content = {
-				status: 404,
-				message: 'Event not found'
-			};
-			goto(`/events/${data.event_id}?error_content=${JSON.stringify(error_content)}`);
-		}
-	});
-
 	function handleDeleteEvent() {
 		if (comp_state.event_details) {
 			const id = comp_state.event_details.id;
@@ -199,11 +187,24 @@
 			comp_state.confimation_open = false;
 		}
 	}
+
+	onMount(() => {
+		if (!comp_state.event_details) {
+			const error_content = {
+				status: 404,
+				message: 'Event not found'
+			};
+			goto(`/events/${data.event_id}?error_content=${JSON.stringify(error_content)}`);
+		}
+	});
 </script>
 
 <div in:fly={{ y: 20 }} class="grid gap-4">
 	<div class="flex items-start gap-6 border-b-2 border-dashed pb-6">
-		<PhotoPreviewer image_src={comp_state.event_details?.cover!} />
+		<PhotoPreviewer
+			image_src={comp_state.event_details?.cover!}
+			class="ring-accent ring-offset-background ring-2 ring-offset-2"
+		/>
 
 		<div class="flex w-full flex-1 flex-col gap-4">
 			<div class="flex w-full items-start justify-between gap-4">
@@ -273,7 +274,7 @@
 			<div class="grid w-full grid-cols-2 grid-rows-2 gap-4">
 				<div class="flex items-center gap-3">
 					<div class="rounded-md border p-3">
-						<Calendar class="size-5 text-muted-foreground" />
+						<Calendar class="text-muted-foreground size-5" />
 					</div>
 
 					<div class="flex gap-4">
@@ -282,7 +283,7 @@
 							<p class="text-base font-medium">
 								{formatDateTime(comp_state.event_details?.start_date)}
 							</p>
-							<p class="text-sm text-muted-foreground">
+							<p class="text-muted-foreground text-sm">
 								{formatDateToTimeOption(comp_state.event_schedules.at(0)?.am_start)} - {formatDateToTimeOption(
 									comp_state.event_schedules.at(0)?.pm_end
 								)}
@@ -296,7 +297,7 @@
 							<p class="text-base font-medium">
 								{formatDateTime(comp_state.event_details?.end_date)}
 							</p>
-							<p class="text-sm text-muted-foreground">
+							<p class="text-muted-foreground text-sm">
 								{formatDateToTimeOption(comp_state.event_schedules.at(-1)?.am_start)} - {formatDateToTimeOption(
 									comp_state.event_schedules.at(-1)?.pm_end
 								)}
@@ -307,7 +308,7 @@
 
 				<div class="flex items-center gap-3">
 					<div class="rounded-md border p-3">
-						<Clock class="size-5 text-muted-foreground" />
+						<Clock class="text-muted-foreground size-5" />
 					</div>
 
 					<div>
@@ -318,17 +319,17 @@
 								? 'days'
 								: 'day'} event
 						</p>
-						<p class="text-sm text-muted-foreground">Duration</p>
+						<p class="text-muted-foreground text-sm">Duration</p>
 					</div>
 				</div>
 
 				<div class="flex items-center gap-3">
 					<div class="rounded-md border p-3">
-						<UsersRound class="size-5 text-muted-foreground" />
+						<UsersRound class="text-muted-foreground size-5" />
 					</div>
 					<div>
 						<p class="text-base font-medium">{comp_state.participants.length}</p>
-						<p class="text-sm text-muted-foreground">
+						<p class="text-muted-foreground text-sm">
 							Participant{comp_state.participants.length > 1 ? 's' : ''}
 						</p>
 					</div>
@@ -336,11 +337,11 @@
 
 				<div class="flex items-center gap-3">
 					<div class="rounded-md border p-3">
-						<MapPin class="size-5 text-muted-foreground" />
+						<MapPin class="text-muted-foreground size-5" />
 					</div>
 					<div>
 						<p class="text-base font-medium">{comp_state.event_details?.location ?? 'N/A'}</p>
-						<p class="text-sm text-muted-foreground">Location</p>
+						<p class="text-muted-foreground text-sm">Location</p>
 					</div>
 				</div>
 			</div>
@@ -420,7 +421,7 @@
 		</div>
 	{/if}
 	<div
-		class="duration-400 flex max-h-[400px] flex-col gap-2 overflow-y-auto pr-1 transition ease-in-out"
+		class="flex max-h-[400px] flex-col gap-2 overflow-y-auto pr-1 transition duration-400 ease-in-out"
 	>
 		{#each comp_state.event_schedules as event_date, index}
 			<EventTimePicker

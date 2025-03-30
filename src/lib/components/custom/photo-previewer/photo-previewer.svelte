@@ -1,9 +1,17 @@
+<script module lang="ts">
+	export type PhotoPreviewerType = {
+		image_src?: string;
+		class?: string;
+	};
+</script>
+
 <script lang="ts">
 	import { scale } from 'svelte/transition';
 	import * as Avatar from '@/components/ui/avatar';
 	import { Image, X } from 'lucide-svelte';
+	import { cn } from '@/utils';
 
-	let { image_src } = $props<{ image_src?: string }>();
+	let { image_src, class: className }: PhotoPreviewerType = $props();
 	let isPreviewOpen = $state(false);
 
 	function openPreview() {
@@ -29,16 +37,14 @@
 <svelte:document onkeydown={handleKeydown} />
 
 <!-- Clickable Image -->
-<Avatar.Root
-	class="aspect-square size-[200px] rounded-md ring-2 ring-accent ring-offset-2 ring-offset-background lg:size-[240px]"
->
+<Avatar.Root class={cn('aspect-square size-[200px] rounded-md lg:size-[240px]', className)}>
 	<Avatar.Image
 		src={image_src}
 		onclick={openPreview}
 		class="cursor-pointer transition-all duration-500 ease-in-out hover:scale-110"
 	/>
 	<Avatar.Fallback class="aspect-square size-[200px] rounded-md lg:size-[240px]">
-		<Image class="size-16 text-muted-foreground opacity-50" />
+		<Image class="text-muted-foreground size-16 opacity-50" />
 	</Avatar.Fallback>
 </Avatar.Root>
 
@@ -49,7 +55,7 @@
 	<div class="modal" onclick={handleModalClick}>
 		<div class="modal-content">
 			<img src={image_src} alt="Enlarged" transition:scale={{ duration: 100 }} />
-			<button class="close-button absolute -right-10 -top-10" onclick={closePreview}>
+			<button class="close-button absolute -top-10 -right-10" onclick={closePreview}>
 				<X class="size-6" />
 			</button>
 		</div>
