@@ -1,5 +1,3 @@
-'use client';
-
 import React, { useMemo } from 'react';
 import { RiCalendarEventLine } from '@remixicon/react';
 import { addDays, format, isToday } from 'date-fns';
