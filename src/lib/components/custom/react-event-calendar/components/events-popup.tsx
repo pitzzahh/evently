@@ -1,5 +1,3 @@
-"use client"
-
 import { useEffect, useMemo, useRef } from "react"
 import { format, isSameDay } from "date-fns"
 import { XIcon } from "lucide-react"
