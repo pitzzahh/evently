@@ -523,8 +523,6 @@
 		</div>
 	</div>
 
-	<SuperDebug data={$formData} />
-
 	<Form.Button
 		disabled={!hasRequiredData($formData, ['title', 'location', 'start_date', 'end_date'])}
 		class="mt-3">{event_to_edit ? 'Save Changes' : 'Submit'}</Form.Button
