@@ -85,7 +85,7 @@ export function MonthView({ currentDate, events, onEventSelect, onEventCreate }:
 
 	return (
 		<>
-			<div className="bg-background/70 sticky top-0 grid grid-cols-7 border-b backdrop-blur-md">
+			<div className="bg-background/70 sticky top-0 grid grid-cols-7 z-10 border-b backdrop-blur-md">
 				{weekdays.map((day) => (
 					<div key={day} className="text-muted-foreground/70 py-2 text-center text-sm">
 						{day}
