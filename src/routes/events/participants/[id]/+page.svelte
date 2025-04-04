@@ -595,6 +595,58 @@
 		);
 	}
 
+	function get_event_details_and_participants() {
+		const _event_details = COLLECTIONS.EVENT_DETAILS_COLLECTION.findOne({
+			id: data.event_id
+		});
+
+		const participants_cursor = COLLECTIONS.PARTICIPANT_COLLECTION.find(
+			{
+				event_id: data.event_id
+			},
+			{
+				sort: {
+					created: -1
+				}
+			}
+		);
+
+		const _participants = participants_cursor.fetch().map((participant) => {
+			const event_days = event_details?.difference_in_days;
+			const total_days_attended = all_participants_attendance.reduce(
+				(acc, participant_attendance) => {
+					if (
+						participant_attendance.participant_id === participant.id &&
+						participant_attendance.am_time_in &&
+						participant_attendance.pm_time_in
+					) {
+						return acc + 1;
+					}
+					return acc;
+				},
+				0
+			);
+
+			const attendance_status =
+				total_days_attended === event_days
+					? 'complete'
+					: event_days && total_days_attended > 0 && total_days_attended < event_days
+						? 'incomplete'
+						: 'absent';
+
+			return {
+				...participant,
+				attendance_status: event_status === 'finished' ? attendance_status : undefined
+			};
+		});
+
+		return {
+			event_details: _event_details as EventDetails,
+			participants: _participants as Participant[],
+			participants_cursor
+		};
+	}
+
 	watch(
 		[
 			() => COLLECTIONS.PARTICIPANT_COLLECTION.isLoading(),
@@ -603,24 +655,20 @@
 			() => COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.isLoading()
 		],
 		() => {
-			const participants_cursor = COLLECTIONS.PARTICIPANT_COLLECTION.find(
-				{
-					event_id: data.event_id
-				},
-				{
-					sort: {
-						created: -1
-					}
-				}
-			);
 			const event_schedule_cursor = COLLECTIONS.EVENT_SCHEDULE_COLLECTION.find({
 				event_id: data.event_id
 			});
 
 			event_schedules = event_schedule_cursor.fetch();
-			event_details = COLLECTIONS.EVENT_DETAILS_COLLECTION.findOne({
-				id: data.event_id
-			});
+
+			const {
+				event_details: _event_details,
+				participants: _participants,
+				participants_cursor
+			} = get_event_details_and_participants();
+
+			event_details = _event_details;
+			participants = _participants;
 
 			if (current_event_day) {
 				current_day_participants_attendance = getPopulatedAttendanceRecords(
@@ -639,35 +687,6 @@
 				participant_collection: COLLECTIONS.PARTICIPANT_COLLECTION,
 				event_schedules_collection: COLLECTIONS.EVENT_SCHEDULE_COLLECTION
 			}) as ParticipantAttendance[];
-
-			participants = participants_cursor.fetch().map((participant) => {
-				const event_days = event_details?.difference_in_days;
-				const total_days_attended = all_participants_attendance.reduce(
-					(acc, participant_attendance) => {
-						if (
-							participant_attendance.participant_id === participant.id &&
-							participant_attendance.am_time_in &&
-							participant_attendance.pm_time_in
-						) {
-							return acc + 1;
-						}
-						return acc;
-					},
-					0
-				);
-
-				const attendance_status =
-					total_days_attended === event_days
-						? 'complete'
-						: event_days && total_days_attended > 0 && total_days_attended < event_days
-							? 'incomplete'
-							: 'absent';
-
-				return {
-					...participant,
-					attendance_status: event_status === 'finished' ? attendance_status : undefined
-				};
-			});
 
 			return () => {
 				participants_cursor.cleanup();
@@ -789,6 +808,9 @@
 												});
 											}
 
+											const { event_details: _event_details, participants: _participants } =
+												get_event_details_and_participants();
+
 											pdf.qr_code_worker.postMessage({
 												info: {
 													creator: 'Evently',
@@ -796,9 +818,10 @@
 													subject: 'QR Codes',
 													producer: 'Evently'
 												},
-												event_details: JSON.stringify(event_details),
-												participants: JSON.stringify(participants)
+												event_details: JSON.stringify({ event_details: _event_details }),
+												participants: JSON.stringify({ participants: _participants })
 											});
+
 											toast.info('Generating QR codes', {
 												description:
 													'Please wait while we generate the QR codes, or feel free to do other things'
@@ -819,7 +842,8 @@
 													description: 'Please refresh the page and try again'
 												});
 											}
-
+											const { event_details: _event_details, participants: _participants } =
+												get_event_details_and_participants();
 											pdf.daily_attendance_report_worker.postMessage({
 												info: {
 													creator: 'Evently',
@@ -827,8 +851,8 @@
 													subject: 'Daily Attendance Report',
 													producer: 'Evently'
 												},
-												event_details: JSON.stringify(event_details),
-												participants: JSON.stringify(participants)
+												event_details: JSON.stringify({ event_details: _event_details }),
+												participants: JSON.stringify({ participants: _participants })
 											});
 											toast.info('Generating daily attendance report', {
 												description:
@@ -851,6 +875,9 @@
 												});
 											}
 
+											const { event_details: _event_details, participants: _participants } =
+												get_event_details_and_participants();
+
 											pdf.full_attendance_report_worker.postMessage({
 												info: {
 													creator: 'Evently',
@@ -858,8 +885,8 @@
 													subject: 'Full Attendance Report',
 													producer: 'Evently'
 												},
-												event_details: JSON.stringify(event_details),
-												participants: JSON.stringify(participants)
+												event_details: JSON.stringify({ event_details: _event_details }),
+												participants: JSON.stringify({ participants: _participants })
 											});
 											toast.info('Generating event full attendance report', {
 												description:
@@ -885,6 +912,9 @@
 												});
 											}
 
+											const { event_details: _event_details, participants: _participants } =
+												get_event_details_and_participants();
+
 											excel.full_attendance_report_worker.postMessage({
 												info: {
 													creator: 'Evently',
@@ -892,8 +922,8 @@
 													subject: 'Full Attendance Report',
 													producer: 'Evently'
 												},
-												event_details: JSON.stringify(event_details),
-												participants: JSON.stringify(participants)
+												event_details: JSON.stringify({ event_details: _event_details }),
+												participants: JSON.stringify({ participants: _participants })
 											});
 
 											toast.info('Generating QR codes', {
@@ -921,7 +951,7 @@
 									<ScanQrCode class="size-4" />
 								</Popover.Trigger>
 								<Popover.Content class="w-auto" side="left">
-									<p class="mb-2 text-sm text-muted-foreground">Choose which scanner to use</p>
+									<p class="text-muted-foreground mb-2 text-sm">Choose which scanner to use</p>
 									<div class="flex items-center gap-1">
 										<QrCodeScannerDialog handleScan={handleScanParticipant} />
 										<Button
@@ -997,10 +1027,10 @@
 {#if last_scanned_participant}
 	<div
 		transition:fly={{ y: -20, duration: 200, easing: quartInOut }}
-		class="fixed right-8 top-10 z-[9999]"
+		class="fixed top-10 right-8 z-[9999]"
 	>
 		<Card.Root class="relative w-[400px]">
-			<button class="absolute right-4 top-4" onclick={() => (last_scanned_participant = null)}>
+			<button class="absolute top-4 right-4" onclick={() => (last_scanned_participant = null)}>
 				<X class="size-4" />
 			</button>
 			<Card.Header>
