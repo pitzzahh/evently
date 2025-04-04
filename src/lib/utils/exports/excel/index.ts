@@ -152,10 +152,59 @@ export async function generateFullEventAttendanceReportExcel(
       dayHeaderCell.font = { size: 14, bold: true };
       dayHeaderCell.alignment = { horizontal: 'center' };
 
-      // Style the header row
-      const headerRow = worksheet.getRow(4);
+      // Add category headers for time entries 
+      worksheet.insertRow(4, [null, 'AM Time', null, 'PM Time', null, null]);
+
+      // Merge cells for AM and PM time categories
+      worksheet.mergeCells('B4:C4');
+      worksheet.mergeCells('D4:E4');
+
+      // Style the category headers
+      const categoryRow = worksheet.getRow(4);
+      categoryRow.font = { bold: true, size: 12 };
+      categoryRow.alignment = { horizontal: 'center' };
+
+      // Style the AM Time header
+      const amTimeCell = categoryRow.getCell(2);
+      amTimeCell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFFAFA7A' } // Light yellow
+      };
+      amTimeCell.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' }
+      };
+
+      // Style the PM Time header
+      const pmTimeCell = categoryRow.getCell(4);
+      pmTimeCell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFFAD5A5' } // Light orange
+      };
+      pmTimeCell.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' }
+      };
+
+      // Style the header row and make sure column headers are visible
+      const headerRow = worksheet.getRow(5);
       headerRow.font = { bold: true };
       headerRow.alignment = { horizontal: 'center' };
+
+      // Ensure each column header is properly set with right text
+      headerRow.getCell(1).value = 'Participant';
+      headerRow.getCell(2).value = 'AM Check-in';
+      headerRow.getCell(3).value = 'AM Check-out';
+      headerRow.getCell(4).value = 'PM Check-in';
+      headerRow.getCell(5).value = 'PM Check-out';
+      headerRow.getCell(6).value = 'Status';
+
       headerRow.eachCell((cell) => {
         cell.fill = {
           type: 'pattern',
@@ -170,7 +219,7 @@ export async function generateFullEventAttendanceReportExcel(
         };
       });
 
-      // Add participant data
+      // Add participant data - adjust row index to start from row 6 (was 5)
       dayParticipantAttendance.forEach((participant, index) => {
         let statusText = '';
         let statusColor = '';
@@ -196,7 +245,7 @@ export async function generateFullEventAttendanceReportExcel(
           }
         }
 
-        const rowIndex = index + 5; // Start from row 5 (after headers and title)
+        const rowIndex = index + 6; // Start from row 6 (was 5, adjusted for new header row)
         const row = worksheet.getRow(rowIndex);
 
         row.getCell(1).value = `${participant.last_name}, ${participant.first_name}${participant.middle_name ? ' ' + participant.middle_name : ''}`;
@@ -226,7 +275,7 @@ export async function generateFullEventAttendanceReportExcel(
       });
 
       // Add summary section
-      const summaryRowIndex = dayParticipantAttendance.length + 7; // Leave some space after the table
+      const summaryRowIndex = dayParticipantAttendance.length + 8; // Leave some space after the table
       worksheet.mergeCells(`A${summaryRowIndex}:F${summaryRowIndex}`);
       const summaryHeaderCell = worksheet.getCell(`A${summaryRowIndex}`);
       summaryHeaderCell.value = 'Daily Summary';
