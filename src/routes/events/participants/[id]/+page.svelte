@@ -827,8 +827,8 @@
 													subject: 'QR Codes',
 													producer: 'Evently'
 												},
-												event_details: JSON.stringify({ event_details: _event_details }),
-												participants: JSON.stringify({ participants: _participants })
+												_event_details: JSON.stringify(_event_details),
+												_participants: JSON.stringify(_participants)
 											});
 
 											toast.info('Generating QR codes', {
@@ -860,8 +860,8 @@
 													subject: 'Daily Attendance Report',
 													producer: 'Evently'
 												},
-												event_details: JSON.stringify({ event_details: _event_details }),
-												participants: JSON.stringify({ participants: _participants })
+												_event_details: JSON.stringify(_event_details),
+												_participants: JSON.stringify(_participants)
 											});
 											toast.info('Generating daily attendance report', {
 												description:
@@ -894,8 +894,8 @@
 													subject: 'Full Attendance Report',
 													producer: 'Evently'
 												},
-												event_details: JSON.stringify({ event_details: _event_details }),
-												participants: JSON.stringify({ participants: _participants })
+												_event_details: JSON.stringify(_event_details),
+												_participants: JSON.stringify(_participants)
 											});
 											toast.info('Generating event full attendance report', {
 												description:
@@ -931,8 +931,8 @@
 													subject: 'Full Attendance Report',
 													producer: 'Evently'
 												},
-												event_details: JSON.stringify({ event_details: _event_details }),
-												participants: JSON.stringify({ participants: _participants })
+												_event_details: JSON.stringify(_event_details),
+												_participants: JSON.stringify(_participants)
 											});
 
 											toast.info('Generating QR codes', {
