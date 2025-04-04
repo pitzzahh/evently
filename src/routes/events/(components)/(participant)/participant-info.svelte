@@ -15,13 +15,18 @@
 	import { formatDate, formatDateToTimeOption } from '@/utils/format';
 	import { cn } from '@/utils';
 	import { checkEventStatus, getEventDayInfo } from '@routes/events/utils';
-	import { tick } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
 	import * as Popover from '$lib/components/ui/popover/index.js';
 	import { Calendar, ListFilter } from 'lucide-svelte';
 	import { Button, buttonVariants } from '@/components/ui/button';
 	import { PhotoPreviewer } from '@/components/custom/photo-previewer';
 	import { Skeleton } from '@/components/ui/skeleton';
+	import { toast } from 'svelte-sonner';
+	import type { HelperResponse } from '@/types/generic';
+	import { getParticipantsWithQRCode } from '@routes/events/participants/[id]/+page.svelte';
+	import { getEnv } from '@/utils/security';
+	import SendEmailToParticipantsDialog from './send-email-to-participants-dialog.svelte';
 
 	interface ParticipantInfoProps {
 		participant: Participant;
@@ -40,6 +45,7 @@
 		participant_attendance: AttendanceRecord[];
 		filtered_attendance_status: (typeof filter_attendance_statuses)[number]['value'];
 		qr_src: string;
+		send_qr_code_worker: Worker | null;
 	}
 
 	let { participant, event_details }: ParticipantInfoProps = $props();
@@ -47,8 +53,13 @@
 		event_schedules: [],
 		participant_attendance: [],
 		filtered_attendance_status: 'all',
-		qr_src: ''
+		qr_src: '',
+		send_qr_code_worker: null
 	});
+
+	const event_status = $derived(
+		checkEventStatus(event_details?.start_date, event_details?.end_date)
+	);
 
 	watch(
 		[
@@ -146,15 +157,87 @@
 		return `${hours ? `${hours} hour${hours > 1 ? 's' : ''} ` : ''}${minutes} minute${minutes > 1 ? 's' : ''}`;
 	}
 
-	// onMount(async () => {
-	// 	comp_state.qr_src = await createQrPngDataUrl({
-	// 		data: participant.id,
-	// 		shape: 'circle',
-	// 		width: 250,
-	// 		height: 250,
-	// 		backgroundFill: '#fff'
-	// 	});
-	// });
+	onMount(async () => {
+		comp_state.qr_src = await createQrPngDataUrl({
+			data: participant.id,
+			shape: 'circle',
+			width: 250,
+			height: 250,
+			backgroundFill: '#fff'
+		});
+	});
+
+	async function load_send_qr_code_worker() {
+		if (comp_state.send_qr_code_worker) {
+			comp_state.send_qr_code_worker.terminate();
+		}
+		const SendQRWorker = await import('$lib/workers/email/send-qr-code-worker?worker');
+		comp_state.send_qr_code_worker = new SendQRWorker.default();
+		comp_state.send_qr_code_worker.onmessage = (
+			message: MessageEvent<HelperResponse<string | null>>
+		) => {
+			if (message.data.status !== 200 || message.data.data === null) {
+				return toast.warning('Failed to send QR codes', {
+					description: message.data.message
+				});
+			}
+			if (message.data.data || message.data.status === 200) {
+				toast.success(
+					`QR codes sent successfully to ${message.data.data} ${Number(message.data.data) > 1 ? 'participants' : 'participant'}`,
+					{
+						description: message.data.message
+					}
+				);
+			} else {
+				toast.error('Failed to send QR codes', {
+					description: 'No data received from the worker'
+				});
+			}
+		};
+	}
+
+	async function handle_email_send() {
+		if (event_status === 'finished') {
+			return toast.warning('Emailing QR codes is disabled since the event has concluded');
+		}
+
+		if (!event_details) {
+			return toast.warning('Event details not available', {
+				description: "Couldn't find event details required to generate QR codes"
+			});
+		}
+
+		if (!comp_state.send_qr_code_worker) {
+			return toast.error('Send qr code email worker not available', {
+				description: 'Please refresh the page and try again'
+			});
+		}
+
+		toast.info(`Sending QR codes to participants`, {
+			description: 'This may take a few moments. You can continue using the application.'
+		});
+
+		const participants_with_qr = await getParticipantsWithQRCode([participant], event_details);
+
+		if (participants_with_qr.length === 0) return;
+
+		comp_state.send_qr_code_worker.postMessage(
+			JSON.stringify({
+				participants: participants_with_qr,
+				PLUNK_API: await getEnv('PLUNK_API'),
+				PLUNK_SK: await getEnv('PLUNK_SK'),
+				event_details: {
+					event_name: event_details.event_name,
+					event_date: event_details.start_date.toISOString(),
+					event_location: event_details.location
+				}
+			})
+		);
+	}
+
+	onMount(() => {
+		load_send_qr_code_worker();
+	});
 </script>
 
 <div class="flex items-center gap-4">
@@ -185,49 +268,57 @@
 				</p>
 			</div>
 
-			<!-- FILTERS -->
-			<Popover.Root>
-				<Popover.Trigger
-					class={cn(
-						'relative',
-						buttonVariants({ size: 'icon', variant: 'outline' }),
-						comp_state.filtered_attendance_status !== 'all' && 'border-blue-500'
-					)}
-				>
-					{#if comp_state.filtered_attendance_status !== 'all'}
-						<div class="absolute -top-1 -right-1 size-3 rounded-full bg-blue-500"></div>
-					{/if}
-					<ListFilter class="size-4" />
-				</Popover.Trigger>
-				<Popover.Content class="w-auto" side="left">
-					<p class="mb-1 text-sm font-medium">Filters</p>
-					<fieldset class="bg-background sticky top-0 space-y-4">
-						<RadioGroup.Root
-							bind:value={comp_state.filtered_attendance_status}
-							name="spacing"
-							class="grid grid-cols-4 gap-2"
-						>
-							{#each filter_attendance_statuses as f, idx}
-								<label
-									for={`${idx}-${f.value}`}
-									class="[&:has([data-state=checked])>div]:border-primary [&:has([data-state=checked])>div]:bg-primary [&:has([data-state=checked])>div>p]:text-white"
-								>
-									<RadioGroup.Item
-										id={`${idx}-${f.value}`}
-										value={f.value}
-										class="sr-only after:absolute after:inset-0"
-									/>
-									<div
-										class="relative flex cursor-pointer flex-col items-center rounded-full border px-2 py-1 text-center"
+			<div class="flex gap-2">
+				<SendEmailToParticipantsDialog
+					is_event_finished={event_status === 'finished'}
+					handleSendEmail={handle_email_send}
+					mode="single"
+				/>
+
+				<!-- FILTERS -->
+				<Popover.Root>
+					<Popover.Trigger
+						class={cn(
+							'relative',
+							buttonVariants({ size: 'icon', variant: 'outline' }),
+							comp_state.filtered_attendance_status !== 'all' && 'border-blue-500'
+						)}
+					>
+						{#if comp_state.filtered_attendance_status !== 'all'}
+							<div class="absolute -top-1 -right-1 size-3 rounded-full bg-blue-500"></div>
+						{/if}
+						<ListFilter class="size-4" />
+					</Popover.Trigger>
+					<Popover.Content class="w-auto" side="left">
+						<p class="mb-1 text-sm font-medium">Filters</p>
+						<fieldset class="bg-background sticky top-0 space-y-4">
+							<RadioGroup.Root
+								bind:value={comp_state.filtered_attendance_status}
+								name="spacing"
+								class="grid grid-cols-4 gap-2"
+							>
+								{#each filter_attendance_statuses as f, idx}
+									<label
+										for={`${idx}-${f.value}`}
+										class="[&:has([data-state=checked])>div]:border-primary [&:has([data-state=checked])>div]:bg-primary [&:has([data-state=checked])>div>p]:text-white"
 									>
-										<p class="text-foreground text-xs font-medium">{f.label}</p>
-									</div>
-								</label>
-							{/each}
-						</RadioGroup.Root>
-					</fieldset>
-				</Popover.Content>
-			</Popover.Root>
+										<RadioGroup.Item
+											id={`${idx}-${f.value}`}
+											value={f.value}
+											class="sr-only after:absolute after:inset-0"
+										/>
+										<div
+											class="relative flex cursor-pointer flex-col items-center rounded-full border px-2 py-1 text-center"
+										>
+											<p class="text-foreground text-xs font-medium">{f.label}</p>
+										</div>
+									</label>
+								{/each}
+							</RadioGroup.Root>
+						</fieldset>
+					</Popover.Content>
+				</Popover.Root>
+			</div>
 		</div>
 
 		<div class="w-full border-t-2 border-dashed"></div>
