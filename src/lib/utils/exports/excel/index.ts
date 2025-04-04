@@ -175,7 +175,6 @@ export async function generateFullEventAttendanceReportExcel(
         let statusText = '';
         let statusColor = '';
 
-        // Check day event status first
         if (participant.day_event_status === 'ongoing') {
           statusText = 'Event is currently ongoing';
           statusColor = 'FFE6E6FA'; // Lavender
@@ -183,7 +182,6 @@ export async function generateFullEventAttendanceReportExcel(
           statusText = "Event hasn't started yet";
           statusColor = 'FFF0F8FF'; // Alice Blue
         } else {
-          // Day is completed, check attendance status
           const attendance_status = participant.attendance_status;
 
           if (attendance_status === 'absent') {
@@ -192,7 +190,7 @@ export async function generateFullEventAttendanceReportExcel(
           } else if (attendance_status === 'complete') {
             statusText = 'Complete Attendance';
             statusColor = 'FF90EE90'; // Light green
-          } else if (attendance_status === 'incomplete') {
+          } else {
             statusText = 'Incomplete Attendance';
             statusColor = 'FFFFD700'; // Gold
           }

@@ -256,22 +256,20 @@ export async function generateDailyAttendanceReportPDF(props: DocumentMetaDetail
         let statusText = '';
         let status_variant: TagVariant = 'default';
 
-        // Check event status first
         if (event_status === 'ongoing') {
           statusText = 'Event is currently ongoing';
         } else if (event_status === 'upcoming') {
           statusText = "Event hasn't started yet";
           status_variant = 'secondary';
         } else {
-          // Event is completed, check attendance status
-          const attendance_status = participant.attendance_status ?? 'absent';
+          const attendance_status = participant.attendance_status;
 
           if (attendance_status === 'absent') {
             statusText = 'Absent';
             status_variant = 'destructive';
           } else if (attendance_status === 'complete') {
             statusText = 'Complete Attendance';
-          } else if (attendance_status === 'incomplete') {
+          } else {
             statusText = 'Incomplete Attendance';
             status_variant = 'outline';
           }
@@ -565,22 +563,22 @@ export async function generateFullEventAttendanceReportPDF(
           let statusText = '';
           let status_variant: TagVariant = 'default';
 
-          // Check day event status first (like in daily report)
+          // Simplified status determination
           if (participant.day_event_status === 'ongoing') {
             statusText = 'Event is currently ongoing';
           } else if (participant.day_event_status === 'upcoming') {
             statusText = "Event hasn't started yet";
             status_variant = 'secondary';
           } else {
-            // Day is completed, check attendance status
-            const attendance_status = participant.attendance_status ?? 'absent';
+            // Direct use of attendance_status
+            const attendance_status = participant.attendance_status;
 
             if (attendance_status === 'absent') {
               statusText = 'Absent';
               status_variant = 'destructive';
             } else if (attendance_status === 'complete') {
               statusText = 'Complete Attendance';
-            } else if (attendance_status === 'incomplete') {
+            } else {
               statusText = 'Incomplete Attendance';
               status_variant = 'outline';
             }
