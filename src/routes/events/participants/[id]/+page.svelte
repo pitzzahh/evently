@@ -33,6 +33,64 @@
 		a.click();
 		document.body.removeChild(a);
 	}
+
+	export async function getParticipantsWithQRCode(
+		participants: Participant[],
+		event_details: EventDetails
+	) {
+		try {
+			if (!event_details) {
+				toast.error('Event details not available', {
+					description: "Couldn't find event details required to generate QR codes"
+				});
+				return [];
+			}
+
+			const CLOUDINARY_API_URL = await getEnv('CLOUDINARY_API_URL');
+			const CLOUD_NAME = await getEnv('CLOUD_NAME');
+			const UPLOAD_PRESET = await getEnv('UPLOAD_PRESET');
+
+			if (!CLOUDINARY_API_URL || !CLOUD_NAME || !UPLOAD_PRESET) {
+				toast.error('Cloudinary API URL, Cloud Name or Upload Preset not found', {
+					description: 'Please check your environment variables'
+				});
+				return [];
+			}
+
+			const participants_with_qr = await Promise.all(
+				participants.map(async (participant) => {
+					const upload_file = await uploadFile(CLOUDINARY_API_URL, {
+						cloud_name: CLOUD_NAME,
+						upload_preset: UPLOAD_PRESET,
+						file: dataURLtoFile(
+							await createQrPngDataUrl({
+								data: participant.id,
+								width: 500,
+								height: 500,
+								shape: 'circle',
+								backgroundFill: '#fff'
+							}),
+							`qr-${participant.id}.png`
+						),
+						event_name: event_details?.event_name!
+					});
+					return {
+						...participant,
+						qr: upload_file.url
+					};
+				})
+			);
+
+			console.log({ participants_with_qr });
+
+			return participants_with_qr;
+		} catch (error) {
+			toast.error('Failed to generate QR codes', {
+				description: 'An error occurred while generating QR codes for participants'
+			});
+			return [];
+		}
+	}
 </script>
 
 <script lang="ts">
@@ -494,61 +552,6 @@
 		} else toast.info('Hardware scanner disabled');
 	}
 
-	async function getParticipantsWithQRCode() {
-		try {
-			if (!event_details) {
-				toast.error('Event details not available', {
-					description: "Couldn't find event details required to generate QR codes"
-				});
-				return [];
-			}
-
-			const CLOUDINARY_API_URL = await getEnv('CLOUDINARY_API_URL');
-			const CLOUD_NAME = await getEnv('CLOUD_NAME');
-			const UPLOAD_PRESET = await getEnv('UPLOAD_PRESET');
-
-			if (!CLOUDINARY_API_URL || !CLOUD_NAME || !UPLOAD_PRESET) {
-				toast.error('Cloudinary API URL, Cloud Name or Upload Preset not found', {
-					description: 'Please check your environment variables'
-				});
-				return [];
-			}
-
-			const participants_with_qr = await Promise.all(
-				participants.map(async (participant) => {
-					const upload_file = await uploadFile(CLOUDINARY_API_URL, {
-						cloud_name: CLOUD_NAME,
-						upload_preset: UPLOAD_PRESET,
-						file: dataURLtoFile(
-							await createQrPngDataUrl({
-								data: participant.id,
-								width: 500,
-								height: 500,
-								shape: 'circle',
-								backgroundFill: '#fff'
-							}),
-							`qr-${participant.id}.png`
-						),
-						event_name: event_details?.event_name!
-					});
-					return {
-						...participant,
-						qr: upload_file.url
-					};
-				})
-			);
-
-			console.log({ participants_with_qr });
-
-			return participants_with_qr;
-		} catch (error) {
-			toast.error('Failed to generate QR codes', {
-				description: 'An error occurred while generating QR codes for participants'
-			});
-			return [];
-		}
-	}
-
 	async function handle_email_send(show_toast_if_no_participants: boolean = true) {
 		if (event_status === 'finished') {
 			return toast.warning('Emailing QR codes is disabled since the event has concluded');
@@ -577,7 +580,13 @@
 			description: 'This may take a few moments. You can continue using the application.'
 		});
 
-		const participants_with_qr = await getParticipantsWithQRCode();
+		if (!event_details) {
+			toast.error('Event details not available', {
+				description: "Couldn't find event details required to generate QR codes"
+			});
+		}
+
+		const participants_with_qr = await getParticipantsWithQRCode(participants, event_details);
 
 		if (participants_with_qr.length === 0) return;
 
