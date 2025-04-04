@@ -3,7 +3,6 @@ import type { DocumentMetaDetails } from "@/types/exports";
 import type { HelperResponse } from "@/types/generic";
 import { formatDate, formatDateTime, formatDateToTimeOption } from "@/utils/format";
 import { COLLECTIONS } from "@/db";
-import type { TagVariant } from "..";
 
 // Helper function to convert ArrayBuffer to binary string
 function arrayBufferToBinaryString(buffer: ArrayBuffer): string {
@@ -152,15 +151,18 @@ export async function generateFullEventAttendanceReportExcel(
       dayHeaderCell.font = { size: 14, bold: true };
       dayHeaderCell.alignment = { horizontal: 'center' };
 
-      // Add category headers for time entries 
-      worksheet.insertRow(4, [null, 'AM Time', null, 'PM Time', null, null]);
+      // Add empty row for spacing
+      worksheet.addRow([]);
+
+      // Add category headers for time entries (now on row 5 instead of 4)
+      worksheet.insertRow(5, [null, 'AM Time', null, 'PM Time', null, null]);
 
       // Merge cells for AM and PM time categories
-      worksheet.mergeCells('B4:C4');
-      worksheet.mergeCells('D4:E4');
+      worksheet.mergeCells('B5:C5');
+      worksheet.mergeCells('D5:E5');
 
       // Style the category headers
-      const categoryRow = worksheet.getRow(4);
+      const categoryRow = worksheet.getRow(5);
       categoryRow.font = { bold: true, size: 12 };
       categoryRow.alignment = { horizontal: 'center' };
 
@@ -193,7 +195,7 @@ export async function generateFullEventAttendanceReportExcel(
       };
 
       // Style the header row and make sure column headers are visible
-      const headerRow = worksheet.getRow(5);
+      const headerRow = worksheet.getRow(6); // Move to row 6 (was 5)
       headerRow.font = { bold: true };
       headerRow.alignment = { horizontal: 'center' };
 
@@ -219,7 +221,7 @@ export async function generateFullEventAttendanceReportExcel(
         };
       });
 
-      // Add participant data - adjust row index to start from row 6 (was 5)
+      // Add participant data - adjust row index to start from row 7 (was 6)
       dayParticipantAttendance.forEach((participant, index) => {
         let statusText = '';
         let statusColor = '';
@@ -245,7 +247,7 @@ export async function generateFullEventAttendanceReportExcel(
           }
         }
 
-        const rowIndex = index + 6; // Start from row 6 (was 5, adjusted for new header row)
+        const rowIndex = index + 7; // Start from row 7 (adjusted for new spacing row)
         const row = worksheet.getRow(rowIndex);
 
         row.getCell(1).value = `${participant.last_name}, ${participant.first_name}${participant.middle_name ? ' ' + participant.middle_name : ''}`;
@@ -274,8 +276,8 @@ export async function generateFullEventAttendanceReportExcel(
         });
       });
 
-      // Add summary section
-      const summaryRowIndex = dayParticipantAttendance.length + 8; // Leave some space after the table
+      // Add summary section - adjust for the additional row
+      const summaryRowIndex = dayParticipantAttendance.length + 9; // Adjusted from +8 to +9
       worksheet.mergeCells(`A${summaryRowIndex}:F${summaryRowIndex}`);
       const summaryHeaderCell = worksheet.getCell(`A${summaryRowIndex}`);
       summaryHeaderCell.value = 'Daily Summary';
