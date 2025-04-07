@@ -604,14 +604,15 @@
 		);
 	}
 
-	function get_event_details_and_participants() {
+	function get_event_details_and_participants(event_id: string) {
 		const _event_details = COLLECTIONS.EVENT_DETAILS_COLLECTION.findOne({
-			id: data.event_id
+			id: event_id
 		});
+		const event_status = checkEventStatus(_event_details?.start_date, _event_details?.end_date);
 
 		const participants_cursor = COLLECTIONS.PARTICIPANT_COLLECTION.find(
 			{
-				event_id: data.event_id
+				event_id
 			},
 			{
 				sort: {
@@ -619,9 +620,8 @@
 				}
 			}
 		);
-
 		const _participants = participants_cursor.fetch().map((participant) => {
-			const event_days = event_details?.difference_in_days;
+			const event_days = _event_details?.difference_in_days;
 			const total_days_attended = all_participants_attendance.reduce(
 				(acc, participant_attendance) => {
 					if (
@@ -651,8 +651,7 @@
 
 		return {
 			event_details: _event_details as EventDetails,
-			participants: _participants as Participant[],
-			participants_cursor
+			participants: _participants as Participant[]
 		};
 	}
 
@@ -670,11 +669,8 @@
 
 			event_schedules = event_schedule_cursor.fetch();
 
-			const {
-				event_details: _event_details,
-				participants: _participants,
-				participants_cursor
-			} = get_event_details_and_participants();
+			const { event_details: _event_details, participants: _participants } =
+				get_event_details_and_participants(data.event_id);
 
 			event_details = _event_details;
 			participants = _participants;
@@ -698,7 +694,6 @@
 			}) as ParticipantAttendance[];
 
 			return () => {
-				participants_cursor.cleanup();
 				event_schedule_cursor.cleanup();
 			};
 		}
@@ -818,7 +813,7 @@
 											}
 
 											const { event_details: _event_details, participants: _participants } =
-												get_event_details_and_participants();
+												get_event_details_and_participants(data.event_id);
 
 											pdf.qr_code_worker.postMessage({
 												info: {
@@ -852,7 +847,7 @@
 												});
 											}
 											const { event_details: _event_details, participants: _participants } =
-												get_event_details_and_participants();
+												get_event_details_and_participants(data.event_id);
 											pdf.daily_attendance_report_worker.postMessage({
 												info: {
 													creator: 'Evently',
@@ -885,7 +880,7 @@
 											}
 
 											const { event_details: _event_details, participants: _participants } =
-												get_event_details_and_participants();
+												get_event_details_and_participants(data.event_id);
 
 											pdf.full_attendance_report_worker.postMessage({
 												info: {
@@ -922,7 +917,7 @@
 											}
 
 											const { event_details: _event_details, participants: _participants } =
-												get_event_details_and_participants();
+												get_event_details_and_participants(data.event_id);
 
 											excel.full_attendance_report_worker.postMessage({
 												info: {
