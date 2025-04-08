@@ -653,7 +653,7 @@
 				attendance_status
 			};
 		});
-		
+
 		return {
 			event_details: _event_details as EventDetails,
 			participants: _participants as Participant[]
