@@ -242,7 +242,7 @@
 
 <div class="flex items-center gap-4">
 	<div class="bg-white p-2">
-		{#await createQrPngDataUrl( { data: participant.id, logoRatio: 107 / 128, shape: 'circle', width: 250, height: 250, backgroundFill: '#fff' } )}
+		{#await createQrPngDataUrl( { data: participant.id, logoRatio: 107 / 128, shape: 'circle', width: 500, height: 500, backgroundFill: '#fff' } )}
 			<Skeleton class="h-[250px] w-[250px]" />
 		{:then qr}
 			<PhotoPreviewer image_src={qr} />
