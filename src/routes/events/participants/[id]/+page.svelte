@@ -609,6 +609,7 @@
 			id: event_id
 		});
 		const event_status = checkEventStatus(_event_details?.start_date, _event_details?.end_date);
+		const event_days = _event_details?.difference_in_days ?? 0;
 
 		const participants_cursor = COLLECTIONS.PARTICIPANT_COLLECTION.find(
 			{
@@ -620,35 +621,39 @@
 				}
 			}
 		);
-		const _participants = participants_cursor.fetch().map((participant) => {
-			const event_days = _event_details?.difference_in_days;
-			const total_days_attended = all_participants_attendance.reduce(
-				(acc, participant_attendance) => {
-					if (
-						participant_attendance.participant_id === participant.id &&
-						participant_attendance.am_time_in &&
-						participant_attendance.pm_time_in
-					) {
-						return acc + 1;
-					}
-					return acc;
-				},
-				0
-			);
 
-			const attendance_status =
-				total_days_attended === event_days
-					? 'complete'
-					: event_days && total_days_attended > 0 && total_days_attended < event_days
-						? 'incomplete'
-						: 'absent';
+		const _participants = participants_cursor.fetch().map((participant) => {
+			let days_with_any_attendance = 0;
+			let days_with_full_attendance = 0;
+
+			for (const attendance of all_participants_attendance) {
+				if (attendance.participant_id !== participant.id) continue;
+
+				const has_am = !!attendance.am_time_in;
+				const has_pm = !!attendance.pm_time_in;
+
+				if (has_am || has_pm) days_with_any_attendance += 1;
+				if (has_am && has_pm) days_with_full_attendance += 1;
+			}
+
+			let attendance_status: 'complete' | 'incomplete' | 'absent' | undefined;
+
+			if (event_status === 'finished') {
+				if (days_with_full_attendance === event_days) {
+					attendance_status = 'complete';
+				} else if (days_with_any_attendance > 0) {
+					attendance_status = 'incomplete';
+				} else {
+					attendance_status = 'absent';
+				}
+			}
 
 			return {
 				...participant,
-				attendance_status: event_status === 'finished' ? attendance_status : undefined
+				attendance_status
 			};
 		});
-
+		
 		return {
 			event_details: _event_details as EventDetails,
 			participants: _participants as Participant[]
@@ -669,12 +674,6 @@
 
 			event_schedules = event_schedule_cursor.fetch();
 
-			const { event_details: _event_details, participants: _participants } =
-				get_event_details_and_participants(data.event_id);
-
-			event_details = _event_details;
-			participants = _participants;
-
 			if (current_event_day) {
 				current_day_participants_attendance = getPopulatedAttendanceRecords(
 					data.event_id,
@@ -692,6 +691,12 @@
 				participant_collection: COLLECTIONS.PARTICIPANT_COLLECTION,
 				event_schedules_collection: COLLECTIONS.EVENT_SCHEDULE_COLLECTION
 			}) as ParticipantAttendance[];
+
+			const { event_details: _event_details, participants: _participants } =
+				get_event_details_and_participants(data.event_id);
+
+			event_details = _event_details;
+			participants = _participants;
 
 			return () => {
 				event_schedule_cursor.cleanup();
