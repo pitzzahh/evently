@@ -1,4 +1,4 @@
-import type { HelperResponse } from "@/types/generic";
+import type { HelperResponse } from '@/types/generic';
 
 /**
  * Validates that the Excel file headers match the required format for participant import
@@ -6,42 +6,40 @@ import type { HelperResponse } from "@/types/generic";
  * @returns HelperResponse with validation result
  */
 export function validateExcelHeaders(headers: string[]): HelperResponse<boolean> {
-  // Required headers for participant import
-  const requiredHeaders = ['last_name', 'first_name', 'middle_name', 'email'];
+	const requiredHeaders = ['last_name', 'first_name', 'middle_name', 'email'];
 
-  // Convert headers to lowercase for case-insensitive comparison
-  const normalizedHeaders = headers.map(header => header.toLowerCase().trim());
+	const normalizeHeader = (header: string) =>
+		header
+			.toLowerCase()
+			.trim()
+			.replace(/[\s_]+/g, '');
 
-  // Check if all required headers are present
-  const missingHeaders = requiredHeaders.filter(header =>
-    !normalizedHeaders.includes(header)
-  );
+	const normalizedHeaders = headers.map(normalizeHeader);
+	const normalizedRequired = requiredHeaders.map(normalizeHeader);
 
-  if (missingHeaders.length > 0) {
-    return {
-      status: 400,
-      message: `Missing required headers: ${missingHeaders.join(', ')}`,
-      data: false
-    };
-  }
+	const missingHeaders = normalizedRequired.filter((header) => !normalizedHeaders.includes(header));
 
-  // Check if there are any extra headers that are not required
-  const extraHeaders = normalizedHeaders.filter(header =>
-    !requiredHeaders.includes(header)
-  );
+	if (missingHeaders.length > 0) {
+		return {
+			status: 400,
+			message: `Missing required headers: ${missingHeaders.join(', ')}`,
+			data: false
+		};
+	}
 
-  if (extraHeaders.length > 0) {
-    // This is just a warning, not an error
-    return {
-      status: 200,
-      message: `Excel headers validated. Note: Found additional columns that will be ignored: ${extraHeaders.join(', ')}`,
-      data: true
-    };
-  }
+	const extraHeaders = normalizedHeaders.filter((header) => !normalizedRequired.includes(header));
 
-  return {
-    status: 200,
-    message: "Excel headers validation successful",
-    data: true
-  };
+	if (extraHeaders.length > 0) {
+		return {
+			status: 200,
+			message: `Excel headers validated. Note: Found additional columns that will be ignored: ${extraHeaders.join(', ')}`,
+			data: true
+		};
+	}
+
+	return {
+		status: 200,
+		message: 'Excel headers validation successful',
+		data: true
+	};
 }
