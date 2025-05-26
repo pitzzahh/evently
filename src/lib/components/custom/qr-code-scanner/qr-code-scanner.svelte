@@ -1,3 +1,16 @@
+<script module lang="ts">
+	interface ComponentState {
+		scanner: Html5QrcodeScanner | null;
+		scannerState: Html5QrcodeScannerState | null;
+		lastResult: string | null;
+		errorMessage: string | null;
+		scanning: boolean;
+		scanComplete: boolean;
+		lastScanTimestamp: number;
+		debounceInterval: number;
+	}
+</script>
+
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { onMount, onDestroy } from 'svelte';
@@ -32,25 +45,33 @@
 		singleScanMode?: boolean;
 		autoPauseDelay?: number;
 		resetAfter?: number;
-		stop_camera: boolean
+		stop_camera: boolean;
 	} = $props();
 
-	// State using runes
-	let scanner = $state<Html5QrcodeScanner | null>(null);
-	let scannerState = $state<Html5QrcodeScannerState | null>(null);
-	let lastResult = $state<string | null>(null);
-	let errorMessage = $state<string | null>(null);
-	let scanning = $state(true);
-	let scanComplete = $state(false);
-
-	// Flag to prevent duplicate scans of the same QR code
-	let lastScanTimestamp = 0;
-	const DEBOUNCE_INTERVAL = 1500; // 1.5 seconds between same QR code scan
+	let {
+		scanner,
+		scannerState,
+		lastResult,
+		errorMessage,
+		scanning,
+		scanComplete,
+		lastScanTimestamp,
+		debounceInterval
+	} = $state<ComponentState>({
+		scanner: null,
+		scannerState: null,
+		lastResult: null,
+		errorMessage: null,
+		scanning: true,
+		scanComplete: false,
+		lastScanTimestamp: 0,
+		debounceInterval: 1500 // 1.5 seconds
+	});
 
 	function handleScanSuccess(decodedText: string, decodedResult: Html5QrcodeResult): void {
 		// Prevent duplicate scans
 		const now = Date.now();
-		if (now - lastScanTimestamp < DEBOUNCE_INTERVAL && lastResult === decodedText) {
+		if (now - lastScanTimestamp < debounceInterval && lastResult === decodedText) {
 			return; // Ignore duplicate scan within debounce interval
 		}
 
@@ -161,23 +182,6 @@
 			console.error('Error toggling scanner state:', error);
 		}
 	});
-
-	// Make methods accessible from outside
-	function pause() {
-		if (scanner?.getState() === Html5QrcodeScannerState.SCANNING) {
-			scanner.pause();
-			scanning = false;
-			scannerState = Html5QrcodeScannerState.PAUSED;
-		}
-	}
-
-	function resume() {
-		if (scanner?.getState() === Html5QrcodeScannerState.PAUSED) {
-			scanner.resume();
-			scanning = true;
-			scannerState = Html5QrcodeScannerState.SCANNING;
-		}
-	}
 </script>
 
 <div class="grid place-items-center gap-2">
