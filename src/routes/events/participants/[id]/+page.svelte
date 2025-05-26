@@ -33,6 +33,64 @@
 		a.click();
 		document.body.removeChild(a);
 	}
+
+	export async function getParticipantsWithQRCode(
+		participants: Participant[],
+		event_details: EventDetails
+	) {
+		try {
+			if (!event_details) {
+				toast.error('Event details not available', {
+					description: "Couldn't find event details required to generate QR codes"
+				});
+				return [];
+			}
+
+			const CLOUDINARY_API_URL = await getEnv('CLOUDINARY_API_URL');
+			const CLOUD_NAME = await getEnv('CLOUD_NAME');
+			const UPLOAD_PRESET = await getEnv('UPLOAD_PRESET');
+
+			if (!CLOUDINARY_API_URL || !CLOUD_NAME || !UPLOAD_PRESET) {
+				toast.error('Cloudinary API URL, Cloud Name or Upload Preset not found', {
+					description: 'Please check your environment variables'
+				});
+				return [];
+			}
+
+			const participants_with_qr = await Promise.all(
+				participants.map(async (participant) => {
+					const upload_file = await uploadFile(CLOUDINARY_API_URL, {
+						cloud_name: CLOUD_NAME,
+						upload_preset: UPLOAD_PRESET,
+						file: dataURLtoFile(
+							await createQrPngDataUrl({
+								data: participant.id,
+								width: 500,
+								height: 500,
+								shape: 'circle',
+								backgroundFill: '#fff'
+							}),
+							`qr-${participant.id}.png`
+						),
+						event_name: event_details?.event_name!
+					});
+					return {
+						...participant,
+						qr: upload_file.url
+					};
+				})
+			);
+
+			console.log({ participants_with_qr });
+
+			return participants_with_qr;
+		} catch (error) {
+			toast.error('Failed to generate QR codes', {
+				description: 'An error occurred while generating QR codes for participants'
+			});
+			return [];
+		}
+	}
 </script>
 
 <script lang="ts">
@@ -494,61 +552,6 @@
 		} else toast.info('Hardware scanner disabled');
 	}
 
-	async function getParticipantsWithQRCode() {
-		try {
-			if (!event_details) {
-				toast.error('Event details not available', {
-					description: "Couldn't find event details required to generate QR codes"
-				});
-				return [];
-			}
-
-			const CLOUDINARY_API_URL = await getEnv('CLOUDINARY_API_URL');
-			const CLOUD_NAME = await getEnv('CLOUD_NAME');
-			const UPLOAD_PRESET = await getEnv('UPLOAD_PRESET');
-
-			if (!CLOUDINARY_API_URL || !CLOUD_NAME || !UPLOAD_PRESET) {
-				toast.error('Cloudinary API URL, Cloud Name or Upload Preset not found', {
-					description: 'Please check your environment variables'
-				});
-				return [];
-			}
-
-			const participants_with_qr = await Promise.all(
-				participants.map(async (participant) => {
-					const upload_file = await uploadFile(CLOUDINARY_API_URL, {
-						cloud_name: CLOUD_NAME,
-						upload_preset: UPLOAD_PRESET,
-						file: dataURLtoFile(
-							await createQrPngDataUrl({
-								data: participant.id,
-								width: 500,
-								height: 500,
-								shape: 'circle',
-								backgroundFill: '#fff'
-							}),
-							`qr-${participant.id}.png`
-						),
-						event_name: event_details?.event_name!
-					});
-					return {
-						...participant,
-						qr: upload_file.url
-					};
-				})
-			);
-
-			console.log({ participants_with_qr });
-
-			return participants_with_qr;
-		} catch (error) {
-			toast.error('Failed to generate QR codes', {
-				description: 'An error occurred while generating QR codes for participants'
-			});
-			return [];
-		}
-	}
-
 	async function handle_email_send(show_toast_if_no_participants: boolean = true) {
 		if (event_status === 'finished') {
 			return toast.warning('Emailing QR codes is disabled since the event has concluded');
@@ -577,7 +580,13 @@
 			description: 'This may take a few moments. You can continue using the application.'
 		});
 
-		const participants_with_qr = await getParticipantsWithQRCode();
+		if (!event_details) {
+			toast.error('Event details not available', {
+				description: "Couldn't find event details required to generate QR codes"
+			});
+		}
+
+		const participants_with_qr = await getParticipantsWithQRCode(participants, event_details);
 
 		if (participants_with_qr.length === 0) return;
 
@@ -595,6 +604,62 @@
 		);
 	}
 
+	function get_event_details_and_participants(event_id: string) {
+		const _event_details = COLLECTIONS.EVENT_DETAILS_COLLECTION.findOne({
+			id: event_id
+		});
+		const event_status = checkEventStatus(_event_details?.start_date, _event_details?.end_date);
+		const event_days = _event_details?.difference_in_days ?? 0;
+
+		const participants_cursor = COLLECTIONS.PARTICIPANT_COLLECTION.find(
+			{
+				event_id
+			},
+			{
+				sort: {
+					created: -1
+				}
+			}
+		);
+
+		const _participants = participants_cursor.fetch().map((participant) => {
+			let days_with_any_attendance = 0;
+			let days_with_full_attendance = 0;
+
+			for (const attendance of all_participants_attendance) {
+				if (attendance.participant_id !== participant.id) continue;
+
+				const has_am = !!attendance.am_time_in;
+				const has_pm = !!attendance.pm_time_in;
+
+				if (has_am || has_pm) days_with_any_attendance += 1;
+				if (has_am && has_pm) days_with_full_attendance += 1;
+			}
+
+			let attendance_status: 'complete' | 'incomplete' | 'absent' | undefined;
+
+			if (event_status === 'finished') {
+				if (days_with_full_attendance === event_days) {
+					attendance_status = 'complete';
+				} else if (days_with_any_attendance > 0) {
+					attendance_status = 'incomplete';
+				} else {
+					attendance_status = 'absent';
+				}
+			}
+
+			return {
+				...participant,
+				attendance_status
+			};
+		});
+
+		return {
+			event_details: _event_details as EventDetails,
+			participants: _participants as Participant[]
+		};
+	}
+
 	watch(
 		[
 			() => COLLECTIONS.PARTICIPANT_COLLECTION.isLoading(),
@@ -603,24 +668,11 @@
 			() => COLLECTIONS.ATTENDANCE_RECORDS_COLLECTION.isLoading()
 		],
 		() => {
-			const participants_cursor = COLLECTIONS.PARTICIPANT_COLLECTION.find(
-				{
-					event_id: data.event_id
-				},
-				{
-					sort: {
-						created: -1
-					}
-				}
-			);
 			const event_schedule_cursor = COLLECTIONS.EVENT_SCHEDULE_COLLECTION.find({
 				event_id: data.event_id
 			});
 
 			event_schedules = event_schedule_cursor.fetch();
-			event_details = COLLECTIONS.EVENT_DETAILS_COLLECTION.findOne({
-				id: data.event_id
-			});
 
 			if (current_event_day) {
 				current_day_participants_attendance = getPopulatedAttendanceRecords(
@@ -640,37 +692,13 @@
 				event_schedules_collection: COLLECTIONS.EVENT_SCHEDULE_COLLECTION
 			}) as ParticipantAttendance[];
 
-			participants = participants_cursor.fetch().map((participant) => {
-				const event_days = event_details?.difference_in_days;
-				const total_days_attended = all_participants_attendance.reduce(
-					(acc, participant_attendance) => {
-						if (
-							participant_attendance.participant_id === participant.id &&
-							participant_attendance.am_time_in &&
-							participant_attendance.pm_time_in
-						) {
-							return acc + 1;
-						}
-						return acc;
-					},
-					0
-				);
+			const { event_details: _event_details, participants: _participants } =
+				get_event_details_and_participants(data.event_id);
 
-				const attendance_status =
-					total_days_attended === event_days
-						? 'complete'
-						: event_days && total_days_attended > 0 && total_days_attended < event_days
-							? 'incomplete'
-							: 'absent';
-
-				return {
-					...participant,
-					attendance_status: event_status === 'finished' ? attendance_status : undefined
-				};
-			});
+			event_details = _event_details;
+			participants = _participants;
 
 			return () => {
-				participants_cursor.cleanup();
 				event_schedule_cursor.cleanup();
 			};
 		}
@@ -789,6 +817,9 @@
 												});
 											}
 
+											const { event_details: _event_details, participants: _participants } =
+												get_event_details_and_participants(data.event_id);
+
 											pdf.qr_code_worker.postMessage({
 												info: {
 													creator: 'Evently',
@@ -796,9 +827,10 @@
 													subject: 'QR Codes',
 													producer: 'Evently'
 												},
-												event_details: JSON.stringify(event_details),
-												participants: JSON.stringify(participants)
+												_event_details: JSON.stringify(_event_details),
+												_participants: JSON.stringify(_participants)
 											});
+
 											toast.info('Generating QR codes', {
 												description:
 													'Please wait while we generate the QR codes, or feel free to do other things'
@@ -819,7 +851,8 @@
 													description: 'Please refresh the page and try again'
 												});
 											}
-
+											const { event_details: _event_details, participants: _participants } =
+												get_event_details_and_participants(data.event_id);
 											pdf.daily_attendance_report_worker.postMessage({
 												info: {
 													creator: 'Evently',
@@ -827,8 +860,8 @@
 													subject: 'Daily Attendance Report',
 													producer: 'Evently'
 												},
-												event_details: JSON.stringify(event_details),
-												participants: JSON.stringify(participants)
+												_event_details: JSON.stringify(_event_details),
+												_participants: JSON.stringify(_participants)
 											});
 											toast.info('Generating daily attendance report', {
 												description:
@@ -851,6 +884,9 @@
 												});
 											}
 
+											const { event_details: _event_details, participants: _participants } =
+												get_event_details_and_participants(data.event_id);
+
 											pdf.full_attendance_report_worker.postMessage({
 												info: {
 													creator: 'Evently',
@@ -858,8 +894,8 @@
 													subject: 'Full Attendance Report',
 													producer: 'Evently'
 												},
-												event_details: JSON.stringify(event_details),
-												participants: JSON.stringify(participants)
+												_event_details: JSON.stringify(_event_details),
+												_participants: JSON.stringify(_participants)
 											});
 											toast.info('Generating event full attendance report', {
 												description:
@@ -885,6 +921,9 @@
 												});
 											}
 
+											const { event_details: _event_details, participants: _participants } =
+												get_event_details_and_participants(data.event_id);
+
 											excel.full_attendance_report_worker.postMessage({
 												info: {
 													creator: 'Evently',
@@ -892,8 +931,8 @@
 													subject: 'Full Attendance Report',
 													producer: 'Evently'
 												},
-												event_details: JSON.stringify(event_details),
-												participants: JSON.stringify(participants)
+												_event_details: JSON.stringify(_event_details),
+												_participants: JSON.stringify(_participants)
 											});
 
 											toast.info('Generating QR codes', {
@@ -921,7 +960,7 @@
 									<ScanQrCode class="size-4" />
 								</Popover.Trigger>
 								<Popover.Content class="w-auto" side="left">
-									<p class="mb-2 text-sm text-muted-foreground">Choose which scanner to use</p>
+									<p class="text-muted-foreground mb-2 text-sm">Choose which scanner to use</p>
 									<div class="flex items-center gap-1">
 										<QrCodeScannerDialog handleScan={handleScanParticipant} />
 										<Button
@@ -997,10 +1036,10 @@
 {#if last_scanned_participant}
 	<div
 		transition:fly={{ y: -20, duration: 200, easing: quartInOut }}
-		class="fixed right-8 top-10 z-[9999]"
+		class="fixed top-10 right-8 z-[9999]"
 	>
 		<Card.Root class="relative w-[400px]">
-			<button class="absolute right-4 top-4" onclick={() => (last_scanned_participant = null)}>
+			<button class="absolute top-4 right-4" onclick={() => (last_scanned_participant = null)}>
 				<X class="size-4" />
 			</button>
 			<Card.Header>

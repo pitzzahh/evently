@@ -3,7 +3,6 @@ import type { DocumentMetaDetails } from "@/types/exports";
 import type { HelperResponse } from "@/types/generic";
 import { formatDate, formatDateTime, formatDateToTimeOption } from "@/utils/format";
 import { COLLECTIONS } from "@/db";
-import type { TagVariant } from "..";
 
 // Helper function to convert ArrayBuffer to binary string
 function arrayBufferToBinaryString(buffer: ArrayBuffer): string {
@@ -152,10 +151,62 @@ export async function generateFullEventAttendanceReportExcel(
       dayHeaderCell.font = { size: 14, bold: true };
       dayHeaderCell.alignment = { horizontal: 'center' };
 
-      // Style the header row
-      const headerRow = worksheet.getRow(4);
+      // Add empty row for spacing
+      worksheet.addRow([]);
+
+      // Add category headers for time entries (now on row 5 instead of 4)
+      worksheet.insertRow(5, [null, 'AM Time', null, 'PM Time', null, null]);
+
+      // Merge cells for AM and PM time categories
+      worksheet.mergeCells('B5:C5');
+      worksheet.mergeCells('D5:E5');
+
+      // Style the category headers
+      const categoryRow = worksheet.getRow(5);
+      categoryRow.font = { bold: true, size: 12 };
+      categoryRow.alignment = { horizontal: 'center' };
+
+      // Style the AM Time header
+      const amTimeCell = categoryRow.getCell(2);
+      amTimeCell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFFAFA7A' } // Light yellow
+      };
+      amTimeCell.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' }
+      };
+
+      // Style the PM Time header
+      const pmTimeCell = categoryRow.getCell(4);
+      pmTimeCell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFFAD5A5' } // Light orange
+      };
+      pmTimeCell.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' }
+      };
+
+      // Style the header row and make sure column headers are visible
+      const headerRow = worksheet.getRow(6); // Move to row 6 (was 5)
       headerRow.font = { bold: true };
       headerRow.alignment = { horizontal: 'center' };
+
+      // Ensure each column header is properly set with right text
+      headerRow.getCell(1).value = 'Participant';
+      headerRow.getCell(2).value = 'AM Check-in';
+      headerRow.getCell(3).value = 'AM Check-out';
+      headerRow.getCell(4).value = 'PM Check-in';
+      headerRow.getCell(5).value = 'PM Check-out';
+      headerRow.getCell(6).value = 'Status';
+
       headerRow.eachCell((cell) => {
         cell.fill = {
           type: 'pattern',
@@ -170,12 +221,11 @@ export async function generateFullEventAttendanceReportExcel(
         };
       });
 
-      // Add participant data
+      // Add participant data - adjust row index to start from row 7 (was 6)
       dayParticipantAttendance.forEach((participant, index) => {
         let statusText = '';
         let statusColor = '';
 
-        // Check day event status first
         if (participant.day_event_status === 'ongoing') {
           statusText = 'Event is currently ongoing';
           statusColor = 'FFE6E6FA'; // Lavender
@@ -183,7 +233,6 @@ export async function generateFullEventAttendanceReportExcel(
           statusText = "Event hasn't started yet";
           statusColor = 'FFF0F8FF'; // Alice Blue
         } else {
-          // Day is completed, check attendance status
           const attendance_status = participant.attendance_status;
 
           if (attendance_status === 'absent') {
@@ -192,13 +241,13 @@ export async function generateFullEventAttendanceReportExcel(
           } else if (attendance_status === 'complete') {
             statusText = 'Complete Attendance';
             statusColor = 'FF90EE90'; // Light green
-          } else if (attendance_status === 'incomplete') {
+          } else {
             statusText = 'Incomplete Attendance';
             statusColor = 'FFFFD700'; // Gold
           }
         }
 
-        const rowIndex = index + 5; // Start from row 5 (after headers and title)
+        const rowIndex = index + 7; // Start from row 7 (adjusted for new spacing row)
         const row = worksheet.getRow(rowIndex);
 
         row.getCell(1).value = `${participant.last_name}, ${participant.first_name}${participant.middle_name ? ' ' + participant.middle_name : ''}`;
@@ -227,8 +276,8 @@ export async function generateFullEventAttendanceReportExcel(
         });
       });
 
-      // Add summary section
-      const summaryRowIndex = dayParticipantAttendance.length + 7; // Leave some space after the table
+      // Add summary section - adjust for the additional row
+      const summaryRowIndex = dayParticipantAttendance.length + 9; // Adjusted from +8 to +9
       worksheet.mergeCells(`A${summaryRowIndex}:F${summaryRowIndex}`);
       const summaryHeaderCell = worksheet.getCell(`A${summaryRowIndex}`);
       summaryHeaderCell.value = 'Daily Summary';

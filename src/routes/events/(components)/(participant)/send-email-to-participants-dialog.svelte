@@ -8,9 +8,14 @@
 		handleSendEmail: () => void;
 
 		is_event_finished: boolean;
+		mode?: 'single' | 'multiple';
 	}
 
-	let { is_event_finished, handleSendEmail }: SendEmailToParticipantsDialogProps = $props();
+	let {
+		is_event_finished,
+		handleSendEmail,
+		mode = 'multiple'
+	}: SendEmailToParticipantsDialogProps = $props();
 
 	let open_send_email_dialog = $state(false);
 </script>
@@ -28,14 +33,16 @@
 		}}
 	>
 		<Mail class="size-4" />
-		Send QR Codes to participants
+		{mode === 'multiple' ? 'Send QR Code to Participants via Email' : 'Send QR Code via Email'}
 	</Button>
 
 	<Dialog.Content>
 		<Dialog.Header>
 			<Dialog.Title>Send Email</Dialog.Title>
 			<Dialog.Description>
-				By performing this action, each QR code will be sent to each participant's email. Are you sure about this action?
+				By performing this action, {mode === 'multiple'
+					? `each QR code will be sent to each participant's email`
+					: `QR code will be sent to the participant's email`}. Are you sure about this action?
 			</Dialog.Description>
 		</Dialog.Header>
 		<Dialog.Footer>

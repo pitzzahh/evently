@@ -16,6 +16,8 @@
 	import { readParticipants } from '@/utils/imports/excel';
 	import { COLLECTIONS } from '@/db';
 	import { onDestroy } from 'svelte';
+	import { validateExcelHeaders } from '@/utils/imports';
+	import ExcelJS from 'exceljs';
 
 	interface ImportParticipantsDialogProps {
 		event_id: string;
@@ -77,20 +79,46 @@
 				sleep(1000).then(() => resolve(URL.createObjectURL(file)));
 			});
 
-			files = [
-				...files,
-				{
-					name: file.name,
-					type: file.type,
-					size: file.size,
-					uploadedAt: Date.now(),
-					url: urlPromise,
-					file
-				}
-			];
+			const arrayBuffer = await file.arrayBuffer();
+			const workbook = new ExcelJS.Workbook();
+			await workbook.xlsx.load(arrayBuffer);
+			const worksheet = workbook.worksheets[0];
 
-			// we await since we don't want the onUpload to be complete until the files are actually uploaded
-			await urlPromise;
+			if (!worksheet) {
+				throw new Error('First worksheet not found in the Excel file');
+			}
+
+			console.log('Worksheet found:', JSON.stringify(worksheet.name));
+
+			// Extract headers from the first row
+			const headerRow = worksheet.getRow(1).values;
+			const headers = Array.isArray(headerRow)
+				? headerRow.slice(1).map((header) => header?.toString() || '')
+				: [];
+
+			// Validate headers
+			const validationResult = validateExcelHeaders(headers);
+
+			if (validationResult.data) {
+				files = [
+					...files,
+					{
+						name: file.name,
+						type: file.type,
+						size: file.size,
+						uploadedAt: Date.now(),
+						url: urlPromise,
+						file
+					}
+				];
+
+				// we await since we don't want the onUpload to be complete until the files are actually uploaded
+				await urlPromise;
+			} else {
+				if (validationResult.status !== 200) {
+					throw new Error(validationResult.message);
+				}
+			}
 		} catch (error) {
 			safeLog('Error in uploadFile:', error);
 			toast.error(`Error uploading file: ${(error as any).message || 'Unknown error'}`);

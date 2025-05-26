@@ -1,5 +1,3 @@
-"use client"
-
 import { useEffect, useState } from "react"
 import { endOfWeek, isSameDay, isWithinInterval, startOfWeek } from "date-fns"
 

@@ -361,7 +361,8 @@
 				<Form.Control>
 					{#snippet children({ props })}
 						<Form.Label class="flex items-center gap-1"
-							><Ticket class="size-4" /> Event Name</Form.Label
+							><Ticket class="size-4" /> Event Name
+							<span class="text-lg text-red-600">*</span></Form.Label
 						>
 						<Input
 							{...props}
@@ -379,7 +380,8 @@
 				<Form.Control>
 					{#snippet children({ props })}
 						<Form.Label class="flex items-center gap-1"
-							><MapPin class="size-4" />Location</Form.Label
+							><MapPin class="size-4" />Location
+							<span class="text-lg text-red-600">*</span></Form.Label
 						>
 						<Input
 							{...props}
@@ -393,7 +395,7 @@
 				<Form.FieldErrors />
 			</Form.Field>
 			<div class="mb-3 grid gap-2">
-				<p class="text-sm">Event Date</p>
+				<p class="text-sm">Event Date <span class="text-red-600 text-lg">*</span></p>
 				<div>
 					<Popover.Root>
 						<Popover.Trigger
@@ -522,8 +524,6 @@
 			</div>
 		</div>
 	</div>
-
-	<SuperDebug data={$formData} />
 
 	<Form.Button
 		disabled={!hasRequiredData($formData, ['title', 'location', 'start_date', 'end_date'])}

@@ -40,7 +40,7 @@ export async function readParticipants(file: File, event_id: string): Promise<Om
       const [last_name, first_name, middle_name, email] = row.slice(1, 5);
       return {
         first_name: first_name as string,
-        middle_name: middle_name as string,
+        middle_name: middle_name as string, 
         last_name: last_name as string,
         email: email as string,
         event_id,
