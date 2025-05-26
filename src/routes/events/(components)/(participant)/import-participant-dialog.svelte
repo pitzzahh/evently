@@ -209,10 +209,10 @@
 				<table class="text-muted-foreground table-auto text-sm">
 					<thead>
 						<tr>
-							<th class="px-4 py-2">last_name</th>
-							<th class="px-4 py-2">first_name</th>
-							<th class="px-4 py-2">middle_name</th>
-							<th class="px-4 py-2">email</th>
+							<th class="px-4 py-2">Last Name</th>
+							<th class="px-4 py-2">First Name</th>
+							<th class="px-4 py-2">Middle Name</th>
+							<th class="px-4 py-2">Email</th>
 						</tr>
 					</thead>
 					<tbody>
